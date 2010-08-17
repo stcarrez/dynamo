@@ -25,62 +25,62 @@ with Ada.Unchecked_Deallocation;
 
 package body #{model.package}.Model is
 <h:list value="#{model.tables}" var="table">
-   procedure Set_Field (Object : in out #{fn:capitalize(table.name)}'Class;
-                        Impl   : out #{fn:capitalize(table.name)}_Access;
+   procedure Set_Field (Object : in out #{fn:capitalize(table.type)}'Class;
+                        Impl   : out #{fn:capitalize(table.type)}_Access;
                         Field  : in Positive) is
    begin
       if Object.Is_Null then
-         Impl := new #{fn:capitalize(table.name)}_Impl;
+         Impl := new #{fn:capitalize(table.type)}_Impl;
          ADO.Objects.Set_Object (Object, Impl.all'Access);
       else
-         Impl := #{fn:capitalize(table.name)}_Impl (Object.Get_Object.all)'Access;
+         Impl := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
       end if;
       Impl.Modified (Field) := True;
    end Set_Field;
 
    -- ----------------------------------------
-   --  Data object: #{fn:capitalize(table.name)}
+   --  Data object: #{fn:capitalize(table.type)}
    -- ----------------------------------------
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{column.type = 'String'}">
-   procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.name)};
+   procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)};
                        #{g:indent(column.name)} Value : in String) is
    begin
       Object.Set_#{fn:capitalize(column.name)} (To_Unbounded_String (Value));
    end Set_#{fn:capitalize(column.name)};
 </h:panelGroup>
-   procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.name)};
+   procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)};
                         #{g:indent(column.name)} Value  : in #{g:adaType(column.type)}) is
-      Impl : #{fn:capitalize(table.name)}_Access;
+      Impl : #{fn:capitalize(table.type)}_Access;
    begin
       Set_Field (Object, Impl, #{column.index});
       Impl.#{fn:capitalize(column.name)} := Value;
    end Set_#{fn:capitalize(column.name)};
 <h:panelGroup rendered="#{column.type = 'String'}">
-   function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.name)})
+   function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
                  return String is
    begin
       return To_String (Object.Get_#{fn:capitalize(column.name)});
    end Get_#{fn:capitalize(column.name)};
 </h:panelGroup>
-   function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.name)})
+   function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
                   return #{g:adaType(column.type)} is
-      Impl : constant #{fn:capitalize(table.name)}_Access := #{fn:capitalize(table.name)}_Impl (Object.Get_Object.all)'Access;
+      Impl : constant #{fn:capitalize(table.type)}_Access := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
    begin
       return Impl.#{fn:capitalize(column.name)};
    end Get_#{fn:capitalize(column.name)};
 </h:list>
 
    --  Copy of the object.
-   function Copy (Object : #{fn:capitalize(table.name)}) return #{fn:capitalize(table.name)} is
-      Result : #{fn:capitalize(table.name)};
+   function Copy (Object : #{fn:capitalize(table.type)}) return #{fn:capitalize(table.type)} is
+      Result : #{fn:capitalize(table.type)};
    begin
       if not Object.Is_Null then
          declare
-            Impl : constant #{fn:capitalize(table.name)}_Access
-              := #{fn:capitalize(table.name)}_Impl (Object.Get_Object.all)'Access;
-            Copy : constant #{fn:capitalize(table.name)}_Access
-              := new #{fn:capitalize(table.name)}_Impl;
+            Impl : constant #{fn:capitalize(table.type)}_Access
+              := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
+            Copy : constant #{fn:capitalize(table.type)}_Access
+              := new #{fn:capitalize(table.type)}_Impl;
          begin
             ADO.Objects.Set_Object (Result, Copy.all'Access);
 <h:list value="#{table.members}" var="column">
@@ -96,11 +96,11 @@ package body #{model.package}.Model is
       return Result;
    end Copy;
 
-   procedure Find (Object     : in out #{fn:capitalize(table.name)};
+   procedure Find (Object     : in out #{fn:capitalize(table.type)};
                    Database   : in out ADO.Sessions.Session'Class;
                    Parameters : in ADO.Statements.Parameter_List;
                    Found      : out Boolean) is
-      Impl  : constant #{fn:capitalize(table.name)}_Access := new #{fn:capitalize(table.name)}_Impl;
+      Impl  : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
    begin
       Impl.Find (Database, Parameters, Found);
       if Found then
@@ -111,10 +111,10 @@ package body #{model.package}.Model is
       end if;
    end Find;
 
-   procedure Load (Object   : in out #{fn:capitalize(table.name)};
+   procedure Load (Object   : in out #{fn:capitalize(table.type)};
                    Database : in out ADO.Sessions.Session'Class;
                    Id       : in #{g:adaType(table.primaryKeyType)}) is
-      Impl  : constant #{fn:capitalize(table.name)}_Access := new #{fn:capitalize(table.name)}_Impl;
+      Impl  : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
       Found : Boolean;
       Params : ADO.Statements.Parameter_List;
    begin
@@ -128,12 +128,12 @@ package body #{model.package}.Model is
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Load;
 
-   procedure Save (Object   : in out #{fn:capitalize(table.name)};
+   procedure Save (Object   : in out #{fn:capitalize(table.type)};
                    Database : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
    begin
       if Impl = null then
-         Impl := new #{fn:capitalize(table.name)}_Impl;
+         Impl := new #{fn:capitalize(table.type)}_Impl;
          ADO.Objects.Set_Object (Object, Impl);
       end if;
       if not Is_Created (Impl.all) then
@@ -143,7 +143,7 @@ package body #{model.package}.Model is
       end if;
    end Save;
 
-   procedure Delete (Object   : in out #{fn:capitalize(table.name)};
+   procedure Delete (Object   : in out #{fn:capitalize(table.type)};
                      Database : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
    begin
@@ -155,18 +155,18 @@ package body #{model.package}.Model is
    --  --------------------
    --  Free the object
    --  --------------------
-   procedure Destroy (Object : access #{fn:capitalize(table.name)}_Impl) is
-      type #{fn:capitalize(table.name)}_Impl_Ptr is access all #{fn:capitalize(table.name)}_Impl;
+   procedure Destroy (Object : access #{fn:capitalize(table.type)}_Impl) is
+      type #{fn:capitalize(table.type)}_Impl_Ptr is access all #{fn:capitalize(table.type)}_Impl;
 
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-              (#{fn:capitalize(table.name)}_Impl, #{fn:capitalize(table.name)}_Impl_Ptr);
+              (#{fn:capitalize(table.type)}_Impl, #{fn:capitalize(table.type)}_Impl_Ptr);
 
-      Ptr : #{fn:capitalize(table.name)}_Impl_Ptr := #{fn:capitalize(table.name)}_Impl (Object.all)'Access;
+      Ptr : #{fn:capitalize(table.type)}_Impl_Ptr := #{fn:capitalize(table.type)}_Impl (Object.all)'Access;
    begin
       Unchecked_Free (Ptr);
    end Destroy;
 
-   procedure Find (Object     : in out #{fn:capitalize(table.name)}_Impl;
+   procedure Find (Object     : in out #{fn:capitalize(table.type)}_Impl;
                    Database   : in out ADO.Sessions.Session'Class;
                    Parameters : in ADO.Statements.Parameter_List;
                    Found      : out Boolean) is
@@ -185,7 +185,7 @@ package body #{model.package}.Model is
       end if;
    end Find;
 
-   procedure Save (Object   : in out #{fn:capitalize(table.name)}_Impl;
+   procedure Save (Object   : in out #{fn:capitalize(table.type)}_Impl;
                    Database : in out ADO.Sessions.Master_Session'Class) is
       SQL   : constant String := "UPDATE #{table.name} SET ";
       Query : Statement'Class := Database.Create_Statement (SQL);
@@ -230,49 +230,36 @@ package body #{model.package}.Model is
       end if;
    end Save;
 
-   procedure Create (Object   : in out #{fn:capitalize(table.name)}_Impl;
+   procedure Create (Object   : in out #{fn:capitalize(table.type)}_Impl;
                      Database : in out ADO.Sessions.Master_Session'Class) is
       SQL   : constant String := "INSERT INTO #{table.name} (@_MEMBER_CREATE_NAMES_@) VALUES(@_MEMBER_PARAMS_@);";
       Query : ADO.Statements.Query_Statement'Class 
                   := Database.Create_Statement (SQL);
-@@IF@@ (@_GENERATOR_@ /= "auto")
-      Result : Integer;
-@@END_IF@@
-   begin
-@@TABLE@@
-@@IF@@ (@_MEMBER_GENERATOR_@ = "allocate")
-      Database.Allocate (Name => "#{table.name}", Id => Object.#{fn:capitalize(column.name)});
-@@END_IF@@
-@@IF@@ (@_MEMBER_GENERATOR_@ /= "auto")
-@@IF@@ (@_MEMBER_SQL_MODE_@ = 0)
-      Query.Bind_Param (Position =>@_MEMBER_POSITION_@, Value => Object.#{fn:capitalize(column.name)});
-@@ELSIF@@ (@_MEMBER_SQL_MODE_@ = 1)
-      Query.Bind_Param (Position =>@_MEMBER_POSITION_@, Value => Object.#{fn:capitalize(column.name)});
-@@ELSIF@@ (@_MEMBER_SQL_MODE_@ = 2)
-      Query.Bind_Param (Position =>@_MEMBER_POSITION_@, Value => @_MAPPING_TYPE:MEMBER_TYPE_@'Pos (Object.#{fn:capitalize(column.name)}));
-@@ELSIF@@ (@_MEMBER_SQL_MODE_@ = 3)
-      Query.Bind_Param (Position =>@_MEMBER_POSITION_@, Value => Object.#{fn:capitalize(column.name)});
-@@ELSE@@
-      Query.Bind_Param (Position =>@_MEMBER_POSITION_@, Value => Object.#{fn:capitalize(column.name)});
-@@END_IF@@
-@@END_IF@@
-@@END_TABLE@@
-@@IF@@ (@_TABLE_LAZY_LOCK_@)
-      Object.@_CAPITALIZE:LAZY_LOCK_NAME_@ := 1;
-      Query.Bind_Param (Position =>@_LAZY_LOCK_POS_@, Value => Object.@_CAPITALIZE:LAZY_LOCK_NAME_@);
-@@END_IF@@
-@@IF@@ (@_GENERATOR_@ /= "auto")
+<h:panelGroup rendered="#{table.generator ne 'auto'}">
+      Result : Integer;</h:panelGroup>
+   begin<h:list value="#{table.members}" var="column">
+<h:panelGroup rendered="#{table.generator eq 'allocate' and table.primaryKeyName eq column.name}">
+      Database.Allocate (Name => "#{table.name}", Id => Object.#{fn:capitalize(column.name)});</h:panelGroup>
+<h:panelGroup rendered="#{table.generator ne 'auto' or table.primaryKeyName ne column.name}">
+      Query.Bind_Param (Position => #{column.index}, Value => Object.#{fn:capitalize(column.name)});</h:panelGroup>
+</h:list>
+<h:panelGroup rendered="#{not empty table.version}">
+      Object.#{fn:capitalize(table.version)} := 1;
+      Query.Bind_Param (Position => #{table.versionIndex}, Value => Object.#{fn:capitalize(table.version)});
+</h:panelGroup>
+<h:panelGroup rendered="#{table.generator ne 'auto'}">
       Query.Execute (Result);
       if Result /= 1 then
          raise INSERT_ERROR;
       end if;
-@@ELSE@@
-      Query.Execute (Object.@_CAPITALIZE:PRIMARY_KEY_NAME_@);
-@@END_IF@@
+</h:panelGroup>
+<h:panelGroup rendered="#{table.generator eq 'auto'}">
+      Query.Execute (Object.#{fn:capitalize(table.primaryKeyName)});
+</h:panelGroup>
       Set_Created (Object);
    end Create;
 
-   procedure Delete (Object   : in out #{fn:capitalize(table.name)}_Impl;
+   procedure Delete (Object   : in out #{fn:capitalize(table.type)}_Impl;
                      Database : in out ADO.Sessions.Master_Session'Class) is
       SQL : constant String := "DELETE FROM #{table.name} WHERE #{table.primaryKeyName} = ?";
       Query : ADO.Statements.Query_Statement'Class := Database.Create_Statement (SQL);
@@ -281,38 +268,33 @@ package body #{model.package}.Model is
       Query.Execute;
    end Delete;
 
-   function Get_Value (Item : in #{fn:capitalize(table.name)};
+   function Get_Value (Item : in #{fn:capitalize(table.type)};
                        Name : in String) return EL.Objects.Object is
-      Impl : constant access #{fn:capitalize(table.name)}_Impl := #{fn:capitalize(table.name)}_Impl (Item.Get_Object.all)'Access;
+      Impl : constant access #{fn:capitalize(table.type)}_Impl := #{fn:capitalize(table.type)}_Impl (Item.Get_Object.all)'Access;
    begin
 <h:list value="#{table.members}" var="column">
       if Name = "#{column.name}" then
-@@IF@@ (@_MEMBER_SQL_MODE_@ = 0)
-         return EL.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
-@@ELSIF@@ (@_MEMBER_SQL_MODE_@ = 1)
+<h:panelGroup rendered="#{g:isInteger(column.type) or column.type eq 'Identifier'}">
          return EL.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
-@@ELSIF@@ (@_MEMBER_SQL_MODE_@ = 2)
-         return EL.Objects.To_Object (@_MAPPING_TYPE:MEMBER_TYPE_@'Image (Impl.#{fn:capitalize(column.name)}));
-@@ELSIF@@ (@_MEMBER_SQL_MODE_@ = 3)
-         return EL.Objects.Null_Object;
-@@ELSE@@
+</h:panelGroup>
+<h:panelGroup rendered="#{not g:isInteger(column.type) and column.type ne 'Identifier'}">
          return EL.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
-@@END_IF@@
+</h:panelGroup>
       end if;
 </h:list>
       raise ADO.Databases.NOT_FOUND;
    end Get_Value;
 
-   procedure List (Object   : in out #{fn:capitalize(table.name)}_Vector;
+   procedure List (Object   : in out #{fn:capitalize(table.type)}_Vector;
                    Query    : in out ADO.Statements.Query_Statement'Class) is
    begin
       Query.Prepend ("SELECT @_MEMBER_NAMES_@ FROM #{table.name} AS o ");
       Query.Execute;
-      #{fn:capitalize(table.name)}_Vectors.Clear (Object);
+      #{fn:capitalize(table.type)}_Vectors.Clear (Object);
       while Query.Has_Elements loop
          declare
-            Item : #{fn:capitalize(table.name)};
-            Impl : constant #{fn:capitalize(table.name)}_Access := new #{fn:capitalize(table.name)}_Impl;
+            Item : #{fn:capitalize(table.type)};
+            Impl : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
          begin
             Impl.Load (Query);
             ADO.Objects.Set_Object (Item, Impl.all'Access);
@@ -325,7 +307,7 @@ package body #{model.package}.Model is
    --  ------------------------------
    --  Load the object from current iterator position
    --  ------------------------------
-   procedure Load (Object : in out #{fn:capitalize(table.name)}_Impl;
+   procedure Load (Object : in out #{fn:capitalize(table.type)}_Impl;
                    Query  : in out ADO.Statements.Query_Statement'Class) is
    begin
 <h:list value="#{table.members}" var="column">

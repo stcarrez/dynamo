@@ -1,0 +1,141 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{model.package}-model.ads">-----------------------------------------------------------------------
+--  #{model.package} -- #{model.name}
+--  Copyright (C) 2009, 2010 Stephane Carrez
+--  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+-----------------------------------------------------------------------
+
+with ADO.Databases;
+with ADO.Sessions;
+with ADO.Objects;
+with ADO.Statements;
+with Ada.Calendar;
+with Ada.Containers.Vectors;
+with Ada.Strings.Unbounded;
+
+with EL.Objects;
+package #{model.package}.Model is
+
+   use Ada.Calendar;
+   use Ada.Strings.Unbounded;
+   use ADO.Objects;
+   use ADO.Databases;
+   use ADO.Statements;
+<h:list value="#{model.tables}" var="table">
+   --  --------------------
+   --  #{table.comment}
+   --  --------------------
+   type #{fn:capitalize(table.type)} is new ADO.Objects.Object_Ref with null record;
+<h:list value="#{table.members}" var="column">
+   --  Set #{column.comment}
+   procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)};
+                  #{g:indent(column.name)} Value  : in #{column.type});
+<h:panelGroup rendered="#{column.type = 'String'}">
+   procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)};
+                  #{g:indent(column.name)} Value : in String);
+</h:panelGroup>
+   --  Get #{column.comment}
+   function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
+                 return #{column.type};
+<h:panelGroup rendered="#{column.type = 'String'}">
+   function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
+                 return String;
+</h:panelGroup>
+</h:list>
+
+   --  Copy of the object.
+   function Copy (Object : #{fn:capitalize(table.type)}) return #{fn:capitalize(table.type)};
+
+   --  Load the entity identified by 'Id'.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Load (Object   : in out #{fn:capitalize(table.type)};
+                   Database : in out ADO.Sessions.Session'Class;
+                   Id       : in #{g:adaType(table.primaryKeyType)});
+
+   --  Find and load the entity.
+   procedure Find (Object     : in out #{fn:capitalize(table.type)};
+                   Database   : in out ADO.Sessions.Session'Class;
+                   Parameters : in ADO.Statements.Parameter_List;
+                   Found      : out Boolean);
+
+   --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
+   --  and it is inserted in the table.  Otherwise, only data fields which have been changed
+   --  are updated.
+   procedure Save (Object   : in out #{fn:capitalize(table.type)};
+                   Database : in out ADO.Sessions.Master_Session'Class);
+
+   --  Delete the entity.
+   procedure Delete (Object   : in out #{fn:capitalize(table.type)};
+                     Database : in out ADO.Sessions.Master_Session'Class);
+
+   function Get_Value (Item : in #{fn:capitalize(table.type)};
+                       Name : in String) return EL.Objects.Object;
+
+   package #{fn:capitalize(table.type)}_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Natural,
+                                  Element_Type => #{fn:capitalize(table.type)},
+                                  "="          => "=");
+   subtype #{fn:capitalize(table.type)}_Vector is #{fn:capitalize(table.type)}_Vectors.Vector;
+
+   procedure List (Object   : in out #{fn:capitalize(table.type)}_Vector;
+                   Query    : in out ADO.Statements.Query_Statement'Class);
+</h:list>
+
+private
+<h:list value="#{model.tables}" var="table">
+   type #{fn:capitalize(table.type)}_Impl is
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER) with record<h:list value="#{table.members}" var="column">
+       #{fn:capitalize(column.name)} : #{g:adaType(column.type)};</h:list><h:panelGroup rendered="#{not empty table.version}">
+       #{fn:capitalize(table.version)} : #{g:adaType(table.versionType)};</h:panelGroup>
+       Modified : ADO.Objects.Modified_Map;
+   end record;
+
+   type #{fn:capitalize(table.type)}_Access is access all #{fn:capitalize(table.type)}_Impl;
+
+   overriding
+   procedure Destroy (Object : access #{fn:capitalize(table.type)}_Impl);
+
+   overriding
+   procedure Find (Object     : in out #{fn:capitalize(table.type)}_Impl;
+                   Database   : in out ADO.Sessions.Session'Class;
+                   Parameters : in ADO.Statements.Parameter_List;
+                   Found      : out Boolean);
+   
+   procedure Load (Object   : in out #{fn:capitalize(table.type)}_Impl;
+                   Query    : in out ADO.Statements.Query_Statement'Class);
+
+   overriding
+   procedure Save (Object   : in out #{fn:capitalize(table.type)}_Impl;
+                   Database : in out ADO.Sessions.Master_Session'Class);
+   
+   procedure Create (Object : in out #{fn:capitalize(table.type)}_Impl;
+                     Database : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   procedure Delete (Object   : in out #{fn:capitalize(table.type)}_Impl;
+                     Database : in out ADO.Sessions.Master_Session'Class);
+
+
+   procedure Set_Field (Object : in out #{fn:capitalize(table.type)}'Class;
+                        Impl   : out #{fn:capitalize(table.type)}_Access;
+                        Field  : in Positive);
+</h:list>
+
+end #{model.package}.Model;
+</f:view>

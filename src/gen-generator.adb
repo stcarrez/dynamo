@@ -71,6 +71,19 @@ package body Gen.Generator is
    end To_Ada_Type;
 
    --  ------------------------------
+   --  EL Function to check whether a type is an integer type
+   --  ------------------------------
+   function Is_Integer_Type (Name : EL.Objects.Object) return EL.Objects.Object is
+      Value : constant String := EL.Objects.To_String (Name);
+   begin
+      if Value = "Integer" then
+         return EL.Objects.To_Object (True);
+      else
+         return EL.Objects.To_Object (False);
+      end if;
+   end Is_Integer_Type;
+
+   --  ------------------------------
    --  EL function to indent the code
    --  ------------------------------
    function Indent (Value : EL.Objects.Object) return EL.Objects.Object is
@@ -92,6 +105,9 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "indent",
                            Namespace => URI,
                            Func      => Indent'Access);
+      Mapper.Set_Function (Name      => "isInteger",
+                           Namespace => URI,
+                           Func      => Is_Integer_Type'Access);
    end Set_Functions;
 
    --  ------------------------------

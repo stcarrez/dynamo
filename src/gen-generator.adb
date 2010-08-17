@@ -15,15 +15,15 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
+
 with Input_Sources.File;
-with DOM.Core;
 with DOM.Core.Nodes;
 with DOM.Core.Elements;
 with DOM.Core.Documents;
 with DOM.Readers;
 with Sax.Readers;
 
-with ASF.Applications.Views;
 with ASF.Components.Core;
 with ASF.Contexts.Faces;
 with ASF.Contexts.Writer.String;
@@ -34,8 +34,6 @@ with EL.Contexts.Default;
 with EL.Functions;
 with EL.Variables;
 with EL.Variables.Default;
-
-with Ada.Strings.Unbounded;
 
 with Gen.Model;
 with Gen.Model.Tables;
@@ -50,7 +48,7 @@ package body Gen.Generator is
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Generator");
 
-   Template_Dir : Unbounded_String;
+   RESULT_DIR : constant String := "generator.output.dir";
 
    function To_Ada_Type (Name : EL.Objects.Object) return EL.Objects.Object;
    function Indent (Value : EL.Objects.Object) return EL.Objects.Object;
@@ -94,6 +92,27 @@ package body Gen.Generator is
    end Indent;
 
    --  ------------------------------
+   --  EL function to indent the code
+   --  ------------------------------
+   function To_Sql_Type (Value : EL.Objects.Object) return EL.Objects.Object is
+      Name   : constant String := EL.Objects.To_String (Value);
+      Result : Unbounded_String;
+   begin
+      if Name = "Identifier" then
+         Append (Result, "BIGINT NOT NULL");
+      elsif Name = "Integer" then
+         Append (Result, "INTEGER");
+      elsif Name = "String" then
+         Append (Result, "VARCHAR(255)");
+      elsif Name = "Date" then
+         Append (Result, "DATE");
+      else
+         Append (Result, "VARCHAR(255)");
+      end if;
+      return EL.Objects.To_Object (Result);
+   end To_Sql_Type;
+
+   --  ------------------------------
    --  Register the generator EL functions
    --  ------------------------------
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class) is
@@ -108,35 +127,46 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "isInteger",
                            Namespace => URI,
                            Func      => Is_Integer_Type'Access);
+      Mapper.Set_Function (Name      => "sqlType",
+                           Namespace => URI,
+                           Func      => To_Sql_Type'Access);
    end Set_Functions;
 
    --  ------------------------------
    --  Initialize the generator
    --  ------------------------------
    procedure Initialize (H : in out Handler) is
-      Conf : Applications.Config;
-
       procedure Register_Funcs is
         new ASF.Applications.Views.Register_Functions (Set_Functions);
    begin
-      Conf.Set ("view.ignore_white_spaces", "false");
-      Conf.Set ("view.escape_unknown_tags", "false");
-      H.Initialize (Conf);
+      H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
+      H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
+      H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
+      if not H.Conf.Exists (ASF.Applications.VIEW_DIR) then
+         H.Set_Template_Directory ("templates/");
+      end if;
+      H.Initialize (H.Conf);
 
       Register_Funcs (H);
    end Initialize;
 
-   function Get_Template_Path (H    : Handler;
-                               Name : in String) return String is
-   begin
-      return To_String (Template_Dir & Name);
-   end Get_Template_Path;
-
+   --  ------------------------------
    --  Set the directory where template files are stored.
-   procedure Set_Template_Directory (Path : in String) is
+   --  ------------------------------
+   procedure Set_Template_Directory (H    : in out Handler;
+                                     Path : in String) is
    begin
-      Template_Dir := To_Unbounded_String (Path);
+      H.Conf.Set (ASF.Applications.VIEW_DIR, Path);
    end Set_Template_Directory;
+
+   --  ------------------------------
+   --  Set the directory where results files are generated.
+   --  ------------------------------
+   procedure Set_Result_Directory (H    : in out Handler;
+                                   Path : in String) is
+   begin
+      H.Conf.Set (RESULT_DIR, Path);
+   end Set_Result_Directory;
 
    --  ------------------------------
    --  Read the XML model file
@@ -168,7 +198,7 @@ package body Gen.Generator is
       H.Doc := DOM.Readers.Get_Tree (My_Tree_Reader);
       H.Root := DOM.Core.Documents.Get_Element (H.Doc);
       declare
-         Model_List : DOM.Core.Node_List :=
+         Model_List : constant DOM.Core.Node_List :=
                         DOM.Core.Elements.Get_Elements_By_Tag_Name (H.Root, "model");
       begin
          H.Model :=  DOM.Core.Nodes.Item (Model_List, 0);
@@ -206,12 +236,40 @@ package body Gen.Generator is
       Writer.Flush;
 
       declare
+         Dir    : constant String := H.Conf.Get (RESULT_DIR, "./");
          Result : constant EL.Objects.Object := View.Get_Root.Get_Attribute (Context, "file");
-         Path   : constant String := To_String (Template_Dir) & EL.Objects.To_String (Result);
+         Path   : constant String := Dir & EL.Objects.To_String (Result);
       begin
          Log.Info ("Writing result file {0}", Path);
          Util.Files.Write_File (Path => Path, Content => Writer.Get_Response);
       end;
    end Generate;
+
+
+   --  Generate all the code generation files stored in the directory
+   procedure Generate_All (H    : in out Handler;
+                           Name : in String) is
+      use Ada.Directories;
+
+      Search      : Search_Type;
+      Filter      : constant Filter_Type := (others => True);
+      Ent     : Directory_Entry_Type;
+      Dir     : constant String := H.Conf.Get (ASF.Applications.VIEW_DIR);
+      Path    : constant String := Dir & Name;
+   begin
+      if Kind (Path) /= Directory then
+         Ada.Text_IO.Put_Line ("Cannot read model directory: " & Path);
+      end if;
+
+      Start_Search (Search, Directory => Path, Pattern => "*.xhtml", Filter => Filter);
+      while More_Entries (Search) loop
+         Get_Next_Entry (Search, Ent);
+         declare
+            File_Path : constant String := Full_Name (Ent);
+         begin
+            H.Generate (File_Path);
+         end;
+      end loop;
+   end Generate_All;
 
 end Gen.Generator;

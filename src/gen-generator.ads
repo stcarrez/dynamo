@@ -44,16 +44,22 @@ package Gen.Generator is
    procedure Generate (H    : in out Handler;
                        File : in String);
 
-   --  Set the directory where template files are stored.
-   procedure Set_Template_Directory (Path : in String);
+   --  Generate all the code generation files stored in the directory
+   procedure Generate_All (H    : in out Handler;
+                           Name : in String);
 
-   --  Find the template path and return it
-   function Get_Template_Path (H    : Handler;
-                               Name : in String) return String;
+   --  Set the directory where template files are stored.
+   procedure Set_Template_Directory (H    : in out Handler;
+                                     Path : in String);
+
+   --  Set the directory where results files are generated.
+   procedure Set_Result_Directory (H    : in out Handler;
+                                   Path : in String);
 
 private
 
    type Handler is new ASF.Applications.Views.View_Handler with record
+      Conf  : ASF.Applications.Config;
       Model : DOM.Core.Node;
       Doc   : DOM.Core.Document;
       Root  : DOM.Core.Element;

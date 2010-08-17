@@ -19,7 +19,6 @@
 with EL.Beans;
 with EL.Objects;
 with Gen.Model;
-with DOM.Core.Nodes;
 
 generic
    type T is new Gen.Model.Definition with private;

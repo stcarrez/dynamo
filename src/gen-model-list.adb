@@ -15,7 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with DOM.Core.Nodes;
 package body Gen.Model.List is
 
    --  ------------------------------
@@ -73,6 +73,8 @@ package body Gen.Model.List is
    --  ------------------------------
    function Get_Value (From : List_Definition;
                        Name : String) return EL.Objects.Object is
+      pragma Unreferenced (Name);
+      pragma Unreferenced (From);
    begin
       return EL.Objects.Null_Object;
    end Get_Value;

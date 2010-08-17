@@ -133,6 +133,19 @@ package body Gen.Model.Tables is
       end if;
    end Get_Primary_Key_Type;
 
+   --  ------------------------------
+   --  Get the primary key type for this table
+   --  ------------------------------
+   function Get_Primary_Key_Name (From : Table_Definition) return String is
+      Node : constant DOM.Core.Node := From.Get_Primary_Key;
+   begin
+      if Node /= null then
+         return DOM.Core.Elements.Get_Attribute (Node, "name");
+      else
+         return "id";
+      end if;
+   end Get_Primary_Key_Name;
+
    VERSION_NAME : constant String := "version";
 
    --  ------------------------------
@@ -188,6 +201,9 @@ package body Gen.Model.Tables is
 
       elsif Name = "primaryKeyType" then
          return EL.Objects.To_Object (From.Get_Primary_Key_Type);
+
+      elsif Name = "primaryKeyName" then
+         return EL.Objects.To_Object (From.Get_Primary_Key_Name);
 
       elsif Name = "version" then
          return EL.Objects.To_Object (From.Get_Version_Column_Name);

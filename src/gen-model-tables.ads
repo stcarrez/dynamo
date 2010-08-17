@@ -60,6 +60,9 @@ package Gen.Model.Tables is
    --  Get the primary key type for this table
    function Get_Primary_Key_Type (From : Table_Definition) return String;
 
+   --  Get the primary key type for this table
+   function Get_Primary_Key_Name (From : Table_Definition) return String;
+
    --  Get the DOM node <b>version</b> if there is one.
    function Get_Version_Column (From : Table_Definition) return DOM.Core.Node;
 

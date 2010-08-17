@@ -65,6 +65,8 @@ package body Gen.Model.Tables is
    procedure Set_Node (O     : in out Table_Definition;
                        Node  : in DOM.Core.Node;
                        Index : in Natural) is
+      pragma Unreferenced (Index);
+
       Nodes : constant DOM.Core.Node_List
         := DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, "column");
    begin
@@ -153,7 +155,7 @@ package body Gen.Model.Tables is
    --  ------------------------------
    function Get_Version_Column (From : Table_Definition) return DOM.Core.Node is
       --  Check if there is a version column to generate.
-      Nodes : DOM.Core.Node_List
+      Nodes : constant DOM.Core.Node_List
         := DOM.Core.Elements.Get_Elements_By_Tag_Name (From.Node, VERSION_NAME);
    begin
       if DOM.Core.Nodes.Length (Nodes) > 0 then

@@ -1,0 +1,17 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{model.package}-sql.sql">
+<h:list value="#{model.tables}" var="table">
+/* #{table.comment} */
+create table #{table.name} (
+<h:list value="#{table.members}" var="column">
+  /* #{column.comment} */
+  `#{column.name}` #{g:sqlType(column.type)},
+</h:list>
+  primary key (`#{table.primaryKeyName}`)
+);
+</h:list>
+</f:view>

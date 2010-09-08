@@ -15,31 +15,21 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with DOM.Core.Nodes;
 package body Gen.Model.List is
 
    --  ------------------------------
-   --  Set the DOM nodes associated with the list
+   --  Get the first item of the list
    --  ------------------------------
-   procedure Set_List (Def   : in out List_Definition;
-                       Nodes : in DOM.Core.Node_List) is
+   function First (Def : List_Definition) return Cursor is
    begin
-      Def.Nodes := Nodes;
-   end Set_List;
-
-   --  ------------------------------
-   --  Get the DOM nodes representing the children
-   --  ------------------------------
-   function Get_List (Def : List_Definition) return DOM.Core.Node_List is
-   begin
-      return Def.Nodes;
-   end Get_List;
+      return Def.Nodes.First;
+   end First;
 
    --  ------------------------------
    --  Get the number of elements in the list.
    --  ------------------------------
    function Get_Count (From : List_Definition) return Natural is
-      Count : constant Natural := DOM.Core.Nodes.Length (From.Nodes);
+      Count : constant Natural := Natural (From.Nodes.Length);
    begin
       return Count;
    end Get_Count;
@@ -52,8 +42,12 @@ package body Gen.Model.List is
    begin
       From.Row := Index;
       if Index > 0 then
-         From.Value.Set_Node (DOM.Core.Nodes.Item (From.Nodes, Index - 1), Index);
-         From.Value_Bean := EL.Objects.To_Object (From.Value'Unchecked_Access);
+         declare
+            Current : constant T_Access := From.Nodes.Element (Index - 1);
+            Bean    : constant EL.Beans.Readonly_Bean_Access := Current.all'Access;
+         begin
+            From.Value_Bean := EL.Objects.To_Object (Bean);
+         end;
       else
          From.Value_Bean := EL.Objects.Null_Object;
       end if;
@@ -78,5 +72,14 @@ package body Gen.Model.List is
    begin
       return EL.Objects.Null_Object;
    end Get_Value;
+
+   --  ------------------------------
+   --  Append the item in the list
+   --  ------------------------------
+   procedure Append (Def  : in out List_Definition;
+                     Item : in T_Access) is
+   begin
+      Def.Nodes.Append (Item);
+   end Append;
 
 end Gen.Model.List;

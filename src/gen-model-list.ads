@@ -19,19 +19,34 @@
 with EL.Beans;
 with EL.Objects;
 with Gen.Model;
+with Ada.Containers.Vectors;
 
 generic
    type T is new Gen.Model.Definition with private;
+   type T_Access is access all T'Class;
 package Gen.Model.List is
+
+   package Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Natural,
+                                  Element_Type => T_Access,
+                                  "="          => "=");
+
+   subtype Cursor is Vectors.Cursor;
+   subtype Vector is Vectors.Vector;
+
+   function Has_Element (Position : Cursor) return Boolean
+     renames Vectors.Has_Element;
+
+   function Element (Position : Cursor) return T_Access
+     renames Vectors.Element;
+
+   procedure Next (Position : in out Cursor)
+     renames Vectors.Next;
 
    type List_Definition is limited new EL.Beans.List_Bean with private;
 
-   --  Set the DOM nodes associated with the list
-   procedure Set_List (Def   : in out List_Definition;
-                       Nodes : in DOM.Core.Node_List);
-
-   --  Get the DOM nodes representing the children
-   function Get_List (Def : List_Definition) return DOM.Core.Node_List;
+   --  Get the first item of the list
+   function First (Def : List_Definition) return Cursor;
 
    --  Get the number of elements in the list.
    function Get_Count (From : List_Definition) return Natural;
@@ -47,12 +62,15 @@ package Gen.Model.List is
    --  If the name cannot be found, the method should return the Null object.
    function Get_Value (From : List_Definition;
                        Name : String) return EL.Objects.Object;
-private
 
+   --  Append the item in the list
+   procedure Append (Def  : in out List_Definition;
+                     Item : in T_Access);
+
+private
    type List_Definition is limited new EL.Beans.List_Bean with record
+      Nodes      : Vectors.Vector;
       Row        : Natural;
-      Nodes      : DOM.Core.Node_List;
-      Value      : aliased T;
       Value_Bean : EL.Objects.Object;
    end record;
 

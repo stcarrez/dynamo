@@ -3,8 +3,8 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="#{model.package}-model.ads">-----------------------------------------------------------------------
---  #{model.package} -- #{model.name}
+        file="#{model.package}.ads">-----------------------------------------------------------------------
+--  #{model.name} -- #{model.name}
 --  Copyright (C) 2009, 2010 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -30,7 +30,7 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
 with EL.Objects;
-package #{model.package}.Model is
+package #{model.name} is
 
    use Ada.Calendar;
    use Ada.Strings.Unbounded;
@@ -41,21 +41,23 @@ package #{model.package}.Model is
    --  --------------------
    --  #{table.comment}
    --  --------------------
-   type #{fn:capitalize(table.type)} is new ADO.Objects.Object_Ref with null record;
+   type #{table.type} is new ADO.Objects.Object_Ref with null record;
 <h:list value="#{table.members}" var="column">
+<h:panelGroup rendered="#{not column.isVersion}">
    --  Set #{column.comment}
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)};
                   #{g:indent(column.name)} Value  : in #{column.type});
 <h:panelGroup rendered="#{column.type = 'String'}">
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)};
-                  #{g:indent(column.name)} Value : in String);
+                  #{g:indent(column.name)} Value : in Unbounded_String);
 </h:panelGroup>
    --  Get #{column.comment}
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
                  return #{column.type};
 <h:panelGroup rendered="#{column.type = 'String'}">
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
-                 return String;
+                 return Unbounded_String;
+</h:panelGroup>
 </h:panelGroup>
 </h:list>
 
@@ -101,8 +103,7 @@ private
 <h:list value="#{model.tables}" var="table">
    type #{fn:capitalize(table.type)}_Impl is
       new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER) with record<h:list value="#{table.members}" var="column">
-       #{fn:capitalize(column.name)} : #{g:adaType(column.type)};</h:list><h:panelGroup rendered="#{not empty table.version}">
-       #{fn:capitalize(table.version)} : #{g:adaType(table.versionType)};</h:panelGroup>
+       #{fn:capitalize(column.name)} : #{g:adaType(column.type)};</h:list>
        Modified : ADO.Objects.Modified_Map;
    end record;
 
@@ -137,5 +138,5 @@ private
                         Field  : in Positive);
 </h:list>
 
-end #{model.package}.Model;
+end #{model.name};
 </f:view>

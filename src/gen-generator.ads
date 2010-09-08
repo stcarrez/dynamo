@@ -21,8 +21,10 @@ with Ada.Text_IO;
 with Ada.Strings.Unbounded;
 
 with ASF.Applications.Views;
-
+with Gen.Model.Tables;
 package Gen.Generator is
+
+   type Iteration_Mode is (ITERATION_PACKAGE, ITERATION_TABLE);
 
    type Package_Type is (PACKAGE_MODEL, PACKAGE_FORMS);
 
@@ -41,11 +43,18 @@ package Gen.Generator is
                          File : in String);
 
    --  Generate the code using the template file
-   procedure Generate (H    : in out Handler;
-                       File : in String);
+   procedure Generate (H     : in out Handler;
+                       Mode  : in Iteration_Mode;
+                       File  : in String);
+
+   --  Generate the code using the template file
+   procedure Generate (H     : in out Handler;
+                       File  : in String;
+                       Model : in Gen.Model.Definition_Access);
 
    --  Generate all the code generation files stored in the directory
    procedure Generate_All (H    : in out Handler;
+                           Mode : in Iteration_Mode;
                            Name : in String);
 
    --  Set the directory where template files are stored.
@@ -56,11 +65,15 @@ package Gen.Generator is
    procedure Set_Result_Directory (H    : in out Handler;
                                    Path : in String);
 
+   --  Register a model mapping
+   procedure Register_Mapping (H    : in out Handler;
+                               Node : in DOM.Core.Node);
+
 private
 
    type Handler is new ASF.Applications.Views.View_Handler with record
       Conf  : ASF.Applications.Config;
-      Model : DOM.Core.Node;
+      Model : aliased Gen.Model.Tables.Model_Definition;
       Doc   : DOM.Core.Document;
       Root  : DOM.Core.Element;
    end record;

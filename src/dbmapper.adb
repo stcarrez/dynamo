@@ -90,8 +90,8 @@ begin
       end if;
       Gen.Generator.Initialize (Generator);
       Gen.Generator.Read_Model (Generator, Model_File);
-      Gen.Generator.Generate_All (Generator, "model");
---        Gen.Generator.Generate (Generator, "model/package-body");
+      Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
+      Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
    end;
 
 exception

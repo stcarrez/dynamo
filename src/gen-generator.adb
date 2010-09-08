@@ -18,8 +18,6 @@
 with Ada.Directories;
 
 with Input_Sources.File;
-with DOM.Core.Nodes;
-with DOM.Core.Elements;
 with DOM.Core.Documents;
 with DOM.Readers;
 with Sax.Readers;
@@ -36,7 +34,7 @@ with EL.Variables;
 with EL.Variables.Default;
 
 with Gen.Model;
-with Gen.Model.Tables;
+with Gen.Utils;
 
 with Util.Files;
 with Util.Log.Loggers;
@@ -61,7 +59,7 @@ package body Gen.Generator is
    begin
       if Value = "String" then
          return EL.Objects.To_Object (String '("Unbounded_String"));
-      elsif Value = "Integer" then
+      elsif Value = "Integer" or Value = "int" then
          return EL.Objects.To_Object (String '("Integer"));
       else
          return Name;
@@ -74,7 +72,7 @@ package body Gen.Generator is
    function Is_Integer_Type (Name : EL.Objects.Object) return EL.Objects.Object is
       Value : constant String := EL.Objects.To_String (Name);
    begin
-      if Value = "Integer" then
+      if Value = "Integer" or Value = "int" then
          return EL.Objects.To_Object (True);
       else
          return EL.Objects.To_Object (False);
@@ -169,6 +167,15 @@ package body Gen.Generator is
    end Set_Result_Directory;
 
    --  ------------------------------
+   --  Register a model mapping
+   --  ------------------------------
+   procedure Register_Mapping (H    : in out Handler;
+                               Node : in DOM.Core.Node) is
+   begin
+      H.Model.Initialize (Node);
+   end Register_Mapping;
+
+   --  ------------------------------
    --  Read the XML model file
    --  ------------------------------
    procedure Read_Model (H    : in out Handler;
@@ -176,6 +183,10 @@ package body Gen.Generator is
       Read           : Input_Sources.File.File_Input;
       My_Tree_Reader : DOM.Readers.Tree_Reader;
       Name_Start     : Natural;
+
+      procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Handler,
+                                                        Process => Register_Mapping);
+
    begin
       Log.Info ("Reading model file {0}", File);
 
@@ -197,32 +208,27 @@ package body Gen.Generator is
 
       H.Doc := DOM.Readers.Get_Tree (My_Tree_Reader);
       H.Root := DOM.Core.Documents.Get_Element (H.Doc);
-      declare
-         Model_List : constant DOM.Core.Node_List :=
-                        DOM.Core.Elements.Get_Elements_By_Tag_Name (H.Root, "model");
-      begin
-         H.Model :=  DOM.Core.Nodes.Item (Model_List, 0);
-      end;
+
+      Iterate (H, H.Root, "hibernate-mapping");
    end Read_Model;
 
    --  ------------------------------
    --  Generate the code using the template file
    --  ------------------------------
-   procedure Generate (H    : in out Handler;
-                       File : in String) is
+   procedure Generate (H     : in out Handler;
+                       File  : in String;
+                       Model : in Gen.Model.Definition_Access) is
       Writer    : aliased Contexts.Writer.String.String_Writer;
       Context   : aliased Contexts.Faces.Faces_Context;
       View      : Components.Core.UIViewRoot;
       ELContext : aliased EL.Contexts.Default.Default_Context;
       Variables : aliased EL.Variables.Default.Default_Variable_Mapper;
       Resolver  : aliased EL.Contexts.Default.Default_ELResolver;
-
-      Model     : aliased Gen.Model.Tables.Model_Definition;
    begin
       Log.Info ("Generating {0}", File);
 
-      Model.Initialize (H.Model);
-      Resolver.Register (To_Unbounded_String ("model"), Model'Unchecked_Access);
+      --  Model.Initialize (H.Model);
+      Resolver.Register (To_Unbounded_String ("model"), Model.all'Unchecked_Access);
       Context.Set_Response_Writer (Writer'Unchecked_Access);
       Context.Set_ELContext (ELContext'Unchecked_Access);
       ELContext.Set_Variable_Mapper (Variables'Unchecked_Access);
@@ -236,23 +242,47 @@ package body Gen.Generator is
       Writer.Flush;
 
       declare
-         Dir    : constant String := H.Conf.Get (RESULT_DIR, "./");
-         Result : constant EL.Objects.Object := View.Get_Root.Get_Attribute (Context, "file");
-         Path   : constant String := Dir & EL.Objects.To_String (Result);
+         Dir     : constant String := H.Conf.Get (RESULT_DIR, "./");
+         Result  : constant EL.Objects.Object := View.Get_Root.Get_Attribute (Context, "file");
+         Path    : constant String := Dir & EL.Objects.To_String (Result);
       begin
          Log.Info ("Writing result file {0}", Path);
          Util.Files.Write_File (Path => Path, Content => Writer.Get_Response);
       end;
    end Generate;
 
+   --  ------------------------------
+   --  Generate the code using the template file
+   --  ------------------------------
+   procedure Generate (H     : in out Handler;
+                       Mode  : in Iteration_Mode;
+                       File  : in String) is
+   begin
+      case Mode is
+         when ITERATION_PACKAGE =>
+            declare
+               Pos : Gen.Model.Tables.Package_Cursor := H.Model.First;
+            begin
+               while Gen.Model.Tables.Has_Element (Pos) loop
+                  H.Generate (File, Gen.Model.Tables.Element (Pos).all'Access);
+                  Gen.Model.Tables.Next (Pos);
+               end loop;
+            end;
+
+         when ITERATION_TABLE =>
+            H.Generate (File, H.Model'Unchecked_Access);
+
+      end case;
+   end Generate;
 
    --  Generate all the code generation files stored in the directory
    procedure Generate_All (H    : in out Handler;
+                           Mode : in Iteration_Mode;
                            Name : in String) is
       use Ada.Directories;
 
-      Search      : Search_Type;
-      Filter      : constant Filter_Type := (others => True);
+      Search  : Search_Type;
+      Filter  : constant Filter_Type := (others => True);
       Ent     : Directory_Entry_Type;
       Dir     : constant String := H.Conf.Get (ASF.Applications.VIEW_DIR);
       Path    : constant String := Dir & Name;
@@ -267,7 +297,7 @@ package body Gen.Generator is
          declare
             File_Path : constant String := Full_Name (Ent);
          begin
-            H.Generate (File_Path);
+            H.Generate (Mode, File_Path);
          end;
       end loop;
    end Generate_All;

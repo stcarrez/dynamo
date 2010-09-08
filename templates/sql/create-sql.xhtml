@@ -6,12 +6,12 @@
         file="#{model.package}-sql.sql">
 <h:list value="#{model.tables}" var="table">
 /* #{table.comment} */
-create table #{table.name} (
+create table #{table.table} (
 <h:list value="#{table.members}" var="column">
   /* #{column.comment} */
-  `#{column.name}` #{g:sqlType(column.type)},
+  `#{column.name}` #{column.sqlType},
 </h:list>
-  primary key (`#{table.primaryKeyName}`)
+  primary key (`#{table.id.name}`)
 );
 </h:list>
 </f:view>

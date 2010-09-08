@@ -18,7 +18,6 @@
 with DOM.Core.Nodes;
 with DOM.Core.Elements;
 with DOM.Core.Character_Datas;
-with Ada.Strings.Unbounded;
 package body Gen.Model is
 
    use Ada.Strings.Unbounded;
@@ -79,12 +78,83 @@ package body Gen.Model is
    --  ------------------------------
    function Get_Value (From : Definition;
                        Name : String) return EL.Objects.Object is
+      use type DOM.Core.Node;
    begin
-      if Name = "comment" then
+      if From.Node = null then
+         return EL.Objects.Null_Object;
+      elsif Name = "comment" then
          return EL.Objects.To_Object (From.Get_Comment);
       else
          return Get_Attribute (From.Node, Name);
       end if;
    end Get_Value;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   --  ------------------------------
+   function Get_Attribute (From : Definition;
+                           Name : String) return String is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (From.Node, Name);
+   begin
+      return V;
+   end Get_Attribute;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   --  ------------------------------
+   function Get_Attribute (From : Definition;
+                           Name : String) return Ada.Strings.Unbounded.Unbounded_String is
+   begin
+      return Ada.Strings.Unbounded.To_Unbounded_String (From.Get_Attribute (Name));
+   end Get_Attribute;
+
+   --  ------------------------------
+   --  Get a boolean attribute
+   --  ------------------------------
+   function Get_Attribute (Node    : DOM.Core.Node;
+                           Name    : String;
+                           Default : Boolean := False) return Boolean is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
+   begin
+      if V = "yes" or V = "true" then
+         return True;
+      elsif V = "no" or V = "false" then
+         return False;
+      else
+         return Default;
+      end if;
+   end Get_Attribute;
+
+   --  ------------------------------
+   --  Get a string attribute
+   --  ------------------------------
+   function Get_Attribute (Node    : DOM.Core.Node;
+                           Name    : String;
+                           Default : String := "") return Ada.Strings.Unbounded.Unbounded_String is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
+   begin
+      if V = "" then
+         return To_Unbounded_String (Default);
+      else
+         return To_Unbounded_String (V);
+      end if;
+   end Get_Attribute;
+
+   --  ------------------------------
+   --  Get the first DOM child from the given entity tag
+   --  ------------------------------
+   function Get_Child (Node : DOM.Core.Node;
+                       Name : String) return DOM.Core.Node is
+      Nodes : constant DOM.Core.Node_List :=
+        DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
+   begin
+      if DOM.Core.Nodes.Length (Nodes) = 0 then
+         return null;
+      else
+         return DOM.Core.Nodes.Item (Nodes, 0);
+      end if;
+   end Get_Child;
 
 end Gen.Model;

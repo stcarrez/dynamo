@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Finalization;
+with Ada.Strings.Unbounded;
 
 with EL.Beans;
 with EL.Objects;
@@ -33,6 +34,7 @@ package Gen.Model is
    --  ------------------------------
    type Definition is new Ada.Finalization.Limited_Controlled
      and EL.Beans.Readonly_Bean with private;
+   type Definition_Access is access all Definition'Class;
 
    --  Set the DOM node associated with the definition object
    procedure Set_Node (Def   : in out Definition;
@@ -44,8 +46,32 @@ package Gen.Model is
    function Get_Value (From : Definition;
                        Name : String) return EL.Objects.Object;
 
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   function Get_Attribute (From : Definition;
+                           Name : String) return String;
+
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   function Get_Attribute (From : Definition;
+                           Name : String) return Ada.Strings.Unbounded.Unbounded_String;
+
    --  Get the comment associated with the definition.
    function Get_Comment (Def : Definition) return String;
+
+   --  Get a boolean attribute
+   function Get_Attribute (Node    : DOM.Core.Node;
+                           Name    : String;
+                           Default : Boolean := False) return Boolean;
+
+   --  Get a string attribute
+   function Get_Attribute (Node    : DOM.Core.Node;
+                           Name    : String;
+                           Default : String := "") return Ada.Strings.Unbounded.Unbounded_String;
+
+   --  Get the first DOM child from the given entity tag
+   function Get_Child (Node : DOM.Core.Node;
+                       Name : String) return DOM.Core.Node;
 
 private
 

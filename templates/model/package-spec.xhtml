@@ -26,6 +26,8 @@ with ADO.Sessions;
 with ADO.Objects;
 with ADO.Statements;
 with ADO.SQL;
+with ADO.Schemas;
+
 with Ada.Calendar;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
@@ -72,7 +74,7 @@ package #{model.name} is
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out #{fn:capitalize(table.type)};
                    Session : in out ADO.Sessions.Session'Class;
-                   Id      : in #{g:adaType(table.primaryKeyType)});
+                   Id      : in #{g:adaType(table.id.type)});
 
    --  Find and load the entity.
    procedure Find (Object  : in out #{fn:capitalize(table.type)};
@@ -115,13 +117,13 @@ private
      (Count => #{table.members.size},
       Table => #{fn:toUpperCase(table.type)}_NAME'Access,
       Members => (<h:list value="#{table.members}" var="column">
-         #{fn:toUpperCase(column.name)}_NAME'Access
+         #{fn:toUpperCase(column.name)}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
       </h:list>)
      );
 
    type #{fn:capitalize(table.type)}_Impl is
       new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
-                                     Of_Class => #{fn:toUpperCase(table.type)'Access)
+                                     Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access)
    with record<h:list value="#{table.members}" var="column">
        #{fn:capitalize(column.name)} : #{g:adaType(column.type)};</h:list>
    end record;
@@ -138,8 +140,7 @@ private
                    Found   : out Boolean);
    
    procedure Load (Object  : in out #{fn:capitalize(table.type)}_Impl;
-                   Session : in out ADO.Sessions.Session'Class;
-                   Query   : in ADO.SQL.Query'Class);
+                   Stmt   : in out ADO.Statements.Query_Statement'Class);
 
    overriding
    procedure Save (Object  : in out #{fn:capitalize(table.type)}_Impl;

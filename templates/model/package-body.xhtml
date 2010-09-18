@@ -56,7 +56,7 @@ package body #{model.name} is
                    #{g:indent(column.name)} Value  : in #{g:adaType(column.type)}) is
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
-      Set_Field (Object, Impl, #{column.index});
+      Set_Field (Object, Impl, #{column.index + 1});
       Impl.#{fn:capitalize(column.name)} := Value;
    end Set_#{fn:capitalize(column.name)};
 <h:panelGroup rendered="#{column.type = 'String'}">
@@ -172,7 +172,7 @@ package body #{model.name} is
                    Found   : out Boolean) is
       SQL : constant String := "SELECT @_MEMBER_NAMES_@ FROM #{table.name} AS o ";
       Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (#{fn:toUpperCase(table.type)}_NAME'Access);
+          := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
       Stmt.Set_Parameters (Query);
       Stmt.Execute;
@@ -187,14 +187,14 @@ package body #{model.name} is
 
    procedure Save (Object  : in out #{fn:capitalize(table.type)}_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Update_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_NAME);
+      Stmt : ADO.Statements.Update_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{not column.isVersion}">
-      if Object.Is_Modified (#{column.index}) then
+      if Object.Is_Modified (#{column.index + 1}) then
          Stmt.Save_Field (Name  => "#{column.name}",
                           Value => Object.#{fn:capitalize(column.name)});
-         Object.Clear_Modified (#{column.index});
+         Object.Clear_Modified (#{column.index + 1});
       end if;
 </h:panelGroup>
 </h:list>
@@ -214,7 +214,7 @@ package body #{model.name} is
          declare
             Result : Integer;
          begin
-            Query.Execute (Result);
+            Stmt.Execute (Result);
             if Result /= 1 then
                if Result = 0 then
                   raise LAZY_LOCK;
@@ -229,7 +229,7 @@ package body #{model.name} is
    procedure Create (Object  : in out #{fn:capitalize(table.type)}_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (#{fn:toUpperCase(table.type)}_NAME'Access);
+                  := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
 <h:panelGroup rendered="#{table.generator ne 'auto'}">
       Result : Integer;</h:panelGroup>
    begin<h:list value="#{table.members}" var="column">
@@ -256,7 +256,7 @@ package body #{model.name} is
 
    procedure Delete (Object  : in out #{fn:capitalize(table.type)}_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Delete_Statement := Database.Create_Statement (#{fn:toUpperCase(table.type)}_NAME'Access);
+      Stmt : ADO.Statements.Delete_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
       Stmt.Set_Filter (Filter => "#{table.id.name} = ?");
       Stmt.Add_Param (Value => Object.#{fn:capitalize(table.id.name)});
@@ -284,20 +284,20 @@ package body #{model.name} is
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class) is
+      Stmt : ADO.Statements.Query_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
-      Query.Prepend ("SELECT @_MEMBER_NAMES_@ FROM #{table.name} AS o ");
-      Query.Execute;
+      Stmt.Execute;
       #{fn:capitalize(table.type)}_Vectors.Clear (Object);
-      while Query.Has_Elements loop
+      while Stmt.Has_Elements loop
          declare
             Item : #{fn:capitalize(table.type)};
             Impl : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
          begin
-            Impl.Load (Query);
+            Impl.Load (Stmt);
             ADO.Objects.Set_Object (Item, Impl.all'Access);
             Object.Append (Item);
          end;
-         Query.Next;
+         Stmt.Next;
       end loop;
    end List;
 
@@ -305,12 +305,12 @@ package body #{model.name} is
    --  Load the object from current iterator position
    --  ------------------------------
    procedure Load (Object : in out #{fn:capitalize(table.type)}_Impl;
-                   Query  : in out ADO.Statements.Query_Statement'Class) is
+                   Stmt   : in out ADO.Statements.Query_Statement'Class) is
    begin
 <h:list value="#{table.members}" var="column">
-      Object.#{fn:capitalize(column.name)} := Query.Get_#{fn:capitalize(g:adaType(column.type))} (#{column.index});</h:list>
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column.type))} (#{column.index});</h:list>
 <h:panelGroup rendered="#{not empty table.version}">
-      Object.#{fn:capitalize(table.version)} := Query.Get_#{fn:capitalize(table.versionType)} (#{table.versionIndex});</h:panelGroup>
+      Object.#{fn:capitalize(table.version.name)} := Stmt.Get_#{fn:capitalize(g:adaType(table.version.type))} (#{table.version.index});</h:panelGroup>
       Set_Created (Object);
    end Load;
 </h:list>

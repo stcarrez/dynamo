@@ -29,14 +29,17 @@ package body #{model.name} is
                         Impl   : out #{fn:capitalize(table.type)}_Access;
                         Field  : in Positive) is
    begin
-      if Object.Is_Null then
-         Impl := new #{fn:capitalize(table.type)}_Impl;
-         ADO.Objects.Set_Object (Object, Impl.all'Access);
-      else
-         Impl := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
-      end if;
-      Impl.Modified (Field) := True;
+      Object.Set_Field (Field);
+      Impl := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
    end Set_Field;
+
+   --  Internal method to allocate the Object_Record instance
+   procedure Allocate (Object : in out #{fn:capitalize(table.type)}) is
+      Impl : #{fn:capitalize(table.type)}_Access;
+   begin
+      Impl := new #{fn:capitalize(table.type)}_Impl;
+      ADO.Objects.Set_Object (Object, Impl.all'Access);
+   end Allocate;
 
    -- ----------------------------------------
    --  Data object: #{fn:capitalize(table.type)}
@@ -93,13 +96,13 @@ package body #{model.name} is
       return Result;
    end Copy;
 
-   procedure Find (Object     : in out #{fn:capitalize(table.type)};
-                   Database   : in out ADO.Sessions.Session'Class;
-                   Parameters : in ADO.Statements.Parameter_List;
-                   Found      : out Boolean) is
+   procedure Find (Object  : in out #{fn:capitalize(table.type)};
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
       Impl  : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
    begin
-      Impl.Find (Database, Parameters, Found);
+      Impl.Find (Session, Query, Found);
       if Found then
          ADO.Objects.Set_Object (Object, Impl.all'Access);
       else
@@ -108,16 +111,16 @@ package body #{model.name} is
       end if;
    end Find;
 
-   procedure Load (Object   : in out #{fn:capitalize(table.type)};
-                   Database : in out ADO.Sessions.Session'Class;
-                   Id       : in #{g:adaType(table.id.type)}) is
+   procedure Load (Object  : in out #{fn:capitalize(table.type)};
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in #{g:adaType(table.id.type)}) is
       Impl  : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
       Found : Boolean;
-      Params : ADO.Statements.Parameter_List;
+      Query : ADO.SQL.Query;
    begin
-      Params.Bind_Param (Position => 1, Value => Id);
-      Params.Set_Filter ("#{table.id.name} = ?");
-      Impl.Find (Database, Params, Found);
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("#{table.id.name} = ?");
+      Impl.Find (Session, Query, Found);
       if not Found then
          Destroy (Impl);
          raise ADO.Databases.NOT_FOUND;
@@ -125,8 +128,8 @@ package body #{model.name} is
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Load;
 
-   procedure Save (Object   : in out #{fn:capitalize(table.type)};
-                   Database : in out ADO.Sessions.Master_Session'Class) is
+   procedure Save (Object  : in out #{fn:capitalize(table.type)};
+                   Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
    begin
       if Impl = null then
@@ -134,18 +137,18 @@ package body #{model.name} is
          ADO.Objects.Set_Object (Object, Impl);
       end if;
       if not Is_Created (Impl.all) then
-         Impl.Create (Database);
+         Impl.Create (Session);
       else
-         Impl.Save (Database);
+         Impl.Save (Session);
       end if;
    end Save;
 
-   procedure Delete (Object   : in out #{fn:capitalize(table.type)};
-                     Database : in out ADO.Sessions.Master_Session'Class) is
+   procedure Delete (Object  : in out #{fn:capitalize(table.type)};
+                     Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : constant ADO.Objects.Object_Record_Access := Object.Get_Object;
    begin
       if Impl /= null then
-         Impl.Delete (Database);
+         Impl.Delete (Session);
       end if;
    end Delete;
 
@@ -163,56 +166,50 @@ package body #{model.name} is
       Unchecked_Free (Ptr);
    end Destroy;
 
-   procedure Find (Object     : in out #{fn:capitalize(table.type)}_Impl;
-                   Database   : in out ADO.Sessions.Session'Class;
-                   Parameters : in ADO.Statements.Parameter_List;
-                   Found      : out Boolean) is
+   procedure Find (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean) is
       SQL : constant String := "SELECT @_MEMBER_NAMES_@ FROM #{table.name} AS o ";
-      Query : Query_Statement'Class
-          := Database.Create_Statement (SQL);
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (#{fn:toUpperCase(table.type)}_NAME'Access);
    begin
-      Query.Set_Parameters (Parameters);
-      Query.Execute;
-      if Query.Has_Elements then
-         Object.Load (Query);
-         Query.Next;
-         Found := not Query.Has_Elements;
+      Stmt.Set_Parameters (Query);
+      Stmt.Execute;
+      if Stmt.Has_Elements then
+         Object.Load (Stmt);
+         Stmt.Next;
+         Found := not Stmt.Has_Elements;
       else
          Found := False;
       end if;
    end Find;
 
-   procedure Save (Object   : in out #{fn:capitalize(table.type)}_Impl;
-                   Database : in out ADO.Sessions.Master_Session'Class) is
-      SQL   : constant String := "UPDATE #{table.name} SET ";
-      Query : Statement'Class := Database.Create_Statement (SQL);
-      Pos   : Natural := 0;
+   procedure Save (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Update_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_NAME);
    begin
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{not column.isVersion}">
-      if Object.Modified (#{column.index}) then
-         Pos := Pos + 1;
-         if Pos > 1 then
-            Append (Query => Query, SQL => ",");
-         end if;
-         Append (Query => Query, SQL => "#{column.name} = ?");
-         Query.Bind_Param (Position => Pos, Value => Object.#{fn:capitalize(column.name)});
-         Object.Modified (#{column.index}) := False;
+      if Object.Is_Modified (#{column.index}) then
+         Stmt.Save_Field (Name  => "#{column.name}",
+                          Value => Object.#{fn:capitalize(column.name)});
+         Object.Clear_Modified (#{column.index});
       end if;
 </h:panelGroup>
 </h:list>
-      if Pos > 0 then
+      if Stmt.Has_Save_Fields then
 <h:panelGroup rendered="#{not empty table.version}">
          Object.#{fn:capitalize(table.version.name)} := Object.#{fn:capitalize(table.version.name)} + 1;
-         Query.Append (SQL => ", #{table.version.name} = ?");
-         Query.Bind_Param (Position => Pos + 1, Value => Object.#{fn:capitalize(table.version.name)});
-         Query.Append (SQL => " where #{table.id.name} = ? and #{table.version.name} = ?");
-         Query.Bind_Param (Position => Pos + 2, Value => Object.#{fn:capitalize(table.id.name)});
-         Query.Bind_Param (Position => Pos + 3, Value => Object.#{fn:capitalize(table.version.name)} - 1);
+         Stmt.Save_Field (Name  => "#{table.version.name}",
+                          Value => Object.#{fn:capitalize(table.version.name)});
+         Stmt.Set_Filter (Filter => "#{table.id.name} = ? and #{table.version.name} = ?");
+         Stmt.Add_Param (Value => Object.#{fn:capitalize(table.id.name)});
+         Stmt.Add_Param (Value => Object.#{fn:capitalize(table.version.name)} - 1);
 </h:panelGroup>
 <h:panelGroup rendered="#{empty table.version}">
-         Query.Append (SQL => " where #{table.id.name} = ?");
-         Query.Bind_Param (Position => Pos + 1, Value => Object.#{fn:capitalize(table.id.name)});
+         Stmt.Set_Filter (Filter => "#{table.id.name} = ?");
+         Stmt.Add_Param (Value => Object.#{fn:capitalize(table.id.name)});
 </h:panelGroup>
          declare
             Result : Integer;
@@ -229,22 +226,21 @@ package body #{model.name} is
       end if;
    end Save;
 
-   procedure Create (Object   : in out #{fn:capitalize(table.type)}_Impl;
-                     Database : in out ADO.Sessions.Master_Session'Class) is
-      SQL   : constant String := "INSERT INTO #{table.name} (@_MEMBER_CREATE_NAMES_@) VALUES(@_MEMBER_PARAMS_@);";
-      Query : ADO.Statements.Query_Statement'Class 
-                  := Database.Create_Statement (SQL);
+   procedure Create (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Query : ADO.Statements.Insert_Statement
+                  := Session.Create_Statement (#{fn:toUpperCase(table.type)}_NAME'Access);
 <h:panelGroup rendered="#{table.generator ne 'auto'}">
       Result : Integer;</h:panelGroup>
    begin<h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{table.generator eq 'allocate' and table.id.name eq column.name}">
-      Database.Allocate (Name => "#{table.name}", Id => Object.#{fn:capitalize(column.name)});</h:panelGroup>
+      Session.Allocate (Name => "#{table.name}", Id => Object.#{fn:capitalize(column.name)});</h:panelGroup>
 <h:panelGroup rendered="#{table.generator ne 'auto' or table.id.name ne column.name}">
-      Query.Bind_Param (Position => #{column.index}, Value => Object.#{fn:capitalize(column.name)});</h:panelGroup>
+      Query.Save_Field (Name => "#{column.name}", Value => Object.#{fn:capitalize(column.name)});</h:panelGroup>
 </h:list>
 <h:panelGroup rendered="#{not empty table.version}">
       Object.#{fn:capitalize(table.version.name)} := 1;
-      Query.Bind_Param (Position => #{table.version.index}, Value => Object.#{fn:capitalize(table.version.name)});
+      Query.Save_Field (Name => "#{table.version.name}", Value => Object.#{fn:capitalize(table.version.name)});
 </h:panelGroup>
 <h:panelGroup rendered="#{table.generator ne 'auto'}">
       Query.Execute (Result);
@@ -258,13 +254,13 @@ package body #{model.name} is
       Set_Created (Object);
    end Create;
 
-   procedure Delete (Object   : in out #{fn:capitalize(table.type)}_Impl;
-                     Database : in out ADO.Sessions.Master_Session'Class) is
-      SQL : constant String := "DELETE FROM #{table.name} WHERE #{table.id.name} = ?";
-      Query : ADO.Statements.Query_Statement'Class := Database.Create_Statement (SQL);
+   procedure Delete (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class) is
+      Stmt : ADO.Statements.Delete_Statement := Database.Create_Statement (#{fn:toUpperCase(table.type)}_NAME'Access);
    begin
-      Query.Bind_Param (Position => 1, Value => Object.#{fn:capitalize(table.id.name)});
-      Query.Execute;
+      Stmt.Set_Filter (Filter => "#{table.id.name} = ?");
+      Stmt.Add_Param (Value => Object.#{fn:capitalize(table.id.name)});
+      Stmt.Execute;
    end Delete;
 
    function Get_Value (Item : in #{fn:capitalize(table.type)};
@@ -285,8 +281,9 @@ package body #{model.name} is
       raise ADO.Databases.NOT_FOUND;
    end Get_Value;
 
-   procedure List (Object   : in out #{fn:capitalize(table.type)}_Vector;
-                   Query    : in out ADO.Statements.Query_Statement'Class) is
+   procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class) is
    begin
       Query.Prepend ("SELECT @_MEMBER_NAMES_@ FROM #{table.name} AS o ");
       Query.Execute;

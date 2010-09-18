@@ -25,6 +25,7 @@ with ADO.Databases;
 with ADO.Sessions;
 with ADO.Objects;
 with ADO.Statements;
+with ADO.SQL;
 with Ada.Calendar;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
@@ -61,30 +62,33 @@ package #{model.name} is
 </h:panelGroup>
 </h:list>
 
+   --  Internal method to allocate the Object_Record instance
+   procedure Allocate (Object : in out #{fn:capitalize(table.type)});
+
    --  Copy of the object.
    function Copy (Object : #{fn:capitalize(table.type)}) return #{fn:capitalize(table.type)};
 
    --  Load the entity identified by 'Id'.
    --  Raises the NOT_FOUND exception if it does not exist.
-   procedure Load (Object   : in out #{fn:capitalize(table.type)};
-                   Database : in out ADO.Sessions.Session'Class;
-                   Id       : in #{g:adaType(table.primaryKeyType)});
+   procedure Load (Object  : in out #{fn:capitalize(table.type)};
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in #{g:adaType(table.primaryKeyType)});
 
    --  Find and load the entity.
-   procedure Find (Object     : in out #{fn:capitalize(table.type)};
-                   Database   : in out ADO.Sessions.Session'Class;
-                   Parameters : in ADO.Statements.Parameter_List;
-                   Found      : out Boolean);
+   procedure Find (Object  : in out #{fn:capitalize(table.type)};
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
 
    --  Save the entity.  If the entity does not have an identifier, an identifier is allocated
    --  and it is inserted in the table.  Otherwise, only data fields which have been changed
    --  are updated.
-   procedure Save (Object   : in out #{fn:capitalize(table.type)};
-                   Database : in out ADO.Sessions.Master_Session'Class);
+   procedure Save (Object  : in out #{fn:capitalize(table.type)};
+                   Session : in out ADO.Sessions.Master_Session'Class);
 
    --  Delete the entity.
-   procedure Delete (Object   : in out #{fn:capitalize(table.type)};
-                     Database : in out ADO.Sessions.Master_Session'Class);
+   procedure Delete (Object  : in out #{fn:capitalize(table.type)};
+                     Session : in out ADO.Sessions.Master_Session'Class);
 
    function Get_Value (Item : in #{fn:capitalize(table.type)};
                        Name : in String) return EL.Objects.Object;
@@ -95,16 +99,31 @@ package #{model.name} is
                                   "="          => "=");
    subtype #{fn:capitalize(table.type)}_Vector is #{fn:capitalize(table.type)}_Vectors.Vector;
 
-   procedure List (Object   : in out #{fn:capitalize(table.type)}_Vector;
-                   Query    : in out ADO.Statements.Query_Statement'Class);
+   procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
 </h:list>
 
 private
 <h:list value="#{model.tables}" var="table">
+   #{fn:toUpperCase(table.type)}_NAME : aliased constant String := "#{table.table}";
+   <h:list value="#{table.members}" var="column">
+   #{fn:toUpperCase(column.name)}_NAME : aliased constant String := "#{column.name}";
+   </h:list>
+
+   #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count => #{table.members.size},
+      Table => #{fn:toUpperCase(table.type)}_NAME'Access,
+      Members => (<h:list value="#{table.members}" var="column">
+         #{fn:toUpperCase(column.name)}_NAME'Access
+      </h:list>)
+     );
+
    type #{fn:capitalize(table.type)}_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER) with record<h:list value="#{table.members}" var="column">
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+                                     Of_Class => #{fn:toUpperCase(table.type)'Access)
+   with record<h:list value="#{table.members}" var="column">
        #{fn:capitalize(column.name)} : #{g:adaType(column.type)};</h:list>
-       Modified : ADO.Objects.Modified_Map;
    end record;
 
    type #{fn:capitalize(table.type)}_Access is access all #{fn:capitalize(table.type)}_Impl;
@@ -113,24 +132,25 @@ private
    procedure Destroy (Object : access #{fn:capitalize(table.type)}_Impl);
 
    overriding
-   procedure Find (Object     : in out #{fn:capitalize(table.type)}_Impl;
-                   Database   : in out ADO.Sessions.Session'Class;
-                   Parameters : in ADO.Statements.Parameter_List;
-                   Found      : out Boolean);
+   procedure Find (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
    
-   procedure Load (Object   : in out #{fn:capitalize(table.type)}_Impl;
-                   Query    : in out ADO.Statements.Query_Statement'Class);
+   procedure Load (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class);
 
    overriding
-   procedure Save (Object   : in out #{fn:capitalize(table.type)}_Impl;
-                   Database : in out ADO.Sessions.Master_Session'Class);
+   procedure Save (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class);
    
-   procedure Create (Object : in out #{fn:capitalize(table.type)}_Impl;
-                     Database : in out ADO.Sessions.Master_Session'Class);
+   procedure Create (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
 
    overriding
-   procedure Delete (Object   : in out #{fn:capitalize(table.type)}_Impl;
-                     Database : in out ADO.Sessions.Master_Session'Class);
+   procedure Delete (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
 
 
    procedure Set_Field (Object : in out #{fn:capitalize(table.type)}'Class;

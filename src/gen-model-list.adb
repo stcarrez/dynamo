@@ -67,9 +67,10 @@ package body Gen.Model.List is
    --  ------------------------------
    function Get_Value (From : List_Definition;
                        Name : String) return EL.Objects.Object is
-      pragma Unreferenced (Name);
-      pragma Unreferenced (From);
    begin
+      if Name = "size" then
+         return EL.Objects.To_Object (From.Get_Count);
+      end if;
       return EL.Objects.Null_Object;
    end Get_Value;
 

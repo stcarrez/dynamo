@@ -70,6 +70,10 @@ package body Gen.Model.List is
    begin
       if Name = "size" then
          return EL.Objects.To_Object (From.Get_Count);
+
+      elsif Name = "rowIndex" then
+         return EL.Objects.To_Object (From.Row);
+
       end if;
       return EL.Objects.Null_Object;
    end Get_Value;

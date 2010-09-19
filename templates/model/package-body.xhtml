@@ -270,10 +270,10 @@ package body #{model.name} is
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{not column.isVersion}">
       if Name = "#{column.name}" then
-<h:panelGroup rendered="#{g:isInteger(column.type) or column.type eq 'Identifier'}">
+<h:panelGroup rendered="#{g:isInteger(column.type) or column.type eq 'ADO.Identifier'}">
          return EL.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
 </h:panelGroup>
-<h:panelGroup rendered="#{not g:isInteger(column.type) and column.type ne 'Identifier'}">
+<h:panelGroup rendered="#{not g:isInteger(column.type) and column.type ne 'ADO.Identifier'}">
          return EL.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
 </h:panelGroup>
       end if;
@@ -308,9 +308,15 @@ package body #{model.name} is
                    Stmt   : in out ADO.Statements.Query_Statement'Class) is
    begin
 <h:list value="#{table.members}" var="column">
-      Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column.type))} (#{column.index});</h:list>
+<h:panelGroup rendered="#{column.type eq 'ADO.Identifier'}">
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
+</h:panelGroup>
+<h:panelGroup rendered="#{not column.type eq 'ADO.Identifier'}">
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column.type))} (#{column.index});
+</h:panelGroup></h:list>
 <h:panelGroup rendered="#{not empty table.version}">
-      Object.#{fn:capitalize(table.version.name)} := Stmt.Get_#{fn:capitalize(g:adaType(table.version.type))} (#{table.version.index});</h:panelGroup>
+      Object.#{fn:capitalize(table.version.name)} := Stmt.Get_#{fn:capitalize(g:adaType(table.version.type))} (#{table.version.index});
+</h:panelGroup>
       Set_Created (Object);
    end Load;
 </h:list>

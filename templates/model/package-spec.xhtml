@@ -21,7 +21,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with ADO.Databases;
 with ADO.Sessions;
 with ADO.Objects;
 with ADO.Statements;
@@ -110,14 +109,14 @@ private
 <h:list value="#{model.tables}" var="table">
    #{fn:toUpperCase(table.type)}_NAME : aliased constant String := "#{table.table}";
    <h:list value="#{table.members}" var="column">
-   #{fn:toUpperCase(column.name)}_NAME : aliased constant String := "#{column.name}";
+   COL_#{column.index}_#{model.tables.rowIndex}_NAME : aliased constant String := "#{column.name}";
    </h:list>
 
    #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping :=
      (Count => #{table.members.size},
       Table => #{fn:toUpperCase(table.type)}_NAME'Access,
       Members => (<h:list value="#{table.members}" var="column">
-         #{fn:toUpperCase(column.name)}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
+         COL_#{column.index}_#{model.tables.rowIndex}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
       </h:list>)
      );
 

@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.IO_Exceptions;
 
 with Input_Sources.File;
 with DOM.Core.Documents;
@@ -176,6 +177,28 @@ package body Gen.Generator is
    end Register_Mapping;
 
    --  ------------------------------
+   --  Get the exit status
+   --  Returns 0 if the generation was successful
+   --  Returns 1 if there was a generation error
+   --  ------------------------------
+   function Get_Status (H : in Handler) return Ada.Command_Line.Exit_Status is
+   begin
+      return H.Status;
+   end Get_Status;
+
+   --  ------------------------------
+   --  Report an error and set the exit status accordingly
+   --  ------------------------------
+   procedure Error (H : in out Handler;
+                    Message : in String;
+                    Arg1    : in String := "";
+                    Arg2    : in String := "") is
+   begin
+      Log.Error (Message, Arg1, Arg2);
+      H.Status := 1;
+   end Error;
+
+   --  ------------------------------
    --  Read the XML model file
    --  ------------------------------
    procedure Read_Model (H    : in out Handler;
@@ -210,6 +233,11 @@ package body Gen.Generator is
       H.Root := DOM.Core.Documents.Get_Element (H.Doc);
 
       Iterate (H, H.Root, "hibernate-mapping");
+
+   exception
+      when Ada.IO_Exceptions.Name_Error =>
+         H.Error ("Model file {0} does not exist", File);
+
    end Read_Model;
 
    --  ------------------------------
@@ -249,6 +277,7 @@ package body Gen.Generator is
          Log.Info ("Writing result file {0}", Path);
          Util.Files.Write_File (Path => Path, Content => Writer.Get_Response);
       end;
+
    end Generate;
 
    --  ------------------------------
@@ -300,6 +329,10 @@ package body Gen.Generator is
             H.Generate (Mode, File_Path);
          end;
       end loop;
+
+   exception
+      when Ada.IO_Exceptions.Name_Error =>
+         H.Error ("Template directory {0} does not exist", Path);
    end Generate_All;
 
 end Gen.Generator;

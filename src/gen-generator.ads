@@ -18,6 +18,7 @@
 with DOM.Core;
 
 with Ada.Text_IO;
+with Ada.Command_Line;
 with Ada.Strings.Unbounded;
 
 with ASF.Applications.Views;
@@ -37,6 +38,12 @@ package Gen.Generator is
 
    --  Initialize the generator
    procedure Initialize (H : in out Handler);
+
+   --  Report an error and set the exit status accordingly
+   procedure Error (H : in out Handler;
+                    Message : in String;
+                    Arg1    : in String := "";
+                    Arg2    : in String := "");
 
    --  Read the XML model file
    procedure Read_Model (H    : in out Handler;
@@ -69,13 +76,19 @@ package Gen.Generator is
    procedure Register_Mapping (H    : in out Handler;
                                Node : in DOM.Core.Node);
 
+   --  Get the exit status
+   --  Returns 0 if the generation was successful
+   --  Returns 1 if there was a generation error
+   function Get_Status (H : in Handler) return Ada.Command_Line.Exit_Status;
+
 private
 
    type Handler is new ASF.Applications.Views.View_Handler with record
-      Conf  : ASF.Applications.Config;
-      Model : aliased Gen.Model.Tables.Model_Definition;
-      Doc   : DOM.Core.Document;
-      Root  : DOM.Core.Element;
+      Conf   : ASF.Applications.Config;
+      Model  : aliased Gen.Model.Tables.Model_Definition;
+      Doc    : DOM.Core.Document;
+      Root   : DOM.Core.Element;
+      Status : Ada.Command_Line.Exit_Status := 0;
    end record;
 
 end Gen.Generator;

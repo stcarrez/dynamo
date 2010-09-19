@@ -92,6 +92,8 @@ begin
       Gen.Generator.Read_Model (Generator, Model_File);
       Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
       Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
+
+      Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
    end;
 
 exception

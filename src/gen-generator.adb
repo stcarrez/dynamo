@@ -140,6 +140,7 @@ package body Gen.Generator is
    begin
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
+      H.Conf.Set (ASF.Applications.VIEW_IGNORE_EMPTY_LINES, "true");
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
       if not H.Conf.Exists (ASF.Applications.VIEW_DIR) then
          H.Set_Template_Directory ("templates/");

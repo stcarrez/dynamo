@@ -22,6 +22,7 @@
 -----------------------------------------------------------------------
 
 with Ada.Unchecked_Deallocation;
+with ADO.Databases;
 
 package body #{model.name} is
 <h:list value="#{model.tables}" var="table">
@@ -311,7 +312,7 @@ package body #{model.name} is
 <h:panelGroup rendered="#{column.type eq 'ADO.Identifier'}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
 </h:panelGroup>
-<h:panelGroup rendered="#{not column.type eq 'ADO.Identifier'}">
+<h:panelGroup rendered="#{column.type ne 'ADO.Identifier'}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column.type))} (#{column.index});
 </h:panelGroup></h:list>
 <h:panelGroup rendered="#{not empty table.version}">

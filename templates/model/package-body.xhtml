@@ -171,7 +171,6 @@ package body #{model.name} is
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class;
                    Found   : out Boolean) is
-      SQL : constant String := "SELECT @_MEMBER_NAMES_@ FROM #{table.name} AS o ";
       Stmt : ADO.Statements.Query_Statement
           := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
@@ -193,7 +192,7 @@ package body #{model.name} is
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{not column.isVersion}">
       if Object.Is_Modified (#{column.index + 1}) then
-         Stmt.Save_Field (Name  => "#{column.name}",
+         Stmt.Save_Field (Name  => "#{column.sqlName}",
                           Value => Object.#{fn:capitalize(column.name)});
          Object.Clear_Modified (#{column.index + 1});
       end if;
@@ -287,6 +286,7 @@ package body #{model.name} is
                    Query   : in ADO.SQL.Query'Class) is
       Stmt : ADO.Statements.Query_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
+      Stmt.Set_Parameters (Query);
       Stmt.Execute;
       #{fn:capitalize(table.type)}_Vectors.Clear (Object);
       while Stmt.Has_Elements loop

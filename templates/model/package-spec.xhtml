@@ -108,7 +108,7 @@ private
 <h:list value="#{model.tables}" var="table">
    #{fn:toUpperCase(table.type)}_NAME : aliased constant String := "#{table.table}";
    <h:list value="#{table.members}" var="column">
-   COL_#{column.index}_#{model.tables.rowIndex}_NAME : aliased constant String := "#{column.name}";
+   COL_#{column.index}_#{model.tables.rowIndex}_NAME : aliased constant String := "#{column.sqlName}";
    </h:list>
 
    #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping :=

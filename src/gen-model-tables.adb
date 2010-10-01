@@ -59,6 +59,17 @@ package body Gen.Model.Tables is
       elsif Name = "isPrimaryKey" then
          return EL.Objects.To_Object (From.Is_Key);
 
+      elsif Name = "generator" then
+         declare
+            Node : DOM.Core.Node := Get_Child (From.Node, "generator");
+         begin
+            if Node /= null then
+               return Get_Attribute (Node, "class");
+            else
+               return EL.Objects.Null_Object;
+            end if;
+         end;
+
       else
          return Definition (From).Get_Value (Name);
       end if;

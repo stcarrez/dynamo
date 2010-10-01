@@ -52,14 +52,14 @@ package #{model.name} is
    --  Set #{column.comment}
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)};
                   #{g:indent(column.name)} Value  : in #{column.type});
-<h:panelGroup rendered="#{column.type = 'String'}">
+<h:panelGroup rendered="#{column.type == 'String'}">
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)};
                   #{g:indent(column.name)} Value : in Unbounded_String);
 </h:panelGroup>
    --  Get #{column.comment}
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
                  return #{column.type};
-<h:panelGroup rendered="#{column.type = 'String'}">
+<h:panelGroup rendered="#{column.type == 'String'}">
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
                  return Unbounded_String;
 </h:panelGroup>

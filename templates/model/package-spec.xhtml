@@ -66,6 +66,9 @@ package #{model.name} is
 </h:panelGroup>
 </h:list>
 
+   --  Table definition
+   #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping;
+
    --  Internal method to allocate the Object_Record instance
    procedure Allocate (Object : in out #{fn:capitalize(table.type)});
 

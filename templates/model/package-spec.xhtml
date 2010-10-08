@@ -127,10 +127,14 @@ private
      );
 
    type #{fn:capitalize(table.type)}_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.KEY_INTEGER,
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.#{g:keyEnum(table.id.type)},
                                      Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access)
-   with record<h:list value="#{table.members}" var="column">
-       #{fn:capitalize(column.name)} : #{g:adaType(column.type)};</h:list>
+   with record
+<h:list value="#{table.members}" var="column">
+<h:panelGroup rendered="#{column.name ne table.id.name}">
+       #{fn:capitalize(column.name)} : #{g:adaType(column.type)};
+</h:panelGroup>
+</h:list>
    end record;
 
    type #{fn:capitalize(table.type)}_Access is access all #{fn:capitalize(table.type)}_Impl;

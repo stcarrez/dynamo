@@ -52,6 +52,9 @@ package body Gen.Generator is
    function To_Ada_Type (Name : EL.Objects.Object) return EL.Objects.Object;
    function Indent (Value : EL.Objects.Object) return EL.Objects.Object;
 
+   --  EL Function to translate a model type to the key enum value
+   function To_Key_Enum (Name : EL.Objects.Object) return EL.Objects.Object;
+
    --  ------------------------------
    --  EL Function to translate a model type to an Ada implementation type
    --  ------------------------------
@@ -79,6 +82,22 @@ package body Gen.Generator is
          return EL.Objects.To_Object (False);
       end if;
    end Is_Integer_Type;
+
+   KEY_INTEGER_LABEL : constant String := "KEY_INTEGER";
+   KEY_STRING_LABEL  : constant String := "KEY_STRING";
+
+   --  ------------------------------
+   --  EL Function to translate a model type to the key enum value
+   --  ------------------------------
+   function To_Key_Enum (Name : EL.Objects.Object) return EL.Objects.Object is
+      Value : constant String := EL.Objects.To_String (Name);
+   begin
+      if Value = "Integer" or Value = "int" or Value = "Identifier" then
+         return EL.Objects.To_Object (KEY_INTEGER_LABEL);
+      else
+         return EL.Objects.To_Object (KEY_STRING_LABEL);
+      end if;
+   end To_Key_Enum;
 
    --  ------------------------------
    --  EL function to indent the code
@@ -129,6 +148,9 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "sqlType",
                            Namespace => URI,
                            Func      => To_Sql_Type'Access);
+      Mapper.Set_Function (Name      => "keyEnum",
+                           Namespace => URI,
+                           Func      => To_Key_Enum'Access);
    end Set_Functions;
 
    --  ------------------------------

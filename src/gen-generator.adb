@@ -23,8 +23,11 @@ with DOM.Core.Documents;
 with DOM.Readers;
 with Sax.Readers;
 
+with ASF.Requests.Mockup;
+with ASF.Responses.Mockup;
 with ASF.Components.Core;
 with ASF.Contexts.Faces;
+with ASF.Applications.Views;
 with ASF.Contexts.Writer.String;
 
 with EL.Objects;
@@ -92,7 +95,8 @@ package body Gen.Generator is
    function To_Key_Enum (Name : EL.Objects.Object) return EL.Objects.Object is
       Value : constant String := EL.Objects.To_String (Name);
    begin
-      if Value = "Integer" or Value = "int" or Value = "Identifier" then
+      if Value = "Integer" or Value = "int" or Value = "Identifier"
+         or Value = "ADO.Identifier" then
          return EL.Objects.To_Object (KEY_INTEGER_LABEL);
       else
          return EL.Objects.To_Object (KEY_STRING_LABEL);
@@ -158,7 +162,7 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Initialize (H : in out Handler) is
       procedure Register_Funcs is
-        new ASF.Applications.Views.Register_Functions (Set_Functions);
+        new ASF.Applications.Main.Register_Functions (Set_Functions);
    begin
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
@@ -269,36 +273,39 @@ package body Gen.Generator is
    procedure Generate (H     : in out Handler;
                        File  : in String;
                        Model : in Gen.Model.Definition_Access) is
-      Writer    : aliased Contexts.Writer.String.String_Writer;
       Context   : aliased Contexts.Faces.Faces_Context;
       View      : Components.Core.UIViewRoot;
-      ELContext : aliased EL.Contexts.Default.Default_Context;
-      Variables : aliased EL.Variables.Default.Default_Variable_Mapper;
       Resolver  : aliased EL.Contexts.Default.Default_ELResolver;
+      Req       : ASF.Requests.Mockup.Request;
+      Reply     : ASF.Responses.Mockup.Response;
    begin
       Log.Info ("Generating {0}", File);
 
       --  Model.Initialize (H.Model);
       Resolver.Register (To_Unbounded_String ("model"), Model.all'Unchecked_Access);
-      Context.Set_Response_Writer (Writer'Unchecked_Access);
-      Context.Set_ELContext (ELContext'Unchecked_Access);
-      ELContext.Set_Variable_Mapper (Variables'Unchecked_Access);
-      ELContext.Set_Resolver (Resolver'Unchecked_Access);
-      Writer.Initialize ("text/plain", "UTF-8", 8192);
+--        Context.Set_Response_Writer (Writer'Unchecked_Access);
+--        Context.Set_ELContext (ELContext'Unchecked_Access);
+--        ELContext.Set_Variable_Mapper (Variables'Unchecked_Access);
+--        ELContext.Set_Resolver (Resolver'Unchecked_Access);
+--        Writer.Initialize ("text/plain", "UTF-8", 8192);
 
-      H.Set_Context (Context'Unchecked_Access);
-      H.Restore_View (File, Context, View);
+--        H.Set_Context (Context'Unchecked_Access);
+--        H.Restore_View (File, Context, View);
 
-      H.Render_View (Context, View);
-      Writer.Flush;
+      H.Dispatch (Page     => File,
+                  Request  => Req,
+                  Response => Reply);
 
       declare
          Dir     : constant String := H.Conf.Get (RESULT_DIR, "./");
          Result  : constant EL.Objects.Object := View.Get_Root.Get_Attribute (Context, "file");
          Path    : constant String := Dir & EL.Objects.To_String (Result);
+         Content : Unbounded_String;
       begin
          Log.Info ("Writing result file {0}", Path);
-         Util.Files.Write_File (Path => Path, Content => Writer.Get_Response);
+
+         Reply.Read_Content (Content);
+         Util.Files.Write_File (Path => Path, Content => Content);
       end;
 
    end Generate;

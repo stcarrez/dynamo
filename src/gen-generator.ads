@@ -21,7 +21,7 @@ with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Strings.Unbounded;
 
-with ASF.Applications.Views;
+with ASF.Applications.Main;
 with Gen.Model.Tables;
 package Gen.Generator is
 
@@ -83,7 +83,7 @@ package Gen.Generator is
 
 private
 
-   type Handler is new ASF.Applications.Views.View_Handler with record
+   type Handler is new ASF.Applications.Main.Application with record
       Conf   : ASF.Applications.Config;
       Model  : aliased Gen.Model.Tables.Model_Definition;
       Doc    : DOM.Core.Document;

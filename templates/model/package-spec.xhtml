@@ -66,6 +66,8 @@ package #{model.name} is
 </h:panelGroup>
 </h:list>
 
+   function "=" (Left, Right : #{table.type}'Class) return Boolean;
+
    --  Table definition
    #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping;
 

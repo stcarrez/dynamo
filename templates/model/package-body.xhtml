@@ -30,6 +30,11 @@ with ADO.Databases;
 
 package body #{model.name} is
 <h:list value="#{model.tables}" var="table">
+   function "=" (Left, Right : #{table.type}'Class) return Boolean is
+   begin
+      return ADO.Objects.Object_Ref'Class (Left) = ADO.Objects.Object_Ref'Class (Right);
+   end "=";
+
    procedure Set_Field (Object : in out #{fn:capitalize(table.type)}'Class;
                         Impl   : out #{fn:capitalize(table.type)}_Access;
                         Field  : in Positive) is

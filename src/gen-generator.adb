@@ -28,14 +28,11 @@ with ASF.Responses.Mockup;
 with ASF.Components.Core;
 with ASF.Contexts.Faces;
 with ASF.Applications.Views;
-with ASF.Contexts.Writer.String;
 
 with EL.Objects;
 with EL.Contexts;
 with EL.Contexts.Default;
 with EL.Functions;
-with EL.Variables;
-with EL.Variables.Default;
 
 with Gen.Model;
 with Gen.Utils;
@@ -278,19 +275,12 @@ package body Gen.Generator is
       Resolver  : aliased EL.Contexts.Default.Default_ELResolver;
       Req       : ASF.Requests.Mockup.Request;
       Reply     : ASF.Responses.Mockup.Response;
+      Bean      : constant EL.Objects.Object := EL.Objects.To_Object (Model.all'Unchecked_Access);
    begin
       Log.Info ("Generating {0}", File);
 
-      --  Model.Initialize (H.Model);
+      Req.Set_Attribute (Name => "model", Value => Bean);
       Resolver.Register (To_Unbounded_String ("model"), Model.all'Unchecked_Access);
---        Context.Set_Response_Writer (Writer'Unchecked_Access);
---        Context.Set_ELContext (ELContext'Unchecked_Access);
---        ELContext.Set_Variable_Mapper (Variables'Unchecked_Access);
---        ELContext.Set_Resolver (Resolver'Unchecked_Access);
---        Writer.Initialize ("text/plain", "UTF-8", 8192);
-
---        H.Set_Context (Context'Unchecked_Access);
---        H.Restore_View (File, Context, View);
 
       H.Dispatch (Page     => File,
                   Request  => Req,

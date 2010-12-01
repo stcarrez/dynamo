@@ -25,13 +25,10 @@ with Sax.Readers;
 
 with ASF.Requests.Mockup;
 with ASF.Responses.Mockup;
-with ASF.Components.Core;
-with ASF.Contexts.Faces;
-with ASF.Applications.Views;
+with ASF.Components.Root;
+with ASF.Components.Base;
 
-with EL.Objects;
-with EL.Contexts;
-with EL.Contexts.Default;
+with EL.Beans;
 with EL.Functions;
 
 with Gen.Model;
@@ -160,6 +157,8 @@ package body Gen.Generator is
    procedure Initialize (H : in out Handler) is
       procedure Register_Funcs is
         new ASF.Applications.Main.Register_Functions (Set_Functions);
+
+      Factory : ASF.Applications.Main.Application_Factory;
    begin
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
@@ -168,9 +167,10 @@ package body Gen.Generator is
       if not H.Conf.Exists (ASF.Applications.VIEW_DIR) then
          H.Set_Template_Directory ("templates/");
       end if;
-      H.Initialize (H.Conf);
+      H.Initialize (H.Conf, Factory);
 
       Register_Funcs (H);
+      H.File := new EL.Objects.Object;
    end Initialize;
 
    --  ------------------------------
@@ -265,22 +265,42 @@ package body Gen.Generator is
    end Read_Model;
 
    --  ------------------------------
+   --  Execute the lifecycle phases on the faces context.
+   --  ------------------------------
+   overriding
+   procedure Execute_Lifecycle (App     : in Handler;
+                                Context : in out ASF.Contexts.Faces.Faces_Context'Class) is
+   begin
+      ASF.Applications.Main.Application (App).Execute_Lifecycle (Context);
+
+      declare
+         View    : constant Components.Root.UIViewRoot := Context.Get_View_Root;
+         Root    : constant access Components.Base.UIComponent'Class := Components.Root.Get_Root (View);
+      begin
+         App.File.all := Root.Get_Attribute (Context, "file");
+      end;
+   end Execute_Lifecycle;
+
+   --  ------------------------------
    --  Generate the code using the template file
    --  ------------------------------
    procedure Generate (H     : in out Handler;
                        File  : in String;
                        Model : in Gen.Model.Definition_Access) is
-      Context   : aliased Contexts.Faces.Faces_Context;
-      View      : Components.Core.UIViewRoot;
-      Resolver  : aliased EL.Contexts.Default.Default_ELResolver;
-      Req       : ASF.Requests.Mockup.Request;
-      Reply     : ASF.Responses.Mockup.Response;
-      Bean      : constant EL.Objects.Object := EL.Objects.To_Object (Model.all'Unchecked_Access);
+      --  Context   : aliased Contexts.Faces.Faces_Context;
+      --  View      : Components.Core.UIViewRoot;
+      --  Resolver  : aliased EL.Contexts.Default.Default_ELResolver;
+      Req   : ASF.Requests.Mockup.Request;
+      Reply : ASF.Responses.Mockup.Response;
+      Ptr   : EL.Beans.Readonly_Bean_Access := Model.all'Unchecked_Access;
+      Bean  : constant EL.Objects.Object := EL.Objects.To_Object (Ptr);
    begin
       Log.Info ("Generating {0}", File);
 
+      Req.Set_Path_Info (File);
+      Req.Set_Method ("GET");
       Req.Set_Attribute (Name => "model", Value => Bean);
-      Resolver.Register (To_Unbounded_String ("model"), Model.all'Unchecked_Access);
+      --  Resolver.Register (To_Unbounded_String ("model"), Model.all'Unchecked_Access);
 
       H.Dispatch (Page     => File,
                   Request  => Req,
@@ -288,8 +308,7 @@ package body Gen.Generator is
 
       declare
          Dir     : constant String := H.Conf.Get (RESULT_DIR, "./");
-         Result  : constant EL.Objects.Object := View.Get_Root.Get_Attribute (Context, "file");
-         Path    : constant String := Dir & EL.Objects.To_String (Result);
+         Path    : constant String := Dir & EL.Objects.To_String (H.File.all);
          Content : Unbounded_String;
       begin
          Log.Info ("Writing result file {0}", Path);
@@ -297,7 +316,6 @@ package body Gen.Generator is
          Reply.Read_Content (Content);
          Util.Files.Write_File (Path => Path, Content => Content);
       end;
-
    end Generate;
 
    --  ------------------------------

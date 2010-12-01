@@ -21,7 +21,9 @@ with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Strings.Unbounded;
 
+with EL.Objects;
 with ASF.Applications.Main;
+with ASF.Contexts.Faces;
 with Gen.Model.Tables;
 package Gen.Generator is
 
@@ -89,6 +91,12 @@ private
       Doc    : DOM.Core.Document;
       Root   : DOM.Core.Element;
       Status : Ada.Command_Line.Exit_Status := 0;
+      File   : access EL.Objects.Object;
    end record;
+
+   --  Execute the lifecycle phases on the faces context.
+   overriding
+   procedure Execute_Lifecycle (App     : in Handler;
+                                Context : in out ASF.Contexts.Faces.Faces_Context'Class);
 
 end Gen.Generator;

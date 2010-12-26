@@ -1,0 +1,18 @@
+Ada Generator
+
+This Ada05 application is a code generator used to generate
+database mappings from hibernate-like XML description.
+
+Build with the following commands:
+
+   ./configure
+   make
+
+
+Documentation
+
+   The Ada Generator sources as well as a wiki documentation is provided on:
+
+   http://code.google.com/p/ada-gen/
+
+

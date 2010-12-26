@@ -1,9 +1,9 @@
 with "config";
 with "aws";
 with "xmlada";
-with "../util/util";
-with "../el/el";
-with "../asf/asf";
+with "@UTIL_DIR@util";
+with "@EL_DIR@el";
+with "@ASF_DIR@asf";
 
 project Generator is
 

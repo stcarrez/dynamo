@@ -48,7 +48,7 @@ DISTFILES=README LICENSE.txt NOTICE.txt CHANGES config.guess configure config.su
 configure.in Makefile.in install-sh \
 generator.gpr.in config.gpr \
 src \
-bin obj lib
+bin obj templates
 
 dist:
 	-rm -rf $(distdir)
@@ -68,6 +68,7 @@ dist:
 	  fi; \
 	done
 	-rm -f $(distdir)/bin/*
+	-rm -f $(distdir)/obj/*
 	tar --exclude=.svn --exclude="*~" --exclude="*.o" --exclude="*.ali" \
 	    --exclude="*.log" --exclude="*.a" \
 	    -cvzf $(DIST_FILE) $(distdir)

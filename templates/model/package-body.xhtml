@@ -27,7 +27,7 @@
 
 with Ada.Unchecked_Deallocation;
 with ADO.Databases;
-with EL.Objects.Time;
+with Util.Beans.Objects.Time;
 
 package body #{model.name} is
 <h:list value="#{model.tables}" var="table">
@@ -299,7 +299,7 @@ package body #{model.name} is
    end Delete;
 
    function Get_Value (Item : in #{fn:capitalize(table.type)};
-                       Name : in String) return EL.Objects.Object is
+                       Name : in String) return Util.Beans.Objects.Object is
       Impl : constant access #{fn:capitalize(table.type)}_Impl := #{fn:capitalize(table.type)}_Impl (Item.Get_Object.all)'Access;
    begin
 <h:list value="#{table.members}" var="column">
@@ -310,13 +310,13 @@ package body #{model.name} is
 </h:panelGroup>
 <h:panelGroup rendered="#{column.name ne table.id.name}">
 <h:panelGroup rendered="#{g:isInteger(column.type) or column.type eq 'ADO.Identifier'}">
-         return EL.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
 </h:panelGroup>
 <h:panelGroup rendered="#{column.type eq 'Time'}">
-         return EL.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)});
+         return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)});
 </h:panelGroup>
 <h:panelGroup rendered="#{not g:isInteger(column.type) and column.type ne 'ADO.Identifier' and column.type ne 'Time'}">
-         return EL.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
+         return Util.Beans.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
 </h:panelGroup>
 </h:panelGroup>
       end if;

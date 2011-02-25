@@ -35,7 +35,7 @@ with Ada.Calendar;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
-with EL.Objects;
+with Util.Beans.Objects;
 package #{model.name} is
 
    use Ada.Calendar;
@@ -100,7 +100,7 @@ package #{model.name} is
                      Session : in out ADO.Sessions.Master_Session'Class);
 
    function Get_Value (Item : in #{fn:capitalize(table.type)};
-                       Name : in String) return EL.Objects.Object;
+                       Name : in String) return Util.Beans.Objects.Object;
 
    package #{fn:capitalize(table.type)}_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Natural,

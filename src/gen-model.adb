@@ -27,10 +27,10 @@ package body Gen.Model is
    --  and return it as an EL object.
    --  ------------------------------
    function Get_Attribute (Node : DOM.Core.Node;
-                           Name : String) return EL.Objects.Object is
+                           Name : String) return Util.Beans.Objects.Object is
       V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
    begin
-      return EL.Objects.To_Object (V);
+      return Util.Beans.Objects.To_Object (V);
    end Get_Attribute;
 
    --  ------------------------------
@@ -77,13 +77,13 @@ package body Gen.Model is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    function Get_Value (From : Definition;
-                       Name : String) return EL.Objects.Object is
+                       Name : String) return Util.Beans.Objects.Object is
       use type DOM.Core.Node;
    begin
       if From.Node = null then
-         return EL.Objects.Null_Object;
+         return Util.Beans.Objects.Null_Object;
       elsif Name = "comment" then
-         return EL.Objects.To_Object (From.Get_Comment);
+         return Util.Beans.Objects.To_Object (From.Get_Comment);
       else
          return Get_Attribute (From.Node, Name);
       end if;

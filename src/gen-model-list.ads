@@ -16,8 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with EL.Beans;
-with EL.Objects;
+with Util.Beans.Objects;
+with Util.Beans.Basic;
 with Gen.Model;
 with Ada.Containers.Vectors;
 
@@ -43,7 +43,7 @@ package Gen.Model.List is
    procedure Next (Position : in out Cursor)
      renames Vectors.Next;
 
-   type List_Definition is limited new EL.Beans.List_Bean with private;
+   type List_Definition is limited new Util.Beans.Basic.List_Bean with private;
 
    --  Get the first item of the list
    function First (Def : List_Definition) return Cursor;
@@ -56,22 +56,22 @@ package Gen.Model.List is
                             Index : in Natural);
 
    --  Get the element at the current row index.
-   function Get_Row (From  : List_Definition) return EL.Objects.Object;
+   function Get_Row (From  : List_Definition) return Util.Beans.Objects.Object;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    function Get_Value (From : List_Definition;
-                       Name : String) return EL.Objects.Object;
+                       Name : String) return Util.Beans.Objects.Object;
 
    --  Append the item in the list
    procedure Append (Def  : in out List_Definition;
                      Item : in T_Access);
 
 private
-   type List_Definition is limited new EL.Beans.List_Bean with record
+   type List_Definition is limited new Util.Beans.Basic.List_Bean with record
       Nodes      : Vectors.Vector;
       Row        : Natural;
-      Value_Bean : EL.Objects.Object;
+      Value_Bean : Util.Beans.Objects.Object;
    end record;
 
 end Gen.Model.List;

@@ -18,8 +18,8 @@
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
 
-with EL.Beans;
-with EL.Objects;
+with Util.Beans.Basic;
+with Util.Beans.Objects;
 
 with DOM.Core;
 package Gen.Model is
@@ -27,13 +27,13 @@ package Gen.Model is
    --  Get the attribute identified by <b>Name</b> on the DOM node
    --  and return it as an EL object.
    function Get_Attribute (Node : DOM.Core.Node;
-                           Name : String) return EL.Objects.Object;
+                           Name : String) return Util.Beans.Objects.Object;
 
    --  ------------------------------
    --  Model Definition
    --  ------------------------------
    type Definition is new Ada.Finalization.Limited_Controlled
-     and EL.Beans.Readonly_Bean with private;
+     and Util.Beans.Basic.Readonly_Bean with private;
    type Definition_Access is access all Definition'Class;
 
    --  Set the DOM node associated with the definition object
@@ -44,7 +44,7 @@ package Gen.Model is
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    function Get_Value (From : Definition;
-                       Name : String) return EL.Objects.Object;
+                       Name : String) return Util.Beans.Objects.Object;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
@@ -76,7 +76,7 @@ package Gen.Model is
 private
 
    type Definition is new Ada.Finalization.Limited_Controlled
-     and EL.Beans.Readonly_Bean with record
+     and Util.Beans.Basic.Readonly_Bean with record
       Node : DOM.Core.Node;
    end record;
 

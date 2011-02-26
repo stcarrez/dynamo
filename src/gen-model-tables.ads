@@ -152,6 +152,9 @@ private
       --  Whether the column must be unique
       Unique   : Boolean := False;
 
+      --  The column type name.
+      Type_Name : Unbounded_String;
+
       --  The SQL type associated with the column.
       Sql_Type : Unbounded_String;
 

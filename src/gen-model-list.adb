@@ -44,19 +44,19 @@ package body Gen.Model.List is
       if Index > 0 then
          declare
             Current : constant T_Access := From.Nodes.Element (Index - 1);
-            Bean    : constant EL.Beans.Readonly_Bean_Access := Current.all'Access;
+            Bean    : constant Util.Beans.Basic.Readonly_Bean_Access := Current.all'Access;
          begin
-            From.Value_Bean := EL.Objects.To_Object (Bean);
+            From.Value_Bean := Util.Beans.Objects.To_Object (Bean);
          end;
       else
-         From.Value_Bean := EL.Objects.Null_Object;
+         From.Value_Bean := Util.Beans.Objects.Null_Object;
       end if;
    end Set_Row_Index;
 
    --  ------------------------------
    --  Get the element at the current row index.
    --  ------------------------------
-   function Get_Row (From  : List_Definition) return EL.Objects.Object is
+   function Get_Row (From  : List_Definition) return Util.Beans.Objects.Object is
    begin
       return From.Value_Bean;
    end Get_Row;
@@ -66,16 +66,16 @@ package body Gen.Model.List is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    function Get_Value (From : List_Definition;
-                       Name : String) return EL.Objects.Object is
+                       Name : String) return Util.Beans.Objects.Object is
    begin
       if Name = "size" then
-         return EL.Objects.To_Object (From.Get_Count);
+         return Util.Beans.Objects.To_Object (From.Get_Count);
 
       elsif Name = "rowIndex" then
-         return EL.Objects.To_Object (From.Row);
+         return Util.Beans.Objects.To_Object (From.Row);
 
       end if;
-      return EL.Objects.Null_Object;
+      return Util.Beans.Objects.Null_Object;
    end Get_Value;
 
    --  ------------------------------

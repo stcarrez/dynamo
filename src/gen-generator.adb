@@ -28,7 +28,7 @@ with ASF.Responses.Mockup;
 with ASF.Components.Root;
 with ASF.Components.Base;
 
-with EL.Beans;
+with Util.Beans.Basic;
 with EL.Functions;
 
 with Gen.Model;
@@ -58,9 +58,11 @@ package body Gen.Generator is
    function To_Ada_Type (Name : EL.Objects.Object) return EL.Objects.Object is
       Value : constant String := EL.Objects.To_String (Name);
    begin
-      if Value = "String" then
+      if Value = "String" or Value = "java.lang.String" then
          return EL.Objects.To_Object (String '("Unbounded_String"));
-      elsif Value = "Integer" or Value = "int" then
+      elsif Value = "Integer" or Value = "int" or Value = "java.lang.Integer" then
+         return EL.Objects.To_Object (String '("Integer"));
+      elsif Value = "java.sql.Timestamp" then
          return EL.Objects.To_Object (String '("Integer"));
       else
          return Name;
@@ -292,7 +294,7 @@ package body Gen.Generator is
       --  Resolver  : aliased EL.Contexts.Default.Default_ELResolver;
       Req   : ASF.Requests.Mockup.Request;
       Reply : ASF.Responses.Mockup.Response;
-      Ptr   : EL.Beans.Readonly_Bean_Access := Model.all'Unchecked_Access;
+      Ptr   : Util.Beans.Basic.Readonly_Bean_Access := Model.all'Unchecked_Access;
       Bean  : constant EL.Objects.Object := EL.Objects.To_Object (Ptr);
    begin
       Log.Info ("Generating {0}", File);

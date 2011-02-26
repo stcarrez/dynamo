@@ -32,41 +32,40 @@ package body Gen.Model.Tables is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    function Get_Value (From : Column_Definition;
-                       Name : String) return EL.Objects.Object is
-      Type_Name : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (From.Node, "type");
+                       Name : String) return Util.Beans.Objects.Object is
    begin
       if Name = "type" then
-         return EL.Objects.To_Object (Type_Name);
+         return Util.Beans.Objects.To_Object (From.Type_Name);
 
       elsif Name = "index" then
-         return EL.Objects.To_Object (From.Number);
+         return Util.Beans.Objects.To_Object (From.Number);
 
       elsif Name = "isUnique" then
-         return EL.Objects.To_Object (From.Unique);
+         return Util.Beans.Objects.To_Object (From.Unique);
 
       elsif Name = "isNull" then
-         return EL.Objects.To_Object (not From.Not_Null);
+         return Util.Beans.Objects.To_Object (not From.Not_Null);
 
       elsif Name = "sqlType" then
-         return EL.Objects.To_Object (From.Sql_Type);
+         return Util.Beans.Objects.To_Object (From.Sql_Type);
 
       elsif Name = "sqlName" then
-         return EL.Objects.To_Object (From.Sql_Name);
+         return Util.Beans.Objects.To_Object (From.Sql_Name);
 
       elsif Name = "isVersion" then
-         return EL.Objects.To_Object (From.Is_Version);
+         return Util.Beans.Objects.To_Object (From.Is_Version);
 
       elsif Name = "isPrimaryKey" then
-         return EL.Objects.To_Object (From.Is_Key);
+         return Util.Beans.Objects.To_Object (From.Is_Key);
 
       elsif Name = "generator" then
          declare
-            Node : DOM.Core.Node := Get_Child (From.Node, "generator");
+            Node : constant DOM.Core.Node := Get_Child (From.Node, "generator");
          begin
             if Node /= null then
                return Get_Attribute (Node, "class");
             else
-               return EL.Objects.Null_Object;
+               return Util.Beans.Objects.Null_Object;
             end if;
          end;
 
@@ -114,23 +113,23 @@ package body Gen.Model.Tables is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    function Get_Value (From : Table_Definition;
-                       Name : String) return EL.Objects.Object is
+                       Name : String) return Util.Beans.Objects.Object is
    begin
       if Name = "members" then
          return From.Members_Bean;
 
       elsif Name ="id" then
          declare
-            Bean : constant EL.Beans.Readonly_Bean_Access := From.Id_Column.all'Access;
+            Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Id_Column.all'Access;
          begin
-            return EL.Objects.To_Object (Bean);
+            return Util.Beans.Objects.To_Object (Bean);
          end;
 
       elsif Name ="version" then
          declare
-            Bean : constant EL.Beans.Readonly_Bean_Access := From.Version_Column.all'Access;
+            Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Version_Column.all'Unchecked_Access;
          begin
-            return EL.Objects.To_Object (Bean);
+            return Util.Beans.Objects.To_Object (Bean);
          end;
 
       elsif Name = "type" then
@@ -192,14 +191,20 @@ package body Gen.Model.Tables is
       --  Get the SQL mapping from an optional <column> element.
       declare
          N : DOM.Core.Node := Get_Child (Column, "column");
+         T : constant DOM.Core.Node := Get_Child (Column, "type");
       begin
+         if T /= null then
+            C.Type_Name := Get_Attribute (T, "name");
+         else
+            C.Type_Name := To_Unbounded_String (DOM.Core.Elements.Get_Attribute (Column, "type"));
+         end if;
          if N /= null then
             C.Sql_Name := Get_Attribute (N, "name");
             C.Sql_Type := Get_Attribute (N, "sql-type");
          else
             N := Column;
             C.Sql_Name := Get_Attribute (N, "column");
-            C.Sql_Type := Get_Attribute (N, "type");
+            C.Sql_Type := C.Type_Name;
          end if;
          C.Not_Null := Get_Attribute (N, "not-null");
          C.Unique   := Get_Attribute (N, "unique");
@@ -289,7 +294,7 @@ package body Gen.Model.Tables is
       procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Model_Definition,
                                                         Process => Register_Class);
 
-      T : constant EL.Beans.Readonly_Bean_Access := O.Tables'Unchecked_Access;
+      T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Tables'Unchecked_Access;
    begin
       O.Tables_Bean := EL.Objects.To_Object (T);
       Iterate (O, N, "class");

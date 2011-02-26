@@ -304,6 +304,7 @@ package body Gen.Generator is
       Req.Set_Attribute (Name => "model", Value => Bean);
       --  Resolver.Register (To_Unbounded_String ("model"), Model.all'Unchecked_Access);
 
+      Model.Prepare;
       H.Dispatch (Page     => File,
                   Request  => Req,
                   Response => Reply);

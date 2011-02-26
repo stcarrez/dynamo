@@ -41,6 +41,9 @@ package Gen.Model is
                        Node  : in DOM.Core.Node;
                        Index : in Natural := 0);
 
+   --  Prepare the generation of the model.
+   procedure Prepare (O : in out Definition) is null;
+
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    function Get_Value (From : Definition;

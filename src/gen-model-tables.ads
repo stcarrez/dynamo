@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +17,12 @@
 -----------------------------------------------------------------------
 with EL.Objects;
 
-with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Containers.Hashed_Sets;
+with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Hash;
 with Gen.Model.List;
+with Util.Beans.Objects.Vectors;
 package Gen.Model.Tables is
 
    use Ada.Strings.Unbounded;
@@ -35,6 +37,21 @@ package Gen.Model.Tables is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Column_Definition;
+                       Name : String) return EL.Objects.Object;
+
+   --  Returns true if the column type is a basic type.
+   function Is_Basic_Type (From : Column_Definition) return Boolean;
+
+   --  ------------------------------
+   --  Association Definition
+   --  ------------------------------
+   type Association_Definition is new Column_Definition with private;
+   type Association_Definition_Access is access all Association_Definition'Class;
+
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   overriding
+   function Get_Value (From : Association_Definition;
                        Name : String) return EL.Objects.Object;
 
    --  ------------------------------
@@ -64,6 +81,12 @@ package Gen.Model.Tables is
    function Get_Value (From : Package_Definition;
                        Name : String) return EL.Objects.Object;
 
+   --  Prepare the generation of the package:
+   --  o identify the column types which are used
+   --  o build a list of package for the with clauses.
+   overriding
+   procedure Prepare (O : in out Package_Definition);
+
    --  ------------------------------
    --  Model Definition
    --  ------------------------------
@@ -78,6 +101,7 @@ package Gen.Model.Tables is
    function Get_Value (From : Model_Definition;
                        Name : String) return EL.Objects.Object;
 
+   --  Initialize the model definition looking at tables defined in the file.
    procedure Initialize (O : in out Model_Definition;
                          N : in DOM.Core.Node);
 
@@ -91,10 +115,10 @@ package Gen.Model.Tables is
                              Node : in DOM.Core.Node);
 
    package Package_Map is
-     new Ada.Containers.Indefinite_Hashed_Maps (Key_Type        => Unbounded_String,
-                                                Element_Type    => Package_Definition_Access,
-                                                Hash            => Ada.Strings.Unbounded.Hash,
-                                                Equivalent_Keys => "=");
+     new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+                                     Element_Type    => Package_Definition_Access,
+                                     Hash            => Ada.Strings.Unbounded.Hash,
+                                     Equivalent_Keys => "=");
 
    subtype Package_Cursor is Package_Map.Cursor;
 
@@ -118,10 +142,10 @@ package Gen.Model.Tables is
 
 
    package Table_Map is
-     new Ada.Containers.Indefinite_Hashed_Maps (Key_Type        => Unbounded_String,
-                                                Element_Type    => Table_Definition_Access,
-                                                Hash            => Ada.Strings.Unbounded.Hash,
-                                                Equivalent_Keys => "=");
+     new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+                                     Element_Type    => Table_Definition_Access,
+                                     Hash            => Ada.Strings.Unbounded.Hash,
+                                     Equivalent_Keys => "=");
 
    subtype Table_Cursor is Table_Map.Cursor;
 
@@ -168,6 +192,8 @@ private
       Is_Key : Boolean := False;
    end record;
 
+   type Association_Definition is new Column_Definition with null record;
+
    package Column_List is new Gen.Model.List (T         => Column_Definition,
                                               T_Access  => Column_Definition_Access);
 
@@ -188,9 +214,38 @@ private
    package Table_List is new Gen.Model.List (T        => Table_Definition,
                                              T_Access => Table_Definition_Access);
 
+   package String_Set is
+     new Ada.Containers.Hashed_Sets (Element_Type    => Ada.Strings.Unbounded.Unbounded_String,
+                                     Hash            => Ada.Strings.Unbounded.Hash,
+                                     Equivalent_Elements => Ada.Strings.Unbounded."=");
+
+
+   type List_Object is new Util.Beans.Basic.List_Bean with record
+      Values     : Util.Beans.Objects.Vectors.Vector;
+      Row        : Natural;
+      Value_Bean : Util.Beans.Objects.Object;
+   end record;
+
+   --  Get the number of elements in the list.
+   function Get_Count (From : List_Object) return Natural;
+
+   --  Set the current row index.  Valid row indexes start at 1.
+   procedure Set_Row_Index (From  : in out List_Object;
+                            Index : in Natural);
+
+   --  Get the element at the current row index.
+   function Get_Row (From  : List_Object) return Util.Beans.Objects.Object;
+
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   function Get_Value (From : List_Object;
+                       Name : String) return Util.Beans.Objects.Object;
+
    type Package_Definition is new Definition with record
       Tables      : aliased Table_List.List_Definition;
       Tables_Bean : EL.Objects.Object;
+      Used_Types  : aliased List_Object;
+      Used        : EL.Objects.Object;
       Pkg_Name    : Unbounded_String;
       Name        : Unbounded_String;
       Base_Name   : Unbounded_String;

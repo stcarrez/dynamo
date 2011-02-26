@@ -303,7 +303,7 @@ package body #{model.name} is
       Impl : constant access #{fn:capitalize(table.type)}_Impl := #{fn:capitalize(table.type)}_Impl (Item.Get_Object.all)'Access;
    begin
 <h:list value="#{table.members}" var="column">
-<h:panelGroup rendered="#{not column.isVersion}">
+<h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType}">
       if Name = "#{column.name}" then
 <h:panelGroup rendered="#{column.name eq table.id.name}">
          return ADO.Objects.To_Object (Impl.Get_Key);

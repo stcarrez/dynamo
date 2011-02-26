@@ -36,6 +36,9 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
 with Util.Beans.Objects;
+<h:list value="#{model.usedTypes}" var="type">
+with #{type};
+</h:list>
 package #{model.name} is
 
    use Ada.Calendar;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,9 +23,13 @@ with DOM.Core.Elements;
 with Gen.Utils;
 with Util.Strings;
 with Util.Strings.Transforms;
+with Util.Log.Loggers;
 package body Gen.Model.Tables is
 
    use type DOM.Core.Node;
+   use Util.Log;
+
+   Log : constant Loggers.Logger := Loggers.Create ("Gen.Model.Tables");
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -58,6 +62,9 @@ package body Gen.Model.Tables is
       elsif Name = "isPrimaryKey" then
          return Util.Beans.Objects.To_Object (From.Is_Key);
 
+      elsif Name = "isPrimitiveType" then
+         return Util.Beans.Objects.To_Object (From.Is_Basic_Type);
+
       elsif Name = "generator" then
          declare
             Node : constant DOM.Core.Node := Get_Child (From.Node, "generator");
@@ -74,39 +81,32 @@ package body Gen.Model.Tables is
       end if;
    end Get_Value;
 
+   --  ------------------------------
+   --  Returns true if the column type is a basic type.
+   --  ------------------------------
+   function Is_Basic_Type (From : Column_Definition) return Boolean is
+      Name : constant String := To_String (From.Type_Name);
+   begin
+      return Name = "int" or Name = "String" or Name = "java.lang.String"
+        or Name = "ADO.Identifier" or Name = "java.sql.Timestamp"
+        or Name = "java.lang.Integer"
+        or Name = "long" or Name = "Long" or Name = "Date";
+   end Is_Basic_Type;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   --  ------------------------------
+   function Get_Value (From : Association_Definition;
+                       Name : String) return Util.Beans.Objects.Object is
+   begin
+      return Column_Definition (From).Get_Value (Name);
+   end Get_Value;
+
    procedure Initialize (O : in out Table_Definition) is
    begin
       O.Members_Bean := EL.Objects.To_Object (O.Members'Unchecked_Access);
    end Initialize;
-
---     function Get_Member_Sql_Mode (Member : in DOM.Core.Node) return String is
---        Type_Name : constant DOM_String := Get_Attribute (Member, "type");
---     begin
---        if Type_Name = "String" then
---           return "10";
---        elsif Type_Name = "Integer" then
---           return "0";
---        elsif Type_Name = "Identifier" then
---           return "1";
---        elsif Type_Name = "Time" then
---           return "3";
---        else
---           return "11";
---        end if;
---     end Get_Member_Sql_Mode;
-
---     function Get_Member_Value (Member : in Node) return String is
---        Type_Name : constant DOM_String := Get_Attribute (Member, "type");
---     begin
---        if Type_Name = "String" then
---           return "Null_Unbounded_String";
---        elsif Type_Name = "Integer" then
---           return "0";
---        else
---           return "0";
---        end if;
---     end Get_Member_Value;
-
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -157,9 +157,50 @@ package body Gen.Model.Tables is
      elsif Name = "tables" then
         return From.Tables_Bean;
 
-     else
+      elsif Name = "usedTypes" then
+         return From.Used;
+
+      else
         return Definition (From).Get_Value (Name);
      end if;
+   end Get_Value;
+
+   --  ------------------------------
+   --  Get the number of elements in the list.
+   --  ------------------------------
+   function Get_Count (From : List_Object) return Natural is
+   begin
+      Log.Info ("Length {0}", Natural'Image (Natural (From.Values.Length)));
+      return Natural (From.Values.Length);
+   end Get_Count;
+
+   --  ------------------------------
+   --  Set the current row index.  Valid row indexes start at 1.
+   --  ------------------------------
+   procedure Set_Row_Index (From  : in out List_Object;
+                            Index : in Natural) is
+   begin
+      Log.Info ("Setting row {0}", Natural'Image (Index));
+      From.Row := Index;
+   end Set_Row_Index;
+
+   --  ------------------------------
+   --  Get the element at the current row index.
+   --  ------------------------------
+   function Get_Row (From  : List_Object) return Util.Beans.Objects.Object is
+   begin
+      Log.Info ("Getting row {0}", Natural'Image (From.Row));
+      return From.Values.Element (From.Row - 1);
+   end Get_Row;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   --  ------------------------------
+   function Get_Value (From : List_Object;
+                       Name : String) return Util.Beans.Objects.Object is
+   begin
+      return Util.Beans.Objects.Null_Object;
    end Get_Value;
 
    --  ------------------------------
@@ -221,16 +262,108 @@ package body Gen.Model.Tables is
    end Register_Column;
 
    --  ------------------------------
+   --  Register the association definition in the table
+   --  ------------------------------
+   procedure Register_Association (Table  : in out Table_Definition;
+                                   Column : in DOM.Core.Node) is
+      Name : constant DOM.Core.DOM_String      := DOM.Core.Nodes.Node_Name (Column);
+      C    : constant Association_Definition_Access := new Association_Definition;
+   begin
+      C.Node := Column;
+      C.Number := Table.Members.Get_Count;
+      Table.Members.Append (C.all'Access);
+
+      --  Get the SQL mapping from an optional <column> element.
+      declare
+         N : DOM.Core.Node := Get_Child (Column, "column");
+      begin
+         C.Type_Name := Get_Attribute (Column, "class");
+         if N /= null then
+            C.Sql_Name := Get_Attribute (N, "name");
+            C.Sql_Type := Get_Attribute (N, "sql-type");
+         else
+            N := Column;
+            C.Sql_Name := Get_Attribute (N, "column");
+            C.Sql_Type := C.Type_Name;
+         end if;
+         C.Not_Null := Get_Attribute (N, "not-null");
+         C.Unique   := Get_Attribute (N, "unique");
+      end;
+   end Register_Association;
+
+   --  ------------------------------
    --  Register all the columns defined in the table
    --  ------------------------------
    procedure Register_Columns (Table : in out Table_Definition) is
       procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
                                                         Process => Register_Column);
+      procedure Iterate_Association is new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
+                                                                    Process => Register_Association);
    begin
       Iterate (Table, Table.Node, "id");
       Iterate (Table, Table.Node, "version");
       Iterate (Table, Table.Node, "property");
+      Iterate_Association (Table, Table.Node, "many-to-one");
    end Register_Columns;
+
+   --  ------------------------------
+   --  Prepare the generation of the package:
+   --  o identify the column types which are used
+   --  o build a list of package for the with clauses.
+   --  ------------------------------
+   overriding
+   procedure Prepare (O : in out Package_Definition) is
+      Used_Types  : String_Set.Set;
+      Table_Iter  : Table_List.Cursor := O.Tables.First;
+      T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
+
+      function Get_Package_Name (Name : in String) return String is
+         Pos : Natural := Util.Strings.Rindex (Name, '.');
+      begin
+         if Pos > Name'First then
+            return Name (Name'First .. Pos - 1);
+         else
+            return "";
+         end if;
+      end Get_Package_Name;
+
+   begin
+      O.Used := EL.Objects.To_Object (T);
+      O.Used_Types.Row := 0;
+      O.Used_Types.Values.Clear;
+      while Table_List.Has_Element (Table_Iter) loop
+         declare
+            Table : constant Table_Definition_Access := Table_List.Element (Table_Iter);
+            C     : Column_List.Cursor := Table.Members.First;
+         begin
+            while Column_List.Has_Element (C) loop
+               declare
+                  Col : constant Column_Definition_Access := Column_List.Element (C);
+                  Name : constant String := Get_Package_Name (To_String (Col.Type_Name));
+               begin
+                  if not Col.Is_Basic_Type and Name'Length > 0 then
+                     Used_Types.Include (To_Unbounded_String (Name));
+                  end if;
+               end;
+               Column_List.Next (C);
+            end loop;
+         end;
+         Table_List.Next (Table_Iter);
+      end loop;
+      declare
+         P : String_Set.Cursor := Used_Types.First;
+      begin
+         while String_Set.Has_Element (P) loop
+            declare
+               Name : constant Unbounded_String := String_Set.Element (P);
+            begin
+               Log.Info ("with {0}", Name);
+               O.Used_Types.Values.Append (Util.Beans.Objects.To_Object (Name));
+            end;
+            String_Set.Next (P);
+         end loop;
+      end;
+   end Prepare;
 
    --  ------------------------------
    --  Register or find the package knowing its name

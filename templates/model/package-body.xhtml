@@ -150,7 +150,7 @@ package body #{model.name} is
       Impl.Find (Session, Query, Found);
       if not Found then
          Destroy (Impl);
-         raise ADO.Databases.NOT_FOUND;
+         raise ADO.Objects.NOT_FOUND;
       end if;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Load;
@@ -222,7 +222,7 @@ package body #{model.name} is
       Query.Set_Filter ("#{table.id.name} = ?");
       Object.Find (Session, Query, Found);
       if not Found then
-         raise ADO.Databases.NOT_FOUND;
+         raise ADO.Objects.NOT_FOUND;
       end if;
    end Load;
 
@@ -341,7 +341,7 @@ package body #{model.name} is
 </h:panelGroup>
       end if;
 </h:panelGroup></h:list>
-      raise ADO.Databases.NOT_FOUND;
+      raise ADO.Objects.NOT_FOUND;
    end Get_Value;
 
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;

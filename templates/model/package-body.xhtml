@@ -84,12 +84,14 @@ package body #{model.name} is
 </h:panelGroup>
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)})
                   return #{g:adaType(column.type)} is
-      Impl : constant #{fn:capitalize(table.type)}_Access := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
-   begin
 <h:panelGroup rendered="#{column.name ne table.id.name}">
+      Impl : constant #{fn:capitalize(table.type)}_Access := #{fn:capitalize(table.type)}_Impl (Object.Get_Load_Object.all)'Access;
+   begin
       return Impl.#{fn:capitalize(column.name)};
 </h:panelGroup>
 <h:panelGroup rendered="#{column.name eq table.id.name}">
+      Impl : constant #{fn:capitalize(table.type)}_Access := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
+   begin
       return Impl.Get_Key_Value;
 </h:panelGroup>
    end Get_#{fn:capitalize(column.name)};
@@ -102,11 +104,12 @@ package body #{model.name} is
       if not Object.Is_Null then
          declare
             Impl : constant #{fn:capitalize(table.type)}_Access
-              := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
+              := #{fn:capitalize(table.type)}_Impl (Object.Get_Load_Object.all)'Access;
             Copy : constant #{fn:capitalize(table.type)}_Access
               := new #{fn:capitalize(table.type)}_Impl;
          begin
             ADO.Objects.Set_Object (Result, Copy.all'Access);
+            Copy.Copy (Impl.all);
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{column.name ne table.id.name}">
             Copy.#{fn:capitalize(column.name)} := Impl.#{fn:capitalize(column.name)};
@@ -200,13 +203,28 @@ package body #{model.name} is
       Stmt.Set_Parameters (Query);
       Stmt.Execute;
       if Stmt.Has_Elements then
-         Object.Load (Stmt);
+         Object.Load (Stmt, Session);
          Stmt.Next;
          Found := not Stmt.Has_Elements;
       else
          Found := False;
       end if;
    end Find;
+
+   overriding
+   procedure Load (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Session'Class) is
+      Found : Boolean;
+      Query : ADO.SQL.Query;
+      Id    : constant #{g:adaType(table.id.type)} := Object.Get_Key_Value;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("#{table.id.name} = ?");
+      Object.Find (Session, Query, Found);
+      if not Found then
+         raise ADO.Databases.NOT_FOUND;
+      end if;
+   end Load;
 
    procedure Save (Object  : in out #{fn:capitalize(table.type)}_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
@@ -216,11 +234,11 @@ package body #{model.name} is
 <h:panelGroup rendered="#{not column.isVersion}">
       if Object.Is_Modified (#{column.index + 1}) then
 <h:panelGroup rendered="#{column.name ne table.id.name}">
-         Stmt.Save_Field (Name  => "#{column.sqlName}",
+         Stmt.Save_Field (Name  => COL_#{column.index}_#{model.tables.rowIndex}_NAME, --  #{column.sqlName}
                           Value => Object.#{fn:capitalize(column.name)});
 </h:panelGroup>
 <h:panelGroup rendered="#{column.name eq table.id.name}">
-         Stmt.Save_Field (Name  => "#{column.sqlName}",
+         Stmt.Save_Field (Name  => COL_#{column.index}_#{model.tables.rowIndex}_NAME, --  #{column.sqlName}
                           Value => Object.Get_Key);
 </h:panelGroup>
          Object.Clear_Modified (#{column.index + 1});
@@ -270,10 +288,12 @@ package body #{model.name} is
 </h:panelGroup>
 <h:panelGroup rendered="#{table.id.generator ne 'native' or table.id.name ne column.name}">
 <h:panelGroup rendered="#{column.name ne table.id.name}">
-      Query.Save_Field (Name => "#{column.sqlName}", Value => Object.#{fn:capitalize(column.name)});
+      Query.Save_Field (Name  => COL_#{column.index}_#{model.tables.rowIndex}_NAME, --  #{column.sqlName}
+                        Value => Object.#{fn:capitalize(column.name)});
 </h:panelGroup>
 <h:panelGroup rendered="#{column.name eq table.id.name}">
-      Query.Save_Field (Name => "#{column.sqlName}", Value => Object.Get_Key);
+      Query.Save_Field (Name  => COL_#{column.index}_#{model.tables.rowIndex}_NAME, --  #{column.sqlName}
+                        Value => Object.Get_Key);
 </h:panelGroup>
 </h:panelGroup>
 </h:list>
@@ -300,7 +320,7 @@ package body #{model.name} is
 
    function Get_Value (Item : in #{fn:capitalize(table.type)};
                        Name : in String) return Util.Beans.Objects.Object is
-      Impl : constant access #{fn:capitalize(table.type)}_Impl := #{fn:capitalize(table.type)}_Impl (Item.Get_Object.all)'Access;
+      Impl : constant access #{fn:capitalize(table.type)}_Impl := #{fn:capitalize(table.type)}_Impl (Item.Get_Load_Object.all)'Access;
    begin
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType}">
@@ -337,7 +357,7 @@ package body #{model.name} is
             Item : #{fn:capitalize(table.type)};
             Impl : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
          begin
-            Impl.Load (Stmt);
+            Impl.Load (Stmt, Session);
             ADO.Objects.Set_Object (Item, Impl.all'Access);
             Object.Append (Item);
          end;
@@ -348,8 +368,9 @@ package body #{model.name} is
    --  ------------------------------
    --  Load the object from current iterator position
    --  ------------------------------
-   procedure Load (Object : in out #{fn:capitalize(table.type)}_Impl;
-                   Stmt   : in out ADO.Statements.Query_Statement'Class) is
+   procedure Load (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class) is
    begin
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{column.name eq table.id.name and column.type eq 'ADO.Identifier'}">
@@ -358,13 +379,18 @@ package body #{model.name} is
 <h:panelGroup rendered="#{column.name eq table.id.name and column.type ne 'ADO.Identifier'}">
       Object.Set_Key_Value (Stmt.Get_Unbounded_String (#{column.index}));
 </h:panelGroup>
-<h:panelGroup rendered="#{column.name ne table.id.name}">
-<h:panelGroup rendered="#{column.type eq 'ADO.Identifier'}">
+<h:panelGroup rendered="#{column.name ne table.id.name and column.name ne table.version.name}">
+  <h:panelGroup rendered="#{not column.isPrimitiveType}">
+      if not Stmt.Is_Null (#{column.index}) then
+          Object.#{fn:capitalize(column.name)}.Set_Key_Value (Stmt.Get_Identifier (#{column.index}), Session);
+      end if;
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.isPrimitiveType and column.type eq 'ADO.Identifier'}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
-</h:panelGroup>
-<h:panelGroup rendered="#{column.type ne 'ADO.Identifier'}">
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.isPrimitiveType and column.type ne 'ADO.Identifier'}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column.type))} (#{column.index});
-</h:panelGroup>
+  </h:panelGroup>
 </h:panelGroup>
 </h:list>
 <h:panelGroup rendered="#{not empty table.version}">

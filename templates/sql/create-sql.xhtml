@@ -9,7 +9,7 @@
 create table #{table.table} (
 <h:list value="#{table.members}" var="column">
   /* #{column.comment} */
-  `#{column.name}` #{column.sqlType},
+  `#{column.sqlName}` #{column.sqlType},
 </h:list>
   primary key (`#{table.id.name}`)
 );

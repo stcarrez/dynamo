@@ -89,7 +89,7 @@ package body Gen.Model.Tables is
    begin
       return Name = "int" or Name = "String" or Name = "java.lang.String"
         or Name = "ADO.Identifier" or Name = "java.sql.Timestamp"
-        or Name = "java.lang.Integer"
+        or Name = "java.lang.Integer" or Name = "Integer"
         or Name = "long" or Name = "Long" or Name = "Date";
    end Is_Basic_Type;
 

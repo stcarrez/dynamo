@@ -80,21 +80,25 @@ begin
       end case;
    end loop;
 
-   declare
-      Model_File : constant String := Get_Argument;
-   begin
-      if Model_File'Length = 0 then
-         Usage;
-         Set_Exit_Status (2);
-         return;
-      end if;
-      Gen.Generator.Initialize (Generator);
-      Gen.Generator.Read_Model (Generator, Model_File);
-      Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
-      Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
+   Gen.Generator.Initialize (Generator);
+   loop
+      declare
+         Model_File : constant String := Get_Argument;
+      begin
+         exit when Model_File'Length = 0;
+--           if Model_File'Length = 0 then
+--              Usage;
+--              Set_Exit_Status (2);
+--              return;
+--           end if;
+         Gen.Generator.Read_Model (Generator, Model_File);
+      end;
+   end loop;
 
-      Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
-   end;
+   Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
+   Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
+
+   Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
 
 exception
    when E : XML_Fatal_Error =>

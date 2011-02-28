@@ -59,7 +59,7 @@ package body Gen.Generator is
       Value : constant String := EL.Objects.To_String (Name);
    begin
       if Value = "String" or Value = "java.lang.String" then
-         return EL.Objects.To_Object (String '("Unbounded_String"));
+         return EL.Objects.To_Object (String '("Ada.Strings.Unbounded.Unbounded_String"));
       elsif Value = "Integer" or Value = "int" or Value = "java.lang.Integer" then
          return EL.Objects.To_Object (String '("Integer"));
       elsif Value = "java.sql.Timestamp" then

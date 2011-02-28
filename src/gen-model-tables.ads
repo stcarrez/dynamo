@@ -190,6 +190,15 @@ private
 
       --  True if this column is the primary key column.
       Is_Key : Boolean := False;
+
+      --  True if the column can be read by the application.
+      Is_Readable  : Boolean := True;
+
+      --  True if the column is included in the insert statement
+      Is_Inserted  : Boolean := True;
+
+      --  True if the column is included in the update statement
+      Is_Updated   : Boolean := True;
    end record;
 
    type Association_Definition is new Column_Definition with null record;

@@ -50,6 +50,12 @@ package body Gen.Model.Tables is
       elsif Name = "isNull" then
          return Util.Beans.Objects.To_Object (not From.Not_Null);
 
+      elsif Name = "isInserted" then
+         return Util.Beans.Objects.To_Object (From.Is_Inserted);
+
+      elsif Name = "isUpdated" then
+         return Util.Beans.Objects.To_Object (From.Is_Updated);
+
       elsif Name = "sqlType" then
          return Util.Beans.Objects.To_Object (From.Sql_Type);
 
@@ -58,6 +64,9 @@ package body Gen.Model.Tables is
 
       elsif Name = "isVersion" then
          return Util.Beans.Objects.To_Object (From.Is_Version);
+
+      elsif Name = "isReadable" then
+         return Util.Beans.Objects.To_Object (From.Is_Readable);
 
       elsif Name = "isPrimaryKey" then
          return Util.Beans.Objects.To_Object (From.Is_Key);
@@ -224,10 +233,14 @@ package body Gen.Model.Tables is
                               Column : in DOM.Core.Node) is
       Name : constant DOM.Core.DOM_String      := DOM.Core.Nodes.Node_Name (Column);
       C    : constant Column_Definition_Access := new Column_Definition;
+
    begin
       C.Node := Column;
       C.Number := Table.Members.Get_Count;
       Table.Members.Append (C);
+
+      C.Is_Inserted := Get_Attribute (Column, "insert", True);
+      C.Is_Updated  := Get_Attribute (Column, "update", True);
 
       --  Get the SQL mapping from an optional <column> element.
       declare
@@ -235,9 +248,9 @@ package body Gen.Model.Tables is
          T : constant DOM.Core.Node := Get_Child (Column, "type");
       begin
          if T /= null then
-            C.Type_Name := Get_Attribute (T, "name");
+            C.Type_Name := To_Unbounded_String (Get_Normalized_Type (T, "name"));
          else
-            C.Type_Name := To_Unbounded_String (DOM.Core.Elements.Get_Attribute (Column, "type"));
+            C.Type_Name := To_Unbounded_String (Get_Normalized_Type (Column, "type"));
          end if;
          if N /= null then
             C.Sql_Name := Get_Attribute (N, "name");
@@ -252,7 +265,9 @@ package body Gen.Model.Tables is
       end;
       if Name = "version" then
          Table.Version_Column := C;
-         C.Is_Version := True;
+         C.Is_Version  := True;
+         C.Is_Updated  := False;
+         C.Is_Inserted := False;
 
       elsif Name = "id" then
          Table.Id_Column := C;

@@ -72,6 +72,12 @@ package Gen.Model is
                            Name    : String;
                            Default : String := "") return Ada.Strings.Unbounded.Unbounded_String;
 
+   --  Get the value identified by the name from the attribute.
+   --  Normalize the result string.
+   --  If the name cannot be found, the method should return the Null object.
+   function Get_Normalized_Type (Node : DOM.Core.Node;
+                                 Name : String) return String;
+
    --  Get the first DOM child from the given entity tag
    function Get_Child (Node : DOM.Core.Node;
                        Name : String) return DOM.Core.Node;

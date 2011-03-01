@@ -26,8 +26,9 @@
 -----------------------------------------------------------------------
 
 with Ada.Unchecked_Deallocation;
-with ADO.Databases;
+<h:panelGroup rendered="#{model.useCalendarTime}">
 with Util.Beans.Objects.Time;
+</h:panelGroup>
 
 package body #{model.name} is
 #{''}
@@ -400,6 +401,9 @@ package body #{model.name} is
    procedure Load (Object  : in out #{fn:capitalize(table.type)}_Impl;
                    Stmt    : in out ADO.Statements.Query_Statement'Class;
                    Session : in out ADO.Sessions.Session'Class) is
+<h:panelGroup rendered="#{not table.hasAssociations}">
+      pragma Unreferenced (Session);
+</h:panelGroup>
    begin
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{column.name eq table.id.name and column.type eq 'ADO.Identifier'}">

@@ -144,6 +144,9 @@ package body Gen.Model.Tables is
       elsif Name = "type" then
          return EL.Objects.To_Object (From.Type_Name);
 
+      elsif Name = "hasAssociations" then
+         return Util.Beans.Objects.To_Object (From.Has_Associations);
+
       else
          return Definition (From).Get_Value (Name);
       end if;
@@ -158,16 +161,19 @@ package body Gen.Model.Tables is
                        Name : String) return EL.Objects.Object is
    begin
      if Name = "name" then
-        return EL.Objects.To_Object (From.Pkg_Name);
+        return Util.Beans.Objects.To_Object (From.Pkg_Name);
 
      elsif Name = "package" then
-        return EL.Objects.To_Object (From.Base_Name);
+        return Util.Beans.Objects.To_Object (From.Base_Name);
 
      elsif Name = "tables" then
         return From.Tables_Bean;
 
       elsif Name = "usedTypes" then
          return From.Used;
+
+      elsif Name = "useCalendarTime" then
+         return Util.Beans.Objects.To_Object (From.Uses_Calendar_Time);
 
       else
         return Definition (From).Get_Value (Name);
@@ -287,6 +293,7 @@ package body Gen.Model.Tables is
       C.Node := Column;
       C.Number := Table.Members.Get_Count;
       Table.Members.Append (C.all'Access);
+      Table.Has_Associations := True;
 
       --  Get the SQL mapping from an optional <column> element.
       declare
@@ -346,6 +353,7 @@ package body Gen.Model.Tables is
       O.Used := EL.Objects.To_Object (T);
       O.Used_Types.Row := 0;
       O.Used_Types.Values.Clear;
+      O.Uses_Calendar_Time := False;
       while Table_List.Has_Element (Table_Iter) loop
          declare
             Table : constant Table_Definition_Access := Table_List.Element (Table_Iter);
@@ -354,10 +362,14 @@ package body Gen.Model.Tables is
             while Column_List.Has_Element (C) loop
                declare
                   Col : constant Column_Definition_Access := Column_List.Element (C);
-                  Name : constant String := Get_Package_Name (To_String (Col.Type_Name));
+                  T    : constant String := To_String (Col.Type_Name);
+                  Name : constant String := Get_Package_Name (T);
                begin
                   if not Col.Is_Basic_Type and Name'Length > 0 then
                      Used_Types.Include (To_Unbounded_String (Name));
+
+                  elsif T = "Time" or T = "Date" or T = "java.sql.Timestamp" then
+                     O.Uses_Calendar_Time := True;
                   end if;
                end;
                Column_List.Next (C);
@@ -365,6 +377,7 @@ package body Gen.Model.Tables is
          end;
          Table_List.Next (Table_Iter);
       end loop;
+
       declare
          P : String_Set.Cursor := Used_Types.First;
       begin

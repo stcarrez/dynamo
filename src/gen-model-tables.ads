@@ -218,6 +218,7 @@ private
       Pkg_Name       : Unbounded_String;
       Version_Column : Column_Definition_Access;
       Id_Column      : Column_Definition_Access;
+      Has_Associations : Boolean := False;
    end record;
 
    package Table_List is new Gen.Model.List (T        => Table_Definition,
@@ -258,6 +259,9 @@ private
       Pkg_Name    : Unbounded_String;
       Name        : Unbounded_String;
       Base_Name   : Unbounded_String;
+
+      --  True if the package uses Ada.Calendar.Time
+      Uses_Calendar_Time    : Boolean;
    end record;
 
    type Model_Definition is new Definition with record

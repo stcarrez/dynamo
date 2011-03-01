@@ -31,7 +31,9 @@ with ADO.Statements;
 with ADO.SQL;
 with ADO.Schemas;
 
+<h:panelGroup rendered="#{model.useCalendarTime}">
 with Ada.Calendar;
+</h:panelGroup>
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
@@ -41,10 +43,6 @@ with #{type};
 </h:list>
 package #{model.name} is
 
---   use Ada.Calendar;
---   use Ada.Strings.Unbounded;
---   use ADO.Objects;
---   use ADO.Statements;
 #{''}
 <h:list value="#{model.tables}" var="table">
    --  --------------------
@@ -73,6 +71,7 @@ package #{model.name} is
                   #{g:indent(column.name)} Value : in String);
 </h:panelGroup>
 #{''}
+</h:panelGroup>
 
    --  Get #{column.comment}
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
@@ -80,7 +79,6 @@ package #{model.name} is
 <h:panelGroup rendered="#{column.type == 'String'}">
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
                  return String;
-</h:panelGroup>
 </h:panelGroup>
 </h:list>
 #{''}

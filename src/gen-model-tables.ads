@@ -42,6 +42,9 @@ package Gen.Model.Tables is
    --  Returns true if the column type is a basic type.
    function Is_Basic_Type (From : Column_Definition) return Boolean;
 
+   --  Returns the column type.
+   function Get_Type (From : Column_Definition) return String;
+
    --  ------------------------------
    --  Association Definition
    --  ------------------------------

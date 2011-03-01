@@ -36,6 +36,7 @@ with Gen.Utils;
 
 with Util.Files;
 with Util.Log.Loggers;
+with Util.Beans.Objects.To_Access;
 package body Gen.Generator is
 
    use ASF;
@@ -46,26 +47,62 @@ package body Gen.Generator is
 
    RESULT_DIR : constant String := "generator.output.dir";
 
-   function To_Ada_Type (Name : EL.Objects.Object) return EL.Objects.Object;
+   function To_Ada_Type (Value : in Util.Beans.Objects.Object;
+                         Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
    function Indent (Value : EL.Objects.Object) return EL.Objects.Object;
 
    --  EL Function to translate a model type to the key enum value
    function To_Key_Enum (Name : EL.Objects.Object) return EL.Objects.Object;
 
+--     function To_Column_Access is
+--       new Util.Beans.Objects.To_Access (T => Gen.Model.Tables.Column_Definition,
+--                                         T_Access => Gen.Model.Tables.Column_Definition_Access);
+
+--     function To_Definition_Access is
+--       new Util.Beans.Objects.To_Access (T => Gen.Model.Definition,
+--                                         T_Access => Gen.Model.Definition_Access);
+
    --  ------------------------------
    --  EL Function to translate a model type to an Ada implementation type
    --  ------------------------------
-   function To_Ada_Type (Name : EL.Objects.Object) return EL.Objects.Object is
-      Value : constant String := EL.Objects.To_String (Name);
+   function To_Ada_Type (Value : in Util.Beans.Objects.Object;
+                         Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      use Gen.Model.Tables;
+      use Gen.Model;
+
+--        Def    : constant Definition_Access := To_Definition_Access (Value);
+      Column : Column_Definition_Access := null; --  To_Definition_Access (Value);
+
+      function To_Ada_Type (Value : in String) return Util.Beans.Objects.Object is
+      begin
+         if Value = "String" or Value = "java.lang.String" then
+            return Util.Beans.Objects.To_Object (String '("Ada.Strings.Unbounded.Unbounded_String"));
+         elsif Value = "Integer" or Value = "int" or Value = "java.lang.Integer" then
+            return Util.Beans.Objects.To_Object (String '("Integer"));
+         elsif Value = "Timestamp" then
+            return Util.Beans.Objects.To_Object (String '("Ada.Calendar.Time"));
+         else
+            return Util.Beans.Objects.To_Object (Value);
+         end if;
+      end To_Ada_Type;
+
+      Ptr : access Util.Beans.Basic.Readonly_Bean'Class := Util.Beans.Objects.To_Bean (Value);
    begin
-      if Value = "String" or Value = "java.lang.String" then
-         return EL.Objects.To_Object (String '("Ada.Strings.Unbounded.Unbounded_String"));
-      elsif Value = "Integer" or Value = "int" or Value = "java.lang.Integer" then
-         return EL.Objects.To_Object (String '("Integer"));
-      elsif Value = "java.sql.Timestamp" then
-         return EL.Objects.To_Object (String '("Integer"));
+      if Ptr /= null and then Ptr.all in Column_Definition'Class then
+         Column := Column_Definition'Class (Ptr.all)'Unchecked_Access;
       else
-         return Name;
+         Column := null;
+      end if;
+      if Column /= null then
+         if Column.Is_Basic_Type then
+            return To_Ada_Type (Column.Get_Type);
+         elsif Util.Beans.Objects.To_Boolean (Param) then
+            return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
+         else
+            return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref");
+         end if;
+      else
+         return To_Ada_Type (Util.Beans.Objects.To_String (Value));
       end if;
    end To_Ada_Type;
 

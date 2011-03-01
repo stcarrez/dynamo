@@ -96,11 +96,19 @@ package body Gen.Model.Tables is
    function Is_Basic_Type (From : Column_Definition) return Boolean is
       Name : constant String := To_String (From.Type_Name);
    begin
-      return Name = "int" or Name = "String" or Name = "java.lang.String"
-        or Name = "ADO.Identifier" or Name = "java.sql.Timestamp"
-        or Name = "java.lang.Integer" or Name = "Integer"
-        or Name = "long" or Name = "Long" or Name = "Date";
+      return Name = "int" or Name = "String"
+        or Name = "ADO.Identifier" or Name = "Timestamp"
+        or Name = "Integer"
+        or Name = "long" or Name = "Long" or Name = "Date" or Name = "Time";
    end Is_Basic_Type;
+
+   --  ------------------------------
+   --  Returns the column type.
+   --  ------------------------------
+   function Get_Type (From : Column_Definition) return String is
+   begin
+      return To_String (From.Type_Name);
+   end Get_Type;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -368,7 +376,7 @@ package body Gen.Model.Tables is
                   if not Col.Is_Basic_Type and Name'Length > 0 then
                      Used_Types.Include (To_Unbounded_String (Name));
 
-                  elsif T = "Time" or T = "Date" or T = "java.sql.Timestamp" then
+                  elsif T = "Time" or T = "Date" or T = "Timestamp" then
                      O.Uses_Calendar_Time := True;
                   end if;
                end;

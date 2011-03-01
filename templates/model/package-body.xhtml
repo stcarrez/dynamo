@@ -89,7 +89,7 @@ package body #{model.name} is
     </h:panelGroup>
 
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
-                   #{g:indent(column.name)} Value  : in #{g:adaType(column.type)}) is
+                   #{g:indent(column.name)} Value  : in #{g:adaType(column,1)}) is
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
       Set_Field (Object, Impl, #{column.index + 1});
@@ -112,7 +112,7 @@ package body #{model.name} is
     </h:panelGroup>
 
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
-                  return #{g:adaType(column.type)} is
+                  return #{g:adaType(column,1)} is
     <h:panelGroup rendered="#{column.name ne table.id.name}">
       Impl : constant #{fn:capitalize(table.type)}_Access := #{fn:capitalize(table.type)}_Impl (Object.Get_Load_Object.all)'Access;
    begin
@@ -170,7 +170,7 @@ package body #{model.name} is
 
    procedure Load (Object  : in out #{fn:capitalize(table.type)}_Ref;
                    Session : in out ADO.Sessions.Session'Class;
-                   Id      : in #{g:adaType(table.id.type)}) is
+                   Id      : in #{g:adaType(table.id.type,0)}) is
       Impl  : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
       Found : Boolean;
       Query : ADO.SQL.Query;
@@ -246,7 +246,7 @@ package body #{model.name} is
                    Session : in out ADO.Sessions.Session'Class) is
       Found : Boolean;
       Query : ADO.SQL.Query;
-      Id    : constant #{g:adaType(table.id.type)} := Object.Get_Key_Value;
+      Id    : constant #{g:adaType(table.id.type,0)} := Object.Get_Key_Value;
    begin
       Query.Bind_Param (Position => 1, Value => Id);
       Query.Set_Filter ("#{table.id.name} = ?");
@@ -425,12 +425,12 @@ package body #{model.name} is
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.isPrimitiveType and column.type ne 'ADO.Identifier' and column.type ne 'String'}">
-      Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column.type))} (#{column.index});
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,0))} (#{column.index});
   </h:panelGroup>
 </h:panelGroup>
 </h:list>
 <h:panelGroup rendered="#{not empty table.version}">
-      Object.#{fn:capitalize(table.version.name)} := Stmt.Get_#{fn:capitalize(g:adaType(table.version.type))} (#{table.version.index});
+      Object.#{fn:capitalize(table.version.name)} := Stmt.Get_#{fn:capitalize(g:adaType(table.version.type,0))} (#{table.version.index});
 </h:panelGroup>
       ADO.Objects.Set_Created (Object);
    end Load;

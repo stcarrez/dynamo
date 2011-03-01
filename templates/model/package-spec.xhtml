@@ -65,7 +65,7 @@ package #{model.name} is
 #{''}
    --  Set #{column.comment}
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
-                  #{g:indent(column.name)} Value  : in #{g:adaType(column.type)});
+                  #{g:indent(column.name)} Value  : in #{g:adaType(column,1)});
 <h:panelGroup rendered="#{column.type == 'String'}">
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
                   #{g:indent(column.name)} Value : in String);
@@ -75,7 +75,7 @@ package #{model.name} is
 
    --  Get #{column.comment}
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
-                 return #{g:adaType(column.type)};
+                 return #{g:adaType(column,1)};
 <h:panelGroup rendered="#{column.type == 'String'}">
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
                  return String;
@@ -87,7 +87,7 @@ package #{model.name} is
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out #{fn:capitalize(table.type)}_Ref;
                    Session : in out ADO.Sessions.Session'Class;
-                   Id      : in #{g:adaType(table.id.type)});
+                   Id      : in #{g:adaType(table.id.type,0)});
 #{''}
 
    --  Find and load the entity.
@@ -164,7 +164,7 @@ private
    with record
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{column.name ne table.id.name}">
-       #{fn:capitalize(column.name)} : #{g:adaType(column.type)};
+       #{fn:capitalize(column.name)} : #{g:adaType(column,0)};
 </h:panelGroup>
 </h:list>
    end record;

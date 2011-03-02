@@ -93,7 +93,10 @@ package body #{model.name} is
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
       Set_Field (Object, Impl, #{column.index + 1});
-    <h:panelGroup rendered="#{column.name ne table.id.name}">
+    <h:panelGroup rendered="#{column.name ne table.id.name and not column.isPrimitiveType}">
+      Impl.#{fn:capitalize(column.name)} := #{g:adaType(column,0)} (Value);
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType}">
       Impl.#{fn:capitalize(column.name)} := Value;
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name eq table.id.name}">
@@ -362,10 +365,10 @@ package body #{model.name} is
       <h:panelGroup rendered="#{g:isInteger(column.type) or column.type eq 'ADO.Identifier'}">
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type eq 'Time'}">
+      <h:panelGroup rendered="#{g:isDate(column.type)}">
          return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)});
       </h:panelGroup>
-    <h:panelGroup rendered="#{not g:isInteger(column.type) and column.type ne 'ADO.Identifier' and column.type ne 'Time'}">
+    <h:panelGroup rendered="#{not g:isInteger(column.type) and column.type ne 'ADO.Identifier' and not g:isDate(column.type)}">
          return Util.Beans.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
   </h:panelGroup>
 </h:panelGroup>
@@ -425,7 +428,7 @@ package body #{model.name} is
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.isPrimitiveType and column.type ne 'ADO.Identifier' and column.type ne 'String'}">
-      Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,0))} (#{column.index});
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
   </h:panelGroup>
 </h:panelGroup>
 </h:list>

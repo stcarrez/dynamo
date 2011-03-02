@@ -64,6 +64,10 @@ package body Gen.Generator is
 
    --  ------------------------------
    --  EL Function to translate a model type to an Ada implementation type
+   --  Param values:
+   --    0 : Get the type for a record declaration
+   --    1 : Get the type for a parameter declaration or a return type
+   --    2 : Get the type for the generation of the ADO.Statements.Get procedure name
    --  ------------------------------
    function To_Ada_Type (Value : in Util.Beans.Objects.Object;
                          Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
@@ -80,7 +84,11 @@ package body Gen.Generator is
          elsif Value = "Integer" or Value = "int" or Value = "java.lang.Integer" then
             return Util.Beans.Objects.To_Object (String '("Integer"));
          elsif Value = "Timestamp" then
-            return Util.Beans.Objects.To_Object (String '("Ada.Calendar.Time"));
+            if Util.Beans.Objects.To_Integer (Param) = 2 then
+               return Util.Beans.Objects.To_Object (String '("Time"));
+            else
+               return Util.Beans.Objects.To_Object (String '("Ada.Calendar.Time"));
+            end if;
          else
             return Util.Beans.Objects.To_Object (Value);
          end if;
@@ -96,7 +104,7 @@ package body Gen.Generator is
       if Column /= null then
          if Column.Is_Basic_Type then
             return To_Ada_Type (Column.Get_Type);
-         elsif Util.Beans.Objects.To_Boolean (Param) then
+         elsif Util.Beans.Objects.To_Integer (Param) = 1 then
             return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
          else
             return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref");
@@ -118,6 +126,19 @@ package body Gen.Generator is
          return EL.Objects.To_Object (False);
       end if;
    end Is_Integer_Type;
+
+   --  ------------------------------
+   --  EL Function to check whether a type is an date or a time type
+   --  ------------------------------
+   function Is_Date_Type (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      Value : constant String := Util.Beans.Objects.To_String (Name);
+   begin
+      if Value = "Date" or Value = "Time" or Value = "Timestamp" then
+         return Util.Beans.Objects.To_Object (True);
+      else
+         return Util.Beans.Objects.To_Object (False);
+      end if;
+   end Is_Date_Type;
 
    KEY_INTEGER_LABEL : constant String := "KEY_INTEGER";
    KEY_STRING_LABEL  : constant String := "KEY_STRING";
@@ -182,6 +203,9 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "isInteger",
                            Namespace => URI,
                            Func      => Is_Integer_Type'Access);
+      Mapper.Set_Function (Name      => "isDate",
+                           Namespace => URI,
+                           Func      => Is_Date_Type'Access);
       Mapper.Set_Function (Name      => "sqlType",
                            Namespace => URI,
                            Func      => To_Sql_Type'Access);

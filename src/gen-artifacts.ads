@@ -33,6 +33,7 @@ package Gen.Artifacts is
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    procedure Initialize (Handler : in Artifact;
+                         Path    : in String;
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class) is abstract;
 

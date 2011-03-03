@@ -26,6 +26,8 @@ with ASF.Applications.Main;
 with ASF.Contexts.Faces;
 with Gen.Model.Packages;
 with Gen.Artifacts.Hibernate;
+with Gen.Artifacts.Query;
+with Gen.Artifacts.Mappings;
 package Gen.Generator is
 
    type Iteration_Mode is (ITERATION_PACKAGE, ITERATION_TABLE);
@@ -51,6 +53,9 @@ package Gen.Generator is
    --  Read the XML model file
    procedure Read_Model (H    : in out Handler;
                          File : in String);
+
+   --  Prepare the model by checking, verifying and initializing it after it is completely known.
+   procedure Prepare (H : in out Handler);
 
    --  Generate the code using the template file
    procedure Generate (H     : in out Handler;
@@ -92,6 +97,12 @@ private
 
       --  Hibernate XML artifact
       Hibernate : Gen.Artifacts.Hibernate.Artifact;
+
+      --  Query generation artifact.
+      Query     : Gen.Artifacts.Query.Artifact;
+
+      --  Type mapping artifact.
+      Mappings  : Gen.Artifacts.Mappings.Artifact;
    end record;
 
    --  Execute the lifecycle phases on the faces context.

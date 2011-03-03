@@ -33,6 +33,7 @@ with EL.Functions;
 
 with Gen.Model;
 with Gen.Model.Tables;
+with Gen.Model.Mappings;
 
 with Util.Files;
 with Util.Log.Loggers;
@@ -73,6 +74,7 @@ package body Gen.Generator is
                          Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
       use Gen.Model.Tables;
       use Gen.Model;
+      use type Gen.Model.Mappings.Mapping_Definition_Access;
 
 --        Def    : constant Definition_Access := To_Definition_Access (Value);
       Column : Column_Definition_Access := null; --  To_Definition_Access (Value);
@@ -103,7 +105,13 @@ package body Gen.Generator is
          Column := null;
       end if;
       if Column /= null then
-         if Column.Is_Basic_Type then
+         if Column.Type_Mapping /= null then
+            if Column.Type_Mapping.Is_Date and Util.Beans.Objects.To_Integer (Param) = 2 then
+               return Util.Beans.Objects.To_Object (String '("Time"));
+            else
+               return Util.Beans.Objects.To_Object (Column.Type_Mapping.Target);
+            end if;
+         elsif Column.Is_Basic_Type then
             return To_Ada_Type (Column.Get_Type);
          elsif Util.Beans.Objects.To_Integer (Param) = 1 then
             return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
@@ -308,7 +316,9 @@ package body Gen.Generator is
       H.Doc := DOM.Readers.Get_Tree (My_Tree_Reader);
       H.Root := DOM.Core.Documents.Get_Element (H.Doc);
 
-      H.Hibernate.Initialize (Model => H.Model, Node => H.Root);
+      H.Mappings.Initialize (Path => File, Model => H.Model, Node => H.Root);
+      H.Hibernate.Initialize (Path => File, Model => H.Model, Node => H.Root);
+      H.Query.Initialize (Path => File, Model => H.Model, Node => H.Root);
 
    exception
       when Ada.IO_Exceptions.Name_Error =>
@@ -334,6 +344,16 @@ package body Gen.Generator is
    end Execute_Lifecycle;
 
    --  ------------------------------
+   --  Prepare the model by checking, verifying and initializing it after it is completely known.
+   --  ------------------------------
+   procedure Prepare (H : in out Handler) is
+   begin
+      H.Model.Prepare;
+      H.Hibernate.Prepare (H.Model);
+      H.Query.Prepare (H.Model);
+   end Prepare;
+
+   --  ------------------------------
    --  Generate the code using the template file
    --  ------------------------------
    procedure Generate (H     : in out Handler;
@@ -350,7 +370,6 @@ package body Gen.Generator is
       Req.Set_Method ("GET");
       Req.Set_Attribute (Name => "model", Value => Bean);
 
---        H.Hibernate.Prepare (Model.all);
       H.Dispatch (Page     => File,
                   Request  => Req,
                   Response => Reply);

@@ -108,6 +108,7 @@ begin
    end if;
 
    --  Run the generation.
+   Gen.Generator.Prepare (Generator);
    Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
    Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
 

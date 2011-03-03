@@ -16,8 +16,12 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Ada.Strings.Unbounded;
 with DOM.Core.Nodes;
 with DOM.Core.Elements;
+with DOM.Core.Character_Datas;
+with Util.Strings;
+
 package body Gen.Utils is
 
    --  ------------------------------
@@ -39,5 +43,52 @@ package body Gen.Utils is
          end;
       end loop;
    end Iterate_Nodes;
+
+   --  ------------------------------
+   --  Get the content of the node
+   --  ------------------------------
+   function Get_Data_Content (Node : in DOM.Core.Node) return String is
+      use Ada.Strings.Unbounded;
+
+      Nodes  : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
+      S      : constant Natural       := DOM.Core.Nodes.Length (Nodes);
+      Result : Unbounded_String;
+   begin
+      for J in 0 .. S - 1 loop
+         Append (Result, DOM.Core.Character_Datas.Data (DOM.Core.Nodes.Item (Nodes, J)));
+      end loop;
+      return To_String (Result);
+   end Get_Data_Content;
+
+   --  ------------------------------
+   --  Get the Ada package name from a qualified type
+   --  ------------------------------
+   function Get_Package_Name (Name : in String) return String is
+      Pos : constant Natural := Util.Strings.Rindex (Name, '.');
+   begin
+      if Pos > Name'First then
+         return Name (Name'First .. Pos - 1);
+      else
+         return "";
+      end if;
+   end Get_Package_Name;
+
+   --  ------------------------------
+   --  Get a query name from the XML query file name
+   --  ------------------------------
+   function Get_Query_Name (Path : in String) return String is
+      Pos : Natural := Util.Strings.Rindex (Path, '/');
+   begin
+      if Pos = 0 then
+         Pos := Util.Strings.Rindex (Path, '.');
+         if Pos > Path'First then
+            return Path (Path'First .. Pos - 1);
+         else
+            return Path;
+         end if;
+      else
+         return Get_Query_Name (Path (Pos + 1 .. Path'Last));
+      end if;
+   end Get_Query_Name;
 
 end Gen.Utils;

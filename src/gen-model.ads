@@ -33,7 +33,9 @@ package Gen.Model is
    --  Model Definition
    --  ------------------------------
    type Definition is new Ada.Finalization.Limited_Controlled
-     and Util.Beans.Basic.Readonly_Bean with private;
+     and Util.Beans.Basic.Readonly_Bean with record
+      Node : DOM.Core.Node;
+   end record;
    type Definition_Access is access all Definition'Class;
 
    --  Set the DOM node associated with the definition object
@@ -81,12 +83,5 @@ package Gen.Model is
    --  Get the first DOM child from the given entity tag
    function Get_Child (Node : DOM.Core.Node;
                        Name : String) return DOM.Core.Node;
-
-private
-
-   type Definition is new Ada.Finalization.Limited_Controlled
-     and Util.Beans.Basic.Readonly_Bean with record
-      Node : DOM.Core.Node;
-   end record;
 
 end Gen.Model;

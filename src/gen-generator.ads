@@ -21,10 +21,11 @@ with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Strings.Unbounded;
 
-with EL.Objects;
+with Util.Beans.Objects;
 with ASF.Applications.Main;
 with ASF.Contexts.Faces;
-with Gen.Model.Tables;
+with Gen.Model.Packages;
+with Gen.Artifacts.Hibernate;
 package Gen.Generator is
 
    type Iteration_Mode is (ITERATION_PACKAGE, ITERATION_TABLE);
@@ -74,10 +75,6 @@ package Gen.Generator is
    procedure Set_Result_Directory (H    : in out Handler;
                                    Path : in String);
 
-   --  Register a model mapping
-   procedure Register_Mapping (H    : in out Handler;
-                               Node : in DOM.Core.Node);
-
    --  Get the exit status
    --  Returns 0 if the generation was successful
    --  Returns 1 if there was a generation error
@@ -87,11 +84,14 @@ private
 
    type Handler is new ASF.Applications.Main.Application with record
       Conf   : ASF.Applications.Config;
-      Model  : aliased Gen.Model.Tables.Model_Definition;
+      Model  : aliased Gen.Model.Packages.Model_Definition;
       Doc    : DOM.Core.Document;
       Root   : DOM.Core.Element;
       Status : Ada.Command_Line.Exit_Status := 0;
-      File   : access EL.Objects.Object;
+      File   : access Util.Beans.Objects.Object;
+
+      --  Hibernate XML artifact
+      Hibernate : Gen.Artifacts.Hibernate.Artifact;
    end record;
 
    --  Execute the lifecycle phases on the faces context.

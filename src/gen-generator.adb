@@ -32,11 +32,11 @@ with Util.Beans.Basic;
 with EL.Functions;
 
 with Gen.Model;
-with Gen.Utils;
+with Gen.Model.Tables;
 
 with Util.Files;
 with Util.Log.Loggers;
-with Util.Beans.Objects.To_Access;
+--  with Util.Beans.Objects.To_Access;
 package body Gen.Generator is
 
    use ASF;
@@ -49,10 +49,10 @@ package body Gen.Generator is
 
    function To_Ada_Type (Value : in Util.Beans.Objects.Object;
                          Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
-   function Indent (Value : EL.Objects.Object) return EL.Objects.Object;
+   function Indent (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
    --  EL Function to translate a model type to the key enum value
-   function To_Key_Enum (Name : EL.Objects.Object) return EL.Objects.Object;
+   function To_Key_Enum (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
 --     function To_Column_Access is
 --       new Util.Beans.Objects.To_Access (T => Gen.Model.Tables.Column_Definition,
@@ -94,7 +94,8 @@ package body Gen.Generator is
          end if;
       end To_Ada_Type;
 
-      Ptr : access Util.Beans.Basic.Readonly_Bean'Class := Util.Beans.Objects.To_Bean (Value);
+      Ptr : constant access Util.Beans.Basic.Readonly_Bean'Class
+        := Util.Beans.Objects.To_Bean (Value);
    begin
       if Ptr /= null and then Ptr.all in Column_Definition'Class then
          Column := Column_Definition'Class (Ptr.all)'Unchecked_Access;
@@ -117,13 +118,13 @@ package body Gen.Generator is
    --  ------------------------------
    --  EL Function to check whether a type is an integer type
    --  ------------------------------
-   function Is_Integer_Type (Name : EL.Objects.Object) return EL.Objects.Object is
-      Value : constant String := EL.Objects.To_String (Name);
+   function Is_Integer_Type (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      Value : constant String := Util.Beans.Objects.To_String (Name);
    begin
       if Value = "Integer" or Value = "int" then
-         return EL.Objects.To_Object (True);
+         return Util.Beans.Objects.To_Object (True);
       else
-         return EL.Objects.To_Object (False);
+         return Util.Beans.Objects.To_Object (False);
       end if;
    end Is_Integer_Type;
 
@@ -146,32 +147,32 @@ package body Gen.Generator is
    --  ------------------------------
    --  EL Function to translate a model type to the key enum value
    --  ------------------------------
-   function To_Key_Enum (Name : EL.Objects.Object) return EL.Objects.Object is
-      Value : constant String := EL.Objects.To_String (Name);
+   function To_Key_Enum (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      Value : constant String := Util.Beans.Objects.To_String (Name);
    begin
       if Value = "Integer" or Value = "int" or Value = "Identifier"
          or Value = "ADO.Identifier" then
-         return EL.Objects.To_Object (KEY_INTEGER_LABEL);
+         return Util.Beans.Objects.To_Object (KEY_INTEGER_LABEL);
       else
-         return EL.Objects.To_Object (KEY_STRING_LABEL);
+         return Util.Beans.Objects.To_Object (KEY_STRING_LABEL);
       end if;
    end To_Key_Enum;
 
    --  ------------------------------
    --  EL function to indent the code
    --  ------------------------------
-   function Indent (Value : EL.Objects.Object) return EL.Objects.Object is
-      S      : constant String := EL.Objects.To_String (Value);
+   function Indent (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      S      : constant String := Util.Beans.Objects.To_String (Value);
       Result : constant String (S'Range) := (others => ' ');
    begin
-      return EL.Objects.To_Object (Result);
+      return Util.Beans.Objects.To_Object (Result);
    end Indent;
 
    --  ------------------------------
    --  EL function to indent the code
    --  ------------------------------
-   function To_Sql_Type (Value : EL.Objects.Object) return EL.Objects.Object is
-      Name   : constant String := EL.Objects.To_String (Value);
+   function To_Sql_Type (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      Name   : constant String := Util.Beans.Objects.To_String (Value);
       Result : Unbounded_String;
    begin
       if Name = "Identifier" then
@@ -185,7 +186,7 @@ package body Gen.Generator is
       else
          Append (Result, "VARCHAR(255)");
       end if;
-      return EL.Objects.To_Object (Result);
+      return Util.Beans.Objects.To_Object (Result);
    end To_Sql_Type;
 
    --  ------------------------------
@@ -233,7 +234,7 @@ package body Gen.Generator is
       H.Initialize (H.Conf, Factory);
 
       Register_Funcs (H);
-      H.File := new EL.Objects.Object;
+      H.File := new Util.Beans.Objects.Object;
    end Initialize;
 
    --  ------------------------------
@@ -253,15 +254,6 @@ package body Gen.Generator is
    begin
       H.Conf.Set (RESULT_DIR, Path);
    end Set_Result_Directory;
-
-   --  ------------------------------
-   --  Register a model mapping
-   --  ------------------------------
-   procedure Register_Mapping (H    : in out Handler;
-                               Node : in DOM.Core.Node) is
-   begin
-      H.Model.Initialize (Node);
-   end Register_Mapping;
 
    --  ------------------------------
    --  Get the exit status
@@ -294,11 +286,8 @@ package body Gen.Generator is
       My_Tree_Reader : DOM.Readers.Tree_Reader;
       Name_Start     : Natural;
 
-      procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Handler,
-                                                        Process => Register_Mapping);
-
    begin
-      Log.Info ("Reading model file {0}", File);
+      Log.Info ("Reading model file '{0}'", File);
 
       --  Base file name should be used as the public Id
       Name_Start := File'Last;
@@ -319,7 +308,7 @@ package body Gen.Generator is
       H.Doc := DOM.Readers.Get_Tree (My_Tree_Reader);
       H.Root := DOM.Core.Documents.Get_Element (H.Doc);
 
-      Iterate (H, H.Root, "hibernate-mapping");
+      H.Hibernate.Initialize (Model => H.Model, Node => H.Root);
 
    exception
       when Ada.IO_Exceptions.Name_Error =>
@@ -350,29 +339,25 @@ package body Gen.Generator is
    procedure Generate (H     : in out Handler;
                        File  : in String;
                        Model : in Gen.Model.Definition_Access) is
-      --  Context   : aliased Contexts.Faces.Faces_Context;
-      --  View      : Components.Core.UIViewRoot;
-      --  Resolver  : aliased EL.Contexts.Default.Default_ELResolver;
       Req   : ASF.Requests.Mockup.Request;
       Reply : ASF.Responses.Mockup.Response;
-      Ptr   : Util.Beans.Basic.Readonly_Bean_Access := Model.all'Unchecked_Access;
-      Bean  : constant EL.Objects.Object := EL.Objects.To_Object (Ptr);
+      Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := Model.all'Unchecked_Access;
+      Bean  : constant Util.Beans.Objects.Object := Util.Beans.Objects.To_Object (Ptr);
    begin
       Log.Info ("Generating {0}", File);
 
       Req.Set_Path_Info (File);
       Req.Set_Method ("GET");
       Req.Set_Attribute (Name => "model", Value => Bean);
-      --  Resolver.Register (To_Unbounded_String ("model"), Model.all'Unchecked_Access);
 
-      Model.Prepare;
+--        H.Hibernate.Prepare (Model.all);
       H.Dispatch (Page     => File,
                   Request  => Req,
                   Response => Reply);
 
       declare
          Dir     : constant String := H.Conf.Get (RESULT_DIR, "./");
-         Path    : constant String := Dir & EL.Objects.To_String (H.File.all);
+         Path    : constant String := Dir & Util.Beans.Objects.To_String (H.File.all);
          Content : Unbounded_String;
       begin
          Log.Info ("Writing result file {0}", Path);
@@ -392,11 +377,11 @@ package body Gen.Generator is
       case Mode is
          when ITERATION_PACKAGE =>
             declare
-               Pos : Gen.Model.Tables.Package_Cursor := H.Model.First;
+               Pos : Gen.Model.Packages.Package_Cursor := H.Model.First;
             begin
-               while Gen.Model.Tables.Has_Element (Pos) loop
-                  H.Generate (File, Gen.Model.Tables.Element (Pos).all'Access);
-                  Gen.Model.Tables.Next (Pos);
+               while Gen.Model.Packages.Has_Element (Pos) loop
+                  H.Generate (File, Gen.Model.Packages.Element (Pos).all'Access);
+                  Gen.Model.Packages.Next (Pos);
                end loop;
             end;
 

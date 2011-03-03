@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!-- This is used to map the model types to Java types for the generated code.
+  It extends the default META-INF\andromda\mappings\JavaMappings.xml file in the
+  org/andromda/plugins/andromda-maven-plugin/<Version>/andromda-maven-plugin-<Version>.jar file.
+  If any type mappings are missing or need to be changed
+  from the default mapping file, they can be added here. Examples
+  below are already mapped. A reference was added to config\andromda.xml
+  under default namespace properties languageMappingsUri.
+  See http://docs.andromda.org/mappings.html -->
+<mappings name="Ada05">
+    <mapping>
+        <from>Time</from>
+        <from>Date</from>
+        <from>DateTime</from>
+        <from>Timestamp</from>
+        <from>PrimitiveTypes::Time</from>
+        <from>PrimitiveTypes::Date</from>
+        <from>PrimitiveTypes::DateTime</from>
+        <from>PrimitiveTypes::Timestamp</from>
+        <from>datatype::Time</from>
+        <from>datatype::Date</from>
+        <from>datatype::DateTime</from>
+        <from>datatype::Timestamp</from>
+        <to>Ada.Calendar.Time</to>
+    </mapping>
+    <mapping>
+        <from>int</from>
+        <from>Integer</from>
+        <from>PrimitiveTypes::Integer</from>
+        <from>datatype::Integer</from>
+        <to>Integer</to>
+    </mapping>
+    <mapping>
+        <from>long</from>
+        <from>Long</from>
+        <from>PrimitiveTypes::Long</from>
+        <from>datatype::Long</from>
+        <to>Long</to>
+    </mapping>
+    <mapping>
+        <from>ADO.Identifier</from>
+        <from>Identifier</from>
+        <from>identifier</from>
+        <from>PrimitiveTypes::Identifier</from>
+        <from>datatype::Identifier</from>
+        <to>ADO.Identifier</to>
+    </mapping>
+    <mapping>
+        <from>bool</from>
+        <from>boolean</from>
+        <to>Boolean</to>
+    </mapping>
+    <mapping>
+        <from>String</from>
+        <to>Ada.String.Unbounded.Unbounded_String</to>
+    </mapping>
+    <mapping>
+        <from>PrimitiveTypes::Double</from>
+        <from>double</from>
+        <to>Double</to>
+    </mapping>
+    <mapping>
+        <from>PrimitiveTypes::Double</from>
+        <from>float</from>
+        <to>Float</to>
+    </mapping>
+</mappings>

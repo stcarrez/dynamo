@@ -74,11 +74,15 @@ package Gen.Generator is
 
    --  Set the directory where template files are stored.
    procedure Set_Template_Directory (H    : in out Handler;
-                                     Path : in String);
+                                     Path : in Ada.Strings.Unbounded.Unbounded_String);
+
+   --  Set the directory where configuration files are stored.
+   procedure Set_Config_Directory (H    : in out Handler;
+                                   Path : in Ada.Strings.Unbounded.Unbounded_String);
 
    --  Set the directory where results files are generated.
    procedure Set_Result_Directory (H    : in out Handler;
-                                   Path : in String);
+                                   Path : in Ada.Strings.Unbounded.Unbounded_String);
 
    --  Get the exit status
    --  Returns 0 if the generation was successful

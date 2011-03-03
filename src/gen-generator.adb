@@ -237,28 +237,41 @@ package body Gen.Generator is
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_EMPTY_LINES, "true");
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
       if not H.Conf.Exists (ASF.Applications.VIEW_DIR) then
-         H.Set_Template_Directory ("templates/");
+         H.Set_Template_Directory (To_Unbounded_String ("templates/"));
       end if;
       H.Initialize (H.Conf, Factory);
 
       Register_Funcs (H);
       H.File := new Util.Beans.Objects.Object;
+
+      --  Read the type mappings
+      Read_Model (H    => H,
+                  File => H.Conf.Get (ASF.Applications.VIEW_DIR) & "/AdaMappings.xml");
    end Initialize;
 
    --  ------------------------------
    --  Set the directory where template files are stored.
    --  ------------------------------
    procedure Set_Template_Directory (H    : in out Handler;
-                                     Path : in String) is
+                                     Path : in Ada.Strings.Unbounded.Unbounded_String) is
    begin
       H.Conf.Set (ASF.Applications.VIEW_DIR, Path);
    end Set_Template_Directory;
 
    --  ------------------------------
+   --  Set the directory where configuration files are stored.
+   --  ------------------------------
+   procedure Set_Config_Directory (H    : in out Handler;
+                                   Path : in Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      H.Conf.Set (ASF.Applications.VIEW_DIR, Path & "/template");
+   end Set_Config_Directory;
+
+   --  ------------------------------
    --  Set the directory where results files are generated.
    --  ------------------------------
    procedure Set_Result_Directory (H    : in out Handler;
-                                   Path : in String) is
+                                   Path : in Ada.Strings.Unbounded.Unbounded_String) is
    begin
       H.Conf.Set (RESULT_DIR, Path);
    end Set_Result_Directory;

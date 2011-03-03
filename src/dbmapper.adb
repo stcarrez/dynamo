@@ -20,6 +20,7 @@ with GNAT.Command_Line;  use GNAT.Command_Line;
 with Sax.Readers;        use Sax.Readers;
 with Ada.Text_IO;
 
+with Ada.Strings.Unbounded;
 with Ada.Exceptions;
 with Ada.Command_Line;
 
@@ -27,10 +28,8 @@ with Util.Log.Loggers;
 with Gen.Generator;
 procedure DBMapper is
    use Ada;
-
+   use Ada.Strings.Unbounded;
    use Ada.Command_Line;
-
-   Generator : Gen.Generator.Handler;
 
    Release : constant String
      := "ADO Generator 0.3, Stephane Carrez";
@@ -59,6 +58,7 @@ procedure DBMapper is
       Put_Line ("   -q           Query mode");
       Put_Line ("   -o directory Directory where the Ada mapping files are generated");
       Put_Line ("   -t templates Directory where the Ada templates are defined");
+      Put_Line ("   -c dir       Directory where the Ada templates and configurations are defined");
       New_Line;
       Put_Line ("   -h           Requests this info.");
       New_Line;
@@ -66,54 +66,75 @@ procedure DBMapper is
 
    File_Count : Natural := 0;
 
+   Out_Dir      : Unbounded_String;
+   Config_Dir   : Unbounded_String;
+   Template_Dir : Unbounded_String;
 begin
-   --  Initialization is optional.  Get the log configuration by reading the property
-   --  file 'log4j.properties'.  The 'log.util' logger will use a DEBUG level
-   --  and write the message in 'result.log'.
-   Util.Log.Loggers.Initialize ("log4j.properties");
-
    --  Parse the command line
    loop
-      case Getopt ("o: t:") is
+      case Getopt ("o: t: c:") is
          when ASCII.Nul => exit;
 
          when 'o' =>
-            Gen.Generator.Set_Result_Directory (Generator, Parameter & "/");
+            Out_Dir := To_Unbounded_String (Parameter & "/");
 
          when 't' =>
-            Gen.Generator.Set_Template_Directory (Generator, Parameter & "/");
+            Template_Dir := To_Unbounded_String (Parameter & "/");
+
+         when 'c' =>
+            Config_Dir := To_Unbounded_String (Parameter & "/");
 
          when others =>
             null;
       end case;
    end loop;
 
-   Gen.Generator.Initialize (Generator);
-
-   --  Read the model files.
-   loop
-      declare
-         Model_File : constant String := Get_Argument;
-      begin
-         exit when Model_File'Length = 0;
-         File_Count := File_Count + 1;
-         Gen.Generator.Read_Model (Generator, Model_File);
-      end;
-   end loop;
-
-   if File_Count = 0 then
-      Usage;
-      Set_Exit_Status (2);
-      return;
+   if Length (Config_Dir) = 0 then
+      Config_Dir := To_Unbounded_String ("config/");
    end if;
 
-   --  Run the generation.
-   Gen.Generator.Prepare (Generator);
-   Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
-   Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
+   --  Configure the logs
+   Util.Log.Loggers.Initialize (To_String (Config_Dir) & "/log4j.properties");
 
-   Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
+   declare
+      Generator : Gen.Generator.Handler;
+   begin
+      if Length (Out_Dir) > 0 then
+         Gen.Generator.Set_Result_Directory (Generator, Out_Dir);
+      end if;
+      if Length (Template_Dir) > 0 then
+         Gen.Generator.Set_Template_Directory (Generator, Template_Dir);
+      end if;
+      if Length (Config_Dir) > 0 then
+         Gen.Generator.Set_Config_Directory (Generator, Config_Dir);
+      end if;
 
+      Gen.Generator.Initialize (Generator);
+
+      --  Read the model files.
+      loop
+         declare
+            Model_File : constant String := Get_Argument;
+         begin
+            exit when Model_File'Length = 0;
+            File_Count := File_Count + 1;
+            Gen.Generator.Read_Model (Generator, Model_File);
+         end;
+      end loop;
+
+      if File_Count = 0 then
+         Usage;
+         Set_Exit_Status (2);
+         return;
+      end if;
+
+      --  Run the generation.
+      Gen.Generator.Prepare (Generator);
+      Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
+      Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
+
+      Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
+   end;
 exception
    when E : XML_Fatal_Error =>
       Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));

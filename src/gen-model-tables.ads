@@ -24,6 +24,7 @@ with Util.Beans.Objects;
 
 with Gen.Model.List;
 with Gen.Model.Packages;
+with Gen.Model.Mappings;
 package Gen.Model.Tables is
 
    use Ada.Strings.Unbounded;
@@ -67,6 +68,8 @@ package Gen.Model.Tables is
 
       --  True if the column is included in the update statement
       Is_Updated   : Boolean := True;
+
+      Type_Mapping : Gen.Model.Mappings.Mapping_Definition_Access;
    end record;
    type Column_Definition_Access is access all Column_Definition'Class;
 
@@ -75,6 +78,10 @@ package Gen.Model.Tables is
    overriding
    function Get_Value (From : Column_Definition;
                        Name : String) return Util.Beans.Objects.Object;
+
+   --  Prepare the generation of the model.
+   overriding
+   procedure Prepare (O : in out Column_Definition);
 
    --  Returns true if the column type is a basic type.
    function Is_Basic_Type (From : Column_Definition) return Boolean;
@@ -118,6 +125,14 @@ package Gen.Model.Tables is
    overriding
    function Get_Value (From : Table_Definition;
                        Name : String) return Util.Beans.Objects.Object;
+
+   --  Prepare the generation of the model.
+   overriding
+   procedure Prepare (O : in out Table_Definition);
+
+   --  Set the table name and determines the package name.
+   procedure Set_Table_Name (Table : in out Table_Definition;
+                             Name  : in String);
 
    package Table_Map is
      new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,

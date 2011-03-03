@@ -25,6 +25,7 @@ with Util.Beans.Objects;
 with Util.Beans.Objects.Vectors;
 
 with Gen.Model.List;
+with Gen.Model.Mappings;
 limited with Gen.Model.Tables;
 package Gen.Model.Packages is
 
@@ -80,6 +81,17 @@ package Gen.Model.Packages is
    --  Register the declaration of the given table in the model.
    procedure Register_Table (O     : in out Model_Definition;
                              Table : access Gen.Model.Tables.Table_Definition'Class);
+
+   --  Register the declaration of the given query in the model.
+   procedure Register_Query (O     : in out Model_Definition;
+                             Table : access Gen.Model.Tables.Table_Definition'Class);
+
+   --  Register a type mapping.  The <b>From</b> type describes a type in the XML
+   --  configuration files (hibernate, query, ...) and the <b>To</b> represents the
+   --  corresponding Ada type.
+   procedure Register_Type (O    : in out Model_Definition;
+                            From : in String;
+                            To   : in String);
 
    --  Prepare the generation of the package:
    --  o identify the column types which are used
@@ -172,8 +184,15 @@ private
    end record;
 
    type Model_Definition is new Definition with record
+      --  List of all tables.
       Tables      : aliased Table_List.List_Definition;
       Tables_Bean : Util.Beans.Objects.Object;
+
+      --  List of all queries.
+      Queries      : aliased Table_List.List_Definition;
+      Queries_Bean : Util.Beans.Objects.Object;
+
+      --  Map of all packages.
       Packages    : Package_Map.Map;
    end record;
 

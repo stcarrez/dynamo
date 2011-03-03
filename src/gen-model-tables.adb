@@ -17,7 +17,7 @@
 -----------------------------------------------------------------------
 
 with Ada.Strings;
-
+with Util.Strings;
 package body Gen.Model.Tables is
 
    use type DOM.Core.Node;
@@ -29,8 +29,17 @@ package body Gen.Model.Tables is
    overriding
    function Get_Value (From : Column_Definition;
                        Name : String) return Util.Beans.Objects.Object is
+      use type Gen.Model.Mappings.Mapping_Definition_Access;
    begin
-      if Name = "type" then
+
+      if Name = "type" and From.Type_Mapping /= null then
+         declare
+            Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Type_Mapping.all'Access;
+         begin
+            return Util.Beans.Objects.To_Object (From.Type_Name);
+         end;
+
+      elsif Name = "type" then
          return Util.Beans.Objects.To_Object (From.Type_Name);
 
       elsif Name = "index" then
@@ -98,9 +107,23 @@ package body Gen.Model.Tables is
    --  Returns the column type.
    --  ------------------------------
    function Get_Type (From : Column_Definition) return String is
+      use type Gen.Model.Mappings.Mapping_Definition_Access;
    begin
-      return To_String (From.Type_Name);
+      if From.Type_Mapping /= null then
+         return To_String (From.Type_Mapping.Target);
+      else
+         return To_String (From.Type_Name);
+      end if;
    end Get_Type;
+
+   --  ------------------------------
+   --  Prepare the generation of the model.
+   --  ------------------------------
+   overriding
+   procedure Prepare (O : in out Column_Definition) is
+   begin
+      O.Type_Mapping := Gen.Model.Mappings.Find_Type (O.Type_Name);
+   end Prepare;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -130,32 +153,65 @@ package body Gen.Model.Tables is
    function Get_Value (From : Table_Definition;
                        Name : String) return Util.Beans.Objects.Object is
    begin
-      if Name = "members" then
+      if Name = "members" or Name = "columns" then
          return From.Members_Bean;
 
-      elsif Name ="id" then
+      elsif Name ="id" and From.Id_Column /= null then
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Id_Column.all'Access;
          begin
             return Util.Beans.Objects.To_Object (Bean);
          end;
 
-      elsif Name ="version" then
+      elsif Name ="version" and From.Version_Column /= null then
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Version_Column.all'Unchecked_Access;
          begin
             return Util.Beans.Objects.To_Object (Bean);
          end;
 
+      elsif Name = "hasAssociations" then
+         return Util.Beans.Objects.To_Object (From.Has_Associations);
+
       elsif Name = "type" then
          return Util.Beans.Objects.To_Object (From.Type_Name);
 
-      elsif Name = "hasAssociations" then
-         return Util.Beans.Objects.To_Object (From.Has_Associations);
+      elsif Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
 
       else
          return Definition (From).Get_Value (Name);
       end if;
    end Get_Value;
+
+   --  ------------------------------
+   --  Prepare the generation of the model.
+   --  ------------------------------
+   overriding
+   procedure Prepare (O : in out Table_Definition) is
+      Iter : Column_List.Cursor := O.Members.First;
+   begin
+      while Column_List.Has_Element (Iter) loop
+         Column_List.Element (Iter).Prepare;
+         Column_List.Next (Iter);
+      end loop;
+   end Prepare;
+
+   --  ------------------------------
+   --  Set the table name and determines the package name.
+   --  ------------------------------
+   procedure Set_Table_Name (Table : in out Table_Definition;
+                             Name  : in String) is
+      Pos : constant Natural := Util.Strings.RIndex (Name, '.');
+   begin
+      Table.Name := To_Unbounded_String (Name);
+      if Pos > 0 then
+         Table.Pkg_Name := To_Unbounded_String (Name (Name'First .. Pos - 1));
+         Table.Type_Name := To_Unbounded_String (Name (Pos + 1 .. Name'Last));
+      else
+         Table.Pkg_Name := To_Unbounded_String ("ADO");
+         Table.Type_Name := Table.Name;
+      end if;
+   end Set_Table_Name;
 
 end Gen.Model.Tables;

@@ -19,6 +19,7 @@
 with Ada.Strings;
 with Ada.Strings.Maps;
 
+with Gen.Utils;
 with Gen.Model.Tables;
 
 with Util.Strings;
@@ -74,6 +75,17 @@ package body Gen.Model.Packages is
    end Register_Table;
 
    --  ------------------------------
+   --  Register the declaration of the given query in the model.
+   --  ------------------------------
+   procedure Register_Query (O     : in out Model_Definition;
+                             Table : access Gen.Model.Tables.Table_Definition'Class) is
+   begin
+      O.Register_Package (Table.Pkg_Name, Table.Package_Def);
+      Table.Package_Def.Queries.Append (Table.all'Access);
+      O.Queries.Append (Table.all'Access);
+   end Register_Query;
+
+   --  ------------------------------
    --  Register or find the package knowing its name
    --  ------------------------------
    procedure Register_Package (O      : in out Model_Definition;
@@ -112,48 +124,52 @@ package body Gen.Model.Packages is
       use Gen.Model.Tables;
 
       Used_Types  : String_Set.Set;
-      Table_Iter  : Table_List.Cursor := O.Tables.First;
-      T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
+       T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
 
-      function Get_Package_Name (Name : in String) return String is
-         Pos : constant Natural := Util.Strings.Rindex (Name, '.');
+      procedure Prepare_Table (Table : in Table_Definition_Access) is
+         C     : Column_List.Cursor := Table.Members.First;
       begin
-         if Pos > Name'First then
-            return Name (Name'First .. Pos - 1);
-         else
-            return "";
-         end if;
-      end Get_Package_Name;
+         Table.Prepare;
+
+         --  Walk the columns to get their type.
+         while Column_List.Has_Element (C) loop
+            declare
+               Col  : constant Column_Definition_Access := Column_List.Element (C);
+               T    : constant String := To_String (Col.Type_Name);
+               Name : constant String := Gen.Utils.Get_Package_Name (T);
+            begin
+               if not Col.Is_Basic_Type and Name'Length > 0 then
+                  Used_Types.Include (To_Unbounded_String (Name));
+
+               elsif T = "Time" or T = "Date" or T = "Timestamp" then
+                  O.Uses_Calendar_Time := True;
+               end if;
+            end;
+            Column_List.Next (C);
+         end loop;
+      end Prepare_Table;
+
+      procedure Prepare_Tables (Tables : in Table_List.List_Definition) is
+         Table_Iter  : Table_List.Cursor := Tables.First;
+      begin
+         while Table_List.Has_Element (Table_Iter) loop
+            declare
+               Table : constant Table_Definition_Access := Table_Definition_Access (Table_List.Element (Table_Iter));
+            begin
+               Prepare_Table (Table);
+            end;
+            Table_List.Next (Table_Iter);
+         end loop;
+      end Prepare_Tables;
 
    begin
       O.Used := Util.Beans.Objects.To_Object (T);
       O.Used_Types.Row := 0;
       O.Used_Types.Values.Clear;
       O.Uses_Calendar_Time := False;
-      while Table_List.Has_Element (Table_Iter) loop
-         declare
-            Table : constant Table_Definition_Access := Table_Definition_Access (Table_List.Element (Table_Iter));
-            C     : Column_List.Cursor := Table.Members.First;
-         begin
-            while Column_List.Has_Element (C) loop
-               declare
-                  Col : constant Column_Definition_Access := Column_List.Element (C);
-                  T    : constant String := To_String (Col.Type_Name);
-                  Name : constant String := Get_Package_Name (T);
-               begin
-                  if not Col.Is_Basic_Type and Name'Length > 0 then
-                     Used_Types.Include (To_Unbounded_String (Name));
 
-                  elsif T = "Time" or T = "Date" or T = "Timestamp" then
-                     O.Uses_Calendar_Time := True;
-                  end if;
-               end;
-               Column_List.Next (C);
-            end loop;
-         end;
-         Table_List.Next (Table_Iter);
-      end loop;
-
+      Prepare_Tables (O.Tables);
+      Prepare_Tables (O.Queries);
       declare
          P : String_Set.Cursor := Used_Types.First;
       begin
@@ -271,5 +287,17 @@ package body Gen.Model.Packages is
    begin
       return From.Packages.First;
    end First;
+
+   --  ------------------------------
+   --  Register a type mapping.  The <b>From</b> type describes a type in the XML
+   --  configuration files (hibernate, query, ...) and the <b>To</b> represents the
+   --  corresponding Ada type.
+   --  ------------------------------
+   procedure Register_Type (O    : in out Model_Definition;
+                            From : in String;
+                            To   : in String) is
+   begin
+      null;
+   end Register_Type;
 
 end Gen.Model.Packages;

@@ -1,0 +1,35 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core">
+<h:list value="#{model.queries}" var="query">
+   --  --------------------
+   --  #{query.comment}
+   --  --------------------
+   type #{query.type} is tagged record
+   <h:list value="#{query.columns}" var="column">
+      --  #{column.comment}
+      #{fn:capitalize(column.name)} : #{g:adaType(column,0)};
+#{''}
+   </h:list>
+   end record;
+#{''}
+
+   package #{fn:capitalize(query.type)}_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Natural,
+                                  Element_Type => #{fn:capitalize(query.type)},
+                                  "="          => "=");
+   subtype #{fn:capitalize(query.type)}_Vector is #{fn:capitalize(query.type)}_Vectors.Vector;
+#{''}
+
+   procedure List (Object  : in out #{fn:capitalize(query.type)}_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+
+   #{fn:capitalize(query.name)} : constant ADO.Queries.Definition;
+#{''}
+</h:list>
+
+#{''}
+</ui:composition>

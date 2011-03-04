@@ -1,0 +1,68 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core">
+
+<h:list value="#{model.tables}" var="table">
+   #{fn:toUpperCase(table.type)}_NAME : aliased constant String := "#{table.table}";
+   <h:list value="#{table.members}" var="column">
+   COL_#{column.index}_#{model.tables.rowIndex}_NAME : aliased constant String := "#{column.sqlName}";
+   </h:list>
+
+   #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping :=
+     (Count => #{table.members.size},
+      Table => #{fn:toUpperCase(table.type)}_NAME'Access,
+      Members => (<h:list value="#{table.members}" var="column">
+         COL_#{column.index}_#{model.tables.rowIndex}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
+      </h:list>)
+     );
+
+   type #{fn:capitalize(table.type)}_Impl is
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.#{g:keyEnum(table.id.type)},
+                                     Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access)
+   with record
+<h:list value="#{table.members}" var="column">
+<h:panelGroup rendered="#{column.name ne table.id.name}">
+       #{fn:capitalize(column.name)} : #{g:adaType(column,0)};
+</h:panelGroup>
+</h:list>
+   end record;
+
+   type #{fn:capitalize(table.type)}_Access is access all #{fn:capitalize(table.type)}_Impl;
+
+   overriding
+   procedure Destroy (Object : access #{fn:capitalize(table.type)}_Impl);
+
+   overriding
+   procedure Find (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Query   : in ADO.SQL.Query'Class;
+                   Found   : out Boolean);
+
+   overriding
+   procedure Load (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Session'Class);
+
+   procedure Load (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Stmt    : in out ADO.Statements.Query_Statement'Class;
+                   Session : in out ADO.Sessions.Session'Class);
+
+   overriding
+   procedure Save (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                   Session : in out ADO.Sessions.Master_Session'Class);
+   
+   procedure Create (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+   overriding
+   procedure Delete (Object  : in out #{fn:capitalize(table.type)}_Impl;
+                     Session : in out ADO.Sessions.Master_Session'Class);
+
+
+   procedure Set_Field (Object : in out #{fn:capitalize(table.type)}_Ref'Class;
+                        Impl   : out #{fn:capitalize(table.type)}_Access;
+                        Field  : in Positive);
+</h:list>
+
+</ui:composition>

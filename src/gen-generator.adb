@@ -423,12 +423,16 @@ package body Gen.Generator is
                        Mode  : in Iteration_Mode;
                        File  : in String) is
    begin
+      Log.Debug ("Generating with template {0} in mode {1}",
+                 File, Iteration_Mode'Image (Mode));
+
       case Mode is
          when ITERATION_PACKAGE =>
             declare
                Pos : Gen.Model.Packages.Package_Cursor := H.Model.First;
             begin
                while Gen.Model.Packages.Has_Element (Pos) loop
+                  Log.Debug ("  Generate for package");
                   H.Generate (File, Gen.Model.Packages.Element (Pos).all'Access);
                   Gen.Model.Packages.Next (Pos);
                end loop;
@@ -446,6 +450,9 @@ package body Gen.Generator is
    procedure Generate_All (H    : in out Handler) is
       Iter : Template_Map.Cursor := H.Templates.First;
    begin
+      Log.Debug ("Generating the files {0}",
+                Ada.Containers.Count_Type'Image (H.Templates.Length));
+
       while Template_Map.Has_Element (Iter) loop
          H.Generate (File => To_String (Template_Map.Key (Iter)),
                      Mode => Template_Map.Element (Iter));

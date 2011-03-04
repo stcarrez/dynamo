@@ -91,7 +91,9 @@ package body Gen.Model.Packages is
    procedure Register_Package (O      : in out Model_Definition;
                                Name   : in Unbounded_String;
                                Result : out Package_Definition_Access) is
-      Pos : constant Package_Map.Cursor := O.Packages.Find (Name);
+      Pkg : constant String := Util.Strings.Transforms.To_Upper_Case (To_String (Name));
+      Key : constant Unbounded_String := To_Unbounded_String (Pkg);
+      Pos : constant Package_Map.Cursor := O.Packages.Find (Key);
    begin
       if not Package_Map.Has_Element (Pos) then
          declare
@@ -106,7 +108,7 @@ package body Gen.Model.Packages is
             Result.Tables_Bean := Util.Beans.Objects.To_Object (Result.Tables'Access);
             Util.Strings.Transforms.To_Lower_Case (To_String (Base_Name),
                                                    Result.Base_Name);
-            O.Packages.Insert (Name, Result);
+            O.Packages.Insert (Key, Result);
             Log.Debug ("Ada package '{0}' registered", Name);
          end;
       else

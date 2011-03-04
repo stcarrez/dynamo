@@ -10,8 +10,34 @@
    procedure List (Object  : in out #{fn:capitalize(query.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class) is
+      Stmt : ADO.Statements.Query_Statement
+          := Session.Create_Statement (Context);
+      Pos  : Natural := 0;
+
+      procedure Read (Into : in out #{fn:capitalize(query.type)}) is
+      begin
+<h:list value="#{query.members}" var="column">
+  <h:panelGroup rendered="#{column.type.isIdentifier}">
+         Into.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isString}">
+         Into.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{not column.type.isIdentifier and not column.type.isString}">
+         Into.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
+  </h:panelGroup>
+</h:list>
+      end Read;
+
    begin
-      null;
+      Stmt.Execute;
+      #{fn:capitalize(query.type)}_Vectors.Clear (Object);
+      while Stmt.Has_Elements loop
+         Object.Insert_Space (Before => Pos - 1);
+         Object.Update_Element (Index => Pos, Process => Read'Access);
+         Pos := Pos + 1;
+         Stmt.Next;
+      end loop;
    end List;
 
 #{''}

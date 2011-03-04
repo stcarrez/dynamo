@@ -26,7 +26,7 @@
    --  Set #{column.comment}
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
                   #{g:indent(column.name)} Value  : in #{g:adaType(column,1)});
-<h:panelGroup rendered="#{column.type == 'String'}">
+<h:panelGroup rendered="#{column.type.isString}">
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
                   #{g:indent(column.name)} Value : in String);
 </h:panelGroup>
@@ -36,7 +36,7 @@
    --  Get #{column.comment}
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
                  return #{g:adaType(column,1)};
-<h:panelGroup rendered="#{column.type == 'String'}">
+<h:panelGroup rendered="#{column.type.isString}">
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
                  return String;
 </h:panelGroup>
@@ -47,7 +47,7 @@
    --  Raises the NOT_FOUND exception if it does not exist.
    procedure Load (Object  : in out #{fn:capitalize(table.type)}_Ref;
                    Session : in out ADO.Sessions.Session'Class;
-                   Id      : in #{g:adaType(table.id.type,0)});
+                   Id      : in #{g:adaType(table.id,0)});
 #{''}
 
    --  Find and load the entity.

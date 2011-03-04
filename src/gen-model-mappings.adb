@@ -52,6 +52,12 @@ package body Gen.Model.Mappings is
          return Util.Beans.Objects.To_Object (From.Target);
       elsif Name = "isInteger" then
          return Util.Beans.Objects.To_Object (From.Is_Primitive);
+      elsif Name = "isString" then
+         return Util.Beans.Objects.To_Object (From.Is_String);
+      elsif Name = "isIdentifier" then
+         return Util.Beans.Objects.To_Object (From.Is_Identifier);
+      elsif Name = "isDate" then
+         return Util.Beans.Objects.To_Object (From.Is_Date);
       else
          return Definition (From).Get_Value (Name);
       end if;

@@ -46,7 +46,7 @@
    -- ----------------------------------------
 <h:list value="#{table.members}" var="column">
   <h:panelGroup rendered="#{column.isInserted or column.isUpdated}">
-    <h:panelGroup rendered="#{column.type == 'String'}">
+    <h:panelGroup rendered="#{column.type.isString}">
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
                    #{g:indent(column.name)} Value : in String) is
    begin
@@ -72,7 +72,7 @@
   </h:panelGroup>
 
   <h:panelGroup rendered="#{column.isReadable}">
-    <h:panelGroup rendered="#{column.type eq 'String'}">
+    <h:panelGroup rendered="#{column.type.isString}">
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
                  return String is
    begin
@@ -139,7 +139,7 @@
 
    procedure Load (Object  : in out #{fn:capitalize(table.type)}_Ref;
                    Session : in out ADO.Sessions.Session'Class;
-                   Id      : in #{g:adaType(table.id.type,0)}) is
+                   Id      : in #{g:adaType(table.id,0)}) is
       Impl  : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
       Found : Boolean;
       Query : ADO.SQL.Query;
@@ -215,7 +215,7 @@
                    Session : in out ADO.Sessions.Session'Class) is
       Found : Boolean;
       Query : ADO.SQL.Query;
-      Id    : constant #{g:adaType(table.id.type,0)} := Object.Get_Key_Value;
+      Id    : constant #{g:adaType(table.id,0)} := Object.Get_Key_Value;
    begin
       Query.Bind_Param (Position => 1, Value => Id);
       Query.Set_Filter ("#{table.id.name} = ?");
@@ -328,13 +328,13 @@
          return ADO.Objects.To_Object (Impl.Get_Key);
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name ne table.id.name}">
-      <h:panelGroup rendered="#{g:isInteger(column.type) or column.type eq 'ADO.Identifier'}">
+      <h:panelGroup rendered="#{column.type.isInteger or column.type.isIdentifier}">
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
       </h:panelGroup>
-      <h:panelGroup rendered="#{g:isDate(column.type)}">
+      <h:panelGroup rendered="#{column.type.isDate}">
          return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)});
       </h:panelGroup>
-    <h:panelGroup rendered="#{not g:isInteger(column.type) and column.type ne 'ADO.Identifier' and not g:isDate(column.type)}">
+    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isIdentifier and not column.type.isDate}">
          return Util.Beans.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
   </h:panelGroup>
 </h:panelGroup>
@@ -375,10 +375,10 @@
 </h:panelGroup>
    begin
 <h:list value="#{table.members}" var="column">
-<h:panelGroup rendered="#{column.name eq table.id.name and column.type eq 'ADO.Identifier'}">
+<h:panelGroup rendered="#{column.name eq table.id.name and column.type.isIdentifier}">
       Object.Set_Key_Value (Stmt.Get_Identifier (#{column.index}));
 </h:panelGroup>
-<h:panelGroup rendered="#{column.name eq table.id.name and column.type ne 'ADO.Identifier'}">
+<h:panelGroup rendered="#{column.name eq table.id.name and not column.type.isIdentifier}">
       Object.Set_Key_Value (Stmt.Get_Unbounded_String (#{column.index}));
 </h:panelGroup>
 <h:panelGroup rendered="#{column.name ne table.id.name and column.name ne table.version.name}">
@@ -387,19 +387,19 @@
           Object.#{fn:capitalize(column.name)}.Set_Key_Value (Stmt.Get_Identifier (#{column.index}), Session);
       end if;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.isPrimitiveType and column.type eq 'ADO.Identifier'}">
+  <h:panelGroup rendered="#{column.isPrimitiveType and column.type.isIdentifier}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.isPrimitiveType and column.type eq 'String'}">
+  <h:panelGroup rendered="#{column.isPrimitiveType and column.type.isString}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.isPrimitiveType and column.type ne 'ADO.Identifier' and column.type ne 'String'}">
+  <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isIdentifier and not column.type.isString}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
   </h:panelGroup>
 </h:panelGroup>
 </h:list>
 <h:panelGroup rendered="#{not empty table.version}">
-      Object.#{fn:capitalize(table.version.name)} := Stmt.Get_#{fn:capitalize(g:adaType(table.version.type,0))} (#{table.version.index});
+      Object.#{fn:capitalize(table.version.name)} := Stmt.Get_#{fn:capitalize(g:adaType(table.version,0))} (#{table.version.index});
 </h:panelGroup>
       ADO.Objects.Set_Created (Object);
    end Load;

@@ -36,7 +36,7 @@ package body Gen.Model.Tables is
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Type_Mapping.all'Access;
          begin
-            return Util.Beans.Objects.To_Object (From.Type_Name);
+            return Util.Beans.Objects.To_Object (Bean);
          end;
 
       elsif Name = "type" then

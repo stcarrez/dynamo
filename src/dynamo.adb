@@ -26,7 +26,7 @@ with Ada.Command_Line;
 
 with Util.Log.Loggers;
 with Gen.Generator;
-procedure DBMapper is
+procedure Dynamo is
    use Ada;
    use Ada.Strings.Unbounded;
    use Ada.Command_Line;
@@ -136,4 +136,4 @@ begin
 exception
    when E : XML_Fatal_Error =>
       Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));
-end DBMapper;
+end Dynamo;

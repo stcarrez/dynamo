@@ -52,7 +52,7 @@
     </mapping>
     <mapping>
         <from>String</from>
-        <to>Ada.String.Unbounded.Unbounded_String</to>
+        <to>Ada.Strings.Unbounded.Unbounded_String</to>
     </mapping>
     <mapping>
         <from>PrimitiveTypes::Double</from>

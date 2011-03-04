@@ -397,6 +397,8 @@ package body Gen.Generator is
       Req.Set_Path_Info (File);
       Req.Set_Method ("GET");
       Req.Set_Attribute (Name => "model", Value => Bean);
+      Req.Set_Attribute (Name => "genRevision", Value => Util.Beans.Objects.To_Object (SVN_REV));
+      Req.Set_Attribute (Name => "genURL", Value => Util.Beans.Objects.To_Object (SVN_URL));
 
       H.Dispatch (Page     => File,
                   Request  => Req,

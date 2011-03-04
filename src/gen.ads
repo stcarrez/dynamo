@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,12 @@
 -----------------------------------------------------------------------
 
 package Gen is
+   
+   --  Library SVN identification
+   SVN_URL : constant String := "https://ada-gen.googlecode.com/svn/trunk";
+
+   --  Revision used (must run 'make version' to update)
+   SVN_REV : constant Positive := 70;
 
    GEN_PACKAGE_BODY : constant String := "generator.template.package.body";
    GEN_PACKAGE_SPEC : constant String := "generator.template.package.spec";

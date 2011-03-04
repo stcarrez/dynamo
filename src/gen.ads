@@ -18,4 +18,7 @@
 
 package Gen is
 
+   GEN_PACKAGE_BODY : constant String := "generator.template.package.body";
+   GEN_PACKAGE_SPEC : constant String := "generator.template.package.spec";
+
 end Gen;

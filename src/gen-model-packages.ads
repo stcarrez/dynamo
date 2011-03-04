@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Containers.Hashed_Sets;
 with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Hash;
@@ -25,7 +24,6 @@ with Util.Beans.Objects;
 with Util.Beans.Objects.Vectors;
 
 with Gen.Model.List;
-with Gen.Model.Mappings;
 limited with Gen.Model.Tables;
 package Gen.Model.Packages is
 
@@ -72,6 +70,9 @@ package Gen.Model.Packages is
    --  Initialize the model definition instance.
    overriding
    procedure Initialize (O : in out Model_Definition);
+
+   --  Returns True if the model contains at least one package.
+   function Has_Packages (O : in Model_Definition) return Boolean;
 
    --  Register or find the package knowing its name
    procedure Register_Package (O      : in out Model_Definition;
@@ -126,12 +127,6 @@ private
 
    package Table_List is new Gen.Model.List (T        => Definition,
                                              T_Access => Definition_Access);
-
-   package String_Set is
-     new Ada.Containers.Hashed_Sets (Element_Type    => Ada.Strings.Unbounded.Unbounded_String,
-                                     Hash            => Ada.Strings.Unbounded.Hash,
-                                     Equivalent_Elements => Ada.Strings.Unbounded."=");
-
 
    type List_Object is new Util.Beans.Basic.List_Bean with record
       Values     : Util.Beans.Objects.Vectors.Vector;

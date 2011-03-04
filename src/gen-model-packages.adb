@@ -115,6 +115,14 @@ package body Gen.Model.Packages is
    end Register_Package;
 
    --  ------------------------------
+   --  Returns True if the model contains at least one package.
+   --  ------------------------------
+   function Has_Packages (O : in Model_Definition) return Boolean is
+   begin
+      return not O.Packages.Is_Empty;
+   end Has_Packages;
+
+   --  ------------------------------
    --  Prepare the generation of the package:
    --  o identify the column types which are used
    --  o build a list of package for the with clauses.
@@ -123,7 +131,7 @@ package body Gen.Model.Packages is
    procedure Prepare (O : in out Package_Definition) is
       use Gen.Model.Tables;
 
-      Used_Types  : String_Set.Set;
+      Used_Types  : Gen.Utils.String_Set.Set;
        T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
 
       procedure Prepare_Table (Table : in Table_Definition_Access) is
@@ -171,16 +179,16 @@ package body Gen.Model.Packages is
       Prepare_Tables (O.Tables);
       Prepare_Tables (O.Queries);
       declare
-         P : String_Set.Cursor := Used_Types.First;
+         P : Gen.Utils.String_Set.Cursor := Used_Types.First;
       begin
-         while String_Set.Has_Element (P) loop
+         while Gen.Utils.String_Set.Has_Element (P) loop
             declare
-               Name : constant Unbounded_String := String_Set.Element (P);
+               Name : constant Unbounded_String := Gen.Utils.String_Set.Element (P);
             begin
                Log.Info ("with {0}", Name);
                O.Used_Types.Values.Append (Util.Beans.Objects.To_Object (Name));
             end;
-            String_Set.Next (P);
+            Gen.Utils.String_Set.Next (P);
          end loop;
       end;
    end Prepare;

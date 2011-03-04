@@ -205,12 +205,16 @@ package body Gen.Artifacts.Hibernate is
    --  ------------------------------
    overriding
    procedure Prepare (Handler : in Artifact;
-                      Model   : in out Gen.Model.Packages.Model_Definition'Class) is
+                      Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                      Context : in out Generator'Class) is
       pragma Unreferenced (Handler);
    begin
       Log.Debug ("Preparing the model for hibernate");
 
-      Model.Prepare;
+      if Model.Has_Packages then
+         Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE);
+         Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE);
+      end if;
    end Prepare;
 
 end Gen.Artifacts.Hibernate;

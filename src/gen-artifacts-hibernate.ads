@@ -40,7 +40,8 @@ package Gen.Artifacts.Hibernate is
    --  actually invoking the generation.
    overriding
    procedure Prepare (Handler : in Artifact;
-                      Model   : in out Gen.Model.Packages.Model_Definition'Class);
+                      Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                      Context : in out Generator'Class);
 
 private
 

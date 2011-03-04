@@ -94,7 +94,7 @@ begin
    end if;
 
    --  Configure the logs
-   Util.Log.Loggers.Initialize (To_String (Config_Dir) & "/log4j.properties");
+   Util.Log.Loggers.Initialize (To_String (Config_Dir) & "log4j.properties");
 
    declare
       Generator : Gen.Generator.Handler;
@@ -127,8 +127,9 @@ begin
 
       --  Run the generation.
       Gen.Generator.Prepare (Generator);
-      Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
-      Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
+      Gen.Generator.Generate_All (Generator);
+--        Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
+--        Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
 
       Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
    end;

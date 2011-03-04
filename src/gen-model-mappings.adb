@@ -19,7 +19,6 @@ with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded.Hash;
 
 with Util.Log.Loggers;
-with Util.Strings;
 
 --  The <b>Gen.Model.Mappings</b> package controls the mappings to convert an XML
 --  type into the Ada type.
@@ -63,7 +62,7 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    function Find_Type (Name : in Ada.Strings.Unbounded.Unbounded_String)
                        return Mapping_Definition_Access is
-      Pos : Mapping_Maps.Cursor := Types.Find (Name);
+      Pos : constant Mapping_Maps.Cursor := Types.Find (Name);
    begin
       if Mapping_Maps.Has_Element (Pos) then
          return Mapping_Maps.Element (Pos);
@@ -83,7 +82,7 @@ package body Gen.Model.Mappings is
                             Is_Identifier : in Boolean;
                             Is_String     : in Boolean) is
       Name    : constant Unbounded_String := To_Unbounded_String (From);
-      Pos     : Mapping_Maps.Cursor := Types.Find (Name);
+      Pos     : constant Mapping_Maps.Cursor := Types.Find (Name);
       Mapping : Mapping_Definition_Access;
    begin
       Log.Debug ("Register type '{0}' mapped to '{1}'", From, Target);

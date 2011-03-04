@@ -41,7 +41,6 @@ with Util.Log.Loggers;
 package body Gen.Generator is
 
    use ASF;
-   use Ada.Strings.Unbounded;
    use Util.Log;
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Generator");
@@ -231,9 +230,12 @@ package body Gen.Generator is
       procedure Register_Funcs is
         new ASF.Applications.Main.Register_Functions (Set_Functions);
 
+      Dir     : constant String := Ada.Strings.Unbounded.To_String (Config_Dir);
       Factory : ASF.Applications.Main.Application_Factory;
    begin
-      H.Conf.Set (ASF.Applications.VIEW_DIR, Config_Dir & "/templates/");
+      H.Conf.Load_Properties (Path => Dir & "generator.properties");
+
+      H.Conf.Set (ASF.Applications.VIEW_DIR, Config_Dir & "templates/");
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_EMPTY_LINES, "true");
@@ -244,8 +246,11 @@ package body Gen.Generator is
       H.File := new Util.Beans.Objects.Object;
 
       --  Read the type mappings
-      Read_Model (H    => H,
-                  File => Ada.Strings.Unbounded.To_String (Config_Dir) & "/AdaMappings.xml");
+      Read_Model (H => H, File => Dir & H.Conf.Get ("generator.mapping", "AdaMappings.xml"));
+
+   exception
+      when Ada.IO_Exceptions.Name_Error =>
+         H.Error ("Cannot load configuration file {0}", Dir & "generator.properties");
    end Initialize;
 
    --  ------------------------------
@@ -352,9 +357,29 @@ package body Gen.Generator is
    procedure Prepare (H : in out Handler) is
    begin
       H.Model.Prepare;
-      H.Hibernate.Prepare (H.Model);
-      H.Query.Prepare (H.Model);
+      H.Hibernate.Prepare (Model => H.Model, Context => H);
+      H.Query.Prepare (Model => H.Model, Context => H);
    end Prepare;
+
+   --  ------------------------------
+   --  Tell the generator to activate the generation of the given template name.
+   --  The name is a property name that must be defined in generator.properties to
+   --  indicate the template file.  Several artifacts can trigger the generation
+   --  of a given template.  The template is generated only once.
+   --  ------------------------------
+   procedure Add_Generation (H    : in out Handler;
+                             Name : in String;
+                             Mode : in Gen.Artifacts.Iteration_Mode) is
+      Value : constant String := H.Conf.Get (Name, "");
+   begin
+      Log.Debug ("Adding template {0} to the generation", Name);
+
+      if Value'Length = 0 then
+         H.Error ("Template '{0}' is not defined.", Name);
+      else
+         H.Templates.Include (To_Unbounded_String (Value), Mode);
+      end if;
+   end Add_Generation;
 
    --  ------------------------------
    --  Generate the code using the template file
@@ -367,7 +392,7 @@ package body Gen.Generator is
       Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := Model.all'Unchecked_Access;
       Bean  : constant Util.Beans.Objects.Object := Util.Beans.Objects.To_Object (Ptr);
    begin
-      Log.Info ("Generating {0}", File);
+      Log.Info ("With template '{0}'", File);
 
       Req.Set_Path_Info (File);
       Req.Set_Method ("GET");
@@ -382,7 +407,7 @@ package body Gen.Generator is
          Path    : constant String := Dir & Util.Beans.Objects.To_String (H.File.all);
          Content : Unbounded_String;
       begin
-         Log.Info ("Writing result file {0}", Path);
+         Log.Info ("Generating file '{0}'", Path);
 
          Reply.Read_Content (Content);
          Util.Files.Write_File (Path => Path, Content => Content);
@@ -412,6 +437,19 @@ package body Gen.Generator is
 
       end case;
    end Generate;
+
+   --  ------------------------------
+   --  Generate all the code for the templates activated through <b>Add_Generation</b>.
+   --  ------------------------------
+   procedure Generate_All (H    : in out Handler) is
+      Iter : Template_Map.Cursor := H.Templates.First;
+   begin
+      while Template_Map.Has_Element (Iter) loop
+         H.Generate (File => To_String (Template_Map.Key (Iter)),
+                     Mode => Template_Map.Element (Iter));
+         Template_Map.Next (Iter);
+      end loop;
+   end Generate_All;
 
    --  Generate all the code generation files stored in the directory
    procedure Generate_All (H    : in out Handler;

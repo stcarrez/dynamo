@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
 with DOM.Core.Nodes;
 with DOM.Core.Elements;
 with DOM.Core.Character_Datas;
@@ -48,8 +47,6 @@ package body Gen.Utils is
    --  Get the content of the node
    --  ------------------------------
    function Get_Data_Content (Node : in DOM.Core.Node) return String is
-      use Ada.Strings.Unbounded;
-
       Nodes  : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
       S      : constant Natural       := DOM.Core.Nodes.Length (Nodes);
       Result : Unbounded_String;

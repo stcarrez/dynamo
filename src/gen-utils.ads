@@ -15,6 +15,9 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Containers.Hashed_Sets;
+with Ada.Strings.Unbounded.Hash;
+with Ada.Strings.Unbounded;
 
 with DOM.Core;
 package Gen.Utils is
@@ -37,5 +40,11 @@ package Gen.Utils is
 
    --  Get a query name from the XML query file name
    function Get_Query_Name (Path : in String) return String;
+
+   use Ada.Strings.Unbounded;
+   package String_Set is
+     new Ada.Containers.Hashed_Sets (Element_Type    => Ada.Strings.Unbounded.Unbounded_String,
+                                     Hash            => Ada.Strings.Unbounded.Hash,
+                                     Equivalent_Elements => Ada.Strings.Unbounded."=");
 
 end Gen.Utils;

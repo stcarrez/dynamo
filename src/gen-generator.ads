@@ -20,17 +20,18 @@ with DOM.Core;
 with Ada.Text_IO;
 with Ada.Command_Line;
 with Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded.Hash;
+with Ada.Containers.Hashed_Maps;
 
 with Util.Beans.Objects;
 with ASF.Applications.Main;
 with ASF.Contexts.Faces;
+
 with Gen.Model.Packages;
 with Gen.Artifacts.Hibernate;
 with Gen.Artifacts.Query;
 with Gen.Artifacts.Mappings;
 package Gen.Generator is
-
-   type Iteration_Mode is (ITERATION_PACKAGE, ITERATION_TABLE);
 
    type Package_Type is (PACKAGE_MODEL, PACKAGE_FORMS);
 
@@ -39,7 +40,7 @@ package Gen.Generator is
       Output : Ada.Text_IO.File_Type;
    end record;
 
-   type Handler is limited private;
+   type Handler is new ASF.Applications.Main.Application and Gen.Artifacts.Generator with private;
 
    --  Initialize the generator
    procedure Initialize (H : in out Handler;
@@ -58,9 +59,17 @@ package Gen.Generator is
    --  Prepare the model by checking, verifying and initializing it after it is completely known.
    procedure Prepare (H : in out Handler);
 
+   --  Tell the generator to activate the generation of the given template name.
+   --  The name is a property name that must be defined in generator.properties to
+   --  indicate the template file.  Several artifacts can trigger the generation
+   --  of a given template.  The template is generated only once.
+   procedure Add_Generation (H    : in out Handler;
+                             Name : in String;
+                             Mode : in Gen.Artifacts.Iteration_Mode);
+
    --  Generate the code using the template file
    procedure Generate (H     : in out Handler;
-                       Mode  : in Iteration_Mode;
+                       Mode  : in Gen.Artifacts.Iteration_Mode;
                        File  : in String);
 
    --  Generate the code using the template file
@@ -68,9 +77,12 @@ package Gen.Generator is
                        File  : in String;
                        Model : in Gen.Model.Definition_Access);
 
+   --  Generate all the code for the templates activated through <b>Add_Generation</b>.
+   procedure Generate_All (H    : in out Handler);
+
    --  Generate all the code generation files stored in the directory
    procedure Generate_All (H    : in out Handler;
-                           Mode : in Iteration_Mode;
+                           Mode : in Gen.Artifacts.Iteration_Mode;
                            Name : in String);
 
    --  Set the directory where template files are stored.
@@ -88,7 +100,16 @@ package Gen.Generator is
 
 private
 
-   type Handler is new ASF.Applications.Main.Application with record
+   use Ada.Strings.Unbounded;
+   use Gen.Artifacts;
+
+   package Template_Map is
+     new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+                                     Element_Type    => Gen.Artifacts.Iteration_Mode,
+                                     Hash            => Ada.Strings.Unbounded.Hash,
+                                     Equivalent_Keys => "=");
+
+   type Handler is new ASF.Applications.Main.Application and Gen.Artifacts.Generator with record
       Conf       : ASF.Applications.Config;
 
       --  Config directory.
@@ -108,6 +129,9 @@ private
 
       --  Type mapping artifact.
       Mappings  : Gen.Artifacts.Mappings.Artifact;
+
+      --  The list of templates that must be generated.
+      Templates : Template_Map.Map;
    end record;
 
    --  Execute the lifecycle phases on the faces context.

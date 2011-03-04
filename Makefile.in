@@ -48,7 +48,7 @@ DISTFILES=README LICENSE.txt NOTICE.txt CHANGES config.guess configure config.su
 configure.in Makefile.in install-sh \
 generator.gpr.in config.gpr \
 src \
-bin obj templates
+bin obj config
 
 dist:
 	-rm -rf $(distdir)

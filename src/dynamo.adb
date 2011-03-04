@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  dbmapper -- Database Mapper Generator
+--  dynamo -- Ada Code Generator
 --  Copyright (C) 2009, 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -32,7 +32,7 @@ procedure DBMapper is
    use Ada.Command_Line;
 
    Release : constant String
-     := "ADO Generator 0.3, Stephane Carrez";
+     := "Dynamo Ada Generator 0.3, Stephane Carrez";
 
    Copyright : constant String
      := "Copyright (C) 2009, 2010, 2011 Free Software Foundation, Inc.";

@@ -7,7 +7,7 @@ with "@ASF_DIR@asf";
 
 project Generator is
 
-   Mains := ("dbmapper.adb");
+   Mains := ("dynamo.adb");
 
    for Main use Mains;
 

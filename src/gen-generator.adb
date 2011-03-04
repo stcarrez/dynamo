@@ -226,19 +226,18 @@ package body Gen.Generator is
    --  ------------------------------
    --  Initialize the generator
    --  ------------------------------
-   procedure Initialize (H : in out Handler) is
+   procedure Initialize (H : in out Handler;
+                         Config_Dir : in Ada.Strings.Unbounded.Unbounded_String) is
       procedure Register_Funcs is
         new ASF.Applications.Main.Register_Functions (Set_Functions);
 
       Factory : ASF.Applications.Main.Application_Factory;
    begin
+      H.Conf.Set (ASF.Applications.VIEW_DIR, Config_Dir & "/templates/");
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_EMPTY_LINES, "true");
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
-      if not H.Conf.Exists (ASF.Applications.VIEW_DIR) then
-         H.Set_Template_Directory (To_Unbounded_String ("templates/"));
-      end if;
       H.Initialize (H.Conf, Factory);
 
       Register_Funcs (H);
@@ -246,7 +245,7 @@ package body Gen.Generator is
 
       --  Read the type mappings
       Read_Model (H    => H,
-                  File => H.Conf.Get (ASF.Applications.VIEW_DIR) & "/AdaMappings.xml");
+                  File => Ada.Strings.Unbounded.To_String (Config_Dir) & "/AdaMappings.xml");
    end Initialize;
 
    --  ------------------------------
@@ -257,15 +256,6 @@ package body Gen.Generator is
    begin
       H.Conf.Set (ASF.Applications.VIEW_DIR, Path);
    end Set_Template_Directory;
-
-   --  ------------------------------
-   --  Set the directory where configuration files are stored.
-   --  ------------------------------
-   procedure Set_Config_Directory (H    : in out Handler;
-                                   Path : in Ada.Strings.Unbounded.Unbounded_String) is
-   begin
-      H.Conf.Set (ASF.Applications.VIEW_DIR, Path & "/template");
-   end Set_Config_Directory;
 
    --  ------------------------------
    --  Set the directory where results files are generated.

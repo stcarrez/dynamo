@@ -105,11 +105,8 @@ begin
       if Length (Template_Dir) > 0 then
          Gen.Generator.Set_Template_Directory (Generator, Template_Dir);
       end if;
-      if Length (Config_Dir) > 0 then
-         Gen.Generator.Set_Config_Directory (Generator, Config_Dir);
-      end if;
 
-      Gen.Generator.Initialize (Generator);
+      Gen.Generator.Initialize (Generator, Config_Dir);
 
       --  Read the model files.
       loop

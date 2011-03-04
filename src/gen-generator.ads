@@ -42,7 +42,8 @@ package Gen.Generator is
    type Handler is limited private;
 
    --  Initialize the generator
-   procedure Initialize (H : in out Handler);
+   procedure Initialize (H : in out Handler;
+                         Config_Dir : in Ada.Strings.Unbounded.Unbounded_String);
 
    --  Report an error and set the exit status accordingly
    procedure Error (H : in out Handler;
@@ -76,10 +77,6 @@ package Gen.Generator is
    procedure Set_Template_Directory (H    : in out Handler;
                                      Path : in Ada.Strings.Unbounded.Unbounded_String);
 
-   --  Set the directory where configuration files are stored.
-   procedure Set_Config_Directory (H    : in out Handler;
-                                   Path : in Ada.Strings.Unbounded.Unbounded_String);
-
    --  Set the directory where results files are generated.
    procedure Set_Result_Directory (H    : in out Handler;
                                    Path : in Ada.Strings.Unbounded.Unbounded_String);
@@ -92,7 +89,11 @@ package Gen.Generator is
 private
 
    type Handler is new ASF.Applications.Main.Application with record
-      Conf   : ASF.Applications.Config;
+      Conf       : ASF.Applications.Config;
+
+      --  Config directory.
+      Config_Dir : Ada.Strings.Unbounded.Unbounded_String;
+
       Model  : aliased Gen.Model.Packages.Model_Definition;
       Doc    : DOM.Core.Document;
       Root   : DOM.Core.Element;

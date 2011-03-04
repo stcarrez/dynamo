@@ -31,6 +31,9 @@ with ADO.Objects;
 with ADO.Statements;
 with ADO.SQL;
 with ADO.Schemas;
+<h:panelGroup rendered="#{model.queries.length ne 0}">
+with ADO.Queries;
+</h:panelGroup>
 
 <h:panelGroup rendered="#{model.useCalendarTime}">
 with Ada.Calendar;
@@ -52,6 +55,8 @@ package #{model.name} is
 
 private
   <ui:include src="package-spec-objects-private.xhtml"/>
+
+  <ui:include src="package-spec-queries-private.xhtml"/>
 
 end #{model.name};
 </f:view>

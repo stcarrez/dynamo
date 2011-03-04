@@ -1,0 +1,21 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core">
+<h:list value="#{model.queries}" var="query">
+   --  --------------------
+   --  #{query.comment}
+   --  --------------------
+   procedure List (Object  : in out #{fn:capitalize(query.type)}_Vector;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+   begin
+      null;
+   end List;
+
+#{''}
+</h:list>
+
+#{''}
+</ui:composition>

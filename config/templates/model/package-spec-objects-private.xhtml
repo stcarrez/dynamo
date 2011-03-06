@@ -19,7 +19,7 @@
      );
 
    type #{fn:capitalize(table.type)}_Impl is
-      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.#{g:keyEnum(table.id.type)},
+      new ADO.Objects.Object_Record (Key_Type => ADO.Objects.#{table.id.type.isIdentifier ? 'KEY_INTEGER' : 'KEY_STRING'},
                                      Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access)
    with record
 <h:list value="#{table.members}" var="column">

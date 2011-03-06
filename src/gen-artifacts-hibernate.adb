@@ -214,6 +214,7 @@ package body Gen.Artifacts.Hibernate is
       if Model.Has_Packages then
          Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE);
          Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE);
+         Context.Add_Generation (Name => GEN_SQL_FILE, Mode => ITERATION_TABLE);
       end if;
    end Prepare;
 

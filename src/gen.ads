@@ -22,9 +22,10 @@ package Gen is
    SVN_URL : constant String := "https://ada-gen.googlecode.com/svn/trunk";
 
    --  Revision used (must run 'make version' to update)
-   SVN_REV : constant Positive := 70;
+   SVN_REV : constant Positive := 71;
 
    GEN_PACKAGE_BODY : constant String := "generator.template.package.body";
    GEN_PACKAGE_SPEC : constant String := "generator.template.package.spec";
+   GEN_SQL_FILE     : constant String := "generator.template.sql";
 
 end Gen;

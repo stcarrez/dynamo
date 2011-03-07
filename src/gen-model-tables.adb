@@ -95,8 +95,13 @@ package body Gen.Model.Tables is
    --  Returns true if the column type is a basic type.
    --  ------------------------------
    function Is_Basic_Type (From : Column_Definition) return Boolean is
+      use type Gen.Model.Mappings.Mapping_Definition_Access;
       Name : constant String := To_String (From.Type_Name);
    begin
+      if From.Type_Mapping /= null then
+         return From.Type_Mapping.Is_Primitive or From.Type_Mapping.Is_Date
+           or From.Type_Mapping.Is_Identifier or From.Type_Mapping.Is_String;
+      end if;
       return Name = "int" or Name = "String"
         or Name = "ADO.Identifier" or Name = "Timestamp"
         or Name = "Integer"

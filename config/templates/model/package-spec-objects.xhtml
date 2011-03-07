@@ -18,6 +18,8 @@
    type #{table.type}_Ref is new ADO.Objects.Object_Ref with null record;
 #{''}
 
+   Null_#{table.type} : constant #{table.type}_Ref;
+
    function "=" (Left, Right : #{table.type}_Ref'Class) return Boolean;
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{column.isInserted or column.isUpdated}">
@@ -48,6 +50,13 @@
    procedure Load (Object  : in out #{fn:capitalize(table.type)}_Ref;
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in #{g:adaType(table.id,0)});
+#{''}
+   --  Load the entity identified by 'Id'.
+   --  Returns True in <b>Found</b> if the object was found and False if it does not exist.
+   procedure Load (Object  : in out #{fn:capitalize(table.type)}_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in #{g:adaType(table.id,0)};
+                   Found   : out Boolean);
 #{''}
 
    --  Find and load the entity.

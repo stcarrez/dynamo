@@ -154,6 +154,23 @@
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Load;
 
+   procedure Load (Object  : in out #{fn:capitalize(table.type)}_Ref;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Id      : in #{g:adaType(table.id,0)};
+                   Found   : out Boolean) is
+      Impl  : constant #{fn:capitalize(table.type)}_Access := new #{fn:capitalize(table.type)}_Impl;
+      Query : ADO.SQL.Query;
+   begin
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Set_Filter ("#{table.id.name} = ?");
+      Impl.Find (Session, Query, Found);
+      if not Found then
+         Destroy (Impl);
+      else
+         ADO.Objects.Set_Object (Object, Impl.all'Access);
+      end if;
+   end Load;
+
    procedure Save (Object  : in out #{fn:capitalize(table.type)}_Ref;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Impl : ADO.Objects.Object_Record_Access := Object.Get_Object;
@@ -331,8 +348,15 @@
       <h:panelGroup rendered="#{column.type.isInteger or column.type.isIdentifier}">
          return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate}">
+      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
          return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)});
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+         if Impl.#{fn:capitalize(column.name)}.Is_Null then
+             return Util.Beans.Objects.Null_Object;
+         else
+             return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)}.Value);
+         end if;
       </h:panelGroup>
     <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isIdentifier and not column.type.isDate}">
          return Util.Beans.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
@@ -387,10 +411,10 @@
           Object.#{fn:capitalize(column.name)}.Set_Key_Value (Stmt.Get_Identifier (#{column.index}), Session);
       end if;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.isPrimitiveType and column.type.isIdentifier}">
+  <h:panelGroup rendered="#{column.type.isIdentifier}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.isPrimitiveType and column.type.isString}">
+  <h:panelGroup rendered="#{column.type.isString}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isIdentifier and not column.type.isString}">

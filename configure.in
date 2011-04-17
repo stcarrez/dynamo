@@ -107,5 +107,5 @@ AC_MSG_RESULT(${ASF_DIR})
 AC_SUBST(ASF_DIR)
 
 AC_OUTPUT(
-Makefile generator.gpr
+Makefile dynamo.gpr
 )

@@ -5,7 +5,7 @@ with "@UTIL_DIR@util";
 with "@EL_DIR@el";
 with "@ASF_DIR@asf";
 
-project Generator is
+project Dynamo is
 
    Mains := ("dynamo.adb");
 
@@ -21,4 +21,4 @@ project Generator is
    package Compiler renames Config.Compiler;
    package Linker renames Config.Linker;
 
-end Generator;
+end Dynamo;

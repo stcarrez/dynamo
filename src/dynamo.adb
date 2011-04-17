@@ -26,45 +26,12 @@ with Ada.Command_Line;
 
 with Util.Log.Loggers;
 with Gen.Generator;
+with Gen.Commands;
 procedure Dynamo is
    use Ada;
    use Ada.Strings.Unbounded;
    use Ada.Command_Line;
-
-   Release : constant String
-     := "Dynamo Ada Generator 0.3, Stephane Carrez";
-
-   Copyright : constant String
-     := "Copyright (C) 2009, 2010, 2011 Free Software Foundation, Inc.";
-
-   -----------------
-   -- Output_File --
-   -----------------
-   --------------------------------------------------
-   --  Usage
-   --------------------------------------------------
-   procedure Usage is
-      use Ada.Text_IO;
-   begin
-      Put_Line (Release);
-      Put_Line (Copyright);
-
-      New_Line;
-      Put ("Usage: ");
-      Put (Command_Name);
-      Put_Line (" [-v] [-o directory] [-t templates] model.xml");
-      Put_Line ("where:");
-      Put_Line ("   -v           Verbose");
-      Put_Line ("   -q           Query mode");
-      Put_Line ("   -o directory Directory where the Ada mapping files are generated");
-      Put_Line ("   -t templates Directory where the Ada templates are defined");
-      Put_Line ("   -c dir       Directory where the Ada templates and configurations are defined");
-      New_Line;
-      Put_Line ("   -h           Requests this info.");
-      New_Line;
-   end Usage;
-
-   File_Count : Natural := 0;
+   use Gen.Commands;
 
    Out_Dir      : Unbounded_String;
    Config_Dir   : Unbounded_String;
@@ -97,8 +64,19 @@ begin
    Util.Log.Loggers.Initialize (To_String (Config_Dir) & "log4j.properties");
 
    declare
+      Cmd_Name  : constant String := Get_Argument;
+      Cmd       : constant Gen.Commands.Command_Access := Gen.Commands.Find_Command (Cmd_Name);
       Generator : Gen.Generator.Handler;
    begin
+      --  Check that the command exists.
+      if Cmd = null then
+         if Cmd_Name'Length > 0 then
+            Ada.Text_IO.Put_Line ("Invalid command: '" & Cmd_Name & "'");
+         end if;
+         Gen.Commands.Usage;
+         Set_Exit_Status (1);
+         return;
+      end if;
       if Length (Out_Dir) > 0 then
          Gen.Generator.Set_Result_Directory (Generator, Out_Dir);
       end if;
@@ -108,28 +86,7 @@ begin
 
       Gen.Generator.Initialize (Generator, Config_Dir);
 
-      --  Read the model files.
-      loop
-         declare
-            Model_File : constant String := Get_Argument;
-         begin
-            exit when Model_File'Length = 0;
-            File_Count := File_Count + 1;
-            Gen.Generator.Read_Model (Generator, Model_File);
-         end;
-      end loop;
-
-      if File_Count = 0 then
-         Usage;
-         Set_Exit_Status (2);
-         return;
-      end if;
-
-      --  Run the generation.
-      Gen.Generator.Prepare (Generator);
-      Gen.Generator.Generate_All (Generator);
---        Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_PACKAGE, "model");
---        Gen.Generator.Generate_All (Generator, Gen.Generator.ITERATION_TABLE, "sql");
+      Cmd.Execute (Generator);
 
       Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
    end;

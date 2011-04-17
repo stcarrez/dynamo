@@ -35,6 +35,7 @@ with Gen.Model;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
 
+with Util.Strings;
 with Util.Files;
 with Util.Log.Loggers;
 --  with Util.Beans.Objects.To_Access;
@@ -242,6 +243,8 @@ package body Gen.Generator is
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
       H.Initialize (H.Conf, Factory);
 
+      H.Output_Dir := To_Unbounded_String (H.Conf.Get (RESULT_DIR, "./"));
+
       Register_Funcs (H);
       H.File := new Util.Beans.Objects.Object;
 
@@ -269,6 +272,7 @@ package body Gen.Generator is
                                    Path : in Ada.Strings.Unbounded.Unbounded_String) is
    begin
       H.Conf.Set (RESULT_DIR, Path);
+      H.Output_Dir := Path;
    end Set_Result_Directory;
 
    --  ------------------------------
@@ -405,7 +409,7 @@ package body Gen.Generator is
                   Response => Reply);
 
       declare
-         Dir     : constant String := H.Conf.Get (RESULT_DIR, "./");
+         Dir     : constant String := To_String (H.Output_Dir);
          Path    : constant String := Dir & Util.Beans.Objects.To_String (H.File.all);
          Content : Unbounded_String;
       begin
@@ -460,29 +464,55 @@ package body Gen.Generator is
       end loop;
    end Generate_All;
 
+   --  ------------------------------
    --  Generate all the code generation files stored in the directory
+   --  ------------------------------
    procedure Generate_All (H    : in out Handler;
                            Mode : in Iteration_Mode;
                            Name : in String) is
       use Ada.Directories;
 
-      Search  : Search_Type;
-      Filter  : constant Filter_Type := (others => True);
-      Ent     : Directory_Entry_Type;
-      Dir     : constant String := H.Conf.Get (ASF.Applications.VIEW_DIR);
-      Path    : constant String := Dir & Name;
+      Search     : Search_Type;
+      Filter     : constant Filter_Type := (Ordinary_File => True, others => False);
+      Dir_Filter : constant Filter_Type := (Directory => True, others => False);
+      Ent        : Directory_Entry_Type;
+      Dir        : constant String := H.Conf.Get (ASF.Applications.VIEW_DIR);
+      Path       : constant String := Dir & Name;
+      Base_Dir   : constant Unbounded_String := H.Output_Dir;
    begin
       if Kind (Path) /= Directory then
          Ada.Text_IO.Put_Line ("Cannot read model directory: " & Path);
       end if;
 
-      Start_Search (Search, Directory => Path, Pattern => "*.xhtml", Filter => Filter);
+      Start_Search (Search, Directory => Path, Pattern => "*", Filter => Filter);
       while More_Entries (Search) loop
          Get_Next_Entry (Search, Ent);
          declare
+            Base_Name : constant String := Simple_Name (Ent);
             File_Path : constant String := Full_Name (Ent);
+            Ext       : constant String := Extension (Base_Name);
+            Content   : Unbounded_String;
          begin
-            H.Generate (Mode, File_Path);
+            if Ext = "xhtml" then
+               H.Generate (Mode, File_Path);
+            elsif Util.Strings.Index (Base_Name, '~') = 0 then
+               Util.Files.Read_File (Path => File_Path, Into => Content);
+               Util.Files.Write_File (Path => To_String (Base_Dir) & Base_Name,
+                                      Content => Content);
+            end if;
+         end;
+      end loop;
+
+      Start_Search (Search, Directory => Path, Pattern => "*", Filter => Dir_Filter);
+      while More_Entries (Search) loop
+         Get_Next_Entry (Search, Ent);
+         declare
+            Dir_Name : constant String := Simple_Name (Ent);
+         begin
+            if Dir_Name /= "." and Dir_Name /= ".." and Dir_Name /= ".svn" then
+               H.Output_Dir := Base_Dir & "/" & Dir_Name & "/";
+               H.Generate_All (Mode, Name & "/" & Dir_Name);
+            end if;
          end;
       end loop;
 

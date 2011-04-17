@@ -115,6 +115,9 @@ private
       --  Config directory.
       Config_Dir : Ada.Strings.Unbounded.Unbounded_String;
 
+      --  Output base directory.
+      Output_Dir : Ada.Strings.Unbounded.Unbounded_String;
+
       Model  : aliased Gen.Model.Packages.Model_Definition;
       Doc    : DOM.Core.Document;
       Root   : DOM.Core.Element;

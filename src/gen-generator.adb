@@ -276,6 +276,14 @@ package body Gen.Generator is
    end Set_Result_Directory;
 
    --  ------------------------------
+   --  Get the result directory.
+   --  ------------------------------
+   function Get_Result_Directory (H : in Handler) return String is
+   begin
+      return To_String (H.Output_Dir);
+   end Get_Result_Directory;
+
+   --  ------------------------------
    --  Get the exit status
    --  Returns 0 if the generation was successful
    --  Returns 1 if there was a generation error
@@ -516,6 +524,7 @@ package body Gen.Generator is
          end;
       end loop;
 
+      H.Output_Dir := Base_Dir;
    exception
       when Ada.IO_Exceptions.Name_Error =>
          H.Error ("Template directory {0} does not exist", Path);

@@ -15,10 +15,18 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
 with Gen.Artifacts;
 with GNAT.Command_Line;
+with GNAT.OS_Lib;
+
+with Util.Log.Loggers;
 with Util.Strings.Transforms;
 package body Gen.Commands.Project is
+
+   use Util.Log;
+
+   Log : constant Loggers.Logger := Loggers.Create ("Gen.Commands.Project");
 
    --  ------------------------------
    --  Generator Command
@@ -39,6 +47,19 @@ package body Gen.Commands.Project is
       Generator.Set_Global ("projectName", Name);
       Generator.Set_Global ("projectCode", Util.Strings.Transforms.To_Upper_Case (Name));
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project");
+
+      declare
+         Path   : GNAT.OS_Lib.String_Access := GNAT.OS_Lib.Locate_Exec_On_Path ("autoconf");
+         Args   : GNAT.OS_Lib.Argument_List (1 .. 0);
+         Status : Boolean;
+      begin
+         Ada.Directories.Set_Directory (Generator.Get_Result_Directory);
+         Log.Info ("Executing {0}", Path.all);
+         GNAT.OS_Lib.Spawn (Path.all, Args, Status);
+         if not Status then
+            Generator.Error ("Execution of {0} failed", Path.all);
+         end if;
+      end;
    end Execute;
 
    --  Write the help associated with the command.

@@ -93,6 +93,9 @@ package Gen.Generator is
    procedure Set_Result_Directory (H    : in out Handler;
                                    Path : in Ada.Strings.Unbounded.Unbounded_String);
 
+   --  Get the result directory.
+   function Get_Result_Directory (H : in Handler) return String;
+
    --  Get the exit status
    --  Returns 0 if the generation was successful
    --  Returns 1 if there was a generation error

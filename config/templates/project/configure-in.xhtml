@@ -1,0 +1,64 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="configure.in">dnl Autoconf configure script for #{projectName}
+
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(src/#{projectName}.ads)
+
+AC_CANONICAL_SYSTEM
+dnl AM_MAINTAINER_MODE
+AC_EXEEXT
+
+# Current release settings
+#{projectCode}_MAJOR_VERSION=0
+#{projectCode}_MINOR_VERSION=1
+#{projectCode}_MICRO_VERSION=0
+#{projectCode}=$#{projectCode}_MAJOR_VERSION.$#{projectCode}_MINOR_VERSION.$#{projectCode}_MICRO_VERSION
+
+# checking for local tools
+AC_PROG_CC
+# AM_PATH_GNAT
+# AM_PATH_PERL
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+
+# Set the version number of GtkAda
+AC_SUBST(#{projectCode}_VERSION)
+AC_SUBST(#{projectCode}_MAJOR_VERSION)
+AC_SUBST(#{projectCode}_MINOR_VERSION)
+AC_SUBST(#{projectCode}_MICRO_VERSION)
+
+EXEC_PREFIX="$prefix"
+AC_SUBST(EXEC_PREFIX)
+
+#{projectCode}_LIBDIR="lib"
+AC_SUBST(#{projectCode}_LIBDIR)
+
+##########################################
+# Ada Web Application library
+##########################################
+
+AC_MSG_CHECKING([Ada Web Application library (code.google.com/p/ada-awa)])
+AC_ARG_WITH(ada-awa,
+AS_HELP_STRING([--with-ada-awa=x], [Path for the Ada Web Application library (code.google.com/p/ada-awa)]),
+[
+  AWA_DIR=\${withval}/
+],
+[
+  AWA_DIR=../awa/
+])
+if test ! -f \${AWA_DIR}/util/util.gpr; then
+   AC_MSG_ERROR([Ada Utility library not found in \${AWA_DIR}/util/util.gpr])
+fi
+AC_MSG_RESULT(\${AWA_DIR})
+AC_SUBST(AWA_DIR)
+
+AC_OUTPUT(
+Makefile #{projectName}.gpr tests.gpr
+)
+</f:view>

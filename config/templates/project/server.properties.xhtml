@@ -1,0 +1,18 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}.properties">
+view.dir=web
+view.debug=true
+view.ignore_spaces=false
+view.escape_unknown_tags=true
+view.ext=.html
+web.dir=web
+content-type.default=text/plain
+bundle.dir=bundles
+bundle.var.layoutMsg=layouts
+bundle.var.loginMsg=login
+database=mysql://localhost:3306/#{projectName}?user=#{projectName}
+</f:view>

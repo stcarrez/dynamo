@@ -1,0 +1,35 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="tests.gpr.in">
+with "config";
+with "@AWA_DIR@util/util";
+with "@AWA_DIR@el/el";
+with "@AWA_DIR@asf/asf";
+with "@AWA_DIR@awa/awa";
+with "@AWA_DIR@ado/ado";
+#{''}
+
+project Tests is
+#{''}
+
+   Mains := ("#{projectName}_harness.adb");
+
+   for Main use Mains;
+
+   for Source_Dirs use ("regtests");
+
+   for Object_Dir use "./" &amp; Config'Object_Dir &amp; "/obj";
+   for Exec_Dir use "./" &amp; Config'Exec_Dir &amp; "/bin";
+#{''}
+
+   package Binder renames Config.Binder;
+   package Builder renames Config.Builder;
+   package Compiler renames Config.Compiler;
+   package Linker renames Config.Linker;
+#{''}
+
+end Tests;
+</f:view>

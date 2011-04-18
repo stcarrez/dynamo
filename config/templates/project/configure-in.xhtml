@@ -14,10 +14,10 @@ dnl AM_MAINTAINER_MODE
 AC_EXEEXT
 
 # Current release settings
-#{projectCode}_MAJOR_VERSION=0
-#{projectCode}_MINOR_VERSION=1
-#{projectCode}_MICRO_VERSION=0
-#{projectCode}=$#{projectCode}_MAJOR_VERSION.$#{projectCode}_MINOR_VERSION.$#{projectCode}_MICRO_VERSION
+#{fn:toUpperCase(projectName)}_MAJOR_VERSION=0
+#{fn:toUpperCase(projectName)}_MINOR_VERSION=1
+#{fn:toUpperCase(projectName)}_MICRO_VERSION=0
+#{fn:toUpperCase(projectName)}=$#{fn:toUpperCase(projectName)}_MAJOR_VERSION.$#{fn:toUpperCase(projectName)}_MINOR_VERSION.$#{fn:toUpperCase(projectName)}_MICRO_VERSION
 
 # checking for local tools
 AC_PROG_CC
@@ -28,16 +28,16 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 
 # Set the version number of GtkAda
-AC_SUBST(#{projectCode}_VERSION)
-AC_SUBST(#{projectCode}_MAJOR_VERSION)
-AC_SUBST(#{projectCode}_MINOR_VERSION)
-AC_SUBST(#{projectCode}_MICRO_VERSION)
+AC_SUBST(#{fn:toUpperCase(projectName)}_VERSION)
+AC_SUBST(#{fn:toUpperCase(projectName)}_MAJOR_VERSION)
+AC_SUBST(#{fn:toUpperCase(projectName)}_MINOR_VERSION)
+AC_SUBST(#{fn:toUpperCase(projectName)}_MICRO_VERSION)
 
 EXEC_PREFIX="$prefix"
 AC_SUBST(EXEC_PREFIX)
 
-#{projectCode}_LIBDIR="lib"
-AC_SUBST(#{projectCode}_LIBDIR)
+#{fn:toUpperCase(projectName)}_LIBDIR="lib"
+AC_SUBST(#{fn:toUpperCase(projectName)}_LIBDIR)
 
 ##########################################
 # Ada Web Application library

@@ -8,11 +8,11 @@
 # target names defined.
 GNATMAKE=gnatmake
 GNATCLEAN=gnatclean
-GPRPATH=awa.gpr
+GPRPATH=#{projectName}.gpr
 
-distdir=awa-@#{projectCode}_VERSION@
+distdir=awa-@#{fn:toUpperCase(projectName)}_VERSION@
 
-DIST_FILE=#{projectName}-@#{projectCode}_VERSION@.tar.gz
+DIST_FILE=#{projectName}-@#{fn:toUpperCase(projectName)}_VERSION@.tar.gz
 
 srcdir = .
 top_srcdir = @top_srcdir@
@@ -23,7 +23,7 @@ top_builddir = .
 
 # Build executables for all mains defined by the project.
 build:
-	$(GNATMAKE) -P "$(GPRPATH)"
+	$(GNATMAKE) -p -P "$(GPRPATH)"
 
 # Not intended for manual invocation.
 # Invoked if automatic builds are enabled.

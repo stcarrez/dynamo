@@ -33,10 +33,15 @@ package Gen.Commands is
                       Generator : in out Gen.Generator.Handler) is abstract;
 
    --  Write the help associated with the command.
-   procedure Help (Cmd : in Command) is abstract;
+   procedure Help (Cmd       : in Command;
+                   Generator : in out Gen.Generator.Handler) is abstract;
 
    --  Write the command usage.
    procedure Usage (Cmd : in Command);
+
+   --  Print a message on the standard output.
+   procedure Print (Cmd     : in Command;
+                    Message : in String);
 
    --  ------------------------------
    --  Help Command
@@ -48,7 +53,8 @@ package Gen.Commands is
                       Generator : in out Gen.Generator.Handler);
 
    --  Write the help associated with the command.
-   procedure Help (Cmd : in Help_Command);
+   procedure Help (Cmd       : in Help_Command;
+                   Generator : in out Gen.Generator.Handler);
 
    --  Register the command under the given  name.
    procedure Add_Command (Cmd  : in Command_Access;

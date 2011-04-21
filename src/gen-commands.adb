@@ -17,9 +17,11 @@
 -----------------------------------------------------------------------
 
 with Ada.Text_IO;
+with GNAT.Command_Line;
 with Ada.Command_Line;
 with Gen.Commands.Generate;
 with Gen.Commands.Project;
+with Gen.Commands.Page;
 package body Gen.Commands is
 
    use Ada.Strings.Unbounded;
@@ -32,6 +34,13 @@ package body Gen.Commands is
    begin
       null;
    end Usage;
+
+   --  Print a message on the standard output.
+   procedure Print (Cmd     : in Command;
+                    Message : in String) is
+   begin
+      Ada.Text_IO.Put_Line (Message);
+   end Print;
 
    --  ------------------------------
    --  Print dynamo usage
@@ -62,6 +71,7 @@ package body Gen.Commands is
       pragma Unreferenced (Cmd, Generator);
 
       use Ada.Text_IO;
+      use GNAT.Command_Line;
 
       procedure Print (Position : in Command_Maps.Cursor) is
          Name : constant Unbounded_String := Command_Maps.Key (Position);
@@ -69,18 +79,33 @@ package body Gen.Commands is
          Put_Line ("   " & To_String (Name));
       end Print;
 
-   begin
-      Usage;
-      New_Line;
-      Put_Line ("Available subcommands:");
+      Name : constant String := Get_Argument;
 
-      Commands.Iterate (Process => Print'Access);
+   begin
+      if Name'Length = 0 then
+         Usage;
+         New_Line;
+         Put_Line ("Available subcommands:");
+
+         Commands.Iterate (Process => Print'Access);
+      else
+         declare
+            Target_Cmd : constant Command_Access := Find_Command (Name);
+         begin
+            if Target_Cmd = null then
+               Generator.Error ("Unknown command {0}", Name);
+            else
+               Target_Cmd.Help (Generator);
+            end if;
+         end;
+      end if;
    end Execute;
 
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
-   procedure Help (Cmd : in Help_Command) is
+   procedure Help (Cmd       : in Help_Command;
+                   Generator : in out Gen.Generator.Handler) is
    begin
       null;
    end Help;
@@ -113,10 +138,14 @@ package body Gen.Commands is
    --  Create project command.
    Create_Project_Cmd : aliased Gen.Commands.Project.Command;
 
+   --  Add page command.
+   Add_Page_Cmd       : aliased Gen.Commands.Page.Command;
+
    --  Help command.
    Help_Cmd           : aliased Help_Command;
 begin
    Add_Command (Name => "help", Cmd => Help_Cmd'Access);
    Add_Command (Name => "generate", Cmd => Generate_Cmd'Access);
    Add_Command (Name => "create-project", Cmd => Create_Project_Cmd'Access);
+   Add_Command (Name => "add-page", Cmd => Add_Page_Cmd'Access);
 end Gen.Commands;

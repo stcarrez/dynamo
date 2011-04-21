@@ -58,9 +58,16 @@ package body Gen.Commands.Generate is
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
-   procedure Help (Cmd : in Command) is
+   procedure Help (Cmd       : in Command;
+                   Generator : in out Gen.Generator.Handler) is
+      pragma Unreferenced (Cmd, Generator);
+      use Ada.Text_IO;
    begin
-      Ada.Text_IO.Put_Line ("generate model.xml");
+      Put_Line ("generate: Generate the Ada files for the database model or queries");
+      Put_Line ("Usage: generate MODEL...");
+      New_Line;
+      Put_Line ("  Read the XML model description (Hibernate mapping, query mapping, ...)");
+      Put_Line ("  and generate the Ada model files that correspond to the mapping.");
    end Help;
 
 end Gen.Commands.Generate;

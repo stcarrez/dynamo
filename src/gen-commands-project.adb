@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Directories;
+with Ada.Text_IO;
 with Gen.Artifacts;
 with GNAT.Command_Line;
 with GNAT.OS_Lib;
@@ -35,6 +36,7 @@ package body Gen.Commands.Project is
    --  Execute the command with the arguments.
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
+      pragma Unreferenced (Cmd);
       use GNAT.Command_Line;
 
       Name : constant String := Get_Argument;
@@ -62,10 +64,17 @@ package body Gen.Commands.Project is
       end;
    end Execute;
 
+   --  ------------------------------
    --  Write the help associated with the command.
-   procedure Help (Cmd : in Command) is
+   --  ------------------------------
+   procedure Help (Cmd       : in Command;
+                   Generator : in out Gen.Generator.Handler) is
+      pragma Unreferenced (Cmd, Generator);
+      use Ada.Text_IO;
    begin
-      null;
+      Put_Line ("create-project: Create a new Ada Web Application project");
+      Put_Line ("Usage: create-project NAME");
+      New_Line;
    end Help;
 
 end Gen.Commands.Project;

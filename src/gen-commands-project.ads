@@ -28,6 +28,7 @@ package Gen.Commands.Project is
                       Generator : in out Gen.Generator.Handler);
 
    --  Write the help associated with the command.
-   procedure Help (Cmd : in Command);
+   procedure Help (Cmd       : in Command;
+                   Generator : in out Gen.Generator.Handler);
 
 end Gen.Commands.Project;

@@ -56,6 +56,10 @@ package Gen.Generator is
    procedure Read_Model (H    : in out Handler;
                          File : in String);
 
+   --  Read the XML project file
+   procedure Read_Project (H    : in out Handler;
+                           File : in String);
+
    --  Prepare the model by checking, verifying and initializing it after it is completely known.
    procedure Prepare (H : in out Handler);
 
@@ -93,13 +97,21 @@ package Gen.Generator is
    procedure Set_Result_Directory (H    : in out Handler;
                                    Path : in Ada.Strings.Unbounded.Unbounded_String);
 
-   --  Get the result directory.
+   --  Get the result directory path.
    function Get_Result_Directory (H : in Handler) return String;
+
+   --  Get the config directory path.
+   function Get_Config_Directory (H : in Handler) return String;
 
    --  Get the exit status
    --  Returns 0 if the generation was successful
    --  Returns 1 if there was a generation error
    function Get_Status (H : in Handler) return Ada.Command_Line.Exit_Status;
+
+   --  Get the configuration parameter.
+   function Get_Parameter (H       : in Handler;
+                           Name    : in String;
+                           Default : in String := "") return String;
 
 private
 
@@ -126,6 +138,9 @@ private
       Root   : DOM.Core.Element;
       Status : Ada.Command_Line.Exit_Status := 0;
       File   : access Util.Beans.Objects.Object;
+
+      --  The project document.
+      Project : DOM.Core.Document;
 
       --  Hibernate XML artifact
       Hibernate : Gen.Artifacts.Hibernate.Artifact;

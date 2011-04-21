@@ -14,6 +14,7 @@ VPATH = @srcdir@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 top_builddir = .
+config_dir= @prefix@/share/dynamo
 
 # Build executables for all mains defined by the project.
 build:
@@ -75,5 +76,6 @@ dist:
 
 # Update src/gen.ads with the latest SVN revision number.
 version:
-	gnatprep `svn info | grep '^[UR][eR][Lv]' | sed -e 's,URL: \(.*\),-DURL="\1",' -e 's,Revision: ,-DREVISION=,'` \
+	gnatprep -DCONFIG_DIR='"$(config_dir)"' \
+	   `svn info | grep '^[UR][eR][Lv]' | sed -e 's,URL: \(.*\),-DURL="\1",' -e 's,Revision: ,-DREVISION=,'` \
 		  src/gen.gpb src/gen.ads

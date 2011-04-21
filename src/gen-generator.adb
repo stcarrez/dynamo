@@ -228,28 +228,28 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Initialize (H : in out Handler;
                          Config_Dir : in Ada.Strings.Unbounded.Unbounded_String) is
+      use Ada.Directories;
+
       procedure Register_Funcs is
         new ASF.Applications.Main.Register_Functions (Set_Functions);
 
       Dir     : constant String := Ada.Strings.Unbounded.To_String (Config_Dir);
       Factory : ASF.Applications.Main.Application_Factory;
    begin
-      H.Conf.Load_Properties (Path => Dir & "generator.properties");
+      H.Conf.Load_Properties (Path => Compose (Dir, "generator.properties"));
 
-      H.Conf.Set (ASF.Applications.VIEW_DIR, Config_Dir & "templates/");
+      H.Conf.Set (ASF.Applications.VIEW_DIR, Compose (Dir,  "templates"));
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_EMPTY_LINES, "true");
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
       H.Initialize (H.Conf, Factory);
 
+      H.Config_Dir := To_Unbounded_String (Dir);
       H.Output_Dir := To_Unbounded_String (H.Conf.Get (RESULT_DIR, "./"));
 
       Register_Funcs (H);
       H.File := new Util.Beans.Objects.Object;
-
-      --  Read the type mappings
-      Read_Model (H => H, File => Dir & H.Conf.Get ("generator.mapping", "AdaMappings.xml"));
 
    exception
       when Ada.IO_Exceptions.Name_Error =>
@@ -276,12 +276,20 @@ package body Gen.Generator is
    end Set_Result_Directory;
 
    --  ------------------------------
-   --  Get the result directory.
+   --  Get the result directory path.
    --  ------------------------------
    function Get_Result_Directory (H : in Handler) return String is
    begin
       return To_String (H.Output_Dir);
    end Get_Result_Directory;
+
+   --  ------------------------------
+   --  Get the config directory path.
+   --  ------------------------------
+   function Get_Config_Directory (H : in Handler) return String is
+   begin
+      return To_String (H.Config_Dir);
+   end Get_Config_Directory;
 
    --  ------------------------------
    --  Get the exit status
@@ -294,6 +302,16 @@ package body Gen.Generator is
    end Get_Status;
 
    --  ------------------------------
+   --  Get the configuration parameter.
+   --  ------------------------------
+   function Get_Parameter (H       : in Handler;
+                           Name    : in String;
+                           Default : in String := "") return String is
+   begin
+      return H.Conf.Get (Name, Default);
+   end Get_Parameter;
+
+   --  ------------------------------
    --  Report an error and set the exit status accordingly
    --  ------------------------------
    procedure Error (H : in out Handler;
@@ -304,6 +322,42 @@ package body Gen.Generator is
       Log.Error (Message, Arg1, Arg2);
       H.Status := 1;
    end Error;
+
+   --  ------------------------------
+   --  Read the XML project file
+   --  ------------------------------
+   procedure Read_Project (H    : in out Handler;
+                           File : in String) is
+      Read           : Input_Sources.File.File_Input;
+      My_Tree_Reader : DOM.Readers.Tree_Reader;
+      Name_Start     : Natural;
+
+   begin
+      Log.Info ("Reading project file '{0}'", File);
+
+      --  Base file name should be used as the public Id
+      Name_Start := File'Last;
+      while Name_Start >= File'First  and then File (Name_Start) /= '/' loop
+         Name_Start := Name_Start - 1;
+      end loop;
+      Input_Sources.File.Open (File, Read);
+
+      --  Full name is used as the system id
+      Input_Sources.File.Set_System_Id (Read, File);
+      Input_Sources.File.Set_Public_Id (Read, File (Name_Start + 1 .. File'Last));
+
+      DOM.Readers.Set_Feature (My_Tree_Reader, Sax.Readers.Validation_Feature, False);
+
+      DOM.Readers.Parse (My_Tree_Reader, Read);
+      Input_Sources.File.Close (Read);
+
+      H.Project := DOM.Readers.Get_Tree (My_Tree_Reader);
+
+   exception
+      when Ada.IO_Exceptions.Name_Error =>
+         H.Error ("Project file {0} does not exist", File);
+
+   end Read_Project;
 
    --  ------------------------------
    --  Read the XML model file

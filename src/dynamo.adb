@@ -22,6 +22,7 @@ with Ada.Text_IO;
 
 with Ada.Strings.Unbounded;
 with Ada.Exceptions;
+with Ada.Directories;
 with Ada.Command_Line;
 
 with Util.Log.Loggers;
@@ -30,12 +31,40 @@ with Gen.Commands;
 procedure Dynamo is
    use Ada;
    use Ada.Strings.Unbounded;
+   use Ada.Directories;
    use Ada.Command_Line;
    use Gen.Commands;
 
    Out_Dir      : Unbounded_String;
    Config_Dir   : Unbounded_String;
    Template_Dir : Unbounded_String;
+
+   --  ------------------------------
+   --  Verify and set the configuration path
+   --  ------------------------------
+   procedure Set_Config_Directory (Path   : in String;
+                                   Silent : in Boolean := False) is
+      Log_Path : constant String := Ada.Directories.Compose (Path, "log4j.properties");
+   begin
+      --  Ignore if the config directory was already set.
+      if Length (Config_Dir) > 0 then
+         return;
+      end if;
+
+      --  Check that we can read some configuration file.
+      if not Ada.Directories.Exists (Log_Path) then
+         if not Silent then
+            Ada.Text_IO.Put_Line ("Invalid config directory: " & Path);
+            Ada.Command_Line.Set_Exit_Status (1);
+         end if;
+         return;
+      end if;
+
+      --  Configure the logs
+      Util.Log.Loggers.Initialize (Log_Path);
+      Config_Dir := To_Unbounded_String (Path);
+   end Set_Config_Directory;
+
 begin
    --  Parse the command line
    loop
@@ -49,7 +78,7 @@ begin
             Template_Dir := To_Unbounded_String (Parameter & "/");
 
          when 'c' =>
-            Config_Dir := To_Unbounded_String (Parameter & "/");
+            Set_Config_Directory (Parameter);
 
          when others =>
             null;
@@ -57,11 +86,15 @@ begin
    end loop;
 
    if Length (Config_Dir) = 0 then
-      Config_Dir := To_Unbounded_String ("config/");
+      declare
+         Name : constant String := Ada.Command_Line.Command_Name;
+         Path : constant String := Ada.Directories.Containing_Directory (Name);
+      begin
+         Set_Config_Directory (Compose (Containing_Directory (Path), "config"), False);
+         Set_Config_Directory (Gen.CONFIG_DIR, False);
+      end;
    end if;
 
-   --  Configure the logs
-   Util.Log.Loggers.Initialize (To_String (Config_Dir) & "log4j.properties");
 
    declare
       Cmd_Name  : constant String := Get_Argument;

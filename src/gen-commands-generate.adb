@@ -20,6 +20,7 @@ with GNAT.Command_Line;
 
 with Ada.Command_Line;
 with Ada.Text_IO;
+with Ada.Directories;
 package body Gen.Commands.Generate is
 
    use Ada.Command_Line;
@@ -31,8 +32,15 @@ package body Gen.Commands.Generate is
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
 
+      Mapping : constant String := Generator.Get_Parameter ("generator.mapping",
+                                                            "AdaMappings.xml");
+      Dir     : constant String := Generator.Get_Config_Directory;
       File_Count : Natural := 0;
    begin
+
+      --  Read the type mappings
+      Generator.Read_Model (File => Ada.Directories.Compose (Dir, Mapping));
+
       --  Read the model files.
       loop
          declare

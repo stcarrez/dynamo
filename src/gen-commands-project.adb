@@ -46,10 +46,10 @@ package body Gen.Commands.Project is
          return;
       end if;
 
-      Generator.Set_Global ("projectName", Name);
-      Generator.Set_Global ("projectCode", Util.Strings.Transforms.To_Upper_Case (Name));
+      Generator.Set_Project_Name (Name);
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project");
 
+      Generator.Save_Project;
       declare
          Path   : GNAT.OS_Lib.String_Access := GNAT.OS_Lib.Locate_Exec_On_Path ("autoconf");
          Args   : GNAT.OS_Lib.Argument_List (1 .. 0);

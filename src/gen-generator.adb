@@ -38,6 +38,7 @@ with Gen.Model.Mappings;
 with GNAT.Traceback.Symbolic;
 with Util.Strings;
 with Util.Files;
+with Util.Strings.Transforms;
 with Util.Log.Loggers;
 --  with Util.Beans.Objects.To_Access;
 package body Gen.Generator is
@@ -313,6 +314,37 @@ package body Gen.Generator is
    end Get_Parameter;
 
    --  ------------------------------
+   --  Set the force-save file mode.  When False, if the generated file exists already,
+   --  an error message is reported.
+   --  ------------------------------
+   procedure Set_Force_Save (H  : in out Handler;
+                             To : in Boolean) is
+   begin
+      H.Force_Save := To;
+   end Set_Force_Save;
+
+   --  ------------------------------
+   --  Set the project name.
+   --  ------------------------------
+   procedure Set_Project_Name (H    : in out Handler;
+                               Name : in String) is
+      Code : constant String := Util.Strings.Transforms.To_Upper_Case (Name);
+   begin
+      H.Project.Name := To_Unbounded_String (Name);
+      H.Set_Global ("projectName", Name);
+      H.Set_Global ("projectCode", Code);
+   end Set_Project_Name;
+
+   --  ------------------------------
+   --  Save the project description and parameters.
+   --  ------------------------------
+   procedure Save_Project (H : in out Handler) is
+      Path : constant String := Ada.Directories.Compose (H.Get_Result_Directory, "dynamo.xml");
+   begin
+      H.Project.Save (Path);
+   end Save_Project;
+
+   --  ------------------------------
    --  Report an error and set the exit status accordingly
    --  ------------------------------
    procedure Error (H : in out Handler;
@@ -352,7 +384,8 @@ package body Gen.Generator is
       DOM.Readers.Parse (My_Tree_Reader, Read);
       Input_Sources.File.Close (Read);
 
-      H.Project := DOM.Readers.Get_Tree (My_Tree_Reader);
+      H.Project_Doc := DOM.Readers.Get_Tree (My_Tree_Reader);
+      H.Project.Node := DOM.Core.Documents.Get_Element (H.Project_Doc);
 
    exception
       when Ada.IO_Exceptions.Name_Error =>
@@ -477,10 +510,14 @@ package body Gen.Generator is
          Path    : constant String := Util.Files.Compose (Dir, File);
          Content : Unbounded_String;
       begin
-         Log.Info ("Generating file '{0}'", Path);
+         if not H.Force_Save and then Ada.Directories.Exists (Path) then
+            H.Error ("Cannot generate file: '{0}' exists already.", Path);
+         else
+            Log.Info ("Generating file '{0}'", Path);
 
-         Reply.Read_Content (Content);
-         Util.Files.Write_File (Path => Path, Content => Content);
+            Reply.Read_Content (Content);
+            Util.Files.Write_File (Path => Path, Content => Content);
+         end if;
       end;
    end Generate;
 

@@ -16,35 +16,43 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Containers.Hashed_Maps;
-with Ada.Strings.Unbounded;
-with Ada.Strings.Unbounded.Hash;
-
+with Util.Files;
 with Util.Beans.Objects;
+with Util.Serialize.IO.XML;
+with Util.Streams.Buffered;
+with Util.Streams.Texts;
 
-with Gen.Model.List;
-with Gen.Model.Packages;
-with Gen.Model.Mappings;
-package Gen.Model.Projects is
-
-   use Ada.Strings.Unbounded;
+package body Gen.Model.Projects is
 
    --  ------------------------------
-   --  Project Definition
-   --  ------------------------------
-   type Project_Definition is new Definition with record
-      Name : Unbounded_String;
-   end record;
-   type Project_Definition_Access is access all Project_Definition'Class;
-
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
+   --  ------------------------------
    overriding
    function Get_Value (From : Project_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+      else
+         return Definition'Class (From).Get_Value (Name);
+      end if;
+   end Get_Value;
 
+   --  ------------------------------
    --  Save the project description and parameters.
+   --  ------------------------------
    procedure Save (Project : in out Project_Definition;
-                   Path    : in String);
+                   Path    : in String) is
+      use Util.Streams.Buffered;
+      Output : Util.Serialize.IO.XML.Output_Stream;
+   begin
+      Output.Initialize (Size => 10000);
+      Output.Start_Entity (Name => "project");
+      Output.Write_Entity (Name => "name", Value => Project.Get_Value ("name"));
+      Output.End_Entity (Name => "project");
+      Util.Files.Write_File (Content => Util.Streams.Texts.To_String (Buffered_Stream (Output)),
+                             Path    =>  Path);
+   end Save;
 
 end Gen.Model.Projects;

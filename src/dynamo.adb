@@ -38,6 +38,7 @@ procedure Dynamo is
    Out_Dir      : Unbounded_String;
    Config_Dir   : Unbounded_String;
    Template_Dir : Unbounded_String;
+   Status       : Exit_Status := Success;
 
    --  ------------------------------
    --  Verify and set the configuration path
@@ -55,7 +56,7 @@ procedure Dynamo is
       if not Ada.Directories.Exists (Log_Path) then
          if not Silent then
             Ada.Text_IO.Put_Line ("Invalid config directory: " & Path);
-            Ada.Command_Line.Set_Exit_Status (1);
+            Status := Failure;
          end if;
          return;
       end if;
@@ -90,11 +91,14 @@ begin
          Name : constant String := Ada.Command_Line.Command_Name;
          Path : constant String := Ada.Directories.Containing_Directory (Name);
       begin
-         Set_Config_Directory (Compose (Containing_Directory (Path), "config"), False);
-         Set_Config_Directory (Gen.CONFIG_DIR, False);
+         Set_Config_Directory (Compose (Containing_Directory (Path), "config"), True);
+         Set_Config_Directory (Gen.CONFIG_DIR, True);
       end;
    end if;
-
+   if Status /= Success then
+      Ada.Command_Line.Set_Exit_Status (Status);
+      return;
+   end if;
 
    declare
       Cmd_Name  : constant String := Get_Argument;
@@ -107,7 +111,7 @@ begin
             Ada.Text_IO.Put_Line ("Invalid command: '" & Cmd_Name & "'");
          end if;
          Gen.Commands.Usage;
-         Set_Exit_Status (1);
+         Set_Exit_Status (Failure);
          return;
       end if;
       if Length (Out_Dir) > 0 then

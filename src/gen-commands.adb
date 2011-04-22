@@ -22,6 +22,7 @@ with Ada.Command_Line;
 with Gen.Commands.Generate;
 with Gen.Commands.Project;
 with Gen.Commands.Page;
+with Gen.Commands.Layout;
 package body Gen.Commands is
 
    use Ada.Strings.Unbounded;
@@ -68,7 +69,7 @@ package body Gen.Commands is
    --  ------------------------------
    procedure Execute (Cmd       : in Help_Command;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Generator);
+      pragma Unreferenced (Cmd);
 
       use Ada.Text_IO;
       use GNAT.Command_Line;
@@ -141,6 +142,9 @@ package body Gen.Commands is
    --  Add page command.
    Add_Page_Cmd       : aliased Gen.Commands.Page.Command;
 
+   --  Add layout command.
+   Add_Layout_Cmd     : aliased Gen.Commands.Layout.Command;
+
    --  Help command.
    Help_Cmd           : aliased Help_Command;
 begin
@@ -148,4 +152,5 @@ begin
    Add_Command (Name => "generate", Cmd => Generate_Cmd'Access);
    Add_Command (Name => "create-project", Cmd => Create_Project_Cmd'Access);
    Add_Command (Name => "add-page", Cmd => Add_Page_Cmd'Access);
+   Add_Command (Name => "add-layout", Cmd => Add_Layout_Cmd'Access);
 end Gen.Commands;

@@ -56,6 +56,7 @@ package body Gen.Commands.Page is
          return;
       end if;
 
+      Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (To_Unbounded_String (Dir));
       Generator.Set_Global ("pageName", Name);
       Generator.Set_Global ("layout", Layout);

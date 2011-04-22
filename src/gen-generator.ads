@@ -28,6 +28,7 @@ with ASF.Applications.Main;
 with ASF.Contexts.Faces;
 
 with Gen.Model.Packages;
+with Gen.Model.Projects;
 with Gen.Artifacts.Hibernate;
 with Gen.Artifacts.Query;
 with Gen.Artifacts.Mappings;
@@ -113,6 +114,18 @@ package Gen.Generator is
                            Name    : in String;
                            Default : in String := "") return String;
 
+   --  Set the force-save file mode.  When False, if the generated file exists already,
+   --  an error message is reported.
+   procedure Set_Force_Save (H  : in out Handler;
+                             To : in Boolean);
+
+   --  Set the project name.
+   procedure Set_Project_Name (H    : in out Handler;
+                               Name : in String);
+
+   --  Save the project description and parameters.
+   procedure Save_Project (H : in out Handler);
+
 private
 
    use Ada.Strings.Unbounded;
@@ -140,7 +153,8 @@ private
       File   : access Util.Beans.Objects.Object;
 
       --  The project document.
-      Project : DOM.Core.Document;
+      Project : aliased Gen.Model.Projects.Project_Definition;
+      Project_Doc : DOM.Core.Document;
 
       --  Hibernate XML artifact
       Hibernate : Gen.Artifacts.Hibernate.Artifact;
@@ -153,6 +167,9 @@ private
 
       --  The list of templates that must be generated.
       Templates : Template_Map.Map;
+
+      --  Force the saving of a generated file, even if a file already exist.
+      Force_Save : Boolean := True;
    end record;
 
    --  Execute the lifecycle phases on the faces context.

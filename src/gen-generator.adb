@@ -35,6 +35,7 @@ with Gen.Model;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
 
+with GNAT.Traceback.Symbolic;
 with Util.Strings;
 with Util.Files;
 with Util.Log.Loggers;
@@ -472,7 +473,8 @@ package body Gen.Generator is
 
       declare
          Dir     : constant String := To_String (H.Output_Dir);
-         Path    : constant String := Dir & Util.Beans.Objects.To_String (H.File.all);
+         File    : constant String := Util.Beans.Objects.To_String (H.File.all);
+         Path    : constant String := Util.Files.Compose (Dir, File);
          Content : Unbounded_String;
       begin
          Log.Info ("Generating file '{0}'", Path);
@@ -539,7 +541,7 @@ package body Gen.Generator is
       Dir_Filter : constant Filter_Type := (Directory => True, others => False);
       Ent        : Directory_Entry_Type;
       Dir        : constant String := H.Conf.Get (ASF.Applications.VIEW_DIR);
-      Path       : constant String := Dir & Name;
+      Path       : constant String := Util.Files.Compose (Dir, Name);
       Base_Dir   : constant Unbounded_String := H.Output_Dir;
    begin
       if Kind (Path) /= Directory then
@@ -559,7 +561,7 @@ package body Gen.Generator is
                H.Generate (Mode, File_Path);
             elsif Util.Strings.Index (Base_Name, '~') = 0 then
                Util.Files.Read_File (Path => File_Path, Into => Content);
-               Util.Files.Write_File (Path => To_String (Base_Dir) & Base_Name,
+               Util.Files.Write_File (Path => Compose (To_String (Base_Dir), Base_Name),
                                       Content => Content);
             end if;
          end;
@@ -572,16 +574,17 @@ package body Gen.Generator is
             Dir_Name : constant String := Simple_Name (Ent);
          begin
             if Dir_Name /= "." and Dir_Name /= ".." and Dir_Name /= ".svn" then
-               H.Output_Dir := Base_Dir & "/" & Dir_Name & "/";
-               H.Generate_All (Mode, Name & "/" & Dir_Name);
+               H.Output_Dir := To_Unbounded_String (Compose (To_String (Base_Dir), Dir_Name));
+               H.Generate_All (Mode, Compose (Name, Dir_Name));
             end if;
          end;
       end loop;
 
       H.Output_Dir := Base_Dir;
    exception
-      when Ada.IO_Exceptions.Name_Error =>
+      when E : Ada.IO_Exceptions.Name_Error =>
          H.Error ("Template directory {0} does not exist", Path);
+         Log.Info ("Exception: {0}", GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
    end Generate_All;
 
 end Gen.Generator;

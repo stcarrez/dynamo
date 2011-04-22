@@ -8,13 +8,35 @@ distdir=ada-gen-@GEN_VERSION@
 
 DIST_FILE=ada-gen-@GEN_VERSION@.tar.gz
 
-srcdir = .
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+
+srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+datarootdir= @datarootdir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+
 top_builddir = .
-config_dir= @prefix@/share/dynamo
+config_dir=${datadir}/dynamo
+
+MKDIR=mkdir
+CP=cp
 
 # Build executables for all mains defined by the project.
 build:
@@ -79,3 +101,15 @@ version:
 	gnatprep -DCONFIG_DIR='"$(config_dir)"' \
 	   `svn info | grep '^[UR][eR][Lv]' | sed -e 's,URL: \(.*\),-DURL="\1",' -e 's,Revision: ,-DREVISION=,'` \
 		  src/gen.gpb src/gen.ads
+
+install:	  install_dirs
+	$(INSTALL) bin/dynamo $(prefix)/bin/dynamo
+	$(CP) config/*.properties $(prefix)/share/dynamo
+	$(CP) config/*.xml $(prefix)/share/dynamo
+	-rm -rf $(prefix)/share/dynamo/templates
+	$(CP) -r config/templates $(prefix)/share/dynamo
+
+install_dirs:
+	${MKDIR} -p ${bindir}
+	${MKDIR} -p ${prefix}/share/dynamo
+

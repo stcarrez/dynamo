@@ -556,6 +556,7 @@ PACKAGE_URL=
 ac_unique_file="src/gen.ads"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+mkdir_p
 ASF_DIR
 EL_DIR
 UTIL_DIR
@@ -565,6 +566,7 @@ GEN_MICRO_VERSION
 GEN_MINOR_VERSION
 GEN_MAJOR_VERSION
 GEN_VERSION
+LN_S
 RANLIB
 INSTALL_DATA
 INSTALL_SCRIPT
@@ -577,10 +579,6 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
-target_os
-target_vendor
-target_cpu
-target
 host_os
 host_vendor
 host_cpu
@@ -1243,7 +1241,6 @@ _ACEOF
 System types:
   --build=BUILD     configure for building on BUILD [guessed]
   --host=HOST       cross-compile to build programs to run on HOST [BUILD]
-  --target=TARGET   configure for building compilers for TARGET [HOST]
 _ACEOF
 fi
 
@@ -1832,46 +1829,6 @@ host_os=$*
 IFS=$ac_save_IFS
 case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking target system type" >&5
-$as_echo_n "checking target system type... " >&6; }
-if test "${ac_cv_target+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test "x$target_alias" = x; then
-  ac_cv_target=$ac_cv_host
-else
-  ac_cv_target=`$SHELL "$ac_aux_dir/config.sub" $target_alias` ||
-    as_fn_error "$SHELL $ac_aux_dir/config.sub $target_alias failed" "$LINENO" 5
-fi
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_target" >&5
-$as_echo "$ac_cv_target" >&6; }
-case $ac_cv_target in
-*-*-*) ;;
-*) as_fn_error "invalid value of canonical target" "$LINENO" 5;;
-esac
-target=$ac_cv_target
-ac_save_IFS=$IFS; IFS='-'
-set x $ac_cv_target
-shift
-target_cpu=$1
-target_vendor=$2
-shift; shift
-# Remember, the first character of IFS is used to create $*,
-# except with old shells:
-target_os=$*
-IFS=$ac_save_IFS
-case $target_os in *\ *) target_os=`echo "$target_os" | sed 's/ /-/g'`;; esac
-
-
-# The aliases save the names the user supplied, while $host etc.
-# will get canonicalized.
-test -n "$target_alias" &&
-  test "$program_prefix$program_suffix$program_transform_name" = \
-    NONENONEs,x,x, &&
-  program_prefix=${target_alias}-
 
 
 
@@ -2891,6 +2848,17 @@ else
   RANLIB="$ac_cv_prog_RANLIB"
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ln -s works" >&5
+$as_echo_n "checking whether ln -s works... " >&6; }
+LN_S=$as_ln_s
+if test "$LN_S" = "ln -s"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no, using $LN_S" >&5
+$as_echo "no, using $LN_S" >&6; }
+fi
+
 
 # Set the version number of GtkAda
 
@@ -2977,7 +2945,11 @@ fi
 $as_echo "${ASF_DIR}" >&6; }
 
 
-ac_config_files="$ac_config_files Makefile dynamo.gpr"
+
+
+ac_config_files="$ac_config_files Makefile"
+
+ac_config_files="$ac_config_files dynamo.gpr"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

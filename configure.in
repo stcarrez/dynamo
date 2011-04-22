@@ -21,8 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/gen.ads)
 
-AC_CANONICAL_SYSTEM
-dnl AM_MAINTAINER_MODE
+AC_CANONICAL_HOST
 AC_EXEEXT
 
 # Current release settings
@@ -38,6 +37,7 @@ AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AC_PROG_LN_S
 
 # Set the version number of GtkAda
 AC_SUBST(GEN_VERSION)
@@ -106,6 +106,9 @@ fi
 AC_MSG_RESULT(${ASF_DIR})
 AC_SUBST(ASF_DIR)
 
+AC_SUBST(mkdir_p)
+
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT(
-Makefile dynamo.gpr
+dynamo.gpr
 )

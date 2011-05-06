@@ -127,7 +127,13 @@ begin
 
       Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
    end;
+
 exception
+   when Invalid_Switch =>
+      Ada.Text_IO.Put_Line ("Invalid option.");
+      Ada.Text_IO.Put_Line ("Use the 'help' command.");
+      Ada.Command_Line.Set_Exit_Status (2);
+
    when E : XML_Fatal_Error =>
       Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));
 end Dynamo;

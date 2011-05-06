@@ -5,7 +5,7 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{modelName}.hbm.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <hibernate-mapping default-cascade="none">
-    <class name="Model.#{fn:capitalize(modelName)}" table="#{modelName}"
+    <class name="#{fn:capitalize(projectName)}.Model.#{fn:capitalize(modelName)}" table="#{modelName}"
            dynamic-insert="true" dynamic-update="true">
         <comment>The #{modelName} table.</comment>
         <id name="id" type="ADO.Identifier" unsaved-value="0">

@@ -56,10 +56,11 @@ package body Gen.Commands.Model is
          return;
       end if;
 
+      Generator.Read_Project ("dynamo.xml");
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (To_Unbounded_String (Dir));
       Generator.Set_Global ("modelName", Name);
-      Generator.Set_Global ("projectCode", Util.Strings.Transforms.To_Upper_Case (Name));
+      Generator.Set_Global ("projectName", Generator.Get_Project_Name);
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "add-model");
    end Execute;
 

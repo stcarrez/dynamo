@@ -31,6 +31,7 @@ with ASF.Components.Base;
 with Util.Beans.Basic;
 with EL.Functions;
 
+with Gen.Utils;
 with Gen.Model;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
@@ -328,6 +329,14 @@ package body Gen.Generator is
    end Set_Project_Name;
 
    --  ------------------------------
+   --  Get the project name.
+   --  ------------------------------
+   function Get_Project_Name (H : in Handler) return String is
+   begin
+      return To_String (H.Project.Name);
+   end Get_Project_Name;
+
+   --  ------------------------------
    --  Save the project description and parameters.
    --  ------------------------------
    procedure Save_Project (H : in out Handler) is
@@ -353,10 +362,11 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Read_Project (H    : in out Handler;
                            File : in String) is
+      use type DOM.Core.Node;
+
       Read           : Input_Sources.File.File_Input;
       My_Tree_Reader : DOM.Readers.Tree_Reader;
       Name_Start     : Natural;
-
    begin
       Log.Info ("Reading project file '{0}'", File);
 
@@ -378,6 +388,16 @@ package body Gen.Generator is
 
       H.Project_Doc := DOM.Readers.Get_Tree (My_Tree_Reader);
       H.Project.Node := DOM.Core.Documents.Get_Element (H.Project_Doc);
+
+      declare
+         N : DOM.Core.Node := Gen.Model.Get_Child (H.Project.Node, "name");
+      begin
+         if N /= null then
+            H.Project.Name := To_Unbounded_String (Gen.Utils.Get_Data_Content (N));
+         else
+            H.Error ("Project file {0} does not contain the project name.", File);
+         end if;
+      end;
 
    exception
       when Ada.IO_Exceptions.Name_Error =>

@@ -22,7 +22,7 @@ package Gen is
    SVN_URL : constant String := "https://ada-gen.googlecode.com/svn/trunk";
 
    --  Revision used (must run 'make version' to update)
-   SVN_REV : constant Positive := 95;
+   SVN_REV : constant Positive := 109;
 
    RELEASE          : constant String := "Dynamo Ada Generator 0.3 - Revision"
                            & Positive'Image (SVN_REV) & ", Stephane Carrez";

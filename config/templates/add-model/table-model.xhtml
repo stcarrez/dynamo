@@ -1,0 +1,23 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{modelName}.hbm.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<hibernate-mapping default-cascade="none">
+    <class name="Model.#{fn:capitalize(modelName)}" table="#{modelName}"
+           dynamic-insert="true" dynamic-update="true">
+        <comment>The #{modelName} table.</comment>
+        <id name="id" type="ADO.Identifier" unsaved-value="0">
+            <comment>the #{modelName} id</comment>
+            <column name="ID" not-null="true" unique="false" sql-type="BIGINT"/>
+            <generator class="sequence"/>
+        </id>
+        <version name="version" type="int" column="version"/>
+        <property name="name" type="String">
+            <comment>the #{modelName} name</comment>
+            <column name="NAME" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+        </property>
+    </class>
+ </hibernate-mapping>
+]]></f:view>

@@ -1,0 +1,136 @@
+.\"
+.\"
+.TH DYNAMO 1 "Dynamo" "6 May 2011" ""
+.SH NAME
+dynamo - Ada Web Application Generator
+.SH SYNOPSIS
+.B dynamo
+[ -o
+.I directory
+] [ -t
+.I templates
+] [ -c
+.I config-dir
+]
+.I command
+.br
+.SH DESCRIPTION
+\fIdynamo\fR is a command to help developers write an Ada Web Application using the
+.B ASF
+framework.  \fIdynamo\fR provides several commands to perform one specific task in
+the development process.
+.\"
+.PP
+First the
+.B create-project
+command will be used to initiate a new project.  The project name is used at this stage
+to configure the name of the root Ada package for the application.
+.\""
+.PP
+The
+.B add-model
+command will be used to create a database table mapping file.  The database mapping file
+describes how to map a database table into an Ada record type for the
+.B ADO
+framework.  The
+.B generate
+command is then used to build the Ada model files from the database mapping files.
+.PP
+The
+.B add-page
+command is then used to add web pages for the application.  When a new application
+layout is necessary, the
+.B add-layout
+command can be used.
+.\"
+.SH OPTIONS
+The following options are recognized by \fIdynamo\fR:
+.TP 5
+-o directory
+.br
+Specifies the directory where result files are created.  The default is the current directory.
+.TP 5
+-c directory
+.br
+Specifies the configuration directory which contains \fIdynamo\fR configuration
+files as well as template files.
+.TP 5
+-t directory
+.br
+Specifies the templates directory.  This option can be used to override the
+templates provided by \fIdynamo\fR.
+.\"
+.SH COMMANDS
+.\"
+.PP
+.I The
+.B create-project
+.I command
+.PP
+ \fBcreate-project \fIname\fR\fR
+.PP
+Create a new project in the current working directory or in the
+directory specified by the
+.I -o
+option.  The project name should be a valid Ada identifier.  It represents the Ada root
+package name for the project.  The command creates a set of Ada files, a configure script,
+a Makefile as well as a
+.I gnatmake
+build file.  The application can be immediately compiled to obtain a web server that is ready
+to run.
+.\"
+.PP
+.I The
+.B add-layout
+.I command
+.PP
+ \fBadd-layout \fIname\fR\fR
+.PP
+Create a new layout file.
+.\"
+.\"
+.PP
+.I The
+.B add-page
+.I command
+.PP
+ \fBadd-page \fIname\fR\fR
+.PP
+Create a new page file.
+.\"
+.\"
+.PP
+.I The
+.B add-page
+.I command
+.PP
+ \fBadd-model \fIname\fR\fR
+.PP
+Create a new database table model mapping.
+.\"
+.\"
+.PP
+.I The
+.B add-page
+.I command
+.PP
+ \fBadd-model \fIname\fR\fR
+.PP
+Create a new database table model mapping.
+.\"
+.\"
+.PP
+.I The
+.B generate
+.I command
+.PP
+ \fBgenerate \fImodel ... \fR\fR
+.PP
+Create a new database table model mapping.
+.\"
+.SH SEE ALSO
+\fIgnatmake(1)\fR, \fIgcc(1)\fR
+.\"
+.SH COPYRIGHT
+Copyright 2011 by Stephane Carrez.
+.\"

@@ -109,8 +109,12 @@ begin
       if Cmd = null then
          if Cmd_Name'Length > 0 then
             Ada.Text_IO.Put_Line ("Invalid command: '" & Cmd_Name & "'");
+         else
+            Ada.Text_IO.Put_Line (Gen.RELEASE);
+            Ada.Text_IO.Put ("Type '");
+            Ada.Text_IO.Put (Ada.Command_Line.Command_Name);
+            Ada.Text_IO.Put_Line (" help' for usage.");
          end if;
-         Gen.Commands.Usage;
          Set_Exit_Status (Failure);
          return;
       end if;

@@ -105,7 +105,8 @@ package body Gen.Model.Packages is
 
             Result := new Package_Definition;
             Result.Pkg_Name := Name;
-            Result.Tables_Bean := Util.Beans.Objects.To_Object (Result.Tables'Access);
+            Result.Tables_Bean := Util.Beans.Objects.To_Object (Result.Tables'Access,
+                                                                Util.Beans.Objects.STATIC);
             Util.Strings.Transforms.To_Lower_Case (To_String (Base_Name),
                                                    Result.Base_Name);
             O.Packages.Insert (Key, Result);
@@ -173,7 +174,7 @@ package body Gen.Model.Packages is
       end Prepare_Tables;
 
    begin
-      O.Used := Util.Beans.Objects.To_Object (T);
+      O.Used := Util.Beans.Objects.To_Object (T, Util.Beans.Objects.STATIC);
       O.Used_Types.Row := 0;
       O.Used_Types.Values.Clear;
       O.Uses_Calendar_Time := False;
@@ -200,10 +201,11 @@ package body Gen.Model.Packages is
    --  ------------------------------
    overriding
    procedure Initialize (O : in out Package_Definition) is
+      use Util.Beans.Objects;
    begin
-      O.Tables_Bean  := Util.Beans.Objects.To_Object (O.Tables'Unchecked_Access);
-      O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access);
-      O.Used         := Util.Beans.Objects.To_Object (O.Used_Types'Unchecked_Access);
+      O.Tables_Bean  := Util.Beans.Objects.To_Object (O.Tables'Unchecked_Access, STATIC);
+      O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access, STATIC);
+      O.Used         := Util.Beans.Objects.To_Object (O.Used_Types'Unchecked_Access, STATIC);
    end Initialize;
 
    --  ------------------------------
@@ -272,7 +274,7 @@ package body Gen.Model.Packages is
    procedure Initialize (O : in out Model_Definition) is
       T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Tables'Unchecked_Access;
    begin
-      O.Tables_Bean := Util.Beans.Objects.To_Object (T);
+      O.Tables_Bean := Util.Beans.Objects.To_Object (T, Util.Beans.Objects.STATIC);
    end Initialize;
 
    --  ------------------------------

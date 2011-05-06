@@ -23,6 +23,7 @@ with Gen.Commands.Generate;
 with Gen.Commands.Project;
 with Gen.Commands.Page;
 with Gen.Commands.Layout;
+with Gen.Commands.Model;
 package body Gen.Commands is
 
    use Ada.Strings.Unbounded;
@@ -145,6 +146,9 @@ package body Gen.Commands is
    --  Add layout command.
    Add_Layout_Cmd     : aliased Gen.Commands.Layout.Command;
 
+   --  Add model command.
+   Add_Model_Cmd      : aliased Gen.Commands.Model.Command;
+
    --  Help command.
    Help_Cmd           : aliased Help_Command;
 begin
@@ -153,4 +157,5 @@ begin
    Add_Command (Name => "create-project", Cmd => Create_Project_Cmd'Access);
    Add_Command (Name => "add-page", Cmd => Add_Page_Cmd'Access);
    Add_Command (Name => "add-layout", Cmd => Add_Layout_Cmd'Access);
+   Add_Command (Name => "add-model", Cmd => Add_Model_Cmd'Access);
 end Gen.Commands;

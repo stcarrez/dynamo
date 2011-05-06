@@ -36,7 +36,7 @@ package body Gen.Model.Tables is
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Type_Mapping.all'Access;
          begin
-            return Util.Beans.Objects.To_Object (Bean);
+            return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
          end;
 
       elsif Name = "type" then
@@ -147,7 +147,8 @@ package body Gen.Model.Tables is
    overriding
    procedure Initialize (O : in out Table_Definition) is
    begin
-      O.Members_Bean := Util.Beans.Objects.To_Object (O.Members'Unchecked_Access);
+      O.Members_Bean := Util.Beans.Objects.To_Object (O.Members'Unchecked_Access,
+                                                      Util.Beans.Objects.STATIC);
    end Initialize;
 
    --  ------------------------------
@@ -165,14 +166,14 @@ package body Gen.Model.Tables is
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Id_Column.all'Access;
          begin
-            return Util.Beans.Objects.To_Object (Bean);
+            return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
          end;
 
       elsif Name ="version" and From.Version_Column /= null then
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Version_Column.all'Unchecked_Access;
          begin
-            return Util.Beans.Objects.To_Object (Bean);
+            return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
          end;
 
       elsif Name = "hasAssociations" then

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-list -- List bean interface for model objects
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,7 @@ package body Gen.Model.List is
             Current : constant T_Access := From.Nodes.Element (Index - 1);
             Bean    : constant Util.Beans.Basic.Readonly_Bean_Access := Current.all'Access;
          begin
-            From.Value_Bean := Util.Beans.Objects.To_Object (Bean);
+            From.Value_Bean := Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
          end;
       else
          From.Value_Bean := Util.Beans.Objects.Null_Object;

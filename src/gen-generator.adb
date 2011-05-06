@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,14 +56,6 @@ package body Gen.Generator is
 
    --  EL Function to translate a model type to the key enum value
    function To_Key_Enum (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
-
---     function To_Column_Access is
---       new Util.Beans.Objects.To_Access (T => Gen.Model.Tables.Column_Definition,
---                                         T_Access => Gen.Model.Tables.Column_Definition_Access);
-
---     function To_Definition_Access is
---       new Util.Beans.Objects.To_Access (T => Gen.Model.Definition,
---                                         T_Access => Gen.Model.Definition_Access);
 
    --  ------------------------------
    --  EL Function to translate a model type to an Ada implementation type
@@ -490,7 +482,8 @@ package body Gen.Generator is
       Req   : ASF.Requests.Mockup.Request;
       Reply : ASF.Responses.Mockup.Response;
       Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := Model.all'Unchecked_Access;
-      Bean  : constant Util.Beans.Objects.Object := Util.Beans.Objects.To_Object (Ptr);
+      Bean  : constant Util.Beans.Objects.Object
+        := Util.Beans.Objects.To_Object (Ptr, Util.Beans.Objects.STATIC);
    begin
       Log.Info ("With template '{0}'", File);
 

@@ -19,11 +19,8 @@
 with GNAT.Command_Line;
 
 with Ada.Text_IO;
-with Ada.Directories;
-with Ada.Command_Line;
 package body Gen.Commands.Generate is
 
-   use Ada.Command_Line;
    use GNAT.Command_Line;
 
    --  ------------------------------
@@ -35,6 +32,8 @@ package body Gen.Commands.Generate is
 
       File_Count : Natural := 0;
    begin
+      Generator.Read_Project ("dynamo.xml");
+
       --  Read the model files.
       loop
          declare

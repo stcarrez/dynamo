@@ -398,7 +398,7 @@ package body Gen.Generator is
       H.Project.Node := DOM.Core.Documents.Get_Element (H.Project_Doc);
 
       declare
-         N : DOM.Core.Node := Gen.Model.Get_Child (H.Project.Node, "name");
+         N : constant DOM.Core.Node := Gen.Model.Get_Child (H.Project.Node, "name");
       begin
          if N /= null then
             H.Project.Name := To_Unbounded_String (Gen.Utils.Get_Data_Content (N));
@@ -406,6 +406,7 @@ package body Gen.Generator is
             H.Error ("Project file {0} does not contain the project name.", File);
          end if;
       end;
+      H.Set_Global ("projectName", H.Get_Project_Name);
 
    exception
       when Ada.IO_Exceptions.Name_Error =>

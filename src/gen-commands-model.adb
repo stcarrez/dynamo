@@ -53,7 +53,6 @@ package body Gen.Commands.Model is
          Generator.Set_Global ("moduleName", Name);
          Generator.Set_Global ("modelName", Arg2);
       end if;
-      Generator.Set_Global ("projectName", Generator.Get_Project_Name);
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "add-model");
 
       --  If the generation succeeds, run the generate command to generate the Ada files.

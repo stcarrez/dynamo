@@ -18,9 +18,9 @@
 
 with GNAT.Command_Line;
 
-with Ada.Command_Line;
 with Ada.Text_IO;
 with Ada.Directories;
+with Ada.Command_Line;
 package body Gen.Commands.Generate is
 
    use Ada.Command_Line;
@@ -31,16 +31,10 @@ package body Gen.Commands.Generate is
    --  ------------------------------
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
+      pragma Unreferenced (Cmd);
 
-      Mapping : constant String := Generator.Get_Parameter ("generator.mapping",
-                                                            "AdaMappings.xml");
-      Dir     : constant String := Generator.Get_Config_Directory;
       File_Count : Natural := 0;
    begin
-
-      --  Read the type mappings
-      Generator.Read_Model (File => Ada.Directories.Compose (Dir, Mapping));
-
       --  Read the model files.
       loop
          declare
@@ -53,9 +47,7 @@ package body Gen.Commands.Generate is
       end loop;
 
       if File_Count = 0 then
-         Cmd.Usage;
-         Set_Exit_Status (2);
-         return;
+         Gen.Generator.Read_Models (Generator);
       end if;
 
       --  Run the generation.
@@ -72,7 +64,7 @@ package body Gen.Commands.Generate is
       use Ada.Text_IO;
    begin
       Put_Line ("generate: Generate the Ada files for the database model or queries");
-      Put_Line ("Usage: generate MODEL...");
+      Put_Line ("Usage: generate [MODEL ...]");
       New_Line;
       Put_Line ("  Read the XML model description (Hibernate mapping, query mapping, ...)");
       Put_Line ("  and generate the Ada model files that correspond to the mapping.");

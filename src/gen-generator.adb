@@ -346,6 +346,14 @@ package body Gen.Generator is
    end Save_Project;
 
    --  ------------------------------
+   --  Get the path of the last generated file.
+   --  ------------------------------
+   function Get_Generated_File (H : in Handler) return String is
+   begin
+      return Util.Beans.Objects.To_String (H.File.all);
+   end Get_Generated_File;
+
+   --  ------------------------------
    --  Report an error and set the exit status accordingly
    --  ------------------------------
    procedure Error (H : in out Handler;
@@ -415,6 +423,20 @@ package body Gen.Generator is
       Name_Start     : Natural;
 
    begin
+      --  Before loading a model file, we should know the type mappings.
+      --  Load them first if needed.
+      if not H.Type_Mapping_Loaded then
+         declare
+            Mapping : constant String := H.Get_Parameter ("generator.mapping",
+                                                          "AdaMappings.xml");
+            Dir     : constant String := H.Get_Config_Directory;
+         begin
+            --  Read the type mappings
+            H.Type_Mapping_Loaded := True;
+            H.Read_Model (File => Ada.Directories.Compose (Dir, Mapping));
+         end;
+      end if;
+
       Log.Info ("Reading model file '{0}'", File);
 
       --  Base file name should be used as the public Id
@@ -445,6 +467,32 @@ package body Gen.Generator is
          H.Error ("Model file {0} does not exist", File);
 
    end Read_Model;
+
+   --  ------------------------------
+   --  Read the model and query files stored in the application directory <b>db</b>.
+   --  ------------------------------
+   procedure Read_Models (H : in out Handler) is
+      use Ada.Directories;
+      Path    : constant String := Util.Files.Compose (H.Get_Result_Directory, "db");
+      Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
+      Search  : Search_Type;
+      Ent     : Directory_Entry_Type;
+   begin
+      Log.Info ("Reading model file stored in '{0}'", Path);
+
+      --  No argument specified, look at the model files in the db directory.
+      if Exists (Path) then
+         Start_Search (Search, Directory => Path, Pattern => "*.xml", Filter => Filter);
+         while More_Entries (Search) loop
+            Get_Next_Entry (Search, Ent);
+            declare
+               Name : constant String := Full_Name (Ent);
+            begin
+               H.Read_Model (Name);
+            end;
+         end loop;
+      end if;
+   end Read_Models;
 
    --  ------------------------------
    --  Execute the lifecycle phases on the faces context.
@@ -505,7 +553,7 @@ package body Gen.Generator is
       Bean  : constant Util.Beans.Objects.Object
         := Util.Beans.Objects.To_Object (Ptr, Util.Beans.Objects.STATIC);
    begin
-      Log.Info ("With template '{0}'", File);
+      Log.Debug ("With template '{0}'", File);
 
       Req.Set_Path_Info (File);
       Req.Set_Method ("GET");

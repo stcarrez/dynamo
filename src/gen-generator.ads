@@ -57,6 +57,9 @@ package Gen.Generator is
    procedure Read_Model (H    : in out Handler;
                          File : in String);
 
+   --  Read the model and query files stored in the application directory <b>db</b>.
+   procedure Read_Models (H : in out Handler);
+
    --  Read the XML project file
    procedure Read_Project (H    : in out Handler;
                            File : in String);
@@ -129,6 +132,9 @@ package Gen.Generator is
    --  Save the project description and parameters.
    procedure Save_Project (H : in out Handler);
 
+   --  Get the path of the last generated file.
+   function Get_Generated_File (H : in Handler) return String;
+
 private
 
    use Ada.Strings.Unbounded;
@@ -154,6 +160,9 @@ private
       Root   : DOM.Core.Element;
       Status : Ada.Command_Line.Exit_Status := 0;
       File   : access Util.Beans.Objects.Object;
+
+      --  Whether the AdaMappings.xml file was loaded or not.
+      Type_Mapping_Loaded : Boolean := False;
 
       --  The project document.
       Project : aliased Gen.Model.Projects.Project_Definition;

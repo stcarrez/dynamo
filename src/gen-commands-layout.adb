@@ -21,7 +21,6 @@ with Gen.Artifacts;
 with GNAT.Command_Line;
 
 with Util.Files;
-with Util.Strings.Transforms;
 package body Gen.Commands.Layout is
 
    --  ------------------------------
@@ -70,7 +69,7 @@ package body Gen.Commands.Layout is
    --  ------------------------------
    procedure Help (Cmd : in Command;
                    Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Generator);
       use Ada.Text_IO;
 
    begin

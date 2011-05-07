@@ -15,12 +15,12 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Directories;
 with Ada.Text_IO;
+with Ada.Command_Line;
 with Gen.Artifacts;
 with GNAT.Command_Line;
 
-with Util.Strings.Transforms;
+with Util.Files;
 package body Gen.Commands.Model is
 
    --  ------------------------------
@@ -30,26 +30,13 @@ package body Gen.Commands.Model is
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
       use GNAT.Command_Line;
+      use Ada.Command_Line;
       use Ada.Strings.Unbounded;
 
-      Name   : constant String := Get_Argument;
-      Dir    : constant String := Generator.Get_Result_Directory & "db/";
-
-      function Get_Layout return String is
-         Layout : constant String := Get_Argument;
-      begin
-         if Layout'Length = 0 then
-            return "layout";
-         end if;
-         if Ada.Directories.Exists (Dir & "WEB-INF/layouts/" & Layout & ".xhtml") then
-            return Layout;
-         end if;
-
-         Generator.Error ("Layout file {0} not found.  Using 'layout' instead.", Layout);
-         return "layout";
-      end Get_Layout;
-
-      Layout : constant String := Get_Layout;
+      Name     : constant String := Get_Argument;
+      Arg2     : constant String := Get_Argument;
+      Root_Dir : constant String := Generator.Get_Result_Directory;
+      Dir      : constant String := Util.Files.Compose (Root_Dir, "db");
    begin
       if Name'Length = 0 then
          Gen.Commands.Usage;
@@ -59,9 +46,27 @@ package body Gen.Commands.Model is
       Generator.Read_Project ("dynamo.xml");
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (To_Unbounded_String (Dir));
-      Generator.Set_Global ("modelName", Name);
+      if Arg2'Length = 0 then
+         Generator.Set_Global ("moduleName", "");
+         Generator.Set_Global ("modelName", Name);
+      else
+         Generator.Set_Global ("moduleName", Name);
+         Generator.Set_Global ("modelName", Arg2);
+      end if;
       Generator.Set_Global ("projectName", Generator.Get_Project_Name);
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "add-model");
+
+      --  If the generation succeeds, run the generate command to generate the Ada files.
+      if Generator.Get_Status = Ada.Command_Line.Success then
+
+         Generator.Set_Result_Directory (To_Unbounded_String (Root_Dir));
+         Generator.Set_Force_Save (True);
+         Gen.Generator.Read_Models (Generator);
+
+         --  Run the generation.
+         Gen.Generator.Prepare (Generator);
+         Gen.Generator.Generate_All (Generator);
+      end if;
    end Execute;
 
    --  ------------------------------
@@ -69,16 +74,18 @@ package body Gen.Commands.Model is
    --  ------------------------------
    procedure Help (Cmd : in Command;
                    Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Generator);
       use Ada.Text_IO;
    begin
       Put_Line ("add-model: Add a new database table model to the application");
-      Put_Line ("Usage: add-model NAME");
+      Put_Line ("Usage: add-model [MODULE] NAME");
       New_Line;
       Put_Line ("  The database table model is an XML file that describes the mapping");
       Put_Line ("  for of a database table to an Ada representation.");
       Put_Line ("  The XML description is similar to Hibernate mapping files.");
       Put_Line ("  (See http://docs.jboss.org/hibernate/core/3.6/reference/en-US/html/mapping.html)");
+      Put_Line ("  If a MODULE is specified, the Ada package will be: <PROJECT>.<MODULE>.Model.<NAME>");
+      Put_Line ("  Otherwise, the Ada package will be: <PROJECT>.Model.<NAME>");
     end Help;
 
 end Gen.Commands.Model;

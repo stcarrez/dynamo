@@ -83,6 +83,10 @@ package body Gen.Commands is
       if Name'Length = 0 then
          Usage;
          New_Line;
+         Put ("Type '");
+         Put (Ada.Command_Line.Command_Name);
+         Put_Line (" help {command}' for help on a specific command.");
+         New_Line;
          Put_Line ("Available subcommands:");
 
          Commands.Iterate (Process => Print'Access);

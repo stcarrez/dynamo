@@ -47,6 +47,7 @@ package body Gen.Commands.Project is
       end if;
 
       Generator.Set_Project_Name (Name);
+      Generator.Set_Force_Save (False);
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project");
 
       Generator.Save_Project;

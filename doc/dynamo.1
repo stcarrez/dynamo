@@ -113,13 +113,17 @@ directory.
 .B add-model
 .I command
 .PP
- \fBadd-model \fIname\fR\fR
+ \fBadd-model [\fImodule\fR] \fIname\fR\fR
 .PP
 Create a new database table model mapping.  The model mapping is an XML file that
 describes how to map a database table into an Ada type.
 The model mappings are stored in the
 .B db
-directory.
+directory.  The database table is mapped to an Ada tagged record in the package
+\fB\fIproject-name\fR\fR.\fImodule\fR.Model\fR if a module name is passed otherwise the package
+will have the name \fB\fIproject-name\fR.Model\fR.  The Ada record will have the name
+\fB\fIname\fR_Ref\fR.
+
 .\"
 .\"
 .PP
@@ -136,12 +140,17 @@ Give an help description about a command.
 .B generate
 .I command
 .PP
- \fBgenerate \fImodel ... \fR\fR
+ \fBgenerate [\fImodel ... \fR]\fR
 .PP
 Generate the Ada model implementation from the XML model mappings.
 The Ada model files are generated in the
 .B src/model
 directory.  Developers should not modify those files by themselves.
+When no file is specified, the
+.B generate
+command will read all the XML files stored in the
+.B db
+directory.  It will generate all the models found in those files.
 .\"
 .SH SEE ALSO
 \fIgnatmake(1)\fR, \fIgcc(1)\fR

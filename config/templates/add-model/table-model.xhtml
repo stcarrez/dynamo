@@ -3,9 +3,9 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="#{modelName}.hbm.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+        file="#{moduleName}#{empty moduleName ? '' : '-'}#{modelName}.hbm.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <hibernate-mapping default-cascade="none">
-    <class name="#{fn:capitalize(projectName)}.Model.#{fn:capitalize(modelName)}" table="#{modelName}"
+    <class name="#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}#{empty moduleName ? '' : '.'}Model.#{fn:capitalize(modelName)}" table="#{modelName}"
            dynamic-insert="true" dynamic-update="true">
         <comment>The #{modelName} table.</comment>
         <id name="id" type="ADO.Identifier" unsaved-value="0">
@@ -18,6 +18,11 @@
             <comment>the #{modelName} name</comment>
             <column name="NAME" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
         </property>
+        <property name="create_date" update="false">
+            <comment>the #{modelName} creation date</comment>
+            <column name="CREATE_DATE" not-null="false" unique="false" sql-type="DATETIME"/>
+            <type name="Nullable_Time"/>
+        </property>
     </class>
- </hibernate-mapping>
+</hibernate-mapping>
 ]]></f:view>

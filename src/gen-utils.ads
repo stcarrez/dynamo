@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils -- Utilities for model generator
---  Copyright (C) 2010 Stephane Carrez
+--  Copyright (C) 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,5 +46,9 @@ package Gen.Utils is
      new Ada.Containers.Hashed_Sets (Element_Type    => Ada.Strings.Unbounded.Unbounded_String,
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Elements => Ada.Strings.Unbounded."=");
+
+   --  Returns True if the Name is a valid project or module name.
+   --  The name must be a valid Ada identifier.
+   function Is_Valid_Name (Name : in String) return Boolean;
 
 end Gen.Utils;

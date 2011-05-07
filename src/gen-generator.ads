@@ -34,6 +34,9 @@ with Gen.Artifacts.Query;
 with Gen.Artifacts.Mappings;
 package Gen.Generator is
 
+   --  A fatal error that prevents the generator to proceed has occurred.
+   Fatal_Error : exception;
+
    type Package_Type is (PACKAGE_MODEL, PACKAGE_FORMS);
 
    type Mapping_File is record

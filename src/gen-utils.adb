@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils -- Utilities for model generator
---  Copyright (C) 2010 Stephane Carrez
+--  Copyright (C) 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,5 +87,29 @@ package body Gen.Utils is
          return Get_Query_Name (Path (Pos + 1 .. Path'Last));
       end if;
    end Get_Query_Name;
+
+   --  ------------------------------
+   --  Returns True if the Name is a valid project or module name.
+   --  The name must be a valid Ada identifier.
+   --  ------------------------------
+   function Is_Valid_Name (Name : in String) return Boolean is
+      C : Character;
+   begin
+      if Name'Length = 0 then
+         return False;
+      end if;
+      C := Name (Name'First);
+      if not (C >= 'a' and C <= 'z') and not (C >= 'A' and C <= 'Z') then
+         return False;
+      end if;
+      for I in Name'First + 1 .. Name'Last loop
+         C := Name (I);
+         if not (C >= 'a' and C <= 'z') and not (C >= 'A' and C <= 'Z')
+           and not (C >= '0' and C <= '9') and C /= '_' then
+            return False;
+         end if;
+      end loop;
+      return True;
+   end Is_Valid_Name;
 
 end Gen.Utils;

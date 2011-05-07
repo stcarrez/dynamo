@@ -323,6 +323,10 @@ package body Gen.Generator is
                                Name : in String) is
       Code : constant String := Util.Strings.Transforms.To_Upper_Case (Name);
    begin
+      if not Gen.Utils.Is_Valid_Name (Name) then
+         H.Error ("The project name should be a valid Ada identifier ([A-Za-z][A-Za-z0-9_]*).");
+         raise Fatal_Error with "Invalid project name: " & Name;
+      end if;
       H.Project.Name := To_Unbounded_String (Name);
       H.Set_Global ("projectName", Name);
       H.Set_Global ("projectCode", Code);

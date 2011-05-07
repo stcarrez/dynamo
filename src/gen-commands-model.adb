@@ -20,6 +20,7 @@ with Ada.Command_Line;
 with Gen.Artifacts;
 with GNAT.Command_Line;
 
+with Gen.Utils;
 with Util.Files;
 package body Gen.Commands.Model is
 
@@ -47,9 +48,25 @@ package body Gen.Commands.Model is
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (To_Unbounded_String (Dir));
       if Arg2'Length = 0 then
+         --  Verify that we can use the name for an Ada identifier.
+         if not Gen.Utils.Is_Valid_Name (Name) then
+            Generator.Error ("The mapping name should be a valid Ada identifier.");
+            raise Gen.Generator.Fatal_Error with "Invalid mapping name: " & Name;
+         end if;
          Generator.Set_Global ("moduleName", "");
          Generator.Set_Global ("modelName", Name);
       else
+         --  Verify that we can use the name for an Ada identifier.
+         if not Gen.Utils.Is_Valid_Name (Name) then
+            Generator.Error ("The module name should be a valid Ada identifier.");
+            raise Gen.Generator.Fatal_Error with "Invalid module name: " & Name;
+         end if;
+
+         --  Likewise for the mapping name.
+         if not Gen.Utils.Is_Valid_Name (Arg2) then
+            Generator.Error ("The mapping name should be a valid Ada identifier.");
+            raise Gen.Generator.Fatal_Error with "Invalid mapping name: " & Arg2;
+         end if;
          Generator.Set_Global ("moduleName", Name);
          Generator.Set_Global ("modelName", Arg2);
       end if;

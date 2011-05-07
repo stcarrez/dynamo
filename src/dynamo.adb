@@ -138,6 +138,11 @@ exception
       Ada.Text_IO.Put_Line ("Use the 'help' command.");
       Ada.Command_Line.Set_Exit_Status (2);
 
+   when E : Gen.Generator.Fatal_Error =>
+      Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));
+      Ada.Command_Line.Set_Exit_Status (1);
+
    when E : XML_Fatal_Error =>
       Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));
+      Ada.Command_Line.Set_Exit_Status (1);
 end Dynamo;

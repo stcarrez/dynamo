@@ -104,6 +104,7 @@ version:
 
 install:	  install_dirs
 	$(INSTALL) bin/dynamo $(prefix)/bin/dynamo
+	$(INSTALL) doc/dynamo.1 $(prefix)/share/man/man1/dynamo.1
 	$(CP) config/*.properties $(prefix)/share/dynamo
 	$(CP) config/*.xml $(prefix)/share/dynamo
 	-rm -rf $(prefix)/share/dynamo/templates

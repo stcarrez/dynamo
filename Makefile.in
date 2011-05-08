@@ -68,10 +68,10 @@ rebuild: clean build
 
 # Files to package in source distribution
 DISTFILES=README LICENSE.txt NOTICE.txt CHANGES config.guess configure config.sub \
-configure.in Makefile.in install-sh \
-generator.gpr.in config.gpr \
+configure.in Makefile.in install-sh ChangeLog \
+dynamo.gpr.in config.gpr \
 src \
-bin obj config
+bin obj config doc
 
 dist:
 	-rm -rf $(distdir)

@@ -2886,13 +2886,24 @@ if test "${with_ada_util+set}" = set; then :
 
 else
 
-  UTIL_DIR=../util/
+  echo "with \"util\"; project t is for Source_Dirs use (); end t;" > t.gpr
+  gnatmake -p -Pt >/dev/null 2>/dev/null
+  if test $? -eq 0; then
+    UTIL_DIR=
+  else
+    UTIL_DIR=../util/
+  fi;
+  rm -f t.gpr
 
 fi
 
-if test ! -f ${UTIL_DIR}/util.gpr; then
+echo "with \"${UTIL_DIR}util\"; project t is for Source_Dirs use (); end t;" > t.gpr
+gnatmake -p -Pt >/dev/null 2>/dev/null
+if test $? -ne 0 ; then
+   rm -f t.gpr
    as_fn_error "Ada Utility library not found in ${UTIL_DIR}" "$LINENO" 5
 fi
+rm -f t.gpr
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${UTIL_DIR}" >&5
 $as_echo "${UTIL_DIR}" >&6; }
 
@@ -2910,13 +2921,24 @@ if test "${with_ada_el+set}" = set; then :
 
 else
 
-  EL_DIR=../el/
+  echo "with \"el\"; project t is for Source_Dirs use (); end t;" > t.gpr
+  gnatmake -p -Pt >/dev/null 2>/dev/null
+  if test $? -eq 0; then
+    EL_DIR=
+  else
+    EL_DIR=../el/
+  fi;
+  rm -f t.gpr
 
 fi
 
-if test ! -f ${EL_DIR}/el.gpr; then
+echo "with \"${EL_DIR}el\"; project t is for Source_Dirs use (); end t;" > t.gpr
+gnatmake -p -Pt >/dev/null 2>/dev/null
+if test $? -ne 0 ; then
+   rm -f t.gpr
    as_fn_error "Ada Expression Language library not found in ${EL_DIR}" "$LINENO" 5
 fi
+rm -f t.gpr
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${EL_DIR}" >&5
 $as_echo "${EL_DIR}" >&6; }
 
@@ -2934,13 +2956,24 @@ if test "${with_ada_asf+set}" = set; then :
 
 else
 
-  ASF_DIR=../asf/
+  echo "with \"asf\"; project t is for Source_Dirs use (); end t;" > t.gpr
+  gnatmake -p -Pt >/dev/null 2>/dev/null
+  if test $? -eq 0; then
+    ASF_DIR=
+  else
+    ASF_DIR=../asf/
+  fi;
+  rm -f t.gpr
 
 fi
 
-if test ! -f ${ASF_DIR}/asf.gpr; then
+echo "with \"${ASF_DIR}asf\"; project t is for Source_Dirs use (); end t;" > t.gpr
+gnatmake -p -Pt >/dev/null 2>/dev/null
+if test $? -ne 0 ; then
+   rm -f t.gpr
    as_fn_error "Ada Server Faces library not found in ${ASF_DIR}" "$LINENO" 5
 fi
+rm -f t.gpr
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${ASF_DIR}" >&5
 $as_echo "${ASF_DIR}" >&6; }
 

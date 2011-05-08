@@ -2,7 +2,7 @@
 # target names defined.
 GNATMAKE=gnatmake
 GNATCLEAN=gnatclean
-GPRPATH=generator.gpr
+GPRPATH=dynamo.gpr
 
 distdir=ada-gen-@GEN_VERSION@
 

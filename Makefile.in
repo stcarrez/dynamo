@@ -4,9 +4,9 @@ GNATMAKE=gnatmake
 GNATCLEAN=gnatclean
 GPRPATH=dynamo.gpr
 
-distdir=ada-gen-@GEN_VERSION@
+distdir=dynamo-@GEN_VERSION@
 
-DIST_FILE=ada-gen-@GEN_VERSION@.tar.gz
+DIST_FILE=dynamo-@GEN_VERSION@.tar.gz
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)

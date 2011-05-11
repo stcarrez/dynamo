@@ -193,11 +193,40 @@ package body Gen.Generator is
    end To_Sql_Type;
 
    --  ------------------------------
+   --  EL function to create an Ada identifier from a file name
+   --  ------------------------------
+   function To_Ada_Ident (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      Name   : constant String := Util.Beans.Objects.To_String (Value);
+      Result : Unbounded_String;
+      C      : Character;
+   begin
+      for I in Name'Range loop
+         C := Name (I);
+         if C = '-' then
+            Append (Result, '_');
+
+         elsif C >= 'a' and C <= 'z' then
+            Append (Result, C);
+
+         elsif C >= 'A' and C <= 'Z' then
+            Append (Result, C);
+
+         elsif C >= '0' and C <= '9' then
+            Append (Result, C);
+         end if;
+      end loop;
+      return Util.Beans.Objects.To_Object (Result);
+   end To_Ada_Ident;
+
+   --  ------------------------------
    --  Register the generator EL functions
    --  ------------------------------
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class) is
       URI : constant String := "http://code.google.com/p/ada-ado/generator";
    begin
+      Mapper.Set_Function (Name      => "adaIdent",
+                           Namespace => URI,
+                           Func      => To_Ada_Ident'Access);
       Mapper.Set_Function (Name      => "adaType",
                            Namespace => URI,
                            Func      => To_Ada_Type'Access);

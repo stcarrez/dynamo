@@ -4,14 +4,14 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core">
 
-<h:list value="#{model.queries}" var="query">
-   #{fn:capitalize(query.name)}_NAME : aliased constant String := "#{query.name}";
+<h:list value="#{package.queries}" var="query">
+   #{fn:capitalize(g:adaIdent(query.name))}_NAME : aliased constant String := "#{query.name}";
 #{''}
-   #{fn:capitalize(query.name)}_REC : aliased ADO.Queries.Query_Definition_Record
-      := ADO.Queries.Query_Definition_Record '(Name => #{fn:capitalize(query.name)}_NAME'Access);
+   #{fn:capitalize(g:adaIdent(query.name))}_REC : aliased ADO.Queries.Query_Definition_Record
+      := ADO.Queries.Query_Definition_Record '(Name => #{fn:capitalize(g:adaIdent(query.name))}_NAME'Access);
 #{''}
-   #{fn:capitalize(query.name)} : constant ADO.Queries.Query_Definition
-      := #{fn:capitalize(query.name)}_REC'Access;
+   #{fn:capitalize(g:adaIdent(query.name))} : constant ADO.Queries.Query_Definition
+      := #{fn:capitalize(g:adaIdent(query.name))}_REC'Access;
 #{''}
 </h:list>
 

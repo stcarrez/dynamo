@@ -3,7 +3,7 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core">
-<h:list value="#{model.tables}" var="table">
+<h:list value="#{package.tables}" var="table">
    function #{table.type}_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.#{g:keyEnum(table.id.type)},
                                        Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access);
@@ -250,11 +250,11 @@
     <h:panelGroup rendered="#{column.isUpdated}">
       if Object.Is_Modified (#{column.index + 1}) then
       <h:panelGroup rendered="#{column.name ne table.id.name}">
-         Stmt.Save_Field (Name  => COL_#{column.index}_#{model.tables.rowIndex}_NAME, --  #{column.sqlName}
+         Stmt.Save_Field (Name  => COL_#{column.index}_#{package.tables.rowIndex}_NAME, --  #{column.sqlName}
                           Value => Object.#{fn:capitalize(column.name)});
       </h:panelGroup>
       <h:panelGroup rendered="#{column.name eq table.id.name}">
-         Stmt.Save_Field (Name  => COL_#{column.index}_#{model.tables.rowIndex}_NAME, --  #{column.sqlName}
+         Stmt.Save_Field (Name  => COL_#{column.index}_#{package.tables.rowIndex}_NAME, --  #{column.sqlName}
                           Value => Object.Get_Key);
       </h:panelGroup>
          Object.Clear_Modified (#{column.index + 1});
@@ -304,11 +304,11 @@
   </h:panelGroup>
   <h:panelGroup rendered="#{table.id.generator ne 'native' or table.id.name ne column.name}">
     <h:panelGroup rendered="#{column.name ne table.id.name and (column.isInserted or column.isVersion)}">
-      Query.Save_Field (Name  => COL_#{column.index}_#{model.tables.rowIndex}_NAME, --  #{column.sqlName}
+      Query.Save_Field (Name  => COL_#{column.index}_#{package.tables.rowIndex}_NAME, --  #{column.sqlName}
                         Value => Object.#{fn:capitalize(column.name)});
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name eq table.id.name}">
-      Query.Save_Field (Name  => COL_#{column.index}_#{model.tables.rowIndex}_NAME, --  #{column.sqlName}
+      Query.Save_Field (Name  => COL_#{column.index}_#{package.tables.rowIndex}_NAME, --  #{column.sqlName}
                         Value => Object.Get_Key);
     </h:panelGroup>
   </h:panelGroup>

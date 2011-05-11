@@ -3,7 +3,7 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core">
-<h:list value="#{model.queries}" var="query">
+<h:list value="#{package.queries}" var="query">
    --  --------------------
    --  #{query.comment}
    --  --------------------
@@ -27,7 +27,7 @@
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class);
 
-   #{fn:capitalize(query.name)} : constant ADO.Queries.Query_Definition;
+   #{fn:capitalize(g:adaIdent(query.name))} : constant ADO.Queries.Query_Definition;
 
 #{''}
 </h:list>

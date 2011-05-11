@@ -476,9 +476,10 @@ package body Gen.Generator is
    --  ------------------------------
    --  Read the model and query files stored in the application directory <b>db</b>.
    --  ------------------------------
-   procedure Read_Models (H : in out Handler) is
+   procedure Read_Models (H : in out Handler;
+                          Dirname : in String) is
       use Ada.Directories;
-      Path    : constant String := Util.Files.Compose (H.Get_Result_Directory, "db");
+      Path    : constant String := Util.Files.Compose (H.Get_Result_Directory, Dirname);
       Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
       Search  : Search_Type;
       Ent     : Directory_Entry_Type;
@@ -487,6 +488,13 @@ package body Gen.Generator is
 
       --  No argument specified, look at the model files in the db directory.
       if Exists (Path) then
+         if Dirname = "db/regtests" then
+            H.Model.Set_Dirname ("regtests");
+         elsif Dirname = "db/samples" then
+            H.Model.Set_Dirname ("samples");
+         else
+            H.Model.Set_Dirname ("src");
+         end if;
          Start_Search (Search, Directory => Path, Pattern => "*.xml", Filter => Filter);
          while More_Entries (Search) loop
             Get_Next_Entry (Search, Ent);
@@ -552,17 +560,23 @@ package body Gen.Generator is
    procedure Generate (H     : in out Handler;
                        File  : in String;
                        Model : in Gen.Model.Definition_Access) is
+      use Util.Beans.Objects;
+
       Req   : ASF.Requests.Mockup.Request;
       Reply : ASF.Responses.Mockup.Response;
       Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := Model.all'Unchecked_Access;
-      Bean  : constant Util.Beans.Objects.Object
-        := Util.Beans.Objects.To_Object (Ptr, Util.Beans.Objects.STATIC);
+      Bean  : constant Object := Util.Beans.Objects.To_Object (Ptr, Util.Beans.Objects.STATIC);
+
+      Model_Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := H.Model'Unchecked_Access;
+      Model_Bean  : constant Object := To_Object (Model_Ptr, Util.Beans.Objects.STATIC);
+
    begin
       Log.Debug ("With template '{0}'", File);
 
       Req.Set_Path_Info (File);
       Req.Set_Method ("GET");
-      Req.Set_Attribute (Name => "model", Value => Bean);
+      Req.Set_Attribute (Name => "package", Value => Bean);
+      Req.Set_Attribute (Name => "model", Value => Model_Bean);
       Req.Set_Attribute (Name => "genRevision", Value => Util.Beans.Objects.To_Object (SVN_REV));
       Req.Set_Attribute (Name => "genURL", Value => Util.Beans.Objects.To_Object (SVN_URL));
 

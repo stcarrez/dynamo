@@ -262,10 +262,25 @@ package body Gen.Model.Packages is
    begin
       if Name = "tables" then
          return From.Tables_Bean;
+
+      elsif Name = "dirname" then
+         return Util.Beans.Objects.To_Object (From.Dir_Name);
+
       else
          return Definition (From).Get_Value (Name);
       end if;
    end Get_Value;
+
+   --  ------------------------------
+   --  Set the directory name associated with the model. This directory name allows to
+   --  save and build a model in separate directories for the application, the unit tests
+   --  and others.
+   --  ------------------------------
+   procedure Set_Dirname (O : in out Model_Definition;
+                          Name : in String) is
+   begin
+      O.Dir_Name := To_Unbounded_String (Name);
+   end Set_Dirname;
 
    --  ------------------------------
    --  Initialize the model definition instance.
@@ -275,6 +290,7 @@ package body Gen.Model.Packages is
       T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Tables'Unchecked_Access;
    begin
       O.Tables_Bean := Util.Beans.Objects.To_Object (T, Util.Beans.Objects.STATIC);
+      O.Dir_Name    := To_Unbounded_String ("src");
    end Initialize;
 
    --  ------------------------------

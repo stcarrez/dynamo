@@ -61,7 +61,8 @@ package Gen.Generator is
                          File : in String);
 
    --  Read the model and query files stored in the application directory <b>db</b>.
-   procedure Read_Models (H : in out Handler);
+   procedure Read_Models (H : in out Handler;
+                          Dirname : in String);
 
    --  Read the XML project file
    procedure Read_Project (H    : in out Handler;

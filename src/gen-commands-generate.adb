@@ -18,10 +18,12 @@
 
 with GNAT.Command_Line;
 
+with Ada.Directories;
 with Ada.Text_IO;
 package body Gen.Commands.Generate is
 
    use GNAT.Command_Line;
+   use Ada.Directories;
 
    --  ------------------------------
    --  Execute the command with the arguments.
@@ -41,12 +43,17 @@ package body Gen.Commands.Generate is
          begin
             exit when Model_File'Length = 0;
             File_Count := File_Count + 1;
-            Gen.Generator.Read_Model (Generator, Model_File);
+            if Ada.Directories.Exists (Model_File)
+              and then Ada.Directories.Kind (Model_File) = Ada.Directories.Directory then
+               Gen.Generator.Read_Models (Generator, Model_File);
+            else
+               Gen.Generator.Read_Model (Generator, Model_File);
+            end if;
          end;
       end loop;
 
       if File_Count = 0 then
-         Gen.Generator.Read_Models (Generator);
+         Gen.Generator.Read_Models (Generator, "db");
       end if;
 
       --  Run the generation.

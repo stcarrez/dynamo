@@ -3,7 +3,7 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="db/#{projectName}-sql.sql">
+        file="db/#{model.dirname ne 'src' ? model.dirname : ''}/#{projectName}-sql.sql">
 /* File generated automatically by dynamo */
 <h:list value="#{model.tables}" var="table">
 /* #{table.comment} */

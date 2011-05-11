@@ -94,6 +94,12 @@ package Gen.Model.Packages is
                             From : in String;
                             To   : in String);
 
+   --  Set the directory name associated with the model. This directory name allows to
+   --  save and build a model in separate directories for the application, the unit tests
+   --  and others.
+   procedure Set_Dirname (O : in out Model_Definition;
+                          Name : in String);
+
    --  Prepare the generation of the package:
    --  o identify the column types which are used
    --  o build a list of package for the with clauses.
@@ -189,6 +195,9 @@ private
 
       --  Map of all packages.
       Packages    : Package_Map.Map;
+
+      --  Directory associated with the model ('src', 'samples', 'regtests', ...).
+      Dir_Name    : Unbounded_String;
    end record;
 
 end Gen.Model.Packages;

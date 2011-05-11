@@ -77,7 +77,7 @@ package body Gen.Commands.Model is
 
          Generator.Set_Result_Directory (To_Unbounded_String (Root_Dir));
          Generator.Set_Force_Save (True);
-         Gen.Generator.Read_Models (Generator);
+         Gen.Generator.Read_Models (Generator, "db");
 
          --  Run the generation.
          Gen.Generator.Prepare (Generator);

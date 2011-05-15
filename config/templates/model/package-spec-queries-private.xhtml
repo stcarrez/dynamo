@@ -5,14 +5,20 @@
         xmlns:f="http://java.sun.com/jsf/core">
 
 <h:list value="#{package.queries}" var="query">
-   #{fn:capitalize(g:adaIdent(query.name))}_NAME : aliased constant String := "#{query.name}";
 #{''}
-   #{fn:capitalize(g:adaIdent(query.name))}_REC : aliased ADO.Queries.Query_Definition_Record
-      := ADO.Queries.Query_Definition_Record '(Name => #{fn:capitalize(g:adaIdent(query.name))}_NAME'Access);
+   package Query_#{fn:capitalize(g:adaIdent(query.type))} is
+      new ADO.Queries.Loaders.File (Path => "#{query.path}",
+                                    Sha1 => "#{query.sha1}");
+
+   <h:list value="#{query.queries}" var="basic_query">
 #{''}
-   #{fn:capitalize(g:adaIdent(query.name))} : constant ADO.Queries.Query_Definition
-      := #{fn:capitalize(g:adaIdent(query.name))}_REC'Access;
-#{''}
+   package Query_#{fn:capitalize(g:adaIdent(query.type))}_#{fn:capitalize(g:adaIdent(basic_query.name))} is
+      new ADO.Queries.Loaders.Query (Name => "#{basic_query.name}",
+                                     File => Query_#{fn:capitalize(g:adaIdent(query.type))}.File'Access);
+
+   Query_#{fn:capitalize(g:adaIdent(basic_query.name))} : constant ADO.Queries.Query_Definition_Access
+   := Query_#{fn:capitalize(g:adaIdent(query.type))}_#{fn:capitalize(g:adaIdent(basic_query.name))}.Query'Access;
+   </h:list>
 </h:list>
 
 </ui:composition>

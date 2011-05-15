@@ -16,10 +16,13 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
+with Ada.Directories;
 
 with Gen.Utils;
 with Gen.Model.Tables;
+with Gen.Model.Queries;
 with Util.Log.Loggers;
+with Util.Encoders.HMAC.SHA1;
 
 --  The <b>Gen.Artifacts.Query</b> package is an artifact for the generation of
 --  data structures returned by queries.
@@ -28,6 +31,7 @@ package body Gen.Artifacts.Query is
    use Ada.Strings.Unbounded;
    use Gen.Model;
    use Gen.Model.Tables;
+   use Gen.Model.Queries;
 
    use type DOM.Core.Node;
    use Util.Log;
@@ -44,12 +48,15 @@ package body Gen.Artifacts.Query is
                          Model   : in out Gen.Model.Packages.Model_Definition'Class) is
       pragma Unreferenced (Handler);
 
+      Hash : Unbounded_String;
+
       --  ------------------------------
       --  Register the column definition in the table
       --  ------------------------------
-      procedure Register_Column (Table  : in out Table_Definition;
+      procedure Register_Column (Table  : in out Query_Definition;
                                  Column : in DOM.Core.Node) is
-         C : constant Column_Definition_Access := new Column_Definition;
+         Name  : constant Unbounded_String := Gen.Model.Get_Attribute (Column, "name");
+         C     : constant Column_Definition_Access := new Column_Definition;
       begin
          C.Node := Column;
          C.Number := Table.Members.Get_Count;
@@ -61,40 +68,61 @@ package body Gen.Artifacts.Query is
          C.Is_Updated  := False;
          C.Not_Null    := False;
          C.Unique      := False;
+
+         --  Construct the hash for this column mapping.
+         Append (Hash, ",type=");
+         Append (Hash, C.Type_Name);
+         Append (Hash, ",name=");
+         Append (Hash, Name);
       end Register_Column;
 
       --  ------------------------------
       --  Register all the columns defined in the table
       --  ------------------------------
-      procedure Register_Columns (Table : in out Table_Definition) is
-         procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
+      procedure Register_Columns (Table : in out Query_Definition) is
+         procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Query_Definition,
                                                            Process => Register_Column);
       begin
          Log.Debug ("Register columns from query {0}", Table.Name);
 
-         Iterate (Table, Table.Node, "column");
+         Iterate (Table, Table.Node, "property");
       end Register_Columns;
 
       --  ------------------------------
       --  Register a new class definition in the model.
       --  ------------------------------
-      procedure Register_Query (O    : in out Gen.Model.Packages.Model_Definition;
-                                Node : in DOM.Core.Node) is
-         Table : constant Table_Definition_Access := new Table_Definition;
+      procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
+                                  Node  : in DOM.Core.Node) is
          Name  : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "name");
       begin
-         Table.Node := Node;
-         Table.Set_Table_Name (Table.Get_Attribute ("className"));
+         Query.Node := Node;
+         Query.Set_Table_Name (Query.Get_Attribute ("name"));
 
          if Name /= "" then
-            Table.Name := Name;
+            Query.Name := Name;
          else
-            Table.Name := To_Unbounded_String (Gen.Utils.Get_Query_Name (Path));
+            Query.Name := To_Unbounded_String (Gen.Utils.Get_Query_Name (Path));
          end if;
 
-         Log.Debug ("Register query {0} with type {0}", Table.Name, Table.Type_Name);
-         O.Register_Query (Table);
-         Register_Columns (Table_Definition (Table.all));
+         --  Construct the hash for this column mapping.
+         Append (Hash, "class=");
+         Append (Hash, Query.Name);
+
+         Log.Debug ("Register query {0} with type {0}", Query.Name, Query.Type_Name);
+         Register_Columns (Query);
+      end Register_Mapping;
+
+      --  ------------------------------
+      --  Register a new query.
+      --  ------------------------------
+      procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
+                                Node  : in DOM.Core.Node) is
+         Name : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "name");
+         C    : constant Column_Definition_Access := new Column_Definition;
+      begin
+         C.Node := Node;
+         C.Number := Query.Queries.Get_Count;
+         Query.Queries.Append (C);
       end Register_Query;
 
       --  ------------------------------
@@ -102,10 +130,23 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
                                   Node  : in DOM.Core.Node) is
-         procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
-                                                           Process => Register_Query);
+         procedure Iterate_Mapping is
+           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Queries.Query_Definition,
+                                        Process => Register_Mapping);
+         procedure Iterate_Query is
+           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Queries.Query_Definition,
+                                        Process => Register_Query);
+
+         Table : constant Query_Definition_Access := new Query_Definition;
       begin
-         Iterate (Model, Node, "map");
+         Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
+         Iterate_Mapping (Query_Definition (Table.all), Node, "class");
+         Iterate_Query (Query_Definition (Table.all), Node, "query");
+         Model.Register_Query (Table);
+
+         Log.Info ("Query hash for {0} is {1}", Path, To_String (Hash));
+         Table.Sha1 := Util.Encoders.HMAC.SHA1.Sign (Key  => "ADO.Queries",
+                                                     Data => To_String (Hash));
       end Register_Mapping;
 
       procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
@@ -114,7 +155,7 @@ package body Gen.Artifacts.Query is
    begin
       Log.Debug ("Initializing query artifact for the configuration");
 
-      Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "query");
+      Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "query-mapping");
    end Initialize;
 
    --  ------------------------------

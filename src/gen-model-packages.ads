@@ -25,6 +25,7 @@ with Util.Beans.Objects.Vectors;
 
 with Gen.Model.List;
 limited with Gen.Model.Tables;
+limited with Gen.Model.Queries;
 package Gen.Model.Packages is
 
    use Ada.Strings.Unbounded;
@@ -85,7 +86,7 @@ package Gen.Model.Packages is
 
    --  Register the declaration of the given query in the model.
    procedure Register_Query (O     : in out Model_Definition;
-                             Table : access Gen.Model.Tables.Table_Definition'Class);
+                             Table : access Gen.Model.Queries.Query_Definition'Class);
 
    --  Register a type mapping.  The <b>From</b> type describes a type in the XML
    --  configuration files (hibernate, query, ...) and the <b>To</b> represents the

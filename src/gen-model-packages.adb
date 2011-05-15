@@ -21,6 +21,7 @@ with Ada.Strings.Maps;
 
 with Gen.Utils;
 with Gen.Model.Tables;
+with Gen.Model.Queries;
 
 with Util.Strings;
 with Util.Strings.Transforms;
@@ -78,7 +79,7 @@ package body Gen.Model.Packages is
    --  Register the declaration of the given query in the model.
    --  ------------------------------
    procedure Register_Query (O     : in out Model_Definition;
-                             Table : access Gen.Model.Tables.Table_Definition'Class) is
+                             Table : access Gen.Model.Queries.Query_Definition'Class) is
    begin
       O.Register_Package (Table.Pkg_Name, Table.Package_Def);
       Table.Package_Def.Queries.Append (Table.all'Access);

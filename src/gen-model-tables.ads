@@ -130,6 +130,10 @@ package Gen.Model.Tables is
    overriding
    procedure Prepare (O : in out Table_Definition);
 
+   --  Initialize the table definition instance.
+   overriding
+   procedure Initialize (O : in out Table_Definition);
+
    --  Set the table name and determines the package name.
    procedure Set_Table_Name (Table : in out Table_Definition;
                              Name  : in String);
@@ -158,9 +162,5 @@ private
 
    type Association_Definition is new Column_Definition with null record;
 
-
-   --  Initialize the table definition instance.
-   overriding
-   procedure Initialize (O : in out Table_Definition);
 
 end Gen.Model.Tables;

@@ -33,7 +33,7 @@
       Stmt.Execute;
       #{fn:capitalize(query.type)}_Vectors.Clear (Object);
       while Stmt.Has_Elements loop
-         Object.Insert_Space (Before => Pos - 1);
+         Object.Insert_Space (Before => Pos);
          Object.Update_Element (Index => Pos, Process => Read'Access);
          Pos := Pos + 1;
          Stmt.Next;

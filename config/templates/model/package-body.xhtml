@@ -27,7 +27,9 @@
 -----------------------------------------------------------------------
 
 with Ada.Unchecked_Deallocation;
-<h:panelGroup rendered="#{package.useCalendarTime}"></h:panelGroup>
+<h:panelGroup rendered="#{package.useCalendarTime}">
+with Util.Beans.Objects.Time;
+</h:panelGroup>
 
 package body #{package.name} is
 #{''}

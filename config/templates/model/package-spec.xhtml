@@ -31,13 +31,14 @@ with ADO.Objects;
 with ADO.Statements;
 with ADO.SQL;
 with ADO.Schemas;
-<h:panelGroup rendered="#{package.queries.length ne 0}">
+
+<h:panelGroup rendered="#{not empty package.queries}">
 with ADO.Queries;
 with ADO.Queries.Loaders;
 </h:panelGroup>
 
-with Ada.Calendar;
 <h:panelGroup rendered="#{package.useCalendarTime}">
+with Ada.Calendar;
 </h:panelGroup>
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;

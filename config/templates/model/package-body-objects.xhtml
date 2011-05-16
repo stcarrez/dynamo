@@ -244,7 +244,8 @@
 
    procedure Save (Object  : in out #{fn:capitalize(table.type)}_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Update_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
+      Stmt : ADO.Statements.Update_Statement
+         := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
 <h:list value="#{table.members}" var="column">
     <h:panelGroup rendered="#{column.isUpdated}">
@@ -327,7 +328,8 @@
 
    procedure Delete (Object  : in out #{fn:capitalize(table.type)}_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
-      Stmt : ADO.Statements.Delete_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
+      Stmt : ADO.Statements.Delete_Statement
+         := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
       Stmt.Set_Filter (Filter => "#{table.id.name} = ?");
       Stmt.Add_Param (Value => Object.Get_Key);
@@ -336,7 +338,8 @@
 
    function Get_Value (Item : in #{fn:capitalize(table.type)}_Ref;
                        Name : in String) return Util.Beans.Objects.Object is
-      Impl : constant access #{fn:capitalize(table.type)}_Impl := #{fn:capitalize(table.type)}_Impl (Item.Get_Load_Object.all)'Access;
+      Impl : constant access #{fn:capitalize(table.type)}_Impl
+         := #{fn:capitalize(table.type)}_Impl (Item.Get_Load_Object.all)'Access;
    begin
 <h:list value="#{table.members}" var="column">
   <h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType}">

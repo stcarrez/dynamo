@@ -10,9 +10,15 @@
 create table #{table.table} (
 <h:list value="#{table.members}" var="column">
   /* #{column.comment} */
-  `#{column.sqlName}` #{column.sqlType},
+  `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} NOT NULL#{column.name eq table.id.name and (table.id.generator eq 'increment') ? ' AUTO_INCREMENT' : ''},
 </h:list>
   primary key (`#{table.id.name}`)
 );
 </h:list>
+<h:panelGroup rendered="#{not empty model.tables}">
+insert into entity_type (name) values
+  <h:list value="#{model.tables}" var="table">
+#{model.tables.rowIndex ge 2 ? ',' : ''}("#{table.table}")
+</h:list>;
+</h:panelGroup>
 </f:view>

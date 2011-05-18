@@ -20,6 +20,7 @@ with Ada.IO_Exceptions;
 
 with Input_Sources.File;
 with DOM.Core.Documents;
+with DOM.Core.Elements;
 with DOM.Readers;
 with Sax.Readers;
 
@@ -370,6 +371,18 @@ package body Gen.Generator is
    end Get_Project_Name;
 
    --  ------------------------------
+   --  Set the project property.
+   --  ------------------------------
+   procedure Set_Project_Property (H     : in out Handler;
+                                   Name  : in String;
+                                   Value : in String) is
+   begin
+      Log.Debug ("Set property {0} to {1}", Name, Value);
+
+      H.Project.Props.Set (Name, Value);
+   end Set_Project_Property;
+
+   --  ------------------------------
    --  Save the project description and parameters.
    --  ------------------------------
    procedure Save_Project (H : in out Handler) is
@@ -405,6 +418,17 @@ package body Gen.Generator is
                            File : in String) is
       use type DOM.Core.Node;
 
+      procedure Set_Property (O : in out Natural;
+                              Node : in DOM.Core.Node) is
+         Name  : constant String := DOM.Core.Elements.Get_Attribute (Node, "name");
+         Value : constant String := Gen.Utils.Get_Data_Content (Node);
+      begin
+         H.Project.Props.Set (Name, Value);
+      end Set_Property;
+
+      procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Natural,
+                                                        Process => Set_Property);
+
       Read           : Input_Sources.File.File_Input;
       My_Tree_Reader : DOM.Readers.Tree_Reader;
       Name_Start     : Natural;
@@ -432,12 +456,14 @@ package body Gen.Generator is
 
       declare
          N : constant DOM.Core.Node := Gen.Model.Get_Child (H.Project.Node, "name");
+         Tmp : Natural := 0;
       begin
          if N /= null then
             H.Project.Name := To_Unbounded_String (Gen.Utils.Get_Data_Content (N));
          else
             H.Error ("Project file {0} does not contain the project name.", File);
          end if;
+         Iterate (Tmp, H.Project.Node, "property");
       end;
       H.Set_Global ("projectName", H.Get_Project_Name);
 

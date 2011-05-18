@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 
 with Util.Files;
-with Util.Beans.Objects;
 with Util.Serialize.IO.XML;
 with Util.Streams.Buffered;
 with Util.Streams.Texts;
@@ -50,6 +49,17 @@ package body Gen.Model.Projects is
       Output.Initialize (Size => 10000);
       Output.Start_Entity (Name => "project");
       Output.Write_Entity (Name => "name", Value => Project.Get_Value ("name"));
+      declare
+         Names : constant Util.Properties.Name_Array := Project.Props.Get_Names;
+      begin
+         for I in Names'Range loop
+            Output.Start_Entity (Name => "property");
+            Output.Write_Attribute (Name  => "name",
+                                    Value => Util.Beans.Objects.To_Object (Names (I)));
+            Output.Write_String (Value => To_String (Project.Props.Get (Names (I))));
+            Output.End_Entity (Name => "property");
+         end loop;
+      end;
       Output.End_Entity (Name => "project");
       Util.Files.Write_File (Content => Util.Streams.Texts.To_String (Buffered_Stream (Output)),
                              Path    =>  Path);

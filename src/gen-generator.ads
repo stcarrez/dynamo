@@ -133,6 +133,11 @@ package Gen.Generator is
    --  Get the project name.
    function Get_Project_Name (H : in Handler) return String;
 
+   --  Set the project property.
+   procedure Set_Project_Property (H     : in out Handler;
+                                   Name  : in String;
+                                   Value : in String);
+
    --  Save the project description and parameters.
    procedure Save_Project (H : in out Handler);
 

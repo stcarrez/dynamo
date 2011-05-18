@@ -25,6 +25,7 @@ with Util.Beans.Objects;
 with Gen.Model.List;
 with Gen.Model.Packages;
 with Gen.Model.Mappings;
+with Util.Properties;
 package Gen.Model.Projects is
 
    use Ada.Strings.Unbounded;
@@ -33,7 +34,8 @@ package Gen.Model.Projects is
    --  Project Definition
    --  ------------------------------
    type Project_Definition is new Definition with record
-      Name : Unbounded_String;
+      Name  : Unbounded_String;
+      Props : Util.Properties.Manager;
    end record;
    type Project_Definition_Access is access all Project_Definition'Class;
 

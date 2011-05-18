@@ -24,6 +24,7 @@ with Gen.Commands.Project;
 with Gen.Commands.Page;
 with Gen.Commands.Layout;
 with Gen.Commands.Model;
+with Gen.Commands.Propset;
 package body Gen.Commands is
 
    use Ada.Strings.Unbounded;
@@ -149,6 +150,9 @@ package body Gen.Commands is
    --  Add model command.
    Add_Model_Cmd      : aliased Gen.Commands.Model.Command;
 
+   --  Sets a property on the dynamo.xml project.
+   Propset_Cmd      : aliased Gen.Commands.Propset.Command;
+
    --  Help command.
    Help_Cmd           : aliased Help_Command;
 begin
@@ -158,4 +162,5 @@ begin
    Add_Command (Name => "add-page", Cmd => Add_Page_Cmd'Access);
    Add_Command (Name => "add-layout", Cmd => Add_Layout_Cmd'Access);
    Add_Command (Name => "add-model", Cmd => Add_Model_Cmd'Access);
+   Add_Command (Name => "propset", Cmd => Propset_Cmd'Access);
 end Gen.Commands;

@@ -420,6 +420,7 @@ package body Gen.Generator is
 
       procedure Set_Property (O : in out Natural;
                               Node : in DOM.Core.Node) is
+         pragma Unreferenced (O);
          Name  : constant String := DOM.Core.Elements.Get_Attribute (Node, "name");
          Value : constant String := Gen.Utils.Get_Data_Content (Node);
       begin

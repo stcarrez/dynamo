@@ -16,8 +16,9 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with GNAT.Command_Line;  use GNAT.Command_Line;
+with GNAT.Traceback.Symbolic;
 
-with Sax.Readers;        use Sax.Readers;
+with Sax.Readers;
 with Ada.Text_IO;
 
 with Ada.Strings.Unbounded;
@@ -142,7 +143,13 @@ exception
       Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));
       Ada.Command_Line.Set_Exit_Status (1);
 
-   when E : XML_Fatal_Error =>
+   when E : Sax.Readers.XML_Fatal_Error =>
       Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));
       Ada.Command_Line.Set_Exit_Status (1);
+
+   when E : others =>
+      Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (E));
+      Ada.Text_IO.Put_Line (GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
+      Ada.Command_Line.Set_Exit_Status (1);
+
 end Dynamo;

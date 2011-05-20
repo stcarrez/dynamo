@@ -12,7 +12,7 @@ create table #{table.table} (
   /* #{column.comment} */
   `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} NOT NULL#{column.name eq table.id.name and (table.id.generator eq 'increment') ? ' AUTO_INCREMENT' : ''},
 </h:list>
-  primary key (`#{table.id.name}`)
+  primary key (`#{table.id.sqlName}`)
 );
 </h:list>
 <h:panelGroup rendered="#{not empty model.tables}">

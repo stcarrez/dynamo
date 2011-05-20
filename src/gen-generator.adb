@@ -20,7 +20,6 @@ with Ada.IO_Exceptions;
 
 with Input_Sources.File;
 with DOM.Core.Documents;
-with DOM.Core.Elements;
 with DOM.Readers;
 with Sax.Readers;
 
@@ -42,6 +41,10 @@ with Util.Strings;
 with Util.Files;
 with Util.Strings.Transforms;
 with Util.Log.Loggers;
+
+with Util.Serialize.Mappers.Record_Mapper;
+with Util.Serialize.IO.XML;
+
 --  with Util.Beans.Objects.To_Access;
 package body Gen.Generator is
 
@@ -412,66 +415,96 @@ package body Gen.Generator is
    end Error;
 
    --  ------------------------------
+   --  Read the XML project description into the project description.
+   --  ------------------------------
+   procedure Read_Project (H : in out Handler;
+                           Into : in Gen.Model.Projects.Project_Definition_Access) is
+
+      type Project_Fields is (FIELD_PROJECT_NAME,
+                              FIELD_PROPERTY_NAME,
+                              FIELD_PROPERTY_VALUE,
+                              FIELD_MODULE_NAME);
+
+      type Project_Loader is record
+         Name : Unbounded_String;
+      end record;
+      type Project_Loader_Access is access all Project_Loader;
+
+      --  ------------------------------
+      --  Called by the de-serialization when a given field is recognized.
+      --  ------------------------------
+      procedure Set_Member (Closure : in out Project_Loader;
+                            Field   : in Project_Fields;
+                            Value   : in Util.Beans.Objects.Object) is
+      begin
+         case Field is
+         when FIELD_PROJECT_NAME =>
+            Into.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+
+         when FIELD_MODULE_NAME =>
+            declare
+               P : constant Model.Projects.Project_Definition_Access
+                 := new Model.Projects.Project_Definition;
+            begin
+               P.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+               Into.Modules.Append (P);
+            end;
+
+         when FIELD_PROPERTY_NAME =>
+            Closure.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+
+         when FIELD_PROPERTY_VALUE =>
+            Into.Props.Set (Closure.Name, Util.Beans.Objects.To_Unbounded_String (Value));
+
+         end case;
+      end Set_Member;
+
+      package Project_Mapper is
+        new Util.Serialize.Mappers.Record_Mapper (Element_Type        => Project_Loader,
+                                                  Element_Type_Access => Project_Loader_Access,
+                                                  Fields              => Project_Fields,
+                                                  Set_Member          => Set_Member);
+
+      Path   : constant String := To_String (Into.Path);
+      Loader : aliased Project_Loader;
+      Mapper : aliased Project_Mapper.Mapper;
+      Reader : Util.Serialize.IO.XML.Parser;
+   begin
+      Log.Info ("Reading project file '{0}'", Path);
+
+      --  Create the mapping to load the XML project file.
+      Mapper.Add_Mapping ("name", FIELD_PROJECT_NAME);
+      Mapper.Add_Mapping ("property/@name", FIELD_PROPERTY_NAME);
+      Mapper.Add_Mapping ("property", FIELD_PROPERTY_VALUE);
+      Mapper.Add_Mapping ("module/@name", FIELD_MODULE_NAME);
+      Reader.Add_Mapping ("project", Mapper'Unchecked_Access);
+
+      --  Set the context for Set_Member.
+      Project_Mapper.Set_Context (Reader, Loader'Access);
+
+      Into.Name := Null_Unbounded_String;
+
+      --  Read the XML query file.
+      Reader.Parse (Path);
+
+      if Length (Into.Name) = 0 then
+         H.Error ("Project file {0} does not contain the project name.", Path);
+      end if;
+
+   exception
+      when Ada.IO_Exceptions.Name_Error =>
+         H.Error ("Project file {0} does not exist", Path);
+   end Read_Project;
+
+   --  ------------------------------
    --  Read the XML project file
    --  ------------------------------
    procedure Read_Project (H    : in out Handler;
                            File : in String) is
-      use type DOM.Core.Node;
-
-      procedure Set_Property (O : in out Natural;
-                              Node : in DOM.Core.Node) is
-         pragma Unreferenced (O);
-         Name  : constant String := DOM.Core.Elements.Get_Attribute (Node, "name");
-         Value : constant String := Gen.Utils.Get_Data_Content (Node);
-      begin
-         H.Project.Props.Set (Name, Value);
-      end Set_Property;
-
-      procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Natural,
-                                                        Process => Set_Property);
-
-      Read           : Input_Sources.File.File_Input;
-      My_Tree_Reader : DOM.Readers.Tree_Reader;
-      Name_Start     : Natural;
    begin
-      Log.Info ("Reading project file '{0}'", File);
-
-      --  Base file name should be used as the public Id
-      Name_Start := File'Last;
-      while Name_Start >= File'First  and then File (Name_Start) /= '/' loop
-         Name_Start := Name_Start - 1;
-      end loop;
-      Input_Sources.File.Open (File, Read);
-
-      --  Full name is used as the system id
-      Input_Sources.File.Set_System_Id (Read, File);
-      Input_Sources.File.Set_Public_Id (Read, File (Name_Start + 1 .. File'Last));
-
-      DOM.Readers.Set_Feature (My_Tree_Reader, Sax.Readers.Validation_Feature, False);
-
-      DOM.Readers.Parse (My_Tree_Reader, Read);
-      Input_Sources.File.Close (Read);
-
-      H.Project_Doc := DOM.Readers.Get_Tree (My_Tree_Reader);
-      H.Project.Node := DOM.Core.Documents.Get_Element (H.Project_Doc);
-
-      declare
-         N : constant DOM.Core.Node := Gen.Model.Get_Child (H.Project.Node, "name");
-         Tmp : Natural := 0;
-      begin
-         if N /= null then
-            H.Project.Name := To_Unbounded_String (Gen.Utils.Get_Data_Content (N));
-         else
-            H.Error ("Project file {0} does not contain the project name.", File);
-         end if;
-         Iterate (Tmp, H.Project.Node, "property");
-      end;
+      H.Project.Path := To_Unbounded_String (File);
+      H.Read_Project (H.Project'Unchecked_Access);
       H.Set_Global ("projectName", H.Get_Project_Name);
-
-   exception
-      when Ada.IO_Exceptions.Name_Error =>
-         H.Error ("Project file {0} does not exist", File);
-
    end Read_Project;
 
    --  ------------------------------

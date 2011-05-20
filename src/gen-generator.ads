@@ -68,6 +68,10 @@ package Gen.Generator is
    procedure Read_Project (H    : in out Handler;
                            File : in String);
 
+   --  Read the XML project description into the project description.
+   procedure Read_Project (H    : in out Handler;
+                           Into : in Gen.Model.Projects.Project_Definition_Access);
+
    --  Prepare the model by checking, verifying and initializing it after it is completely known.
    procedure Prepare (H : in out Handler);
 

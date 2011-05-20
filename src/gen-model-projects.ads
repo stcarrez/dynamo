@@ -16,28 +16,32 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded;
-with Ada.Strings.Unbounded.Hash;
+with Ada.Containers.Vectors;
 
 with Util.Beans.Objects;
 
-with Gen.Model.List;
-with Gen.Model.Packages;
-with Gen.Model.Mappings;
 with Util.Properties;
 package Gen.Model.Projects is
 
    use Ada.Strings.Unbounded;
 
+   type Project_Definition;
+   type Project_Definition_Access is access all Project_Definition'Class;
+
+   package Project_Vectors is
+     new Ada.Containers.Vectors (Element_Type => Project_Definition_Access,
+                                 Index_Type   => Natural);
+
    --  ------------------------------
    --  Project Definition
    --  ------------------------------
    type Project_Definition is new Definition with record
-      Name  : Unbounded_String;
-      Props : Util.Properties.Manager;
+      Name    : Unbounded_String;
+      Path    : Unbounded_String;
+      Props   : Util.Properties.Manager;
+      Modules : Project_Vectors.Vector;
    end record;
-   type Project_Definition_Access is access all Project_Definition'Class;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.

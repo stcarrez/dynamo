@@ -45,6 +45,16 @@ package body Gen.Model.Projects is
                    Path    : in String) is
       use Util.Streams.Buffered;
       Output : Util.Serialize.IO.XML.Output_Stream;
+
+      procedure Save_Module (Pos : in Project_Vectors.Cursor) is
+         Module : constant Project_Definition_Access := Project_Vectors.Element (Pos);
+      begin
+         Output.Start_Entity (Name => "module");
+         Output.Write_Attribute (Name  => "name",
+                                 Value => Util.Beans.Objects.To_Object (Module.Path));
+         Output.End_Entity (Name => "module");
+      end Save_Module;
+
    begin
       Output.Initialize (Size => 10000);
       Output.Start_Entity (Name => "project");
@@ -53,6 +63,7 @@ package body Gen.Model.Projects is
          Names : constant Util.Properties.Name_Array := Project.Props.Get_Names;
       begin
          for I in Names'Range loop
+            Output.Write (ASCII.LF);
             Output.Start_Entity (Name => "property");
             Output.Write_Attribute (Name  => "name",
                                     Value => Util.Beans.Objects.To_Object (Names (I)));
@@ -60,6 +71,8 @@ package body Gen.Model.Projects is
             Output.End_Entity (Name => "property");
          end loop;
       end;
+
+      Project.Modules.Iterate (Save_Module'Access);
       Output.End_Entity (Name => "project");
       Util.Files.Write_File (Content => Util.Streams.Texts.To_String (Buffered_Stream (Output)),
                              Path    =>  Path);

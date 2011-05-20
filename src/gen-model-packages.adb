@@ -153,7 +153,7 @@ package body Gen.Model.Packages is
                if not Col.Is_Basic_Type and Name'Length > 0 then
                   Used_Types.Include (To_Unbounded_String (Name));
 
-               elsif T = "Time" or T = "Date" or T = "Timestamp" then
+               elsif T = "Time" or T = "Date" or T = "Timestamp" or T = "Nullable_Time" then
                   O.Uses_Calendar_Time := True;
                end if;
             end;

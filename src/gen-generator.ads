@@ -24,6 +24,8 @@ with Ada.Strings.Unbounded.Hash;
 with Ada.Containers.Hashed_Maps;
 
 with Util.Beans.Objects;
+with Util.Properties;
+
 with ASF.Applications.Main;
 with ASF.Contexts.Faces;
 
@@ -49,6 +51,9 @@ package Gen.Generator is
    --  Initialize the generator
    procedure Initialize (H : in out Handler;
                          Config_Dir : in Ada.Strings.Unbounded.Unbounded_String);
+
+   --  Get the configuration properties.
+   function Get_Properties (H : in Handler) return Util.Properties.Manager;
 
    --  Report an error and set the exit status accordingly
    procedure Error (H : in out Handler;

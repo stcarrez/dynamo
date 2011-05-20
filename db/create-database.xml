@@ -1,0 +1,28 @@
+<query-mapping>
+    <description>
+      Get the list of users (compact form).
+    </description>
+    <class name="Gen.Database.Model.Database_Info">
+        <property type='String' name="name">
+            <comment>the database name.</comment>
+        </property>
+    </class>
+
+    <query name='database-list'>
+       <comment>Get the list of databases</comment>
+       <sql>show databases</sql>
+    </query>
+
+    <query name='create-database'>
+       <comment>Create the database</comment>
+       <sql>create database #{name}</sql>
+    </query>
+
+    <query name='create-user'>
+       <comment>Create the database</comment>
+       <sql>grant select, insert, update, delete, create temporary tables, execute,
+     show view on `#{name}`.* to '#{user}'@'localhost'
+     #{not empty password ? ' identified by ' : ''}#{not empty password ? password : ''}
+       </sql>
+    </query>
+</query-mapping>

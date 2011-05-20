@@ -81,6 +81,24 @@ to run.
 .\"
 .PP
 .I The
+.B create-database
+.I command
+.PP
+ \fBcreate-database \fIconnection admin-user [admin-password]\fR\fR
+.PP
+The create-database command creates the database used by the application.
+The database connection string is of the form: 
+.\"
+.PP
+\fIdriver\fR://\fIhost\fR:\fIport\fR/\fIdatabase\fR
+.PP
+The command will connect to the database server specified by the connection string.
+It will use the admin user for this connection. The database is created if it does
+not yet exist. If a user is specified in the connection string, a grant command is
+issued to create that user and allow him to access the new database.
+.\"
+.PP
+.I The
 .B add-layout
 .I command
 .PP

@@ -285,6 +285,14 @@ package body Gen.Generator is
    end Initialize;
 
    --  ------------------------------
+   --  Get the configuration properties.
+   --  ------------------------------
+   function Get_Properties (H : in Handler) return Util.Properties.Manager is
+   begin
+      return Util.Properties.Manager (H.Conf);
+   end Get_Properties;
+
+   --  ------------------------------
    --  Set the directory where template files are stored.
    --  ------------------------------
    procedure Set_Template_Directory (H    : in out Handler;

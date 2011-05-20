@@ -22,7 +22,7 @@ package Gen is
    SVN_URL : constant String := "https://ada-gen.googlecode.com/svn/trunk";
 
    --  Revision used (must run 'make version' to update)
-   SVN_REV : constant Positive := 119;
+   SVN_REV : constant Positive := 126;
 
    RELEASE          : constant String := "Dynamo Ada Generator 0.3 - Revision"
                            & Positive'Image (SVN_REV) & ", Stephane Carrez";
@@ -31,6 +31,6 @@ package Gen is
    GEN_SQL_FILE     : constant String := "generator.template.sql";
 
    --  Path of the config directory
-   CONFIG_DIR       : constant String := "/usr/local/share/dynamo";
+   CONFIG_DIR       : constant String := "/usr/share/dynamo";
 
 end Gen;

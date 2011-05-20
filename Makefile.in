@@ -65,6 +65,10 @@ analyze:
 # Clean, then build executables for all mains defined by the project.
 rebuild: clean build
 
+GENERATOR=dynamo
+
+generate:
+	$(GENERATOR) generate db
 
 # Files to package in source distribution
 DISTFILES=README LICENSE.txt NOTICE.txt CHANGES config.guess configure config.sub \

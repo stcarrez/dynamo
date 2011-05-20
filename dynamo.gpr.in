@@ -4,6 +4,7 @@ with "xmlada";
 with "@UTIL_DIR@util";
 with "@EL_DIR@el";
 with "@ASF_DIR@asf";
+with "@ADO_DIR@ado";
 
 project Dynamo is
 

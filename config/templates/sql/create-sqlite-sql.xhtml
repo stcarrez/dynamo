@@ -1,0 +1,27 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="db/#{model.dirname ne 'src' ? model.dirname : ''}/#{projectName}-sqlite-sql.sql">
+/* File generated automatically by dynamo */
+<h:list value="#{model.tables}" var="table">
+/* #{table.comment} */
+create table #{table.table} (
+<h:list value="#{table.members}" var="column">
+  /* #{column.comment} */
+  <h:panelGroup rendered="#{column.name eq table.id.name}">
+  `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} PRIMARY KEY#{column.name eq table.id.name and (table.id.generator eq 'increment') ? ' AUTOINCREMENT' : ''}#{table.members.rowIndex lt table.members.size ? ',' : ''}
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.name ne table.id.name}">
+  `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} NOT NULL#{table.members.rowIndex lt table.members.size ? ',' : ''}
+  </h:panelGroup>
+</h:list>
+);
+</h:list>
+<h:panelGroup rendered="#{not empty model.tables}">
+  <h:list value="#{model.tables}" var="table">
+insert into entity_type (name) values ("#{table.table}");
+</h:list>
+</h:panelGroup>
+</f:view>

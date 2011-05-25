@@ -29,6 +29,7 @@ package Gen.Model.Mappings is
    type Mapping_Definition is new Definition with record
       Target        : Ada.Strings.Unbounded.Unbounded_String;
       Is_Primitive  : Boolean := False;
+      Is_Boolean    : Boolean := False;
       Is_Date       : Boolean := False;
       Is_Identifier : Boolean := False;
       Is_String     : Boolean := False;
@@ -49,6 +50,7 @@ package Gen.Model.Mappings is
    procedure Register_Type (Target        : in String;
                             From          : in String;
                             Is_Primitive  : in Boolean;
+                            Is_Boolean    : in Boolean;
                             Is_Date       : in Boolean;
                             Is_Identifier : in Boolean;
                             Is_String     : in Boolean);

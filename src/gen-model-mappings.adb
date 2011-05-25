@@ -50,6 +50,8 @@ package body Gen.Model.Mappings is
    begin
       if Name = "name" then
          return Util.Beans.Objects.To_Object (From.Target);
+      elsif Name = "isBoolean" then
+         return Util.Beans.Objects.To_Object (From.Is_Boolean);
       elsif Name = "isInteger" then
          return Util.Beans.Objects.To_Object (From.Is_Primitive);
       elsif Name = "isString" then
@@ -84,6 +86,7 @@ package body Gen.Model.Mappings is
    procedure Register_Type (Target : in String;
                             From   : in String;
                             Is_Primitive : in Boolean;
+                            Is_Boolean    : in Boolean;
                             Is_Date       : in Boolean;
                             Is_Identifier : in Boolean;
                             Is_String     : in Boolean) is
@@ -104,6 +107,7 @@ package body Gen.Model.Mappings is
       Mapping.Is_Date       := Is_Date;
       Mapping.Is_Identifier := Is_Identifier;
       Mapping.Is_String     := Is_String;
+      Mapping.Is_Boolean    := Is_Boolean;
    end Register_Type;
 
 end Gen.Model.Mappings;

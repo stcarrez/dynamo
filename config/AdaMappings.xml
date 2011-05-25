@@ -52,9 +52,10 @@
         <from>datatype::Identifier</from>
         <to>ADO.Identifier</to>
     </mapping>
-    <mapping>
+    <mapping type='boolean'>
         <from>bool</from>
         <from>boolean</from>
+        <from>Boolean</from>
         <to>Boolean</to>
     </mapping>
     <mapping>

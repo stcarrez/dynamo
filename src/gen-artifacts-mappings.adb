@@ -62,6 +62,7 @@ package body Gen.Artifacts.Mappings is
          Is_Date       : Boolean := False;
          Is_String     : Boolean := False;
          Is_Identifier : Boolean := False;
+         Is_Boolean    : Boolean := False;
 
          procedure Register_Type (O    : in out Gen.Model.Packages.Model_Definition;
                                   Node : in DOM.Core.Node) is
@@ -72,6 +73,7 @@ package body Gen.Artifacts.Mappings is
             Gen.Model.Mappings.Register_Type (Target => To,
                                               From  => From,
                                               Is_Primitive => Is_Primitive,
+                                              Is_Boolean   => Is_Boolean,
                                               Is_Date      => Is_Date,
                                               Is_String    => Is_String,
                                               Is_Identifier => Is_Identifier);
@@ -86,6 +88,9 @@ package body Gen.Artifacts.Mappings is
 
          elsif Kind = "identifier" or To = "ADO.Identifier" then
             Is_Identifier := True;
+
+         elsif Kind = "boolean" then
+            Is_Boolean := True;
 
          elsif Kind = "string" or To = "Ada.Strings.Unbounded.Unbounded_String" then
             Is_String := True;

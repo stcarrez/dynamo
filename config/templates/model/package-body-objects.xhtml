@@ -59,7 +59,10 @@
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
       Set_Field (Object, Impl, #{column.index + 1});
-    <h:panelGroup rendered="#{column.name ne table.id.name and not column.isPrimitiveType}">
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isBoolean}">
+      Impl.#{fn:capitalize(column.name)} := Value;
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.name ne table.id.name and not column.isPrimitiveType and not column.type.isBoolean}">
       Impl.#{fn:capitalize(column.name)} := #{g:adaType(column,0)} (Value);
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType}">
@@ -402,14 +405,17 @@
 </h:panelGroup>
    begin
 <h:list value="#{table.members}" var="column">
-<h:panelGroup rendered="#{column.name eq table.id.name and column.type.isIdentifier}">
+
+  <h:panelGroup rendered="#{column.name eq table.id.name and column.type.isIdentifier}">
       Object.Set_Key_Value (Stmt.Get_Identifier (#{column.index}));
-</h:panelGroup>
-<h:panelGroup rendered="#{column.name eq table.id.name and not column.type.isIdentifier}">
+  </h:panelGroup>
+
+  <h:panelGroup rendered="#{column.name eq table.id.name and not column.type.isIdentifier}">
       Object.Set_Key_Value (Stmt.Get_Unbounded_String (#{column.index}));
-</h:panelGroup>
+  </h:panelGroup>
+
 <h:panelGroup rendered="#{column.name ne table.id.name and column.name ne table.version.name}">
-  <h:panelGroup rendered="#{not column.isPrimitiveType}">
+  <h:panelGroup rendered="#{not column.isPrimitiveType and not column.type.isBoolean}">
       if not Stmt.Is_Null (#{column.index}) then
           Object.#{fn:capitalize(column.name)}.Set_Key_Value (Stmt.Get_Identifier (#{column.index}), Session);
       end if;
@@ -419,6 +425,9 @@
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isString}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isBoolean}">
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_Boolean (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isIdentifier and not column.type.isString}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});

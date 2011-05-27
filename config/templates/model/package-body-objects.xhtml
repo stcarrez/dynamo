@@ -38,6 +38,20 @@
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
       Impl := new #{fn:capitalize(table.type)}_Impl;
+<h:list value="#{table.members}" var="column">
+  <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isIdentifier}">
+      Impl.#{fn:capitalize(column.name)} := ADO.NO_IDENTIFIER;
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isBoolean}">
+      Impl.#{fn:capitalize(column.name)} := False;
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isInteger}">
+      Impl.#{fn:capitalize(column.name)} := 0;
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+      Impl.#{fn:capitalize(column.name)}.Is_Null := True;
+  </h:panelGroup>
+</h:list>
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
 #{' '}

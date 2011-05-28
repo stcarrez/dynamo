@@ -52,6 +52,13 @@
         <from>datatype::Identifier</from>
         <to>ADO.Identifier</to>
     </mapping>
+    <mapping type='integer'>
+        <from>ADO.Entity_Type</from>
+        <from>Entity_Type</from>
+        <from>PrimitiveTypes::Entity_Type</from>
+        <from>datatype::Entity_Type</from>
+        <to>ADO.Entity_Type</to>
+    </mapping>
     <mapping type='boolean'>
         <from>bool</from>
         <from>boolean</from>

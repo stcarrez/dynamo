@@ -271,6 +271,7 @@ package body Gen.Generator is
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_EMPTY_LINES, "true");
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
+      H.Conf.Set ("ado.queries", Compose (Dir, "db"));
       H.Initialize (H.Conf, Factory);
 
       H.Config_Dir := To_Unbounded_String (Dir);

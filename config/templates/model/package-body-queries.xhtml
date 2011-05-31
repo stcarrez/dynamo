@@ -4,6 +4,7 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core">
 <h:list value="#{package.queries}" var="query">
+  <h:panelGroup rendered="#{not empty query.type}">
    --  --------------------
    --  #{query.comment}
    --  --------------------
@@ -39,7 +40,7 @@
          Stmt.Next;
       end loop;
    end List;
-
+  </h:panelGroup>
 #{''}
 </h:list>
 

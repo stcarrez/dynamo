@@ -4,6 +4,7 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core">
 <h:list value="#{package.queries}" var="query">
+  <h:panelGroup rendered="#{not empty query.type}">
    --  --------------------
    --  #{query.comment}
    --  --------------------
@@ -26,6 +27,7 @@
    procedure List (Object  : in out #{fn:capitalize(query.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class);
+   </h:panelGroup>
 
    <h:list value="#{query.queries}" var="basic_query">
 #{''}

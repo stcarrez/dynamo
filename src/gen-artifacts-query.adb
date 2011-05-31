@@ -138,8 +138,10 @@ package body Gen.Artifacts.Query is
                                         Process => Register_Query);
 
          Table : constant Query_Definition_Access := new Query_Definition;
+         Pkg   : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "package");
       begin
          Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
+         Table.Pkg_Name  := Pkg;
          Iterate_Mapping (Query_Definition (Table.all), Node, "class");
          Iterate_Query (Query_Definition (Table.all), Node, "query");
          Model.Register_Query (Table);

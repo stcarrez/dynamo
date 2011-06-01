@@ -443,6 +443,9 @@
   <h:panelGroup rendered="#{column.type.isBoolean}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Boolean (#{column.index});
   </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isDate}">
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_Time (#{column.index});
+  </h:panelGroup>
   <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type'}">
       Object.#{fn:capitalize(column.name)} := ADO.Entity_Type (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>

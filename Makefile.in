@@ -113,6 +113,7 @@ install:	  install_dirs
 	$(CP) config/*.xml $(prefix)/share/dynamo
 	-rm -rf $(prefix)/share/dynamo/templates
 	$(CP) -r config/templates $(prefix)/share/dynamo
+	$(CP) -r db $(prefix)/share/dynamo/db
 
 install_dirs:
 	${MKDIR} -p ${bindir}

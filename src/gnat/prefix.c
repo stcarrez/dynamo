@@ -82,8 +82,18 @@ License along with GCC; see the file COPYING3.  If not see
 #endif
 
 #define concat internal_concat
-#define xstrdup strdup
-#define xmalloc malloc
+
+void* xmalloc (size_t size)
+{
+  return malloc (size);
+}
+
+char* xstrdup (const char* s)
+{
+  /* The xstrdup real version checks the result and aborts... */
+  return strdup (s);
+}
+
 static char* concat(const char* first, const char* second, const char* last)
 {
   size_t len = strlen (first) + strlen (second);

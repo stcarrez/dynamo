@@ -813,6 +813,7 @@ __gnat_fopen (char *path, char *mode, int encoding ATTRIBUTE_UNUSED)
 #endif
 }
 
+#ifdef GCC /* SCz: not used in Dynamo - does not link */
 FILE *
 __gnat_freopen (char *path,
 		char *mode,
@@ -839,6 +840,7 @@ __gnat_freopen (char *path,
   return freopen (path, mode, stream);
 #endif
 }
+#endif
 
 int
 __gnat_open_read (char *path, int fmode)

@@ -1,7 +1,7 @@
 # You may edit this makefile as long as you keep these original 
 # target names defined.
-GNATMAKE=gnatmake
-GNATCLEAN=gnatclean
+GNATMAKE=gprbuild
+GNATCLEAN=gprclean
 GPRPATH=dynamo.gpr
 
 distdir=dynamo-@GEN_VERSION@
@@ -51,7 +51,7 @@ autobuild:
 
 # Clean the root project of all build products.
 clean:
-	$(GNATCLEAN) -P "$(GPRPATH)"
+	$(GNATCLEAN) -q -P "$(GPRPATH)"
 
 # Clean root project and all imported projects too.
 clean_tree:

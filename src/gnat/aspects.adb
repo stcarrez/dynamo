@@ -254,12 +254,12 @@ package body Aspects is
       Node : Node_Id := Empty;
       List : List_Id;
    begin
-      Aspect_Specifications_Hash_Table.Get_First (Node, List);
+--  SCz    Aspect_Specifications_Hash_Table.Get_First; -- (Node); --  SCz , List);
       loop
          Tree_Write_Int (Int (Node));
          Tree_Write_Int (Int (List));
          exit when List = No_List;
-         Aspect_Specifications_Hash_Table.Get_Next (Node, List);
+--  SCz         Aspect_Specifications_Hash_Table.Get_Next (Node); --  SCz, List);
       end loop;
    end Tree_Write;
 

@@ -26,11 +26,11 @@ along with GCC; see the file COPYING3.  If not see
    welcome to forward us bugs reported to you, if you determine that
    they are not bugs in your modifications.)  */
 
-const char bug_report_url[] = BUGURL;
+const char bug_report_url[] = "";
 
 /* The complete version string, assembled from several pieces.
    BASEVER, DATESTAMP, DEVPHASE, and REVISION are defined by the
    Makefile.  */
 
-const char version_string[] = BASEVER DATESTAMP DEVPHASE REVISION;
-const char pkgversion_string[] = PKGVERSION;
+const char version_string[] = "gcc 4.6.0";
+

@@ -180,7 +180,7 @@ extern int fprintf_unlocked (FILE *, const char *, ...);
 /* There are an extraordinary number of issues with <ctype.h>.
    The last straw is that it varies with the locale.  Use libiberty's
    replacement instead.  */
-#include "safe-ctype.h"
+/* SCz #include "safe-ctype.h" */
 
 #include <sys/types.h>
 
@@ -573,7 +573,7 @@ extern int vsnprintf(char *, size_t, const char *, va_list);
 #endif
 
 /* Filename handling macros.  */
-#include "filenames.h"
+/* SCz #include "filenames.h" */
 
 /* These should be phased out in favor of IS_DIR_SEPARATOR, where possible.  */
 #ifndef DIR_SEPARATOR

@@ -66,12 +66,34 @@ License along with GCC; see the file COPYING3.  If not see
 
 #include "config.h"
 #include "system.h"
-#include "coretypes.h"
-#include "tm.h"
+                        /* #include "coretypes.h" */
+                        /* #include "tm.h" */
 #if defined(_WIN32) && defined(ENABLE_WIN32_REGISTRY)
 #include <windows.h>
 #endif
 #include "prefix.h"
+
+#ifndef PREFIX
+# define PREFIX "/usr/local"
+#endif
+
+#ifndef IS_DIR_SEPARATOR
+# define IS_DIR_SEPARATOR(C) ((C) == '/' || (C) == '\\')
+#endif
+
+#define concat internal_concat
+#define xstrdup strdup
+#define xmalloc malloc
+static char* concat(const char* first, const char* second, const char* last)
+{
+  size_t len = strlen (first) + strlen (second);
+  char* result = malloc (len + 1);
+
+  strcpy (result, first);
+  strcat (result, second);
+  
+  return result;
+}
 
 static const char *std_prefix = PREFIX;
 

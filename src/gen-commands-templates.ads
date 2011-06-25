@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Util.Strings.Sets;
 package Gen.Commands.Templates is
 
    --  ------------------------------

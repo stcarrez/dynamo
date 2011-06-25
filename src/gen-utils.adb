@@ -30,9 +30,8 @@ package body Gen.Utils is
    procedure Iterate_Nodes (Closure : in out T;
                             Node    : DOM.Core.Node;
                             Name    : String) is
-      Nodes : constant DOM.Core.Node_List
-        := DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
-      Size  : constant Natural := DOM.Core.Nodes.Length (Nodes);
+      Nodes : DOM.Core.Node_List := DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
+      Size  : constant Natural   := DOM.Core.Nodes.Length (Nodes);
    begin
       for I in 0 .. Size - 1 loop
          declare
@@ -41,14 +40,15 @@ package body Gen.Utils is
             Process (Closure, N);
          end;
       end loop;
+      DOM.Core.Free (Nodes);
    end Iterate_Nodes;
 
    --  ------------------------------
    --  Get the content of the node
    --  ------------------------------
    function Get_Data_Content (Node : in DOM.Core.Node) return String is
-      Nodes  : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
-      S      : constant Natural       := DOM.Core.Nodes.Length (Nodes);
+      Nodes  : DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
+      S      : constant Natural   := DOM.Core.Nodes.Length (Nodes);
       Result : Unbounded_String;
    begin
       for J in 0 .. S - 1 loop

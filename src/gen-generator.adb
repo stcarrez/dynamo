@@ -19,6 +19,8 @@ with Ada.Directories;
 with Ada.IO_Exceptions;
 
 with Input_Sources.File;
+
+with DOM.Core;
 with DOM.Core.Documents;
 with DOM.Readers;
 with Sax.Readers;
@@ -649,12 +651,16 @@ package body Gen.Generator is
       DOM.Readers.Parse (My_Tree_Reader, Read);
       Input_Sources.File.Close (Read);
 
-      H.Doc := DOM.Readers.Get_Tree (My_Tree_Reader);
-      H.Root := DOM.Core.Documents.Get_Element (H.Doc);
+      declare
+         Doc  : constant DOM.Core.Document := DOM.Readers.Get_Tree (My_Tree_Reader);
+         Root : constant DOM.Core.Element  := DOM.Core.Documents.Get_Element (Doc);
+      begin
+         H.Mappings.Initialize (Path => File, Model => H.Model, Node => Root);
+         H.Hibernate.Initialize (Path => File, Model => H.Model, Node => Root);
+         H.Query.Initialize (Path => File, Model => H.Model, Node => Root);
+      end;
 
-      H.Mappings.Initialize (Path => File, Model => H.Model, Node => H.Root);
-      H.Hibernate.Initialize (Path => File, Model => H.Model, Node => H.Root);
-      H.Query.Initialize (Path => File, Model => H.Model, Node => H.Root);
+--        DOM.Readers.Free (My_Tree_Reader);
 
    exception
       when Ada.IO_Exceptions.Name_Error =>

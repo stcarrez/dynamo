@@ -167,13 +167,16 @@ package body Gen.Model is
    --  ------------------------------
    function Get_Child (Node : DOM.Core.Node;
                        Name : String) return DOM.Core.Node is
-      Nodes : constant DOM.Core.Node_List :=
+      Nodes : DOM.Core.Node_List :=
         DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
    begin
       if DOM.Core.Nodes.Length (Nodes) = 0 then
+         DOM.Core.Free (Nodes);
          return null;
       else
-         return DOM.Core.Nodes.Item (Nodes, 0);
+         return Result : constant DOM.Core.Node := DOM.Core.Nodes.Item (Nodes, 0) do
+            DOM.Core.Free (Nodes);
+         end return;
       end if;
    end Get_Child;
 

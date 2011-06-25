@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with DOM.Core;
 
 with Ada.Text_IO;
 with Ada.Command_Line;
@@ -191,8 +190,6 @@ private
       Output_Dir : Ada.Strings.Unbounded.Unbounded_String;
 
       Model  : aliased Gen.Model.Packages.Model_Definition;
-      Doc    : DOM.Core.Document;
-      Root   : DOM.Core.Element;
       Status : Ada.Command_Line.Exit_Status := 0;
       File   : access Util.Beans.Objects.Object;
 

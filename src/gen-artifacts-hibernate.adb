@@ -16,11 +16,15 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
+with Ada.Directories;
 
 with DOM.Core.Nodes;
 
 with Gen.Utils;
 with Gen.Model.Tables;
+with Gen.Model.Projects;
+
+with Util.Files;
 with Util.Log.Loggers;
 
 
@@ -218,5 +222,86 @@ package body Gen.Artifacts.Hibernate is
          Context.Add_Generation (Name => GEN_SQLITE_SQL_FILE, Mode => ITERATION_TABLE);
       end if;
    end Prepare;
+
+   --  ------------------------------
+   --  After the generation, perform a finalization step for the generation process.
+   --  For each database SQL mapping, collect the schema files from the different modules
+   --  of the project and generate an SQL script that can be used to create the database tables.
+   --  ------------------------------
+   overriding
+   procedure Finish (Handler : in Artifact;
+                     Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                     Project : in out Gen.Model.Projects.Project_Definition'Class;
+                     Context : in out Generator'Class) is
+      pragma Unreferenced (Handler, Model, Context);
+
+      MySQL_Content  : Unbounded_String;
+      Sqlite_Content : Unbounded_String;
+
+      --  ------------------------------
+      --  Check if an SQL file exists for the given driver.  If such file exist,
+      --  read the content and append it to the <b>Content</b> buffer.
+      --  ------------------------------
+      procedure Collect_SQL (Project : in Gen.Model.Projects.Project_Definition_Access;
+                             Dir     : in String;
+                             Driver  : in String;
+                             Content : in out Unbounded_String) is
+         Name : constant String := Project.Get_Project_Name;
+         Path : constant String := Util.Files.Compose (Dir, Name & "-" & Driver & ".sql");
+         SQL  : Unbounded_String;
+      begin
+         Log.Debug ("Checking SQL file {0}", Path);
+
+         if Ada.Directories.Exists (Path) then
+            Append (Content, "/* Copied from ");
+            Append (Content, Path);
+            Append (Content, "*/");
+            Append (Content, ASCII.LF);
+            Util.Files.Read_File (Path => Path,
+                                  Into => SQL);
+            Append (Content, SQL);
+         end if;
+      end Collect_SQL;
+
+      --  ------------------------------
+      --  Collect the SQL schemas defined by the projects and modules used by the main project.
+      --  ------------------------------
+      procedure Build_SQL_Schemas is
+         use type Gen.Model.Projects.Project_Definition_Access;
+
+         Iter : Gen.Utils.String_List.Cursor := Project.Dynamo_Files.First;
+      begin
+         while Gen.Utils.String_List.Has_Element (Iter) loop
+            declare
+               Name : constant String := Gen.Utils.String_List.Element (Iter);
+               Dir  : constant String := Ada.Directories.Containing_Directory (Name);
+               Prj  : constant Gen.Model.Projects.Project_Definition_Access
+                 := Project.Find_Project (Name);
+            begin
+               if Prj /= null then
+                  Collect_SQL (Prj, Util.Files.Compose (Dir, "db"), "mysql", MySQL_Content);
+                  Collect_SQL (Prj, Util.Files.Compose (Dir, "db"), "sqlite", Sqlite_Content);
+               end if;
+            end;
+            Gen.Utils.String_List.Next (Iter);
+         end loop;
+      end Build_SQL_Schemas;
+
+      use Ada.Directories;
+
+      Name       : constant String := Project.Get_Project_Name;
+      Result_Dir : constant String := Containing_Directory (To_String (Project.Path));
+      Base_Path  : constant String := Util.Files.Compose (Result_Dir, "db/create-") & Name;
+   begin
+      Build_SQL_Schemas;
+
+      Log.Info ("Generating MySQL creation schema in '{0}'", Base_Path & "-mysql.sql");
+      Util.Files.Write_File (Path    => Base_Path & "-mysql.sql",
+                             Content => MySQL_Content);
+
+      Log.Info ("Generating Sqlite creation schema in '{0}'", Base_Path & "-sqlite.sql");
+      Util.Files.Write_File (Path    => Base_Path & "-sqlite.sql",
+                             Content => Sqlite_Content);
+   end Finish;
 
 end Gen.Artifacts.Hibernate;

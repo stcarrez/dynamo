@@ -43,6 +43,15 @@ package Gen.Artifacts.Hibernate is
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class);
 
+   --  After the generation, perform a finalization step for the generation process.
+   --  For each database SQL mapping, collect the schema files from the different modules
+   --  of the project and generate an SQL script that can be used to create the database tables.
+   overriding
+   procedure Finish (Handler : in Artifact;
+                     Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                     Project : in out Gen.Model.Projects.Project_Definition'Class;
+                     Context : in out Generator'Class);
+
 private
 
    type Artifact is new Gen.Artifacts.Artifact with null record;

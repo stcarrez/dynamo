@@ -39,6 +39,14 @@ package body Gen.Model.Projects is
    end Get_Value;
 
    --  ------------------------------
+   --  Get the project name.
+   --  ------------------------------
+   function Get_Project_Name (Project : in Project_Definition) return String is
+   begin
+      return To_String (Project.Name);
+   end Get_Project_Name;
+
+   --  ------------------------------
    --  Find the project definition associated with the dynamo XML file <b>Path</b>.
    --  Returns null if there is no such project
    --  ------------------------------

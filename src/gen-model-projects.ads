@@ -56,6 +56,9 @@ package Gen.Model.Projects is
    function Get_Value (From : Project_Definition;
                        Name : String) return Util.Beans.Objects.Object;
 
+   --  Get the project name.
+   function Get_Project_Name (Project : in Project_Definition) return String;
+
    --  Find the project definition associated with the dynamo XML file <b>Path</b>.
    --  Returns null if there is no such project
    function Find_Project (From : in Project_Definition;

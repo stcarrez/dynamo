@@ -39,6 +39,27 @@ package body Gen.Model.Projects is
    end Get_Value;
 
    --  ------------------------------
+   --  Find the project definition associated with the dynamo XML file <b>Path</b>.
+   --  Returns null if there is no such project
+   --  ------------------------------
+   function Find_Project (From : in Project_Definition;
+                          Path : in String) return Project_Definition_Access is
+      Iter : Project_Vectors.Cursor := From.Modules.First;
+   begin
+      while Project_Vectors.Has_Element (Iter) loop
+         declare
+            P : constant Project_Definition_Access := Project_Vectors.Element (Iter);
+         begin
+            if P.Path = Path then
+               return P;
+            end if;
+         end;
+         Project_Vectors.Next (Iter);
+      end loop;
+      return null;
+   end Find_Project;
+
+   --  ------------------------------
    --  Save the project description and parameters.
    --  ------------------------------
    procedure Save (Project : in out Project_Definition;

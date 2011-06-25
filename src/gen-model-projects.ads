@@ -20,8 +20,9 @@ with Ada.Strings.Unbounded;
 with Ada.Containers.Vectors;
 
 with Util.Beans.Objects;
-
 with Util.Properties;
+
+with Gen.Utils;
 package Gen.Model.Projects is
 
    use Ada.Strings.Unbounded;
@@ -41,6 +42,12 @@ package Gen.Model.Projects is
       Path    : Unbounded_String;
       Props   : Util.Properties.Manager;
       Modules : Project_Vectors.Vector;
+
+      --  The list of GNAT project files used by the project.
+      Project_Files : Gen.Utils.String_List.Vector;
+
+      --  The list of 'dynamo.xml' files used by the project (gathered from GNAT files).
+      Dynamo_Files  : Gen.Utils.String_List.Vector;
    end record;
 
    --  Get the value identified by the name.
@@ -48,6 +55,11 @@ package Gen.Model.Projects is
    overriding
    function Get_Value (From : Project_Definition;
                        Name : String) return Util.Beans.Objects.Object;
+
+   --  Find the project definition associated with the dynamo XML file <b>Path</b>.
+   --  Returns null if there is no such project
+   function Find_Project (From : in Project_Definition;
+                          Path : in String) return Project_Definition_Access;
 
    --  Save the project description and parameters.
    procedure Save (Project : in out Project_Definition;

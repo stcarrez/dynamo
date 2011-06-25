@@ -382,7 +382,7 @@ package body Gen.Generator is
    --  ------------------------------
    function Get_Project_Name (H : in Handler) return String is
    begin
-      return To_String (H.Project.Name);
+      return H.Project.Get_Project_Name;
    end Get_Project_Name;
 
    --  ------------------------------
@@ -729,8 +729,8 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Finish (H : in out Handler) is
    begin
-      H.Hibernate.Finish (Model => H.Model, Context => H);
-      H.Query.Finish (Model => H.Model, Context => H);
+      H.Hibernate.Finish (Model => H.Model, Project => H.Project, Context => H);
+      H.Query.Finish (Model => H.Model, Project => H.Project, Context => H);
    end Finish;
 
    --  ------------------------------

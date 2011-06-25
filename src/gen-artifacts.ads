@@ -20,6 +20,7 @@ with Ada.Finalization;
 with DOM.Core;
 with Gen.Model;
 with Gen.Model.Packages;
+with Gen.Model.Projects;
 
 --  The <b>Gen.Artifacts</b> package represents the methods and process to prepare,
 --  control and realize the code generation.
@@ -60,6 +61,12 @@ package Gen.Artifacts is
    procedure Prepare (Handler : in Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is null;
+
+   --  After the generation, perform a finalization step for the generation process.
+   procedure Finish (Handler : in Artifact;
+                     Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                     Project : in out Gen.Model.Projects.Project_Definition'Class;
+                     Context : in out Generator'Class) is null;
 
 private
 

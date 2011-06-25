@@ -99,9 +99,11 @@ package body Gen.Commands.Model is
       Put_Line ("  The database table model is an XML file that describes the mapping");
       Put_Line ("  for of a database table to an Ada representation.");
       Put_Line ("  The XML description is similar to Hibernate mapping files.");
-      Put_Line ("  (See http://docs.jboss.org/hibernate/core/3.6/reference/en-US/html/mapping.html)");
-      Put_Line ("  If a MODULE is specified, the Ada package will be: <PROJECT>.<MODULE>.Model.<NAME>");
+      Put_Line ("  (See http://docs.jboss.org/hibernate/core/3.6/"
+                & "reference/en-US/html/mapping.html)");
+      Put_Line ("  If a MODULE is specified, the Ada package will be: "
+                & "<PROJECT>.<MODULE>.Model.<NAME>");
       Put_Line ("  Otherwise, the Ada package will be: <PROJECT>.Model.<NAME>");
-    end Help;
+   end Help;
 
 end Gen.Commands.Model;

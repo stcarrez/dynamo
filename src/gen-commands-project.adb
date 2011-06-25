@@ -51,7 +51,8 @@ package body Gen.Commands.Project is
 
       Generator.Save_Project;
       declare
-         Path   : constant GNAT.OS_Lib.String_Access := GNAT.OS_Lib.Locate_Exec_On_Path ("autoconf");
+         Path   : constant GNAT.OS_Lib.String_Access
+           := GNAT.OS_Lib.Locate_Exec_On_Path ("autoconf");
          Args   : GNAT.OS_Lib.Argument_List (1 .. 0);
          Status : Boolean;
       begin

@@ -44,6 +44,7 @@ package body Gen.Commands.Templates is
    --  Execute the command with the arguments.
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
+      function Get_Output_Dir return String;
 
       function Get_Output_Dir return String is
          Dir        : constant String := Generator.Get_Result_Directory;
@@ -83,6 +84,8 @@ package body Gen.Commands.Templates is
    --  ------------------------------
    procedure Help (Cmd       : in Command;
                    Generator : in out Gen.Generator.Handler) is
+      pragma Unreferenced (Generator);
+
       use Ada.Text_IO;
    begin
       Put_Line (To_String (Cmd.Name) & ": " & To_String (Cmd.Title));
@@ -108,6 +111,15 @@ package body Gen.Commands.Templates is
    end record;
    type Command_Loader_Access is access all Command_Loader;
 
+   procedure Set_Member (Closure : in out Command_Loader;
+                         Field   : in Command_Fields;
+                         Value   : in Util.Beans.Objects.Object);
+
+   function To_String (Value : in Util.Beans.Objects.Object) return Unbounded_String;
+
+   --  ------------------------------
+   --  Convert the object value into a string and trim any space/tab/newlines.
+   --  ------------------------------
    function To_String (Value : in Util.Beans.Objects.Object) return Unbounded_String is
       Result    : constant String := Util.Beans.Objects.To_String (Value);
       First_Pos : Natural := Result'First;
@@ -182,6 +194,10 @@ package body Gen.Commands.Templates is
    --  Read the template commands defined in dynamo configuration directory.
    --  ------------------------------
    procedure Read_Commands (Generator : in out Gen.Generator.Handler) is
+
+      procedure Read_Command (Name      : in String;
+                              File_Path : in String;
+                              Done      : out Boolean);
 
       --  ------------------------------
       --  Read the XML command file.

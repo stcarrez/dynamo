@@ -62,7 +62,7 @@ package body Gen.Database.Model is
       Impl.Date.Is_Null := True;
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
- 
+
    -- ----------------------------------------
    --  Data object: Schema
    -- ----------------------------------------
@@ -278,7 +278,7 @@ package body Gen.Database.Model is
                else
                   raise ADO.Objects.UPDATE_ERROR;
                end if;
-            end if; 
+            end if;
          end;
       end if;
    end Save;
@@ -322,9 +322,9 @@ package body Gen.Database.Model is
       end if;
       if Name = "date" then
          if Impl.Date.Is_Null then
-             return Util.Beans.Objects.Null_Object;
+            return Util.Beans.Objects.Null_Object;
          else
-             return Util.Beans.Objects.Time.To_Object (Impl.Date.Value);
+            return Util.Beans.Objects.Time.To_Object (Impl.Date.Value);
          end if;
       end if;
       raise ADO.Objects.NOT_FOUND;
@@ -367,6 +367,8 @@ package body Gen.Database.Model is
    procedure List (Object  : in out Database_Info_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out Database_Info);
+
       Stmt : ADO.Statements.Query_Statement
           := Session.Create_Statement (Context);
       Pos  : Natural := 0;

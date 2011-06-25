@@ -48,6 +48,20 @@ package body Gen.Artifacts.Query is
                          Model   : in out Gen.Model.Packages.Model_Definition'Class) is
       pragma Unreferenced (Handler);
 
+      procedure Register_Column (Table  : in out Query_Definition;
+                                 Column : in DOM.Core.Node);
+
+      procedure Register_Columns (Table : in out Query_Definition);
+
+      procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
+                                  Node  : in DOM.Core.Node);
+
+      procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
+                                  Node  : in DOM.Core.Node);
+
+      procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
+                                Node  : in DOM.Core.Node);
+
       Hash : Unbounded_String;
 
       --  ------------------------------
@@ -117,7 +131,6 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
                                 Node  : in DOM.Core.Node) is
-         Name : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "name");
          C    : constant Column_Definition_Access := new Column_Definition;
       begin
          C.Node := Node;

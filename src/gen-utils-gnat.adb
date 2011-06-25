@@ -88,14 +88,14 @@ package body Gen.Utils.GNAT is
 
       --  Parse the GNAT project files and build the tree.
       Prj.Pars.Parse (Project           => Main_Project,
-                      In_Tree           => MakeUtl.Project_Tree,
+                      In_Tree           => Makeutl.Project_Tree,
                       Project_File_Name => Project_File_Name,
                       Flags             => Prj.Gnatmake_Flags,
                       In_Node_Tree      => Project_Node_Tree);
 
       if Main_Project /= Prj.No_Project then
          declare
-            Dummy : Boolean;
+            Dummy : Boolean := False;
          begin
             --  Scan the tree to get the list of projects (in dependency order).
             For_All_Projects (Main_Project, Dummy, Imported_First => True);

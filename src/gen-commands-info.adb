@@ -30,12 +30,28 @@ package body Gen.Commands.Info is
    --  ------------------------------
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
+      pragma Unreferenced (Cmd);
+
+      procedure Collect_Directories (List   : in Gen.Utils.String_List.Vector;
+                                     Result : out Gen.Utils.String_List.Vector);
+
+      procedure Print_Model_File (Name : in String;
+                                  File : in String;
+                                  Done : out Boolean);
+
+      procedure Print_GNAT_Projects (Project : in out Gen.Model.Projects.Project_Definition);
+
+      procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Project_Definition);
+
+      procedure Print_Project (Project : in out Gen.Model.Projects.Project_Definition);
 
       List : Gen.Utils.String_List.Vector;
 
       procedure Collect_Directories (List : in Gen.Utils.String_List.Vector;
                                      Result : out Gen.Utils.String_List.Vector) is
-         Iter : Gen.Utils.String_List.Cursor := List.First;
+
+         procedure Add_Model_Dir (Base_Dir : in String;
+                                  Dir : in String);
 
          procedure Add_Model_Dir (Base_Dir : in String;
                                   Dir : in String) is
@@ -47,6 +63,7 @@ package body Gen.Commands.Info is
             end if;
          end Add_Model_Dir;
 
+         Iter : Gen.Utils.String_List.Cursor := List.First;
       begin
          while Gen.Utils.String_List.Has_Element (Iter) loop
             declare
@@ -64,6 +81,7 @@ package body Gen.Commands.Info is
       procedure Print_Model_File (Name : in String;
                                   File : in String;
                                   Done : out Boolean) is
+         pragma Unreferenced (Name);
       begin
          Ada.Text_IO.Put ("    ");
          Ada.Text_IO.Put_Line (File);

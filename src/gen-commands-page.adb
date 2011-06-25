@@ -32,6 +32,8 @@ package body Gen.Commands.Page is
       use GNAT.Command_Line;
       use Ada.Strings.Unbounded;
 
+      function Get_Layout return String;
+
       Name   : constant String := Get_Argument;
       Dir    : constant String := Generator.Get_Result_Directory & "web/";
 

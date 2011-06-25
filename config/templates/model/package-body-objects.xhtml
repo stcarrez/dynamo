@@ -54,7 +54,7 @@
 </h:list>
       ADO.Objects.Set_Object (Object, Impl.all'Access);
    end Allocate;
-#{' '}
+#{''}
    -- ----------------------------------------
    --  Data object: #{fn:capitalize(table.type)}
    -- ----------------------------------------
@@ -302,7 +302,7 @@
                else
                   raise ADO.Objects.UPDATE_ERROR;
                end if;
-            end if; 
+            end if;
          end;
       end if;
    end Save;
@@ -373,9 +373,9 @@
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
          if Impl.#{fn:capitalize(column.name)}.Is_Null then
-             return Util.Beans.Objects.Null_Object;
+            return Util.Beans.Objects.Null_Object;
          else
-             return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)}.Value);
+            return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)}.Value);
          end if;
       </h:panelGroup>
     <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isIdentifier and not column.type.isDate}">

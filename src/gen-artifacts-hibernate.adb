@@ -41,6 +41,20 @@ package body Gen.Artifacts.Hibernate is
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Hibernate");
 
+   --  Register the column definition in the table
+   procedure Register_Column (Table  : in out Table_Definition;
+                              Column : in DOM.Core.Node);
+
+   --  Register the association definition in the table
+   procedure Register_Association (Table  : in out Table_Definition;
+                                   Column : in DOM.Core.Node);
+
+   --  Register all the columns defined in the table
+   procedure Register_Columns (Table : in out Table_Definition);
+
+   procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
+                             Node : in DOM.Core.Node);
+
    --  ------------------------------
    --  Register the column definition in the table
    --  ------------------------------
@@ -131,10 +145,12 @@ package body Gen.Artifacts.Hibernate is
    --  Register all the columns defined in the table
    --  ------------------------------
    procedure Register_Columns (Table : in out Table_Definition) is
-      procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
-                                                        Process => Register_Column);
-      procedure Iterate_Association is new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
-                                                                    Process => Register_Association);
+      procedure Iterate is
+        new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
+                                     Process => Register_Column);
+      procedure Iterate_Association is
+        new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
+                                     Process => Register_Association);
    begin
       Log.Debug ("Register columns from table {0}", Table.Name);
 
@@ -181,13 +197,17 @@ package body Gen.Artifacts.Hibernate is
                          Model   : in out Gen.Model.Packages.Model_Definition'Class) is
       pragma Unreferenced (Handler, Path);
 
+      procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
+                                  Node  : in DOM.Core.Node);
+
       --  ------------------------------
       --  Register a model mapping
       --  ------------------------------
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
                                   Node  : in DOM.Core.Node) is
-         procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
-                                                           Process => Register_Class);
+         procedure Iterate is
+           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
+                                        Process => Register_Class);
       begin
          Iterate (Model, Node, "class");
          Iterate (Model, Node, "subclass");
@@ -234,6 +254,13 @@ package body Gen.Artifacts.Hibernate is
                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                      Context : in out Generator'Class) is
       pragma Unreferenced (Handler, Model, Context);
+
+      procedure Collect_SQL (Project : in Gen.Model.Projects.Project_Definition_Access;
+                             Dir     : in String;
+                             Driver  : in String;
+                             Content : in out Unbounded_String);
+
+      procedure Build_SQL_Schemas;
 
       MySQL_Content  : Unbounded_String;
       Sqlite_Content : Unbounded_String;

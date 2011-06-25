@@ -162,16 +162,17 @@ package body Gen.Model.Tables is
       if Name = "members" or Name = "columns" then
          return From.Members_Bean;
 
-      elsif Name ="id" and From.Id_Column /= null then
+      elsif Name = "id" and From.Id_Column /= null then
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Id_Column.all'Access;
          begin
             return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
          end;
 
-      elsif Name ="version" and From.Version_Column /= null then
+      elsif Name = "version" and From.Version_Column /= null then
          declare
-            Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Version_Column.all'Unchecked_Access;
+            Bean : constant Util.Beans.Basic.Readonly_Bean_Access
+              := From.Version_Column.all'Unchecked_Access;
          begin
             return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
          end;
@@ -208,7 +209,7 @@ package body Gen.Model.Tables is
    --  ------------------------------
    procedure Set_Table_Name (Table : in out Table_Definition;
                              Name  : in String) is
-      Pos : constant Natural := Util.Strings.RIndex (Name, '.');
+      Pos : constant Natural := Util.Strings.Rindex (Name, '.');
    begin
       Table.Name := To_Unbounded_String (Name);
       if Pos > 0 then

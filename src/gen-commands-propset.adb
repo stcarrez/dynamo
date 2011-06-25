@@ -16,12 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Text_IO;
-with Ada.Command_Line;
-with Gen.Artifacts;
 with GNAT.Command_Line;
 
-with Gen.Utils;
-with Util.Files;
 package body Gen.Commands.Propset is
 
    --  ------------------------------
@@ -31,7 +27,6 @@ package body Gen.Commands.Propset is
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
       use GNAT.Command_Line;
-      use Ada.Command_Line;
       use Ada.Strings.Unbounded;
 
       Name     : constant String := Get_Argument;

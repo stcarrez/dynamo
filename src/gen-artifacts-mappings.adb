@@ -43,16 +43,24 @@ package body Gen.Artifacts.Mappings is
                          Path    : in String;
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class) is
+      pragma Unreferenced (Handler, Path);
 
       use Ada.Strings.Unbounded;
 
-      pragma Unreferenced (Handler, Path);
+      procedure Register_Mapping (O    : in out Gen.Model.Packages.Model_Definition;
+                                  Node : in DOM.Core.Node);
+
+      procedure Register_Mappings (Model : in out Gen.Model.Packages.Model_Definition;
+                                   Node  : in DOM.Core.Node);
 
       --  ------------------------------
       --  Register a new type mapping.
       --  ------------------------------
       procedure Register_Mapping (O    : in out Gen.Model.Packages.Model_Definition;
                                   Node : in DOM.Core.Node) is
+
+         procedure Register_Type (O    : in out Gen.Model.Packages.Model_Definition;
+                                  Node : in DOM.Core.Node);
 
          N    : constant DOM.Core.Node := Gen.Model.Get_Child (Node, "to");
          To   : constant String := Gen.Utils.Get_Data_Content (N);
@@ -79,8 +87,9 @@ package body Gen.Artifacts.Mappings is
                                               Is_Identifier => Is_Identifier);
          end Register_Type;
 
-         procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
-                                                           Process => Register_Type);
+         procedure Iterate is
+           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
+                                        Process => Register_Type);
 
       begin
          if Kind = "date" or To = "Ada.Calendar.Time" then
@@ -105,9 +114,10 @@ package body Gen.Artifacts.Mappings is
       --  Register a model mapping
       --  ------------------------------
       procedure Register_Mappings (Model : in out Gen.Model.Packages.Model_Definition;
-                                  Node  : in DOM.Core.Node) is
-         procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
-                                                           Process => Register_Mapping);
+                                   Node  : in DOM.Core.Node) is
+         procedure Iterate is
+           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
+                                        Process => Register_Mapping);
       begin
          Iterate (Model, Node, "mapping");
       end Register_Mappings;

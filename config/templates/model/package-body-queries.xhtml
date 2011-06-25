@@ -11,6 +11,8 @@
    procedure List (Object  : in out #{fn:capitalize(query.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class) is
+      procedure Read (Into : in out #{fn:capitalize(query.type)});
+#{''}
       Stmt : ADO.Statements.Query_Statement
           := Session.Create_Statement (Context);
       Pos  : Natural := 0;

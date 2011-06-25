@@ -66,6 +66,20 @@ package body Gen.Generator is
    --  EL Function to translate a model type to the key enum value
    function To_Key_Enum (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
+   --  EL function to create an Ada identifier from a file name
+   function To_Ada_Ident (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+
+   --  EL function to indent the code
+   function To_Sql_Type (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+
+   --  EL Function to check whether a type is an integer type
+   function Is_Integer_Type (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+
+   --  EL Function to check whether a type is an date or a time type
+   function Is_Date_Type (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+
+   procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class);
+
    --  ------------------------------
    --  EL Function to translate a model type to an Ada implementation type
    --  Param values:
@@ -79,13 +93,16 @@ package body Gen.Generator is
       use Gen.Model;
       use type Gen.Model.Mappings.Mapping_Definition_Access;
 
+      function To_Ada_Type (Value : in String) return Util.Beans.Objects.Object;
+
 --        Def    : constant Definition_Access := To_Definition_Access (Value);
       Column : Column_Definition_Access := null; --  To_Definition_Access (Value);
 
       function To_Ada_Type (Value : in String) return Util.Beans.Objects.Object is
       begin
          if Value = "String" or Value = "java.lang.String" then
-            return Util.Beans.Objects.To_Object (String '("Ada.Strings.Unbounded.Unbounded_String"));
+            return Util.Beans.Objects.To_Object
+              (String '("Ada.Strings.Unbounded.Unbounded_String"));
          elsif Value = "Integer" or Value = "int" or Value = "java.lang.Integer" then
             return Util.Beans.Objects.To_Object (String '("Integer"));
          elsif Value = "Timestamp" then
@@ -459,6 +476,10 @@ package body Gen.Generator is
       end record;
       type Project_Loader_Access is access all Project_Loader;
 
+      procedure Set_Member (Closure : in out Project_Loader;
+                            Field   : in Project_Fields;
+                            Value   : in Util.Beans.Objects.Object);
+
       --  ------------------------------
       --  Called by the de-serialization when a given field is recognized.
       --  ------------------------------
@@ -534,6 +555,9 @@ package body Gen.Generator is
                            File      : in String;
                            Recursive : in Boolean := False) is
 
+      procedure Collect_Dynamo_Files (List   : in Gen.Utils.String_List.Vector;
+                                      Result : out Gen.Utils.String_List.Vector);
+
       --  ------------------------------
       --  Collect the <b>dynamo.xml</b> files used by the projects.
       --  Keep the list in the dependency order so that it can be used
@@ -563,7 +587,7 @@ package body Gen.Generator is
                  --  Insert only if there is a file.
                  and then Ada.Directories.Exists (Dynamo) then
                   if Has_File then
-                     Result.Delete (Result.Find_Index(Dynamo));
+                     Result.Delete (Result.Find_Index (Dynamo));
                   end if;
                   Result.Append (Dynamo);
 
@@ -713,7 +737,8 @@ package body Gen.Generator is
 
       declare
          View    : constant Components.Root.UIViewRoot := Context.Get_View_Root;
-         Root    : constant access Components.Base.UIComponent'Class := Components.Root.Get_Root (View);
+         Root    : constant access Components.Base.UIComponent'Class
+           := Components.Root.Get_Root (View);
       begin
          App.File.all := Root.Get_Attribute (Context, "file");
       end;

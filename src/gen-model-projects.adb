@@ -73,6 +73,9 @@ package body Gen.Model.Projects is
    procedure Save (Project : in out Project_Definition;
                    Path    : in String) is
       use Util.Streams.Buffered;
+
+      procedure Save_Module (Pos : in Project_Vectors.Cursor);
+
       Output : Util.Serialize.IO.XML.Output_Stream;
 
       procedure Save_Module (Pos : in Project_Vectors.Cursor) is

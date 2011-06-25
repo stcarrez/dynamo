@@ -32,6 +32,15 @@ package body Gen.Commands.Database is
 
    use GNAT.Command_Line;
 
+   --  Check if the database with the given name exists.
+   function Has_Database (DB   : in ADO.Sessions.Session'Class;
+                          Name : in String) return Boolean;
+
+   procedure Create_Database (DB   : in ADO.Sessions.Master_Session;
+                              Name : in String;
+                              User : in String;
+                              Password : in String);
+
    --  ------------------------------
    --  Check if the database with the given name exists.
    --  ------------------------------

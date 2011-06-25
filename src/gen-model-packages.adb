@@ -135,8 +135,11 @@ package body Gen.Model.Packages is
    procedure Prepare (O : in out Package_Definition) is
       use Gen.Model.Tables;
 
+      procedure Prepare_Table (Table : in Table_Definition_Access);
+      procedure Prepare_Tables (Tables : in Table_List.List_Definition);
+
       Used_Types  : Gen.Utils.String_Set.Set;
-       T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
+      T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
 
       procedure Prepare_Table (Table : in Table_Definition_Access) is
          C     : Column_List.Cursor := Table.Members.First;
@@ -166,7 +169,8 @@ package body Gen.Model.Packages is
       begin
          while Table_List.Has_Element (Table_Iter) loop
             declare
-               Table : constant Table_Definition_Access := Table_Definition_Access (Table_List.Element (Table_Iter));
+               Table : constant Table_Definition_Access
+                 := Table_Definition_Access (Table_List.Element (Table_Iter));
             begin
                Prepare_Table (Table);
             end;

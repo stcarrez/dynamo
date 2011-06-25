@@ -47,7 +47,7 @@ package body Gen.Utils is
    --  Get the content of the node
    --  ------------------------------
    function Get_Data_Content (Node : in DOM.Core.Node) return String is
-      Nodes  : DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
+      Nodes  : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
       S      : constant Natural   := DOM.Core.Nodes.Length (Nodes);
       Result : Unbounded_String;
    begin

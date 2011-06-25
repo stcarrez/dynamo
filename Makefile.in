@@ -1,6 +1,7 @@
 # You may edit this makefile as long as you keep these original 
 # target names defined.
-GNATMAKE=gprbuild
+MODE=debug
+GNATMAKE=gprbuild -XMODE=${MODE} -XPROCESSORS=4
 GNATCLEAN=gprclean
 GPRPATH=dynamo.gpr
 

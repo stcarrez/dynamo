@@ -251,16 +251,17 @@ package body Aspects is
    ----------------
 
    procedure Tree_Write is
-      Node : Node_Id := Empty;
-      List : List_Id;
+--        Node : Node_Id := Empty;
+--        List : List_Id;
    begin
---  SCz    Aspect_Specifications_Hash_Table.Get_First; -- (Node); --  SCz , List);
-      loop
-         Tree_Write_Int (Int (Node));
-         Tree_Write_Int (Int (List));
-         exit when List = No_List;
---  SCz         Aspect_Specifications_Hash_Table.Get_Next (Node); --  SCz, List);
-      end loop;
+--        Aspect_Specifications_Hash_Table.Get_First (Node, List);
+--        loop
+--           Tree_Write_Int (Int (Node));
+--           Tree_Write_Int (Int (List));
+--           exit when List = No_List;
+--           Aspect_Specifications_Hash_Table.Get_Next (Node, List);
+--        end loop;
+      raise Program_Error with "Tree_Write was commended due to compilation errors.";
    end Tree_Write;
 
 --  Package initialization sets up Aspect Id hash table

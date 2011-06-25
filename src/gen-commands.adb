@@ -27,7 +27,6 @@ with Gen.Commands.Layout;
 with Gen.Commands.Model;
 with Gen.Commands.Propset;
 with Gen.Commands.Database;
-with Gen.Commands.Templates;
 with Gen.Commands.Info;
 
 with Util.Log.Loggers;
@@ -42,15 +41,20 @@ package body Gen.Commands is
    Commands : Command_Maps.Map;
 
 
+   --  ------------------------------
    --  Write the command usage.
+   --  ------------------------------
    procedure Usage (Cmd : in Command) is
    begin
       null;
    end Usage;
 
+   --  ------------------------------
    --  Print a message on the standard output.
+   --  ------------------------------
    procedure Print (Cmd     : in Command;
                     Message : in String) is
+      pragma Unreferenced (Cmd);
    begin
       Ada.Text_IO.Put_Line (Message);
    end Print;
@@ -69,7 +73,8 @@ package body Gen.Commands is
       Put_Line ("where:");
       Put_Line ("   -o directory Directory where the Ada mapping files are generated");
       Put_Line ("   -t templates Directory where the Ada templates are defined");
-      Put_Line ("   -c dir       Directory where the Ada templates and configurations are defined");
+      Put_Line ("   -c dir       Directory where the Ada templates "
+                & "and configurations are defined");
    end Usage;
 
    --  ------------------------------
@@ -78,6 +83,8 @@ package body Gen.Commands is
    procedure Execute (Cmd       : in Help_Command;
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
+
+      procedure Print (Position : in Command_Maps.Cursor);
 
       use Ada.Text_IO;
       use GNAT.Command_Line;
@@ -91,6 +98,8 @@ package body Gen.Commands is
       Name : constant String := Get_Argument;
 
    begin
+      Log.Debug ("Execute command {0}", Name);
+
       if Name'Length = 0 then
          Usage;
          New_Line;

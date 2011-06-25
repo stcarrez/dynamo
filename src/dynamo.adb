@@ -36,6 +36,9 @@ procedure Dynamo is
    use Ada.Command_Line;
    use Gen.Commands;
 
+   procedure Set_Config_Directory (Path   : in String;
+                                   Silent : in Boolean := False);
+
    Out_Dir      : Unbounded_String;
    Config_Dir   : Unbounded_String;
    Template_Dir : Unbounded_String;
@@ -71,7 +74,7 @@ begin
    --  Parse the command line
    loop
       case Getopt ("o: t: c:") is
-         when ASCII.Nul => exit;
+         when ASCII.NUL => exit;
 
          when 'o' =>
             Out_Dir := To_Unbounded_String (Parameter & "/");

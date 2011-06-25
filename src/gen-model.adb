@@ -63,7 +63,8 @@ package body Gen.Model is
                   S     : constant Natural            := DOM.Core.Nodes.Length (Nodes);
                begin
                   for J in 0 .. S - 1 loop
-                     Append (Result, DOM.Core.Character_Datas.Data (DOM.Core.Nodes.Item (Nodes, J)));
+                     Append (Result,
+                             DOM.Core.Character_Datas.Data (DOM.Core.Nodes.Item (Nodes, J)));
                   end loop;
                end;
             end if;

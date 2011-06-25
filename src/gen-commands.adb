@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 
 with Ada.Text_IO;
+
 with GNAT.Command_Line;
 with Ada.Command_Line;
 with Gen.Commands.Generate;
@@ -26,9 +27,17 @@ with Gen.Commands.Layout;
 with Gen.Commands.Model;
 with Gen.Commands.Propset;
 with Gen.Commands.Database;
+with Gen.Commands.Templates;
+with Gen.Commands.Info;
+
+with Util.Log.Loggers;
+
 package body Gen.Commands is
 
    use Ada.Strings.Unbounded;
+   use Util.Log;
+
+   Log : constant Loggers.Logger := Loggers.Create ("Gen.Commands");
 
    Commands : Command_Maps.Map;
 
@@ -157,6 +166,9 @@ package body Gen.Commands is
    --  Create database command.
    Database_Cmd       : aliased Gen.Commands.Database.Command;
 
+   --  Project information command.
+   Info_Cmd           : aliased Gen.Commands.Info.Command;
+
    --  Help command.
    Help_Cmd           : aliased Help_Command;
 begin
@@ -168,4 +180,5 @@ begin
    Add_Command (Name => "add-model", Cmd => Add_Model_Cmd'Access);
    Add_Command (Name => "propset", Cmd => Propset_Cmd'Access);
    Add_Command (Name => "create-database", Cmd => Database_Cmd'Access);
+   Add_Command (Name => "info", Cmd => Info_Cmd'Access);
 end Gen.Commands;

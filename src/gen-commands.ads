@@ -20,6 +20,7 @@ with Ada.Strings.Unbounded;
 with Ada.Containers.Ordered_Maps;
 
 with Gen.Generator;
+with Util.Strings.Sets;
 package Gen.Commands is
 
    --  ------------------------------

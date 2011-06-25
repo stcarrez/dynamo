@@ -34,7 +34,7 @@ package body Gen.Commands.Generate is
 
       File_Count : Natural := 0;
    begin
-      Generator.Read_Project ("dynamo.xml");
+      Generator.Read_Project ("dynamo.xml", True);
 
       --  Read the model files.
       loop
@@ -59,6 +59,7 @@ package body Gen.Commands.Generate is
       --  Run the generation.
       Gen.Generator.Prepare (Generator);
       Gen.Generator.Generate_All (Generator);
+      Gen.Generator.Finish (Generator);
    end Execute;
 
    --  ------------------------------

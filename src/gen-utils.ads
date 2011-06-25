@@ -15,9 +15,10 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Containers.Hashed_Sets;
-with Ada.Strings.Unbounded.Hash;
 with Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded.Hash;
+with Ada.Containers.Hashed_Sets;
+with Ada.Containers.Indefinite_Vectors;
 
 with DOM.Core;
 package Gen.Utils is
@@ -46,6 +47,10 @@ package Gen.Utils is
      new Ada.Containers.Hashed_Sets (Element_Type    => Ada.Strings.Unbounded.Unbounded_String,
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Elements => Ada.Strings.Unbounded."=");
+
+   package String_List is new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
+                                                                 Element_Type => String,
+                                                                 "="          => "=");
 
    --  Returns True if the Name is a valid project or module name.
    --  The name must be a valid Ada identifier.

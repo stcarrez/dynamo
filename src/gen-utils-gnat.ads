@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Containers.Indefinite_Vectors;
 
 with Util.Properties;
 
@@ -29,10 +28,6 @@ package Gen.Utils.GNAT is
    --  Directory which contains the GNAT project files installed on the system.
    --  This is overriden by the configuration property 'generator.gnat.projects.dir'.
    DEFAULT_GNAT_PROJECT_DIR : constant String := "/usr/lib/gnat";
-
-   package String_List is new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
-                                                                 Element_Type => String,
-                                                                 "="          => "=");
 
    --  Initialize the GNAT project runtime for reading the GNAT project tree.
    --  Configure it according to the dynamo configuration properties.

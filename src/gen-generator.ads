@@ -69,9 +69,12 @@ package Gen.Generator is
    procedure Read_Models (H : in out Handler;
                           Dirname : in String);
 
-   --  Read the XML project file
-   procedure Read_Project (H    : in out Handler;
-                           File : in String);
+   --  Read the XML project file.  When <b>Recursive</b> is set, read the GNAT project
+   --  files used by the main project and load all the <b>dynamo.xml</b> files defined
+   --  by these project.
+   procedure Read_Project (H         : in out Handler;
+                           File      : in String;
+                           Recursive : in Boolean := False);
 
    --  Read the XML project description into the project description.
    procedure Read_Project (H    : in out Handler;
@@ -79,6 +82,10 @@ package Gen.Generator is
 
    --  Prepare the model by checking, verifying and initializing it after it is completely known.
    procedure Prepare (H : in out Handler);
+
+   --  Finish the generation.  Some artifacts could generate other files that take into
+   --  account files generated previously.
+   procedure Finish (H : in out Handler);
 
    --  Tell the generator to activate the generation of the given template name.
    --  The name is a property name that must be defined in generator.properties to
@@ -142,6 +149,11 @@ package Gen.Generator is
    --  Get the project name.
    function Get_Project_Name (H : in Handler) return String;
 
+   --  Get the GNAT project file name.  The default is to use the Dynamo project
+   --  name and add the <b>.gpr</b> extension.  The <b>gnat.project</b> configuration
+   --  property allows to override this default.
+   function Get_GNAT_Project_Name (H : in Handler) return String;
+
    --  Set the project property.
    procedure Set_Project_Property (H     : in out Handler;
                                    Name  : in String;
@@ -152,6 +164,11 @@ package Gen.Generator is
 
    --  Get the path of the last generated file.
    function Get_Generated_File (H : in Handler) return String;
+
+   --  Update the project model through the <b>Process</b> procedure.
+   procedure Update_Project (H : in out Handler;
+                             Process : not null access
+                               procedure (Project : in out Model.Projects.Project_Definition));
 
 private
 
@@ -184,7 +201,6 @@ private
 
       --  The project document.
       Project : aliased Gen.Model.Projects.Project_Definition;
-      Project_Doc : DOM.Core.Document;
 
       --  Hibernate XML artifact
       Hibernate : Gen.Artifacts.Hibernate.Artifact;

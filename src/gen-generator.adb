@@ -32,9 +32,11 @@ with Util.Beans.Basic;
 with EL.Functions;
 
 with Gen.Utils;
+with Gen.Utils.GNAT;
 with Gen.Model;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
+with Gen.Commands.Templates;
 
 with GNAT.Traceback.Symbolic;
 with Util.Strings;
@@ -280,6 +282,7 @@ package body Gen.Generator is
       Register_Funcs (H);
       H.File := new Util.Beans.Objects.Object;
 
+      Gen.Commands.Templates.Read_Commands (H);
    exception
       when Ada.IO_Exceptions.Name_Error =>
          H.Error ("Cannot load configuration file {0}", Dir & "generator.properties");
@@ -381,6 +384,21 @@ package body Gen.Generator is
    begin
       return To_String (H.Project.Name);
    end Get_Project_Name;
+
+   --  ------------------------------
+   --  Get the GNAT project file name.  The default is to use the Dynamo project
+   --  name and add the <b>.gpr</b> extension.  The <b>gnat.project</b> configuration
+   --  property allows to override this default.
+   --  ------------------------------
+   function Get_GNAT_Project_Name (H : in Handler) return String is
+      Name : constant String := H.Project.Props.Get ("gnat.project", "");
+   begin
+      if Name'Length = 0 then
+         return To_String (H.Project.Name) & ".gpr";
+      else
+         return Name;
+      end if;
+   end Get_GNAT_Project_Name;
 
    --  ------------------------------
    --  Set the project property.
@@ -506,14 +524,87 @@ package body Gen.Generator is
    end Read_Project;
 
    --  ------------------------------
-   --  Read the XML project file
+   --  Read the XML project file.  When <b>Recursive</b> is set, read the GNAT project
+   --  files used by the main project and load all the <b>dynamo.xml</b> files defined
+   --  by these project.
    --  ------------------------------
-   procedure Read_Project (H    : in out Handler;
-                           File : in String) is
+   procedure Read_Project (H         : in out Handler;
+                           File      : in String;
+                           Recursive : in Boolean := False) is
+
+      --  ------------------------------
+      --  Collect the <b>dynamo.xml</b> files used by the projects.
+      --  Keep the list in the dependency order so that it can be used
+      --  to build the database schema and take into account schema dependencies.
+      --  ------------------------------
+      procedure Collect_Dynamo_Files (List   : in Gen.Utils.String_List.Vector;
+                                      Result : out Gen.Utils.String_List.Vector) is
+         use type Gen.Model.Projects.Project_Definition_Access;
+
+         Iter : Gen.Utils.String_List.Cursor := List.First;
+      begin
+         while Gen.Utils.String_List.Has_Element (Iter) loop
+            declare
+               Path     : constant String := Gen.Utils.String_List.Element (Iter);
+               Dir      : constant String := Ada.Directories.Containing_Directory (Path);
+               Dynamo   : constant String := Util.Files.Compose (Dir, "dynamo.xml");
+               Has_File : constant Boolean := Result.Contains (Dynamo);
+               P        : Model.Projects.Project_Definition_Access;
+            begin
+               Gen.Utils.String_List.Next (Iter);
+
+               --  Do not include the 'dynamo.xml' path if it is already in the list
+               --  (this happens if a project uses several GNAT project files).
+               --  We have to make sure that the 'dynamo.xml' stored in the current directory
+               --  appears last in the list.
+               if (not Has_File or else not Gen.Utils.String_List.Has_Element (Iter))
+                 --  Insert only if there is a file.
+                 and then Ada.Directories.Exists (Dynamo) then
+                  if Has_File then
+                     Result.Delete (Result.Find_Index(Dynamo));
+                  end if;
+                  Result.Append (Dynamo);
+
+                  --  Find the project associated with the dynamo.xml file.
+                  --  Create it and load the XML if necessary.
+                  P := H.Project.Find_Project (Dynamo);
+                  if P = null then
+                     P := new Model.Projects.Project_Definition;
+                     P.Path := To_Unbounded_String (Dynamo);
+                     H.Project.Modules.Append (P);
+                     H.Read_Project (Into => P);
+                  end if;
+               end if;
+            end;
+         end loop;
+      end Collect_Dynamo_Files;
+
    begin
       H.Project.Path := To_Unbounded_String (File);
       H.Read_Project (H.Project'Unchecked_Access);
       H.Set_Global ("projectName", H.Get_Project_Name);
+
+      --  When necessary, read the GNAT project files.  We get a list of absolute GNAT path
+      --  files that we can use known the project dependencies with other modules.
+      --  This is useful for database schema generation for example.
+      if Recursive then
+
+         --  Read GNAT project files.
+         declare
+            Name : constant String := H.Get_GNAT_Project_Name;
+         begin
+            Gen.Utils.GNAT.Initialize (H.Conf);
+            Gen.Utils.GNAT.Read_GNAT_Project_List (Name, H.Project.Project_Files);
+            if H.Project.Project_Files.Is_Empty then
+               H.Error ("Error while reading GNAT project {0}", Name);
+               return;
+            end if;
+         end;
+
+         --  Look for the projects that define the 'dynamo.xml' configuration.
+         Collect_Dynamo_Files (H.Project.Project_Files, H.Project.Dynamo_Files);
+
+      end if;
    end Read_Project;
 
    --  ------------------------------
@@ -633,6 +724,16 @@ package body Gen.Generator is
    end Prepare;
 
    --  ------------------------------
+   --  Finish the generation.  Some artifacts could generate other files that take into
+   --  account files generated previously.
+   --  ------------------------------
+   procedure Finish (H : in out Handler) is
+   begin
+      H.Hibernate.Finish (Model => H.Model, Context => H);
+      H.Query.Finish (Model => H.Model, Context => H);
+   end Finish;
+
+   --  ------------------------------
    --  Tell the generator to activate the generation of the given template name.
    --  The name is a property name that must be defined in generator.properties to
    --  indicate the template file.  Several artifacts can trigger the generation
@@ -683,18 +784,27 @@ package body Gen.Generator is
                   Response => Reply);
 
       declare
-         Dir     : constant String := To_String (H.Output_Dir);
-         File    : constant String := Util.Beans.Objects.To_String (H.File.all);
-         Path    : constant String := Util.Files.Compose (Dir, File);
-         Content : Unbounded_String;
+         Dir         : constant String := To_String (H.Output_Dir);
+         File        : constant String := Util.Beans.Objects.To_String (H.File.all);
+         Path        : constant String := Util.Files.Compose (Dir, File);
+         Exists      : constant Boolean := Ada.Directories.Exists (Path);
+         Content     : Unbounded_String;
+         Old_Content : Unbounded_String;
       begin
-         if not H.Force_Save and then Ada.Directories.Exists (Path) then
+         if not H.Force_Save and Exists then
             H.Error ("Cannot generate file: '{0}' exists already.", Path);
          else
             Log.Info ("Generating file '{0}'", Path);
-
             Reply.Read_Content (Content);
-            Util.Files.Write_File (Path => Path, Content => Content);
+
+            if Exists then
+               Util.Files.Read_File (Path     => Path,
+                                     Into     => Old_Content,
+                                     Max_Size => Natural'Last);
+            end if;
+            if not Exists or else Content /= Old_Content then
+               Util.Files.Write_File (Path => Path, Content => Content);
+            end if;
          end if;
       end;
    end Generate;
@@ -801,5 +911,15 @@ package body Gen.Generator is
          H.Error ("Template directory {0} does not exist", Path);
          Log.Info ("Exception: {0}", GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
    end Generate_All;
+
+   --  ------------------------------
+   --  Update the project model through the <b>Process</b> procedure.
+   --  ------------------------------
+   procedure Update_Project (H : in out Handler;
+                             Process : not null access
+                               procedure (Project : in out Model.Projects.Project_Definition)) is
+   begin
+      Process (H.Project);
+   end Update_Project;
 
 end Gen.Generator;

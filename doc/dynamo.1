@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Dynamo" "6 May 2011" ""
+.TH DYNAMO 1 "Dynamo" "26 June 2011" ""
 .SH NAME
 dynamo - Ada Web Application Generator
 .SH SYNOPSIS
@@ -35,6 +35,7 @@ describes how to map a database table into an Ada record type for the
 framework.  The
 .B generate
 command is then used to build the Ada model files from the database mapping files.
+At the same time, it generate the SQL database creation schemas for MySQL and SQLite databases.
 .PP
 The
 .B add-page
@@ -42,6 +43,15 @@ command is then used to add web pages for the application.  When a new applicati
 layout is necessary, the
 .B add-layout
 command can be used.
+.\"
+.PP
+.I dynamo
+uses the
+.B dynamo.xml
+file to get information on the project and customize the generation.  It scans the
+GNAT project files to obtain the dependencies between several
+.I dynamo
+components.
 .\"
 .SH OPTIONS
 The following options are recognized by \fIdynamo\fR:
@@ -62,12 +72,10 @@ templates provided by \fIdynamo\fR.
 .\"
 .SH COMMANDS
 .\"
-.PP
-.I The
-.B create-project
-.I command
-.PP
- \fBcreate-project \fIname\fR\fR
+.SS The create-project command
+.RS 0
+dynamo \fBcreate-project \fIname\fR\fR
+.RE
 .PP
 Create a new project in the current working directory or in the
 directory specified by the
@@ -79,30 +87,27 @@ a Makefile as well as a
 build file.  The application can be immediately compiled to obtain a web server that is ready
 to run.
 .\"
-.PP
-.I The
-.B create-database
-.I command
-.PP
- \fBcreate-database \fIconnection admin-user [admin-password]\fR\fR
+.SS The create-database command
+.RS 0
+dynamo \fBcreate-database \fIconnection admin-user [admin-password]\fR\fR
+.RE
 .PP
 The create-database command creates the database used by the application.
 The database connection string is of the form: 
 .\"
-.PP
+.RS 0
 \fIdriver\fR://\fIhost\fR:\fIport\fR/\fIdatabase\fR
+.RE
 .PP
 The command will connect to the database server specified by the connection string.
 It will use the admin user for this connection. The database is created if it does
 not yet exist. If a user is specified in the connection string, a grant command is
 issued to create that user and allow him to access the new database.
 .\"
-.PP
-.I The
-.B add-layout
-.I command
-.PP
- \fBadd-layout \fIname\fR\fR
+.SS The add-layout command
+.RS 0
+dynamo \fBadd-layout \fIname\fR\fR
+.RE
 .PP
 Create a new XHTML layout file.  The layout file is an XHTML facelet template which can
 be used by a web page to provide a common presentation layout.  When the project is
@@ -112,12 +117,10 @@ can provide different presentation styles.  The layout files are stored in the
 directory.
 .\"
 .\"
-.PP
-.I The
-.B add-page
-.I command
-.PP
- \fBadd-page \fIname\fR\fR
+.SS The add-page command
+.RS 0
+dynamo \fBadd-page \fIname\fR\fR
+.RE
 .PP
 Create a new presentation page.  The presentation page is an XHTML facelet file
 which contains HTML code as well as ASF facelet components.  The presentation
@@ -126,12 +129,10 @@ pages are stored in the
 directory.
 .\"
 .\"
-.PP
-.I The
-.B add-model
-.I command
-.PP
- \fBadd-model [\fImodule\fR] \fIname\fR\fR
+.SS The add-model command
+.RS 0
+dynamo \fBadd-model [\fImodule\fR] \fIname\fR\fR
+.RE
 .PP
 Create a new database table model mapping.  The model mapping is an XML file that
 describes how to map a database table into an Ada type.
@@ -141,24 +142,30 @@ directory.  The database table is mapped to an Ada tagged record in the package
 \fB\fIproject-name\fR\fR.\fImodule\fR.Model\fR if a module name is passed otherwise the package
 will have the name \fB\fIproject-name\fR.Model\fR.  The Ada record will have the name
 \fB\fIname\fR_Ref\fR.
-
 .\"
+.SS The info command
+.RS 0
+dynamo \fBinfo\fR
+.RE
+.PP
+Report information about the current project.  This command scans the GNAT projects to
+find the
+.I dynamo
+components dependencies.  It then lists the GNAT projects and the
+.I dynamo
+components that are used by the current project.
 .\"
-.PP
-.I The
-.B help
-.I command
-.PP
- \fBhelp \fIname\fR\fR
+.SS The help command
+.RS 0
+dynamo \fBhelp \fIname\fR\fR
+.RE
 .PP
 Give an help description about a command.
 .\"
-.PP
-.I The
-.B generate
-.I command
-.PP
- \fBgenerate [\fImodel ... \fR]\fR
+.SS The generate command
+.RS 0
+dynamo \fBgenerate [\fImodel ... \fR]\fR
+.RE
 .PP
 Generate the Ada model implementation from the XML model mappings.
 The Ada model files are generated in the
@@ -170,16 +177,27 @@ command will read all the XML files stored in the
 .B db
 directory.  It will generate all the models found in those files.
 .\"
-.PP
-.I The
-.B propset
-.I command
-.PP
- \fBpropset \fIname value\fR\fR
+.SS The propset command
+.RS 0
+dynamo \fBpropset \fIname value\fR\fR
+.RE
 .PP
 Set a project property to configure some commands provided by
 \fBdynamo\fR.  The property is composed of a name and a value.  It is saved in
 the \fBdynamo.xml\fR file.
+.\"
+.SH FILES
+.SS /usr/share/dynamo/generator.properties
+This configuration file is read by
+.I dynamo
+to configure various installation parameters necessary for the generation.
+.\"
+.SS /usr/share/dynamo/AdaMappings.xml
+This XML file defines the type mapping used in the
+.I dynamo
+model files.  This mapping indicates for each basic type used in the
+XML model files, what is the target Ada type name.
+.\"
 .\"
 .SH SEE ALSO
 \fIgnatmake(1)\fR, \fIgcc(1)\fR

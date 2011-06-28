@@ -284,9 +284,14 @@ package body Gen.Generator is
 
       Dir     : constant String := Ada.Strings.Unbounded.To_String (Config_Dir);
       Factory : ASF.Applications.Main.Application_Factory;
+      Path    : constant String := Compose (Dir, "generator.properties");
    begin
-      H.Conf.Load_Properties (Path => Compose (Dir, "generator.properties"));
-
+      begin
+         H.Conf.Load_Properties (Path => Path);
+      exception
+         when Ada.IO_Exceptions.Name_Error =>
+            H.Error ("Cannot load configuration file {0}", Path);
+      end;
       H.Conf.Set (ASF.Applications.VIEW_DIR, Compose (Dir,  "templates"));
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
@@ -301,10 +306,12 @@ package body Gen.Generator is
       Register_Funcs (H);
       H.File := new Util.Beans.Objects.Object;
 
-      Gen.Commands.Templates.Read_Commands (H);
-   exception
-      when Ada.IO_Exceptions.Name_Error =>
-         H.Error ("Cannot load configuration file {0}", Dir & "generator.properties");
+      begin
+         Gen.Commands.Templates.Read_Commands (H);
+      exception
+         when Ada.IO_Exceptions.Name_Error =>
+            H.Error ("Cannot read external commands");
+      end;
    end Initialize;
 
    --  ------------------------------

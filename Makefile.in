@@ -77,7 +77,7 @@ DISTFILES=README LICENSE.txt NOTICE.txt CHANGES config.guess configure config.su
 configure.in Makefile.in install-sh ChangeLog \
 dynamo.gpr.in config.gpr \
 src \
-bin obj config doc
+bin obj config doc db
 
 dist:
 	-rm -rf $(distdir)
@@ -104,22 +104,22 @@ dist:
 
 # Update src/gen.ads with the latest SVN revision number.
 version:
-	gnatprep -DCONFIG_DIR='"$(config_dir)"' \
+	gnatprep -DCONFIG_DIR='"$(config_dir)"/base' \
 	   `svn info | grep '^[UR][eR][Lv]' | sed -e 's,URL: \(.*\),-DURL="\1",' -e 's,Revision: ,-DREVISION=,'` \
 		  src/gen.gpb src/gen.ads
 
 install:	  install_dirs
 	$(INSTALL) bin/dynamo $(prefix)/bin/dynamo
 	$(INSTALL) doc/dynamo.1 $(prefix)/share/man/man1/dynamo.1
-	$(CP) config/*.properties $(prefix)/share/dynamo
-	$(CP) config/*.xml $(prefix)/share/dynamo
-	-rm -rf $(prefix)/share/dynamo/templates
-	$(CP) -r config/templates $(prefix)/share/dynamo
-	$(CP) -r db $(prefix)/share/dynamo/db
+	$(CP) config/*.properties $(prefix)/share/dynamo/base
+	$(CP) config/*.xml $(prefix)/share/dynamo/base
+	-rm -rf $(prefix)/share/dynamo/base/templates
+	$(CP) -r config/templates $(prefix)/share/dynamo/base
+	$(CP) -r db $(prefix)/share/dynamo/base/db
 
 install_dirs:
 	${MKDIR} -p ${bindir}
-	${MKDIR} -p ${prefix}/share/dynamo
+	${MKDIR} -p ${prefix}/share/dynamo/base
 
 
 # prepare before releasing a new version of the package

@@ -83,6 +83,10 @@ License along with GCC; see the file COPYING3.  If not see
 
 #define concat internal_concat
 
+#ifndef XNEWVEC
+# define XNEWVEC(T,N) ((T*) xmalloc (sizeof (T) * (N)))
+#endif
+
 void* xmalloc (size_t size)
 {
   return malloc (size);

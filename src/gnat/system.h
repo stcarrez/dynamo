@@ -335,7 +335,7 @@ extern int errno;
 #define CEIL(x,y) (((x) + (y) - 1) / (y))
 
 #ifdef HAVE_SYS_WAIT_H
-#include <sys/wait.h>
+/* #include <sys/wait.h> */
 #endif
 
 #ifndef WIFSIGNALED
@@ -366,7 +366,7 @@ extern int errno;
 #endif
 
 #ifdef HAVE_SYS_MMAN_H
-# include <sys/mman.h>
+/* # include <sys/mman.h> */
 #endif
 
 #ifndef MAP_FAILED
@@ -378,11 +378,11 @@ extern int errno;
 #endif
 
 #ifdef HAVE_SYS_RESOURCE_H
-# include <sys/resource.h>
+/* # include <sys/resource.h> */
 #endif
 
 #ifdef HAVE_SYS_TIMES_H
-# include <sys/times.h>
+/* # include <sys/times.h> */
 #endif
 
 /* The HAVE_DECL_* macros are three-state, undefined, 0 or 1.  If they
@@ -585,11 +585,11 @@ extern int vsnprintf(char *, size_t, const char *, va_list);
 
 #if defined (ENABLE_PLUGIN) && defined (HAVE_DLFCN_H)
 /* If plugin support is enabled, we could use libdl.  */
-#include <dlfcn.h>
+/* #include <dlfcn.h> */
 #endif
 
 /* Get libiberty declarations.  */
-#include "libiberty.h"
+/* #include "libiberty.h" */
 
 /* Provide a default for the HOST_BIT_BUCKET.
    This suffices for POSIX-like hosts.  */

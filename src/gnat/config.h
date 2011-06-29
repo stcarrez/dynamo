@@ -7,4 +7,13 @@
 #ifdef IN_GCC
 # include "ansidecl.h"
 #endif
+
+#ifndef ATTRIBUTE_NORETURN
+# define ATTRIBUTE_NORETURN
+#endif
+
+#ifndef ATTRIBUTE_UNUSED
+# define ATTRIBUTE_UNUSED
+#endif
+
 #endif /* GCC_CONFIG_H */

@@ -33,7 +33,7 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-#include "mingw32.h"
+/* #include "mingw32.h" */
 #endif
 
 #include <dirent.h>

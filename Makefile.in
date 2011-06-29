@@ -121,6 +121,10 @@ install_dirs:
 	${MKDIR} -p ${bindir}
 	${MKDIR} -p ${prefix}/share/dynamo/base
 
+uninstall:
+	rm -rf ${prefix}/share/dynamo/base
+	rm -f ${bindir}/dynamo
+	rm -f $(prefix)/share/man/man1/dynamo.1
 
 # prepare before releasing a new version of the package
 # (collect information about changes and SVN repository)

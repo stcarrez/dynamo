@@ -104,7 +104,7 @@ dist:
 
 # Update src/gen.ads with the latest SVN revision number.
 version:
-	gnatprep -DCONFIG_DIR='"$(config_dir)"/base' \
+	gnatprep -DCONFIG_DIR='"$(config_dir)/base"' \
 	   `svn info | grep '^[UR][eR][Lv]' | sed -e 's,URL: \(.*\),-DURL="\1",' -e 's,Revision: ,-DREVISION=,'` \
 		  src/gen.gpb src/gen.ads
 

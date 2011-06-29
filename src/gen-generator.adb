@@ -574,13 +574,48 @@ package body Gen.Generator is
                                       Result : out Gen.Utils.String_List.Vector) is
          use type Gen.Model.Projects.Project_Definition_Access;
 
+         function Get_Dynamo_Path (Project_Path : in String) return String;
+
          Iter : Gen.Utils.String_List.Cursor := List.First;
+
+         --  ------------------------------
+         --  Find the Dynamo.xml path associated with the given GNAT project file.
+         --  ------------------------------
+         function Get_Dynamo_Path (Project_Path : in String) return String is
+            Name   : constant String := Ada.Directories.Base_Name (Project_Path);
+            Pos    : Natural;
+         begin
+            --  Check in the directory which contains the project file.
+            declare
+               Dir    : constant String := Ada.Directories.Containing_Directory (Project_Path);
+               Dynamo : constant String := Util.Files.Compose (Dir, "dynamo.xml");
+            begin
+               if Ada.Directories.Exists (Dynamo) then
+                  return Dynamo;
+               end if;
+            end;
+
+            Pos := Util.Strings.Index (Name, '.');
+            if Pos > Name'First then
+               declare
+                  Dir  : constant String := H.Get_Config_Directory;
+                  Path : constant String := Util.Files.Compose (Dir,
+                                                                Name (Name'First .. Pos - 1));
+                  Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+               begin
+                  if Ada.Directories.Exists (Dynamo) then
+                     return Dynamo;
+                  end if;
+               end;
+            end if;
+            return "";
+         end Get_Dynamo_Path;
+
       begin
          while Gen.Utils.String_List.Has_Element (Iter) loop
             declare
                Path     : constant String := Gen.Utils.String_List.Element (Iter);
-               Dir      : constant String := Ada.Directories.Containing_Directory (Path);
-               Dynamo   : constant String := Util.Files.Compose (Dir, "dynamo.xml");
+               Dynamo   : constant String := Get_Dynamo_Path (Path);
                Has_File : constant Boolean := Result.Contains (Dynamo);
                P        : Model.Projects.Project_Definition_Access;
             begin
@@ -592,7 +627,7 @@ package body Gen.Generator is
                --  appears last in the list.
                if (not Has_File or else not Gen.Utils.String_List.Has_Element (Iter))
                  --  Insert only if there is a file.
-                 and then Ada.Directories.Exists (Dynamo) then
+                 and Dynamo'Length > 0 then
                   if Has_File then
                      Result.Delete (Result.Find_Index (Dynamo));
                   end if;

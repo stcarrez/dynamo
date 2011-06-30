@@ -358,6 +358,14 @@ package body Gen.Generator is
    end Get_Config_Directory;
 
    --  ------------------------------
+   --  Get the dynamo installation directory path.
+   --  ------------------------------
+   function Get_Install_Directory (H : in Handler) return String is
+   begin
+      return Ada.Directories.Containing_Directory (To_String (H.Config_Dir));
+   end Get_Install_Directory;
+
+   --  ------------------------------
    --  Get the exit status
    --  Returns 0 if the generation was successful
    --  Returns 1 if there was a generation error
@@ -598,7 +606,7 @@ package body Gen.Generator is
             Pos := Util.Strings.Index (Name, '.');
             if Pos > Name'First then
                declare
-                  Dir  : constant String := H.Get_Config_Directory;
+                  Dir  : constant String := H.Get_Install_Directory;
                   Path : constant String := Util.Files.Compose (Dir,
                                                                 Name (Name'First .. Pos - 1));
                   Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");

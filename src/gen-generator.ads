@@ -126,6 +126,9 @@ package Gen.Generator is
    --  Get the config directory path.
    function Get_Config_Directory (H : in Handler) return String;
 
+   --  Get the dynamo installation directory path.
+   function Get_Install_Directory (H : in Handler) return String;
+
    --  Get the exit status
    --  Returns 0 if the generation was successful
    --  Returns 1 if there was a generation error

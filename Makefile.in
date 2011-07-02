@@ -120,6 +120,7 @@ install:	  install_dirs
 install_dirs:
 	${MKDIR} -p ${bindir}
 	${MKDIR} -p ${prefix}/share/dynamo/base
+	${MKDIR} -p ${prefix}/share/man/man1
 
 uninstall:
 	rm -rf ${prefix}/share/dynamo/base

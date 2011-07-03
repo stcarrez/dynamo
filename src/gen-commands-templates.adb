@@ -18,6 +18,7 @@
 
 with Ada.Text_IO;
 with Ada.IO_Exceptions;
+with Ada.Directories;
 
 with GNAT.Command_Line;
 
@@ -231,9 +232,11 @@ package body Gen.Commands.Templates is
       Cmd_Dir    : constant String := Generator.Get_Parameter ("generator.commands.dir");
       Path       : constant String := Util.Files.Compose (Config_Dir, Cmd_Dir);
    begin
-      Util.Files.Iterate_Files_Path (Path    => Path,
-                                     Pattern => "*.xml",
-                                     Process => Read_Command'Access);
+      if Ada.Directories.Exists (Path) then
+         Util.Files.Iterate_Files_Path (Path    => Path,
+                                        Pattern => "*.xml",
+                                        Process => Read_Command'Access);
+      end if;
    end Read_Commands;
 
 begin

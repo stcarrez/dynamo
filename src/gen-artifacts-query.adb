@@ -154,13 +154,13 @@ package body Gen.Artifacts.Query is
          Table : constant Query_Definition_Access := new Query_Definition;
          Pkg   : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "package");
       begin
-         if Length (Pkg) = 0 then
+         Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
+         Table.Pkg_Name  := Pkg;
+         Iterate_Mapping (Query_Definition (Table.all), Node, "class");
+         Iterate_Query (Query_Definition (Table.all), Node, "query");
+         if Length (Table.Pkg_Name) = 0 then
             Context.Error ("Missing or empty package attribute");
          else
-            Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
-            Table.Pkg_Name  := Pkg;
-            Iterate_Mapping (Query_Definition (Table.all), Node, "class");
-            Iterate_Query (Query_Definition (Table.all), Node, "query");
             Model.Register_Query (Table);
          end if;
 

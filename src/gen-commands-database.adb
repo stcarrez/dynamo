@@ -17,24 +17,50 @@
 -----------------------------------------------------------------------
 
 with GNAT.Command_Line;
+with GNAT.Expect;
+with GNAT.OS_Lib;
 
 with Ada.Text_IO;
 
 with Util.Strings;
+with Util.Files;
+with Util.Log.Loggers;
 
 with ADO.Drivers;
 with ADO.Sessions.Factory;
 with ADO.Statements;
 with ADO.Queries;
 
+with System;
+
 with Gen.Database.Model;
 package body Gen.Commands.Database is
 
    use GNAT.Command_Line;
+   use Util.Log;
+
+   Log : constant Loggers.Logger := Loggers.Create ("Gen.Commands.Database");
 
    --  Check if the database with the given name exists.
    function Has_Database (DB   : in ADO.Sessions.Session'Class;
                           Name : in String) return Boolean;
+
+   --  Expect filter to print the command output/error
+   procedure Command_Output (Descriptor : in GNAT.Expect.Process_Descriptor'Class;
+                             Data       : in String;
+                             Closure    : in System.Address);
+
+   --  Execute the external command <b>Name</b> with the arguments in <b>Args</b>
+   --  and send the content of the file <b>Input</b> to that command.
+   procedure Execute_Command (Name  : in String;
+                              Args  : in GNAT.OS_Lib.Argument_List;
+                              Input : in String);
+
+   --  Create the MySQL tables in the database.  The tables are created by launching
+   --  the external command 'mysql' and using the create-xxx-mysql.sql generated scripts.
+   procedure Create_Mysql_Tables (Name   : in String;
+                                  Model  : in String;
+                                  Config : in ADO.Drivers.Configuration);
 
    procedure Create_Database (DB   : in ADO.Sessions.Master_Session;
                               Name : in String;
@@ -73,6 +99,7 @@ package body Gen.Commands.Database is
       Stmt  : ADO.Statements.Query_Statement := DB.Create_Statement ("create database " & Name);
       Grant : Unbounded_String;
    begin
+      Log.Info ("Executing: create database {0}", Name);
       Stmt.Execute;
 
       Append (Grant, "grant select, insert, update, delete, "
@@ -85,9 +112,91 @@ package body Gen.Commands.Database is
          Append (Grant, " identified by ");
          Append (Grant, Password);
       end if;
+      Log.Info ("Executing: {0}", Grant);
       Stmt := DB.Create_Statement (To_String (Grant));
       Stmt.Execute;
    end Create_Database;
+
+   --  ------------------------------
+   --  Expect filter to print the command output/error
+   --  ------------------------------
+   procedure Command_Output (Descriptor : in GNAT.Expect.Process_Descriptor'Class;
+                             Data       : in String;
+                             Closure    : in System.Address) is
+      pragma Unreferenced (Descriptor, Closure);
+   begin
+      Log.Error ("{0}", Data);
+   end Command_Output;
+
+   --  ------------------------------
+   --  Execute the external command <b>Name</b> with the arguments in <b>Args</b>
+   --  and send the content of the file <b>Input</b> to that command.
+   --  ------------------------------
+   procedure Execute_Command (Name  : in String;
+                              Args  : in GNAT.OS_Lib.Argument_List;
+                              Input : in String) is
+      Proc    : GNAT.Expect.Process_Descriptor;
+      Status  : Integer;
+      Func    : constant GNAT.Expect.Filter_Function := Command_Output'Access;
+      Result  : GNAT.Expect.Expect_Match;
+      Content : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      Util.Files.Read_File (Path => Input, Into => Content);
+      GNAT.Expect.Non_Blocking_Spawn (Descriptor  => Proc,
+                                      Command     => Name,
+                                      Args        => Args,
+                                      Buffer_Size => 4096,
+                                      Err_To_Out  => True);
+      GNAT.Expect.Add_Filter (Descriptor => Proc,
+                              Filter     => Func,
+                              Filter_On  => GNAT.Expect.Output);
+      GNAT.Expect.Send (Descriptor   => Proc,
+                        Str          => Ada.Strings.Unbounded.To_String (Content),
+                        Add_LF       => False,
+                        Empty_Buffer => False);
+      GNAT.Expect.Expect (Proc, Result, ".*");
+      GNAT.Expect.Close (Descriptor => Proc,
+                         Status     => Status);
+      Log.Info ("Exit status: {0}", Integer'Image (Status));
+      if Status /= 12345555 then
+         return;
+      end if;
+   end Execute_Command;
+
+   --  ------------------------------
+   --  Create the MySQL tables in the database.  The tables are created by launching
+   --  the external command 'mysql' and using the create-xxx-mysql.sql generated scripts.
+   --  ------------------------------
+   procedure Create_Mysql_Tables (Name   : in String;
+                                  Model  : in String;
+                                  Config : in ADO.Drivers.Configuration) is
+      Database : constant String := Config.Get_Database;
+      Username : constant String := Config.Get_Property ("user");
+      Password : constant String := Config.Get_Property ("password");
+      File     : constant String := Util.Files.Compose (Model, "create-" & Name & "-mysql.sql");
+   begin
+      if Password'Length > 0 then
+         declare
+            Args : GNAT.OS_Lib.Argument_List (1 .. 5);
+         begin
+            Args (1) := new String '("--user");
+            Args (2) := new String '(Username);
+            Args (3) := new String '("--password");
+            Args (4) := new String '(Password);
+            Args (5) := new String '(Database);
+            Execute_Command ("mysql", Args, File);
+         end;
+      else
+         declare
+            Args : GNAT.OS_Lib.Argument_List (1 .. 3);
+         begin
+            Args (1) := new String '("--user");
+            Args (2) := new String '(Username);
+            Args (3) := new String '(Database);
+            Execute_Command ("mysql", Args, File);
+         end;
+      end if;
+   end Create_Mysql_Tables;
 
    --  ------------------------------
    --  Execute the command with the arguments.
@@ -100,6 +209,7 @@ package body Gen.Commands.Database is
 
       Factory    : ADO.Sessions.Factory.Session_Factory;
 
+      Model      : constant String := Get_Argument;
       Database   : constant String := Get_Argument;
       Username   : constant String := Get_Argument;
       Password   : constant String := Get_Argument;
@@ -107,6 +217,7 @@ package body Gen.Commands.Database is
       Config          : ADO.Drivers.Configuration;
       Root_Connection : Unbounded_String;
       Pos             : Natural;
+
    begin
       Generator.Read_Project ("dynamo.xml");
 
@@ -136,6 +247,7 @@ package body Gen.Commands.Database is
       Factory.Create (To_String (Root_Connection));
 
       declare
+         Name : constant String := Generator.Get_Project_Name;
          DB   : ADO.Sessions.Master_Session := Factory.Get_Master_Session;
       begin
          DB.Begin_Transaction;
@@ -149,10 +261,13 @@ package body Gen.Commands.Database is
                           Config.Get_Property ("user"),
                           Config.Get_Property ("password"));
 
+         Create_Mysql_Tables (Name, Model, Config);
+
          --  Remember the database connection string.
          Generator.Set_Project_Property ("database", Database);
          Generator.Save_Project;
       end;
+
    end Execute;
 
    --  ------------------------------
@@ -164,7 +279,7 @@ package body Gen.Commands.Database is
       use Ada.Text_IO;
    begin
       Put_Line ("create-database: Creates the database");
-      Put_Line ("Usage: create-database CONNECTION ADMIN-USER [ADMIN-PASSWORD]");
+      Put_Line ("Usage: create-database MODEL CONNECTION ADMIN-USER [ADMIN-PASSWORD]");
       New_Line;
       Put_Line ("  Create the database specified by the connection string.");
       Put_Line ("  The connection string has the form:");

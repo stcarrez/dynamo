@@ -729,9 +729,9 @@ package body Gen.Generator is
          Doc  : constant DOM.Core.Document := DOM.Readers.Get_Tree (My_Tree_Reader);
          Root : constant DOM.Core.Element  := DOM.Core.Documents.Get_Element (Doc);
       begin
-         H.Mappings.Initialize (Path => File, Model => H.Model, Node => Root);
-         H.Hibernate.Initialize (Path => File, Model => H.Model, Node => Root);
-         H.Query.Initialize (Path => File, Model => H.Model, Node => Root);
+         H.Mappings.Initialize (Path => File, Model => H.Model, Node => Root, Context => H);
+         H.Hibernate.Initialize (Path => File, Model => H.Model, Node => Root, Context => H);
+         H.Query.Initialize (Path => File, Model => H.Model, Node => Root, Context => H);
       end;
 
 --        DOM.Readers.Free (My_Tree_Reader);
@@ -749,6 +749,7 @@ package body Gen.Generator is
                           Dirname : in String) is
       use Ada.Directories;
       Path    : constant String := Util.Files.Compose (H.Get_Result_Directory, Dirname);
+      Name    : constant String := Ada.Directories.Base_Name (Path);
       Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
       Search  : Search_Type;
       Ent     : Directory_Entry_Type;
@@ -757,12 +758,12 @@ package body Gen.Generator is
 
       --  No argument specified, look at the model files in the db directory.
       if Exists (Path) then
-         if Dirname = "db/regtests" then
-            H.Model.Set_Dirname ("regtests");
-         elsif Dirname = "db/samples" then
-            H.Model.Set_Dirname ("samples");
+         if Name = "regtests" then
+            H.Model.Set_Dirname ("regtests", Path);
+         elsif Name = "samples" then
+            H.Model.Set_Dirname ("samples", Path);
          else
-            H.Model.Set_Dirname ("src");
+            H.Model.Set_Dirname ("src", Path);
          end if;
          Start_Search (Search, Directory => Path, Pattern => "*.xml", Filter => Filter);
          while More_Entries (Search) loop

@@ -282,10 +282,28 @@ package body Gen.Model.Packages is
    --  and others.
    --  ------------------------------
    procedure Set_Dirname (O : in out Model_Definition;
-                          Name : in String) is
+                          Target_Dir : in String;
+                          Model_Dir  : in String) is
    begin
-      O.Dir_Name := To_Unbounded_String (Name);
+      O.Dir_Name := To_Unbounded_String (Target_Dir);
+      O.DB_Name  := To_Unbounded_String (Model_Dir);
    end Set_Dirname;
+
+   --  ------------------------------
+   --  Get the directory name associated with the model.
+   --  ------------------------------
+   function Get_Dirname (O : in Model_Definition) return String is
+   begin
+      return To_String (O.Dir_Name);
+   end Get_Dirname;
+
+   --  ------------------------------
+   --  Get the directory name which contains the model.
+   --  ------------------------------
+   function Get_Model_Directory (O : in Model_Definition) return String is
+   begin
+      return To_String (O.DB_Name);
+   end Get_Model_Directory;
 
    --  ------------------------------
    --  Initialize the model definition instance.

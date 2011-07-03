@@ -45,7 +45,8 @@ package body Gen.Artifacts.Query is
    procedure Initialize (Handler : in Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
-                         Model   : in out Gen.Model.Packages.Model_Definition'Class) is
+                         Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                         Context : in out Generator'Class) is
       pragma Unreferenced (Handler);
 
       procedure Register_Column (Table  : in out Query_Definition;
@@ -153,11 +154,15 @@ package body Gen.Artifacts.Query is
          Table : constant Query_Definition_Access := new Query_Definition;
          Pkg   : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "package");
       begin
-         Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
-         Table.Pkg_Name  := Pkg;
-         Iterate_Mapping (Query_Definition (Table.all), Node, "class");
-         Iterate_Query (Query_Definition (Table.all), Node, "query");
-         Model.Register_Query (Table);
+         if Length (Pkg) = 0 then
+            Context.Error ("Missing or empty package attribute");
+         else
+            Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
+            Table.Pkg_Name  := Pkg;
+            Iterate_Mapping (Query_Definition (Table.all), Node, "class");
+            Iterate_Query (Query_Definition (Table.all), Node, "query");
+            Model.Register_Query (Table);
+         end if;
 
          Log.Info ("Query hash for {0} is {1}", Path, To_String (Hash));
          Table.Sha1 := Util.Encoders.HMAC.SHA1.Sign (Key  => "ADO.Queries",

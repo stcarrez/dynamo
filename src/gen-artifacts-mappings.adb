@@ -42,7 +42,8 @@ package body Gen.Artifacts.Mappings is
    procedure Initialize (Handler : in Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
-                         Model   : in out Gen.Model.Packages.Model_Definition'Class) is
+                         Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                         Context : in out Generator'Class) is
       pragma Unreferenced (Handler, Path);
 
       use Ada.Strings.Unbounded;

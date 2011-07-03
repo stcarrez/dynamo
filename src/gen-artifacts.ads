@@ -54,7 +54,8 @@ package Gen.Artifacts is
    procedure Initialize (Handler : in Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
-                         Model   : in out Gen.Model.Packages.Model_Definition'Class) is abstract;
+                         Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                         Context : in out Generator'Class) is abstract;
 
    --  Prepare the model after all the configuration files have been read and before
    --  actually invoking the generation.

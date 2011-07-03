@@ -99,7 +99,14 @@ package Gen.Model.Packages is
    --  save and build a model in separate directories for the application, the unit tests
    --  and others.
    procedure Set_Dirname (O : in out Model_Definition;
-                          Name : in String);
+                          Target_Dir : in String;
+                          Model_Dir  : in String);
+
+   --  Get the directory name associated with the model.
+   function Get_Dirname (O : in Model_Definition) return String;
+
+   --  Get the directory name which contains the model.
+   function Get_Model_Directory (O : in Model_Definition) return String;
 
    --  Prepare the generation of the package:
    --  o identify the column types which are used
@@ -199,6 +206,9 @@ private
 
       --  Directory associated with the model ('src', 'samples', 'regtests', ...).
       Dir_Name    : Unbounded_String;
+
+      --  Directory that contains the SQL and model files.
+      DB_Name     : Unbounded_String;
    end record;
 
 end Gen.Model.Packages;

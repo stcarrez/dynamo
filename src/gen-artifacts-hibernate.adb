@@ -191,10 +191,12 @@ package body Gen.Artifacts.Hibernate is
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    --  ------------------------------
+   overriding
    procedure Initialize (Handler : in Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
-                         Model   : in out Gen.Model.Packages.Model_Definition'Class) is
+                         Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                         Context : in out Generator'Class) is
       pragma Unreferenced (Handler, Path);
 
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
@@ -253,9 +255,9 @@ package body Gen.Artifacts.Hibernate is
                      Model   : in out Gen.Model.Packages.Model_Definition'Class;
                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                      Context : in out Generator'Class) is
-      pragma Unreferenced (Handler, Model, Context);
+      pragma Unreferenced (Handler, Context);
 
-      procedure Collect_SQL (Project : in Gen.Model.Projects.Project_Definition_Access;
+      procedure Collect_SQL (Project : in Gen.Model.Projects.Project_Definition'Class;
                              Dir     : in String;
                              Driver  : in String;
                              Content : in out Unbounded_String);
@@ -264,12 +266,13 @@ package body Gen.Artifacts.Hibernate is
 
       MySQL_Content  : Unbounded_String;
       Sqlite_Content : Unbounded_String;
+      Model_Dir      : constant String := Model.Get_Model_Directory;
 
       --  ------------------------------
       --  Check if an SQL file exists for the given driver.  If such file exist,
       --  read the content and append it to the <b>Content</b> buffer.
       --  ------------------------------
-      procedure Collect_SQL (Project : in Gen.Model.Projects.Project_Definition_Access;
+      procedure Collect_SQL (Project : in Gen.Model.Projects.Project_Definition'Class;
                              Dir     : in String;
                              Driver  : in String;
                              Content : in out Unbounded_String) is
@@ -306,19 +309,20 @@ package body Gen.Artifacts.Hibernate is
                  := Project.Find_Project (Name);
             begin
                if Prj /= null then
-                  Collect_SQL (Prj, Util.Files.Compose (Dir, "db"), "mysql", MySQL_Content);
-                  Collect_SQL (Prj, Util.Files.Compose (Dir, "db"), "sqlite", Sqlite_Content);
+                  Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), "mysql", MySQL_Content);
+                  Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), "sqlite", Sqlite_Content);
                end if;
             end;
             Gen.Utils.String_List.Next (Iter);
          end loop;
+         Collect_SQL (Project, Model_Dir, "mysql", MySQL_Content);
+         Collect_SQL (Project, Model_Dir, "sqlite", Sqlite_Content);
       end Build_SQL_Schemas;
 
       use Ada.Directories;
 
       Name       : constant String := Project.Get_Project_Name;
-      Result_Dir : constant String := Containing_Directory (To_String (Project.Path));
-      Base_Path  : constant String := Util.Files.Compose (Result_Dir, "db/create-") & Name;
+      Base_Path  : constant String := Util.Files.Compose (Model_Dir, "create-") & Name;
    begin
       Build_SQL_Schemas;
 

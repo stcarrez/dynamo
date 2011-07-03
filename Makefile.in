@@ -115,11 +115,12 @@ install:	  install_dirs
 	$(CP) config/*.xml $(prefix)/share/dynamo/base
 	-rm -rf $(prefix)/share/dynamo/base/templates
 	$(CP) -r config/templates $(prefix)/share/dynamo/base
-	$(CP) -r db $(prefix)/share/dynamo/base/db
+	$(CP) db/*.xml $(prefix)/share/dynamo/base/db
 
 install_dirs:
 	${MKDIR} -p ${bindir}
 	${MKDIR} -p ${prefix}/share/dynamo/base
+	${MKDIR} -p ${prefix}/share/dynamo/base/db
 	${MKDIR} -p ${prefix}/share/man/man1
 
 uninstall:

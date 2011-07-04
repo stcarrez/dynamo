@@ -13,6 +13,11 @@
        <sql>show databases</sql>
     </query>
 
+    <query name='table-list'>
+       <comment>Get the list of tables in the given database.</comment>
+       <sql>show tables from ?</sql>
+    </query>
+
     <query name='create-database'>
        <comment>Create the database</comment>
        <sql>create database #{name}</sql>
@@ -21,7 +26,7 @@
     <query name='create-user'>
        <comment>Create the database</comment>
        <sql>grant select, insert, update, delete, create temporary tables, execute,
-     show view on `#{name}`.* to '#{user}'@'localhost'
+     show view on `:name`.* to :user@'localhost'
      #{not empty password ? ' identified by ' : ''}#{not empty password ? password : ''}
        </sql>
     </query>

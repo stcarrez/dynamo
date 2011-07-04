@@ -30,6 +30,7 @@ with ADO.Drivers;
 with ADO.Sessions.Factory;
 with ADO.Statements;
 with ADO.Queries;
+with ADO.Parameters;
 
 with System;
 
@@ -44,6 +45,10 @@ package body Gen.Commands.Database is
    --  Check if the database with the given name exists.
    function Has_Database (DB   : in ADO.Sessions.Session'Class;
                           Name : in String) return Boolean;
+
+   --  Check if the database with the given name has some tables.
+   function Has_Tables (DB   : in ADO.Sessions.Session'Class;
+                        Name : in String) return Boolean;
 
    --  Expect filter to print the command output/error
    procedure Command_Output (Descriptor : in GNAT.Expect.Process_Descriptor'Class;
@@ -91,6 +96,21 @@ package body Gen.Commands.Database is
       return False;
    end Has_Database;
 
+   --  ------------------------------
+   --  Check if the database with the given name has some tables.
+   --  ------------------------------
+   function Has_Tables (DB   : in ADO.Sessions.Session'Class;
+                        Name : in String) return Boolean is
+      Query : ADO.Queries.Context;
+      Stmt  : ADO.Statements.Query_Statement;
+   begin
+      Query.Set_Query (Gen.Database.Model.Query_Table_List);
+      Stmt := DB.Create_Statement (Query);
+      Stmt.Bind_Param ("name", ADO.Parameters.Token (Name));
+      Stmt.Execute;
+      return Stmt.Has_Elements;
+   end Has_Tables;
+
    procedure Create_Database (DB   : in ADO.Sessions.Master_Session;
                               Name : in String;
                               User : in String;
@@ -102,7 +122,7 @@ package body Gen.Commands.Database is
       Log.Info ("Executing: create database {0}", Name);
       Stmt.Execute;
 
-      Append (Grant, "grant select, insert, update, delete, "
+      Append (Grant, "grant select, insert, update, delete, create, drop, "
               & "create temporary tables, execute, show view on `");
       Append (Grant, Name);
       Append (Grant, "`.* to '");
@@ -112,8 +132,12 @@ package body Gen.Commands.Database is
          Append (Grant, " identified by ");
          Append (Grant, Password);
       end if;
+
       Log.Info ("Executing: {0}", Grant);
       Stmt := DB.Create_Statement (To_String (Grant));
+      Stmt.Execute;
+
+      Stmt := DB.Create_Statement ("flush privileges");
       Stmt.Execute;
    end Create_Database;
 
@@ -252,16 +276,17 @@ package body Gen.Commands.Database is
       begin
          DB.Begin_Transaction;
 
-         if Has_Database (DB, Config.Get_Database) then
-            Generator.Error ("The database {0} exists", Config.Get_Database);
-            return;
+         if not Has_Database (DB, Config.Get_Database) then
+            Create_Database (DB, Config.Get_Database,
+                             Config.Get_Property ("user"),
+                             Config.Get_Property ("password"));
          end if;
 
-         Create_Database (DB, Config.Get_Database,
-                          Config.Get_Property ("user"),
-                          Config.Get_Property ("password"));
-
-         Create_Mysql_Tables (Name, Model, Config);
+         if Has_Tables (DB, Config.Get_Database) then
+            Generator.Error ("The database {0} exists", Config.Get_Database);
+         else
+            Create_Mysql_Tables (Name, Model, Config);
+         end if;
 
          --  Remember the database connection string.
          Generator.Set_Project_Property ("database", Database);

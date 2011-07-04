@@ -264,10 +264,12 @@ package body Gen.Artifacts.Hibernate is
                              Driver  : in String;
                              Content : in out Unbounded_String);
 
-      procedure Build_SQL_Schemas;
+      procedure Build_SQL_Schemas (Driver : in String;
+                                   Prefix : in String;
+                                   Name   : in String;
+                                   Is_Reverse : in Boolean);
 
-      MySQL_Content  : Unbounded_String;
-      Sqlite_Content : Unbounded_String;
+      SQL_Content    : Unbounded_String;
       Model_Dir      : constant String := Model.Get_Model_Directory;
 
       --  ------------------------------
@@ -298,43 +300,58 @@ package body Gen.Artifacts.Hibernate is
       --  ------------------------------
       --  Collect the SQL schemas defined by the projects and modules used by the main project.
       --  ------------------------------
-      procedure Build_SQL_Schemas is
+      procedure Build_SQL_Schemas (Driver     : in String;
+                                   Prefix     : in String;
+                                   Name       : in String;
+                                   Is_Reverse : in Boolean) is
          use type Gen.Model.Projects.Project_Definition_Access;
+         use Ada.Directories;
 
-         Iter : Gen.Utils.String_List.Cursor := Project.Dynamo_Files.First;
+         File_Prefix : constant String := Prefix & Driver;
+         Path        : constant String := Util.Files.Compose (Model_Dir, Name);
+         Pos         : Integer;
+         Incr        : Integer;
       begin
-         while Gen.Utils.String_List.Has_Element (Iter) loop
+         SQL_Content := Null_Unbounded_String;
+         if Is_Reverse then
+            Pos  := Project.Dynamo_Files.Last_Index;
+            Incr := -1;
+            Collect_SQL (Project, Model_Dir, File_Prefix, SQL_Content);
+         else
+            Pos  := Project.Dynamo_Files.First_Index;
+            Incr := 1;
+         end if;
+         while Pos >= Project.Dynamo_Files.First_Index
+           and Pos <= Project.Dynamo_Files.Last_Index loop
             declare
-               Name : constant String := Gen.Utils.String_List.Element (Iter);
+               Name : constant String := Project.Dynamo_Files.Element (Pos);
                Dir  : constant String := Ada.Directories.Containing_Directory (Name);
                Prj  : constant Gen.Model.Projects.Project_Definition_Access
                  := Project.Find_Project (Name);
             begin
                if Prj /= null then
-                  Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), "mysql", MySQL_Content);
-                  Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), "sqlite", Sqlite_Content);
+                  Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), File_Prefix, SQL_Content);
                end if;
             end;
-            Gen.Utils.String_List.Next (Iter);
+            Pos := Pos + Incr;
          end loop;
-         Collect_SQL (Project, Model_Dir, "mysql", MySQL_Content);
-         Collect_SQL (Project, Model_Dir, "sqlite", Sqlite_Content);
+         if not Is_Reverse then
+            Collect_SQL (Project, Model_Dir, File_Prefix, SQL_Content);
+         end if;
+
+         Log.Info ("Generating " & Driver & " creation schema in '{0}'",
+                   Path & "-" & Driver & ".sql");
+         Util.Files.Write_File (Path    => Path & "-" & Driver & ".sql",
+                                Content => SQL_Content);
+
       end Build_SQL_Schemas;
 
-      use Ada.Directories;
-
       Name       : constant String := Project.Get_Project_Name;
-      Base_Path  : constant String := Util.Files.Compose (Model_Dir, "create-") & Name;
    begin
-      Build_SQL_Schemas;
-
-      Log.Info ("Generating MySQL creation schema in '{0}'", Base_Path & "-mysql.sql");
-      Util.Files.Write_File (Path    => Base_Path & "-mysql.sql",
-                             Content => MySQL_Content);
-
-      Log.Info ("Generating Sqlite creation schema in '{0}'", Base_Path & "-sqlite.sql");
-      Util.Files.Write_File (Path    => Base_Path & "-sqlite.sql",
-                             Content => Sqlite_Content);
+      Build_SQL_Schemas ("mysql", "", "create-" & Name, False);
+      Build_SQL_Schemas ("sqlite", "", "create-" & Name, False);
+      Build_SQL_Schemas ("mysql", "drop-", "drop-" & Name, True);
+      Build_SQL_Schemas ("sqlite", "drop-", "drop-" & Name, True);
    end Finish;
 
 end Gen.Artifacts.Hibernate;

@@ -161,6 +161,13 @@ package Gen.Generator is
                                    Name  : in String;
                                    Value : in String);
 
+   --  Get the project property identified by the given name.  If the project property
+   --  does not exist, returns the default value.  Project properties are loaded
+   --  by <b>Read_Project</b>.
+   function Get_Project_Property (H       : in Handler;
+                                  Name    : in String;
+                                  Default : in String := "") return String;
+
    --  Save the project description and parameters.
    procedure Save_Project (H : in out Handler);
 

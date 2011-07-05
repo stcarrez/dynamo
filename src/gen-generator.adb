@@ -447,6 +447,18 @@ package body Gen.Generator is
    end Set_Project_Property;
 
    --  ------------------------------
+   --  Get the project property identified by the given name.  If the project property
+   --  does not exist, returns the default value.  Project properties are loaded
+   --  by <b>Read_Project</b>.
+   --  ------------------------------
+   function Get_Project_Property (H       : in Handler;
+                                  Name    : in String;
+                                  Default : in String := "") return String is
+   begin
+      return H.Project.Props.Get (Name, Default);
+   end Get_Project_Property;
+
+   --  ------------------------------
    --  Save the project description and parameters.
    --  ------------------------------
    procedure Save_Project (H : in out Handler) is

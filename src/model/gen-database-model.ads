@@ -155,7 +155,11 @@ package Gen.Database.Model is
 
    Query_Create_Database : constant ADO.Queries.Query_Definition_Access;
 
-   Query_Create_User : constant ADO.Queries.Query_Definition_Access;
+   Query_Create_User_No_Password : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Create_User_With_Password : constant ADO.Queries.Query_Definition_Access;
+
+   Query_Flush_Privileges : constant ADO.Queries.Query_Definition_Access;
 
 
 private
@@ -229,9 +233,21 @@ private
    Query_Create_Database : constant ADO.Queries.Query_Definition_Access
    := Def_Databaseinfo_Create_Database.Query'Access;
 
-   package Def_Databaseinfo_Create_User is
-      new ADO.Queries.Loaders.Query (Name => "create-user",
+   package Def_Databaseinfo_Create_User_No_Password is
+      new ADO.Queries.Loaders.Query (Name => "create-user-no-password",
                                      File => File_Databaseinfo.File'Access);
-   Query_Create_User : constant ADO.Queries.Query_Definition_Access
-   := Def_Databaseinfo_Create_User.Query'Access;
+   Query_Create_User_No_Password : constant ADO.Queries.Query_Definition_Access
+   := Def_Databaseinfo_Create_User_No_Password.Query'Access;
+
+   package Def_Databaseinfo_Create_User_With_Password is
+      new ADO.Queries.Loaders.Query (Name => "create-user-with-password",
+                                     File => File_Databaseinfo.File'Access);
+   Query_Create_User_With_Password : constant ADO.Queries.Query_Definition_Access
+   := Def_Databaseinfo_Create_User_With_Password.Query'Access;
+
+   package Def_Databaseinfo_Flush_Privileges is
+      new ADO.Queries.Loaders.Query (Name => "flush-privileges",
+                                     File => File_Databaseinfo.File'Access);
+   Query_Flush_Privileges : constant ADO.Queries.Query_Definition_Access
+   := Def_Databaseinfo_Flush_Privileges.Query'Access;
 end Gen.Database.Model;

@@ -15,19 +15,33 @@
 
     <query name='table-list'>
        <comment>Get the list of tables in the given database.</comment>
-       <sql>show tables from ?</sql>
+       <sql driver='mysql'>show tables from :name</sql>
     </query>
 
     <query name='create-database'>
        <comment>Create the database</comment>
-       <sql>create database #{name}</sql>
+       <sql driver='mysql'>create database :name</sql>
     </query>
 
-    <query name='create-user'>
-       <comment>Create the database</comment>
-       <sql>grant select, insert, update, delete, create temporary tables, execute,
+    <query name='create-user-no-password'>
+       <comment>Create the user grant</comment>
+       <sql driver='mysql'>grant select, insert, update, delete,
+     create, drop, create temporary tables, execute,
      show view on `:name`.* to :user@'localhost'
-     #{not empty password ? ' identified by ' : ''}#{not empty password ? password : ''}
        </sql>
     </query>
+
+    <query name='create-user-with-password'>
+       <comment>Create the user grant</comment>
+       <sql driver='mysql'>grant select, insert, update, delete,
+     create temporary tables, execute,
+     show view on `:name`.* to :user@'localhost' identified by :password
+       </sql>
+    </query>
+
+    <query name='flush-privileges'>
+       <comment>Flush the grant privileges</comment>
+       <sql driver='mysql'>flush privileges</sql>
+    </query>
+   
 </query-mapping>

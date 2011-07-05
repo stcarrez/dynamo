@@ -21,6 +21,7 @@ with GNAT.Expect;
 with GNAT.OS_Lib;
 
 with Ada.Text_IO;
+with Ada.Strings.Fixed;
 
 with Util.Strings;
 with Util.Files;
@@ -67,10 +68,15 @@ package body Gen.Commands.Database is
                                   Model  : in String;
                                   Config : in ADO.Drivers.Configuration);
 
+   --  Create the database identified by the given name.
    procedure Create_Database (DB   : in ADO.Sessions.Master_Session;
-                              Name : in String;
-                              User : in String;
-                              Password : in String);
+                              Name : in String);
+
+   --  Create the user and grant him access to the database.
+   procedure Create_User_Grant (DB       : in ADO.Sessions.Master_Session;
+                                Name     : in String;
+                                User     : in String;
+                                Password : in String);
 
    --  ------------------------------
    --  Check if the database with the given name exists.
@@ -111,35 +117,55 @@ package body Gen.Commands.Database is
       return Stmt.Has_Elements;
    end Has_Tables;
 
+   --  ------------------------------
+   --  Create the database identified by the given name.
+   --  ------------------------------
    procedure Create_Database (DB   : in ADO.Sessions.Master_Session;
-                              Name : in String;
-                              User : in String;
-                              Password : in String) is
+                              Name : in String) is
       use Ada.Strings.Unbounded;
-      Stmt  : ADO.Statements.Query_Statement := DB.Create_Statement ("create database " & Name);
-      Grant : Unbounded_String;
+      Query : ADO.Queries.Context;
+      Stmt  : ADO.Statements.Query_Statement;
    begin
       Log.Info ("Executing: create database {0}", Name);
-      Stmt.Execute;
 
-      Append (Grant, "grant select, insert, update, delete, create, drop, "
-              & "create temporary tables, execute, show view on `");
-      Append (Grant, Name);
-      Append (Grant, "`.* to '");
-      Append (Grant, User);
-      Append (Grant, "'@'localhost'");
-      if Password'Length > 0 then
-         Append (Grant, " identified by ");
-         Append (Grant, Password);
-      end if;
-
-      Log.Info ("Executing: {0}", Grant);
-      Stmt := DB.Create_Statement (To_String (Grant));
-      Stmt.Execute;
-
-      Stmt := DB.Create_Statement ("flush privileges");
+      Query.Set_Query (Gen.Database.Model.Query_Create_Database);
+      Stmt := DB.Create_Statement (Query);
+      Stmt.Bind_Param ("name", ADO.Parameters.Token (Name));
       Stmt.Execute;
    end Create_Database;
+
+   --  ------------------------------
+   --  Create the user and grant him access to the database.
+   --  ------------------------------
+   procedure Create_User_Grant (DB       : in ADO.Sessions.Master_Session;
+                                Name     : in String;
+                                User     : in String;
+                                Password : in String) is
+      use Ada.Strings.Unbounded;
+
+      Query : ADO.Queries.Context;
+      Stmt  : ADO.Statements.Query_Statement;
+   begin
+      Log.Info ("Grant access for user '{0}' to database {1}", User, Name);
+
+      if Password'Length > 0 then
+         Query.Set_Query (Gen.Database.Model.Query_Create_User_With_Password);
+      else
+         Query.Set_Query (Gen.Database.Model.Query_Create_User_No_Password);
+      end if;
+
+      Stmt := DB.Create_Statement (Query);
+      Stmt.Bind_Param ("name", ADO.Parameters.Token (Name));
+      Stmt.Bind_Param ("user", ADO.Parameters.Token (User));
+      if Password'Length > 0 then
+         Stmt.Bind_Param ("password", Password);
+      end if;
+      Stmt.Execute;
+
+      Query.Set_Query (Gen.Database.Model.Query_Flush_Privileges);
+      Stmt := DB.Create_Statement (Query);
+      Stmt.Execute;
+   end Create_User_Grant;
 
    --  ------------------------------
    --  Expect filter to print the command output/error
@@ -231,68 +257,100 @@ package body Gen.Commands.Database is
 
       use Ada.Strings.Unbounded;
 
-      Factory    : ADO.Sessions.Factory.Session_Factory;
+      procedure Create_Database (Model    : in String;
+                                 Database : in String;
+                                 Username : in String;
+                                 Password : in String);
 
-      Model      : constant String := Get_Argument;
-      Database   : constant String := Get_Argument;
-      Username   : constant String := Get_Argument;
-      Password   : constant String := Get_Argument;
+      --  ------------------------------
+      --  Create the database, the user and the tables.
+      --  ------------------------------
+      procedure Create_Database (Model    : in String;
+                                 Database : in String;
+                                 Username : in String;
+                                 Password : in String) is
+         Factory         : ADO.Sessions.Factory.Session_Factory;
+         Config          : ADO.Drivers.Configuration;
+         Root_Connection : Unbounded_String;
+         Pos             : Natural;
+      begin
+         Config.Set_Connection (Database);
 
-      Config          : ADO.Drivers.Configuration;
-      Root_Connection : Unbounded_String;
-      Pos             : Natural;
+         --  Build a connection string to create the database.
+         Pos := Util.Strings.Index (Database, ':');
+         Append (Root_Connection, Database (Database'First .. Pos));
+         Append (Root_Connection, "//");
+         Append (Root_Connection, Config.Get_Server);
+         if Config.Get_Port > 0 then
+            Append (Root_Connection, ':');
+            Append (Root_Connection, Util.Strings.Image (Config.Get_Port));
+         end if;
+         Append (Root_Connection, "/?user=");
+         Append (Root_Connection, Username);
+         if Password'Length > 0 then
+            Append (Root_Connection, "&password=");
+            Append (Root_Connection, Password);
+         end if;
 
+         --  Initialize the session factory to connect to the
+         --  database defined by root connection (which should allow the database creation).
+         Factory.Create (To_String (Root_Connection));
+
+         declare
+            Name : constant String := Generator.Get_Project_Name;
+            DB   : constant ADO.Sessions.Master_Session := Factory.Get_Master_Session;
+         begin
+            --  Create the database only if it does not already exists.
+            if not Has_Database (DB, Config.Get_Database) then
+               Create_Database (DB, Config.Get_Database);
+            end if;
+
+            --  If some tables exist, don't try to create tables again.
+            --  We could improve by reading the current database schema, comparing with our
+            --  schema and create what is missing (new tables, new columns).
+            if Has_Tables (DB, Config.Get_Database) then
+               Generator.Error ("The database {0} exists", Config.Get_Database);
+            else
+               --  Create the user grant.  On MySQL, it is safe to do this several times.
+               Create_User_Grant (DB, Config.Get_Database,
+                                  Config.Get_Property ("user"),
+                                  Config.Get_Property ("password"));
+
+               --  And now create the tables by using the SQL script generated by Dyanmo.
+               Create_Mysql_Tables (Name, Model, Config);
+            end if;
+
+            --  Remember the database connection string.
+            Generator.Set_Project_Property ("database", Database);
+            Generator.Save_Project;
+         end;
+      end Create_Database;
+
+      Model  : constant String := Get_Argument;
+      Arg1   : constant String := Get_Argument;
+      Arg2   : constant String := Get_Argument;
+      Arg3   : constant String := Get_Argument;
    begin
       Generator.Read_Project ("dynamo.xml");
 
       --  Initialize the database drivers.
       ADO.Drivers.Initialize (Generator.Get_Properties);
 
-      Config.Set_Connection (Database);
-
-      --  Build a connection string to create the database.
-      Pos := Util.Strings.Index (Database, ':');
-      Append (Root_Connection, Database (Database'First .. Pos));
-      Append (Root_Connection, "//");
-      Append (Root_Connection, Config.Get_Server);
-      if Config.Get_Port > 0 then
-         Append (Root_Connection, ':');
-         Append (Root_Connection, Util.Strings.Image (Config.Get_Port));
+      --  Check if a database is specified in the command line and use it.
+      if Ada.Strings.Fixed.Index (Arg1, "://") > 0 or Arg3'Length > 0 then
+         Create_Database (Model, Arg1, Arg2, Arg3);
+      else
+         declare
+            Database : constant String := Generator.Get_Project_Property ("database");
+         begin
+            --  Otherwise, get the database identification from dynamo.xml configuration.
+            if Ada.Strings.Fixed.Index (Database, "://") = 0 then
+               Generator.Error ("No database specified.");
+               return;
+            end if;
+            Create_Database (Model, Database, Arg1, Arg2);
+         end;
       end if;
-      Append (Root_Connection, "/?user=");
-      Append (Root_Connection, Username);
-      if Password'Length > 0 then
-         Append (Root_Connection, "&password=");
-         Append (Root_Connection, Password);
-      end if;
-
-      --  Initialize the session factory to connect to the
-      --  database defined by root connection (which should allow the database creation).
-      Factory.Create (To_String (Root_Connection));
-
-      declare
-         Name : constant String := Generator.Get_Project_Name;
-         DB   : ADO.Sessions.Master_Session := Factory.Get_Master_Session;
-      begin
-         DB.Begin_Transaction;
-
-         if not Has_Database (DB, Config.Get_Database) then
-            Create_Database (DB, Config.Get_Database,
-                             Config.Get_Property ("user"),
-                             Config.Get_Property ("password"));
-         end if;
-
-         if Has_Tables (DB, Config.Get_Database) then
-            Generator.Error ("The database {0} exists", Config.Get_Database);
-         else
-            Create_Mysql_Tables (Name, Model, Config);
-         end if;
-
-         --  Remember the database connection string.
-         Generator.Set_Project_Property ("database", Database);
-         Generator.Save_Project;
-      end;
-
    end Execute;
 
    --  ------------------------------
@@ -304,7 +362,7 @@ package body Gen.Commands.Database is
       use Ada.Text_IO;
    begin
       Put_Line ("create-database: Creates the database");
-      Put_Line ("Usage: create-database MODEL CONNECTION ADMIN-USER [ADMIN-PASSWORD]");
+      Put_Line ("Usage: create-database MODEL [CONNECTION] ADMIN-USER [ADMIN-PASSWORD]");
       New_Line;
       Put_Line ("  Create the database specified by the connection string.");
       Put_Line ("  The connection string has the form:");

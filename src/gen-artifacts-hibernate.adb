@@ -262,6 +262,7 @@ package body Gen.Artifacts.Hibernate is
       procedure Collect_SQL (Project : in Gen.Model.Projects.Project_Definition'Class;
                              Dir     : in String;
                              Driver  : in String;
+                             Prefix  : in String;
                              Content : in out Unbounded_String);
 
       procedure Build_SQL_Schemas (Driver : in String;
@@ -279,9 +280,12 @@ package body Gen.Artifacts.Hibernate is
       procedure Collect_SQL (Project : in Gen.Model.Projects.Project_Definition'Class;
                              Dir     : in String;
                              Driver  : in String;
+                             Prefix  : in String;
                              Content : in out Unbounded_String) is
          Name : constant String := Project.Get_Project_Name;
-         Path : constant String := Util.Files.Compose (Dir, Name & "-" & Driver & ".sql");
+         Dir2 : constant String := Util.Files.Compose (Dir, Driver);
+         Path : constant String := Util.Files.Compose (Dir2, Name & "-"
+                                                       & Prefix & Driver & ".sql");
          SQL  : Unbounded_String;
       begin
          Log.Debug ("Checking SQL file {0}", Path);
@@ -307,8 +311,8 @@ package body Gen.Artifacts.Hibernate is
          use type Gen.Model.Projects.Project_Definition_Access;
          use Ada.Directories;
 
-         File_Prefix : constant String := Prefix & Driver;
-         Path        : constant String := Util.Files.Compose (Model_Dir, Name);
+         Out_Dir     : constant String := Util.Files.Compose (Model_Dir, Driver);
+         Path        : constant String := Util.Files.Compose (Out_Dir, Name);
          Pos         : Integer;
          Incr        : Integer;
       begin
@@ -316,7 +320,7 @@ package body Gen.Artifacts.Hibernate is
          if Is_Reverse then
             Pos  := Project.Dynamo_Files.Last_Index;
             Incr := -1;
-            Collect_SQL (Project, Model_Dir, File_Prefix, SQL_Content);
+            Collect_SQL (Project, Model_Dir, Driver, Prefix, SQL_Content);
          else
             Pos  := Project.Dynamo_Files.First_Index;
             Incr := 1;
@@ -330,13 +334,14 @@ package body Gen.Artifacts.Hibernate is
                  := Project.Find_Project (Name);
             begin
                if Prj /= null then
-                  Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), File_Prefix, SQL_Content);
+                  Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), Driver,
+                               Prefix, SQL_Content);
                end if;
             end;
             Pos := Pos + Incr;
          end loop;
          if not Is_Reverse then
-            Collect_SQL (Project, Model_Dir, File_Prefix, SQL_Content);
+            Collect_SQL (Project, Model_Dir, Driver, Prefix, SQL_Content);
          end if;
 
          Log.Info ("Generating " & Driver & " creation schema in '{0}'",

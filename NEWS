@@ -1,6 +1,7 @@
 Version 0.4.0	- 
   - Generate ADO database queries
   - Generate Mysql and Sqlite schemas
+  - Create the Mysql database and tables
 
 Version 0.3.0	- May 2011
   - Generate ADO database model

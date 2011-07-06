@@ -126,7 +126,7 @@ package body Gen.Commands.Database is
       Query : ADO.Queries.Context;
       Stmt  : ADO.Statements.Query_Statement;
    begin
-      Log.Info ("Executing: create database {0}", Name);
+      Log.Info ("Creating database '{0}'", Name);
 
       Query.Set_Query (Gen.Database.Model.Query_Create_Database);
       Stmt := DB.Create_Statement (Query);
@@ -146,7 +146,7 @@ package body Gen.Commands.Database is
       Query : ADO.Queries.Context;
       Stmt  : ADO.Statements.Query_Statement;
    begin
-      Log.Info ("Grant access for user '{0}' to database {1}", User, Name);
+      Log.Info ("Granting access for user '{0}' to database '{1}'", User, Name);
 
       if Password'Length > 0 then
          Query.Set_Query (Gen.Database.Model.Query_Create_User_With_Password);
@@ -207,9 +207,10 @@ package body Gen.Commands.Database is
       GNAT.Expect.Expect (Proc, Result, ".*");
       GNAT.Expect.Close (Descriptor => Proc,
                          Status     => Status);
-      Log.Info ("Exit status: {0}", Integer'Image (Status));
-      if Status /= 12345555 then
-         return;
+      if Status = 0 then
+         Log.Info ("Database schema created successfully.");
+      else
+         Log.Error ("Error while creating the database schema.");
       end if;
    end Execute_Command;
 
@@ -223,8 +224,11 @@ package body Gen.Commands.Database is
       Database : constant String := Config.Get_Database;
       Username : constant String := Config.Get_Property ("user");
       Password : constant String := Config.Get_Property ("password");
-      File     : constant String := Util.Files.Compose (Model, "create-" & Name & "-mysql.sql");
+      Dir      : constant String := Util.Files.Compose (Model, "mysql");
+      File     : constant String := Util.Files.Compose (Dir, "create-" & Name & "-mysql.sql");
    begin
+      Log.Info ("Creating database tables using schema '{0}'", File);
+
       if Password'Length > 0 then
          declare
             Args : GNAT.OS_Lib.Argument_List (1 .. 5);
@@ -291,6 +295,8 @@ package body Gen.Commands.Database is
             Append (Root_Connection, "&password=");
             Append (Root_Connection, Password);
          end if;
+
+         Log.Info ("Connecting to {0}", Root_Connection);
 
          --  Initialize the session factory to connect to the
          --  database defined by root connection (which should allow the database creation).

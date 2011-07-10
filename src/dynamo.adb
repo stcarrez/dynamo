@@ -26,6 +26,7 @@ with Ada.Exceptions;
 with Ada.Directories;
 with Ada.Command_Line;
 
+with Util.Files;
 with Util.Log.Loggers;
 with Gen.Generator;
 with Gen.Commands;
@@ -94,8 +95,10 @@ begin
       declare
          Name : constant String := Ada.Command_Line.Command_Name;
          Path : constant String := Ada.Directories.Containing_Directory (Name);
+         Dir  : constant String := Containing_Directory (Path);
       begin
-         Set_Config_Directory (Compose (Containing_Directory (Path), "config"), True);
+         Set_Config_Directory (Compose (Dir, "config"), True);
+         Set_Config_Directory (Util.Files.Compose (Dir, "share/dynamo/base"), True);
          Set_Config_Directory (Gen.CONFIG_DIR, True);
       end;
    end if;

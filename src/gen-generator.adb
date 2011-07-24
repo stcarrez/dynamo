@@ -863,11 +863,14 @@ package body Gen.Generator is
       Model_Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := H.Model'Unchecked_Access;
       Model_Bean  : constant Object := To_Object (Model_Ptr, Util.Beans.Objects.STATIC);
 
+      Prj_Ptr  : constant Util.Beans.Basic.Readonly_Bean_Access := H.Project'Unchecked_Access;
+      Prj_Bean : constant Object := To_Object (Prj_Ptr, Util.Beans.Objects.STATIC);
    begin
       Log.Debug ("With template '{0}'", File);
 
       Req.Set_Path_Info (File);
       Req.Set_Method ("GET");
+      Req.Set_Attribute (Name => "project", Value => Prj_Bean);
       Req.Set_Attribute (Name => "package", Value => Bean);
       Req.Set_Attribute (Name => "model", Value => Model_Bean);
       Req.Set_Attribute (Name => "genRevision", Value => Util.Beans.Objects.To_Object (SVN_REV));

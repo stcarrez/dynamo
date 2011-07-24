@@ -33,8 +33,10 @@ package body Gen.Model.Projects is
    begin
       if Name = "name" then
          return Util.Beans.Objects.To_Object (From.Name);
+      elsif From.Props.Exists (Name) then
+         return Util.Beans.Objects.To_Object (String '(From.Props.Get (Name)));
       else
-         return Definition'Class (From).Get_Value (Name);
+         return Util.Beans.Objects.Null_Object;
       end if;
    end Get_Value;
 

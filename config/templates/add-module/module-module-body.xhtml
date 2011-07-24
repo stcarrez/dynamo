@@ -1,0 +1,50 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}-#{moduleName}-module.adb">-----------------------------------------------------------------------
+--  #{projectName}-#{moduleName}-module -- Module #{moduleName}
+--  Copyright (C) 2011 XXX
+--  Written by XXX (XXX)
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+-----------------------------------------------------------------------
+#{''}
+with ASF.Modules.Beans;
+with AWA.Modules.Get;
+with Util.Log.loggers;
+package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module is
+#{''}
+   Log : constant Util.log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module");
+#{''}
+   package Register is new ASF.Modules.Beans (Module => #{fn:capitalize(moduleName)}_Module,
+                                              Module_Access => #{fn:capitalize(moduleName)}_Module_Access);
+#{''}
+   --  ------------------------------
+   --  Initialize the #{moduleName} module.
+   --  ------------------------------
+   overriding
+   procedure Initialize (Plugin : in out #{fn:capitalize(moduleName)}_Module;
+                         App    : access ASF.Applications.Main.Application'Class) is
+   begin
+      Log.Info ("Initializing the #{moduleName} module");
+
+      Register.Register (Plugin => Plugin,
+                         Name   => "#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.XXX_Bean",
+                         Handler => #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.XXX_Bean");
+      AWA.Modules.Module (Plugin).Initialize (App);
+   end Initialize;
+#{''}
+end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)};
+</f:view>

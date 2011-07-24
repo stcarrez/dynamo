@@ -1,0 +1,19 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:c="http://java.sun.com/jstl/core">
+--  Copyright (C) 2011 #{project.author}
+--  Written by #{project.author} (#{project.author_email})
+--
+  <c:choose>
+    <c:when test="#{project.license eq 'gpl'}">
+       <ui:include src="gpl-2_0.xhtml"/>
+    </c:when>
+
+    <c:when test="#{project.license eq 'apache'}">
+       <ui:include src="apache-2_0.xhtml"/>
+    </c:when>
+
+    <c:otherwise>
+       <ui:include src="apache-2_0.xhtml"/>
+    </c:otherwise>
+  </c:choose>
+</ui:composition>

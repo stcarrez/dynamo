@@ -40,6 +40,9 @@ package body Gen.Commands.Project is
 
       Name : constant String := Get_Argument;
    begin
+      Generator.Set_Project_Property ("license", "apache");
+      Generator.Set_Project_Property ("author", "unknown");
+      Generator.Set_Project_Property ("author_email", "unknown@company.com");
       if Name'Length = 0 then
          Gen.Commands.Usage;
          return;

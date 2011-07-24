@@ -115,6 +115,7 @@ install:	  install_dirs
 	$(CP) config/*.xml $(prefix)/share/dynamo/base
 	-rm -rf $(prefix)/share/dynamo/base/templates
 	$(CP) -r config/templates $(prefix)/share/dynamo/base
+	$(CP) -r config/commands $(prefix)/share/dynamo/base
 	$(CP) db/*.xml $(prefix)/share/dynamo/base/db
 
 install_dirs:

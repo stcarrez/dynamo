@@ -153,7 +153,7 @@ package body Gen.Model.Packages is
                T    : constant String := To_String (Col.Type_Name);
                Name : constant String := Gen.Utils.Get_Package_Name (T);
             begin
-               if not Col.Is_Basic_Type and Name'Length > 0 then
+               if not Col.Is_Basic_Type and Name'Length > 0 and Name /= O.Pkg_Name then
                   Used_Types.Include (To_Unbounded_String (Name));
 
                elsif T = "Time" or T = "Date" or T = "Timestamp" or T = "Nullable_Time" then
@@ -179,6 +179,8 @@ package body Gen.Model.Packages is
       end Prepare_Tables;
 
    begin
+      Log.Info ("Preparing package {0}", O.Pkg_Name);
+
       O.Used := Util.Beans.Objects.To_Object (T, Util.Beans.Objects.STATIC);
       O.Used_Types.Row := 0;
       O.Used_Types.Values.Clear;

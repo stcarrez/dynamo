@@ -58,17 +58,25 @@ package body Gen.Commands.Templates is
       end Get_Output_Dir;
 
       Out_Dir : constant String := Get_Output_Dir;
-      Name    : constant String := Get_Argument;
+      Iter    : Param_Vectors.Cursor := Cmd.Params.First;
    begin
-      if Name'Length = 0 then
-         Gen.Commands.Usage;
-         return;
-      end if;
+      Generator.Read_Project ("dynamo.xml", False);
+      while Param_Vectors.Has_Element (Iter) loop
+         declare
+            P     : constant Param := Param_Vectors.Element (Iter);
+            Value : constant String := Get_Argument;
+         begin
+            if not P.Is_Optional and Value'Length = 0 then
+               Generator.Error ("Missing argument for {0}", To_String (P.Argument));
+               return;
+            end if;
+            Generator.Set_Global (To_String (P.Name), Value);
+         end;
+         Param_Vectors.Next (Iter);
+      end loop;
 
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (To_Unbounded_String (Out_Dir));
-      Generator.Set_Global ("pageName", Name);
---        Generator.Set_Global ("layout", Layout);
       declare
          Iter : Util.Strings.Sets.Cursor := Cmd.Templates.First;
       begin
@@ -109,6 +117,7 @@ package body Gen.Commands.Templates is
 
    type Command_Loader is record
       Command : Command_Access := null;
+      P       : Param;
    end record;
    type Command_Loader_Access is access all Command_Loader;
 
@@ -172,6 +181,25 @@ package body Gen.Commands.Templates is
 
             when FIELD_TEMPLATE =>
                Closure.Command.Templates.Include (To_String (Value));
+
+            when FIELD_PARAM_NAME =>
+               Closure.P.Name := To_Unbounded_String (Value);
+
+            when FIELD_PARAM_OPTIONAL =>
+               Closure.P.Is_Optional := To_Boolean (Value);
+
+            when FIELD_PARAM_ARG =>
+               Closure.P.Argument := To_Unbounded_String (Value);
+
+            when FIELD_PARAM =>
+               Closure.P.Value := To_Unbounded_String (Value);
+               Closure.Command.Params.Append (Closure.P);
+               Closure.P.Name        := Ada.Strings.Unbounded.Null_Unbounded_String;
+               Closure.P.Argument    := Ada.Strings.Unbounded.Null_Unbounded_String;
+               Closure.P.Is_Optional := False;
+
+            when FIELD_BASEDIR =>
+               Closure.Command.Base_Dir := To_Unbounded_String (Value);
 
             when FIELD_COMMAND =>
                null;

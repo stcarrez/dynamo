@@ -109,9 +109,19 @@ begin
 
    declare
       Cmd_Name  : constant String := Get_Argument;
-      Cmd       : constant Gen.Commands.Command_Access := Gen.Commands.Find_Command (Cmd_Name);
+      Cmd       : Gen.Commands.Command_Access;
       Generator : Gen.Generator.Handler;
    begin
+      if Length (Out_Dir) > 0 then
+         Gen.Generator.Set_Result_Directory (Generator, Out_Dir);
+      end if;
+      if Length (Template_Dir) > 0 then
+         Gen.Generator.Set_Template_Directory (Generator, Template_Dir);
+      end if;
+
+      Gen.Generator.Initialize (Generator, Config_Dir);
+      Cmd := Gen.Commands.Find_Command (Cmd_Name);
+
       --  Check that the command exists.
       if Cmd = null then
          if Cmd_Name'Length > 0 then
@@ -125,14 +135,6 @@ begin
          Set_Exit_Status (Failure);
          return;
       end if;
-      if Length (Out_Dir) > 0 then
-         Gen.Generator.Set_Result_Directory (Generator, Out_Dir);
-      end if;
-      if Length (Template_Dir) > 0 then
-         Gen.Generator.Set_Template_Directory (Generator, Template_Dir);
-      end if;
-
-      Gen.Generator.Initialize (Generator, Config_Dir);
 
       Cmd.Execute (Generator);
 

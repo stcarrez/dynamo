@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Ada.Containers.Vectors;
 with Util.Strings.Sets;
 package Gen.Commands.Templates is
 
@@ -39,6 +40,17 @@ package Gen.Commands.Templates is
 
 private
 
+   type Param is record
+      Name        : Ada.Strings.Unbounded.Unbounded_String;
+      Argument    : Ada.Strings.Unbounded.Unbounded_String;
+      Value       : Ada.Strings.Unbounded.Unbounded_String;
+      Is_Optional : Boolean := False;
+   end record;
+
+   package Param_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Param);
+
    type Command is new Gen.Commands.Command with record
       Name      : Ada.Strings.Unbounded.Unbounded_String;
       Title     : Ada.Strings.Unbounded.Unbounded_String;
@@ -46,6 +58,7 @@ private
       Help_Msg  : Ada.Strings.Unbounded.Unbounded_String;
       Base_Dir  : Ada.Strings.Unbounded.Unbounded_String;
       Templates : Util.Strings.Sets.Set;
+      Params    : Param_Vectors.Vector;
    end record;
 
 end Gen.Commands.Templates;

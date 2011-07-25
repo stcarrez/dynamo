@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Dynamo" "26 June 2011" ""
+.TH DYNAMO 1 "Dynamo" "25 July 2011" ""
 .SH NAME
 dynamo - Ada Web Application Generator
 .SH SYNOPSIS
@@ -159,6 +159,46 @@ directory.  The database table is mapped to an Ada tagged record in the package
 will have the name \fB\fIproject-name\fR.Model\fR.  The Ada record will have the name
 \fB\fIname\fR_Ref\fR.
 .\"
+.SS The add-module command
+.RS 0
+dynamo \fBadd-module \fIname\fR\fR
+.RE
+.PP
+Add a new module to the project.  The module is composed of a set of Ada files
+and a set of XHTML presentation files.  The
+.I name
+parameter is the name of the Ada child package that represents the module.
+This is also the name of the directory that will contain the specific XHTML files
+used for the module.
+The following Ada packages are generated:
+.\"
+.RS 0
+package \fIproject\fR.\fImodule\fR;
+.br
+package \fIproject\fR.\fImodule\fR.Beans;
+.br
+package \fIproject\fR.\fImodule\fR.Module;
+.RE
+.PP
+where
+.I project
+is the project name (defined by the
+.B create-project
+command) and
+.I module
+is the new module name.
+.PP
+The
+.I Module
+package defines the main module data type with the initialization steps.
+The
+.I Beans
+package defines the Ada bean types which are specific to the module.
+Each Ada bean type must be registered in the
+.I Module
+package.  The generated files are intended to be modified to implement the
+module functionality.
+.\"
 .SS The info command
 .RS 0
 dynamo \fBinfo\fR
@@ -205,7 +245,17 @@ dynamo \fBpropset \fIname value\fR\fR
 .PP
 Set a project property to configure some commands provided by
 \fBdynamo\fR.  The property is composed of a name and a value.  It is saved in
-the \fBdynamo.xml\fR file.
+the \fBdynamo.xml\fR file.  The following properties are recognized:
+.\"
+.RS 0
+author The author name inserted in file headers
+.br
+author_email The author email address inserted in file headers
+.br
+license Controls the license header in file headers ('gpl', 'apache')
+.br
+database The default database connection string
+.RE
 .\"
 .SH FILES
 .SS /usr/share/dynamo/base/generator.properties

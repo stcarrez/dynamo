@@ -2,6 +2,7 @@ Version 0.4.0	-
   - Generate ADO database queries
   - Generate Mysql and Sqlite schemas
   - Create the Mysql database and tables
+  - Generate AWA modules with the new 'add-module' command
 
 Version 0.3.0	- May 2011
   - Generate ADO database model

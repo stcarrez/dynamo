@@ -102,7 +102,7 @@ The database connection string is optional.  The default database connection str
 is read from the
 .I database
 property in the
-.I dynamo.xml
+.B dynamo.xml
 configuration file.  The connection string has the following form: 
 .\"
 .RS 0
@@ -245,17 +245,32 @@ dynamo \fBpropset \fIname value\fR\fR
 .PP
 Set a project property to configure some commands provided by
 \fBdynamo\fR.  The property is composed of a name and a value.  It is saved in
-the \fBdynamo.xml\fR file.  The following properties are recognized:
+the
+.B dynamo.xml
+file.  The following properties are recognized:
 .\"
-.RS 0
-author The author name inserted in file headers
-.br
-author_email The author email address inserted in file headers
-.br
-license Controls the license header in file headers ('gpl', 'apache')
-.br
-database The default database connection string
-.RE
+.\"
+.SH PROPERTIES
+The
+.B dynamo.xml
+file defines several configuration properties which are used to customize several
+commands.  These properties can be modified with the
+.B propset
+command.
+.\"
+.SS author
+This property defines the author name inserted in file headers.
+.\"
+.SS author_email
+The author email address inserted in file headers.
+.SS license
+This property controls the license header in file headers.
+The following license names are recognized:
+.B gpl
+.B apache
+.\"
+.SS database
+The default database connection string.
 .\"
 .SH FILES
 .SS /usr/share/dynamo/base/generator.properties
@@ -269,6 +284,13 @@ This XML file defines the type mapping used in the
 model files.  This mapping indicates for each basic type used in the
 XML model files, what is the target Ada type name.
 .\"
+.SS /usr/share/dynamo/base/commands
+This directory contains XML files that describe additional template commands.
+.\"
+.SS /usr/share/dynamo/base/templates
+This directory contains the template files associated with
+.I dynamo
+commands.
 .\"
 .SH SEE ALSO
 \fIgnatmake(1)\fR, \fIgcc(1)\fR

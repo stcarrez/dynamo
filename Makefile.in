@@ -67,6 +67,17 @@ analyze:
 # Clean, then build executables for all mains defined by the project.
 rebuild: clean build
 
+test:	 build
+	-rm -rf test-app
+	mkdir test-app
+	cd test-app && ../bin/dynamo create-project test
+	cd test-app && ../bin/dynamo add-module blog
+	cd test-app && ../bin/dynamo add-module user
+	cd test-app && ../bin/dynamo add-model user
+	cd test-app && ../bin/dynamo add-model blog
+	cd test-app && ./configure --with-ada-awa=../../
+	cd test-app && make
+
 GENERATOR=dynamo
 
 generate:

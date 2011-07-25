@@ -13,5 +13,7 @@
       <template>add-module/module-spec.xhtml</template>
       <template>add-module/module-module-spec.xhtml</template>
       <template>add-module/module-module-body.xhtml</template>
+      <template>add-module/module-beans-spec.xhtml</template>
+      <template>add-module/module-beans-body.xhtml</template>
    </command>
 </commands>

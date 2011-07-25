@@ -9,8 +9,9 @@
 -----------------------------------------------------------------------
 #{''}
 with ASF.Modules.Beans;
-with AWA.Modules.Get;
+with ASF.Modules.Get;
 with Util.Log.loggers;
+with #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans;
 package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module is
 #{''}
    Log : constant Util.log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module");
@@ -28,10 +29,10 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module i
       Log.Info ("Initializing the #{moduleName} module");
 
       Register.Register (Plugin => Plugin,
-                         Name   => "#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.XXX_Bean",
-                         Handler => #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.XXX_Bean");
+                         Name   => "#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.#{fn:capitalize(moduleName)}_Bean",
+                         Handler => #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.Create_#{fn:capitalize(moduleName)}_Bean'Access);
       AWA.Modules.Module (Plugin).Initialize (App);
    end Initialize;
 #{''}
-end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)};
+end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module;
 </f:view>

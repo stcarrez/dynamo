@@ -1,0 +1,82 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}-#{moduleName}-beans.adb">-----------------------------------------------------------------------
+--  #{projectName}-#{moduleName}-beans -- Beans for module #{moduleName}
+<ui:include src="../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+#{''}
+
+with ASF.Events.Actions;
+package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans is
+#{''}
+   --  ------------------------------
+   --  Example of action method.
+   --  ------------------------------
+   procedure Action (Bean    : in out #{fn:capitalize(moduleName)}_Bean;
+                     Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      null;
+   end Action;
+#{''}
+   package Action_Binding is
+     new ASF.Events.Actions.Action_Method.Bind (Bean   => #{fn:capitalize(moduleName)}_Bean,
+                                                Method => Action,
+                                                Name   => "action");
+#{''}
+   #{fn:capitalize(moduleName)}_Bean_Binding : aliased constant Util.Beans.Methods.Method_Binding_Array
+     := (Action_Binding.Proxy'Access, null);
+#{''}
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  ------------------------------
+   overriding
+   function Get_Value (From : in #{fn:capitalize(moduleName)}_Bean;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "count" then
+         return Util.Beans.Objects.To_Object (From.Count);
+      else
+         return Util.Beans.Objects.Null_Object;
+      end if;
+   end Get_Value;
+#{''}
+   --  ------------------------------
+   --  Set the value identified by the name.
+   --  ------------------------------
+   overriding
+   procedure Set_Value (From  : in out #{fn:capitalize(moduleName)}_Bean;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      if Name = "count" then
+         From.Count := Util.Beans.Objects.To_Integer (Value);
+      end if;
+   end Set_Value;
+#{''}
+   --  ------------------------------
+   --  This bean provides some methods that can be used in a Method_Expression
+   --  ------------------------------
+   overriding
+   function Get_Method_Bindings (From : in #{fn:capitalize(moduleName)}_Bean)
+                                 return Util.Beans.Methods.Method_Binding_Array_Access is
+      pragma Unreferenced (From);
+   begin
+      return #{fn:capitalize(moduleName)}_Bean_Binding'Access;
+   end Get_Method_Bindings;
+#{''}
+   --  ------------------------------
+   --  Create the #{fn:capitalize(moduleName)}_Bean bean instance.
+   --  ------------------------------
+   function Create_#{fn:capitalize(moduleName)}_Bean (Module : in #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module.#{fn:capitalize(moduleName)}_Module_Access)
+      return Util.Beans.Basic.Readonly_Bean_Access is
+      Object : constant #{fn:capitalize(moduleName)}_Bean_Access := new #{fn:capitalize(moduleName)}_Bean;
+   begin
+      Object.Module := Module;
+      return Object.all'Access;
+   end Create_#{fn:capitalize(moduleName)}_Bean;
+#{''}
+end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans;
+</f:view>

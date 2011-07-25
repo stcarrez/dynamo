@@ -23,8 +23,7 @@ package #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module is
 #{''}
 private
 #{''}
-   type #{fn:capitalize(moduleName)}_Module is new AWA.Modules.Module with record
-   end record;
+   type #{fn:capitalize(moduleName)}_Module is new AWA.Modules.Module with null record;
 #{''}
-end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)};
+end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module;
 </f:view>

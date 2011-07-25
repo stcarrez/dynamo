@@ -1,0 +1,49 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}-applications.ads">-----------------------------------------------------------------------
+--  #{projectName} -- #{projectName} applications
+-----------------------------------------------------------------------
+<ui:include src="../../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+
+with ASF.Servlets.Faces;
+with ASF.Servlets.Files;
+with ASF.Filters.Dump;
+with ASF.Servlets.Measures;
+#{''}
+with Security.Openid.Servlets;
+#{''}
+with AWA.Users.Principals;
+with AWA.Applications;
+with AWA.Services.Filters;
+package #{fn:capitalize(projectName)}.Applications is
+#{''}
+   type Application is new AWA.Applications.Application with private;
+   type Application_Access is access all Application'Class;
+#{''}
+   --  Initialize the application.
+   procedure Initialize (App : in Application_Access);
+#{''}
+private
+#{''}
+   type Application is new AWA.Applications.Application with record
+      --  Application servlets and filters (add new servlet and filter instances here).
+      Faces          : aliased ASF.Servlets.Faces.Faces_Servlet;
+      Files          : aliased ASF.Servlets.Files.File_Servlet;
+      Dump           : aliased ASF.Filters.Dump.Dump_Filter;
+      Service_Filter : aliased AWA.Services.Filters.Service_Filter;
+      Perf           : aliased ASF.Servlets.Measures.Measure_Servlet;
+#{''}
+      --  Authentication servlet and filter.
+      Auth           : aliased Security.Openid.Servlets.Request_Auth_Servlet;
+      Verify_Auth    : aliased AWA.Users.Principals.Verify_Auth_Servlet;
+#{''}
+      --  The application modules.
+--      XXX_Module    : aliased #{fn:capitalize(projectName)}.XXX.Module.XXX_Module;
+   end record;
+#{''}
+end #{fn:capitalize(projectName)}.Applications;
+</f:view>

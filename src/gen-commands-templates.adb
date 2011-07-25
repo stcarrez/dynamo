@@ -204,9 +204,6 @@ package body Gen.Commands.Templates is
             when FIELD_COMMAND =>
                null;
 
-            when others =>
-               null;
-
          end case;
       end if;
    end Set_Member;
@@ -260,6 +257,8 @@ package body Gen.Commands.Templates is
       Cmd_Dir    : constant String := Generator.Get_Parameter ("generator.commands.dir");
       Path       : constant String := Util.Files.Compose (Config_Dir, Cmd_Dir);
    begin
+      Log.Debug ("Checking commands in {0}", Path);
+
       if Ada.Directories.Exists (Path) then
          Util.Files.Iterate_Files_Path (Path    => Path,
                                         Pattern => "*.xml",

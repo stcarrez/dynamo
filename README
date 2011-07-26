@@ -23,3 +23,14 @@ Documentation
    http://code.google.com/p/ada-gen/
 
 
+License
+
+   Dynamo integrates some files from the GNU Compiler Collection (4.6.0).
+   These files are used to read the GNAT project files (see src/gnat).
+   They are distributed under the GPL version 3 license.
+
+   The Dynamo core implementation is distributed under the Apache 2.0 license.
+
+   The Dynamo templates are distributed under the Apache 2.0 license.
+
+   The Dynamo generated code can be distributed under whatever license you like.

@@ -128,7 +128,7 @@ install:	  install_dirs
 	-rm -rf $(prefix)/share/dynamo/base/commands
 	$(CP) -r config/templates $(prefix)/share/dynamo/base
 	$(CP) -r config/commands $(prefix)/share/dynamo/base
-	$(CP) db/*.xml $(prefix)/share/dynamo/base/db
+	$(CP) config/db/*.xml $(prefix)/share/dynamo/base/db
 
 install_dirs:
 	${MKDIR} -p ${bindir}

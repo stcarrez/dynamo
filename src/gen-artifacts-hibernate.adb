@@ -26,7 +26,8 @@ with Gen.Model.Projects;
 
 with Util.Files;
 with Util.Log.Loggers;
-
+with Util.Strings.Sets;
+with Util.Encoders;
 
 --  The <b>Gen.Artifacts</b> package represents the methods and process to prepare,
 --  control and realize the code generation.
@@ -197,7 +198,7 @@ package body Gen.Artifacts.Hibernate is
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
-      pragma Unreferenced (Handler, Path);
+      pragma Unreferenced (Handler, Path, Context);
 
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
                                   Node  : in DOM.Core.Node);
@@ -270,8 +271,17 @@ package body Gen.Artifacts.Hibernate is
                                    Name   : in String;
                                    Is_Reverse : in Boolean);
 
-      SQL_Content    : Unbounded_String;
-      Model_Dir      : constant String := Model.Get_Model_Directory;
+      use Util.Encoders;
+
+      SQL_Content : Unbounded_String;
+
+      --  SHA for each SQL content that is appended in the SQL content.
+      --  This is used to avoid appending the same SQL file several times in the final SQL file.
+      --  (this happens due to the SQL path being different in some cases)
+      SHA_Files   : Util.Strings.Sets.Set;
+      SHA_Encoder : constant Encoder := Util.Encoders.Create (Util.Encoders.HASH_SHA1);
+
+      Model_Dir   : constant String := Model.Get_Model_Directory;
 
       --  ------------------------------
       --  Check if an SQL file exists for the given driver.  If such file exist,
@@ -291,13 +301,20 @@ package body Gen.Artifacts.Hibernate is
          Log.Debug ("Checking SQL file {0}", Path);
 
          if Ada.Directories.Exists (Path) then
-            Append (Content, "/* Copied from ");
-            Append (Content, Path);
-            Append (Content, "*/");
-            Append (Content, ASCII.LF);
             Util.Files.Read_File (Path => Path,
                                   Into => SQL);
-            Append (Content, SQL);
+            declare
+               H : constant String := SHA_Encoder.Encode (To_String (SQL));
+            begin
+               if not SHA_Files.Contains (H) then
+                  SHA_Files.Include (H);
+                  Append (Content, "/* Copied from ");
+                  Append (Content, Path);
+                  Append (Content, "*/");
+                  Append (Content, ASCII.LF);
+                  Append (Content, SQL);
+               end if;
+            end;
          end if;
       end Collect_SQL;
 
@@ -333,6 +350,7 @@ package body Gen.Artifacts.Hibernate is
                Prj  : constant Gen.Model.Projects.Project_Definition_Access
                  := Project.Find_Project (Name);
             begin
+               Log.Debug ("Checking project {0}", Name);
                if Prj /= null then
                   Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), Driver,
                                Prefix, SQL_Content);

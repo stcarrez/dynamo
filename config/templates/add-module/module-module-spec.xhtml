@@ -8,18 +8,22 @@
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
-with ASF.Applications.Main;
 with AWA.Modules;
 package #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module is
 #{''}
+   --  The name under which the module is registered.
    NAME : constant String := "#{moduleName}";
 #{''}
+   --  ------------------------------
+   --  Module #{moduleName}
+   --  ------------------------------
    type #{fn:capitalize(moduleName)}_Module is new AWA.Modules.Module with private;
    type #{fn:capitalize(moduleName)}_Module_Access is access all #{fn:capitalize(moduleName)}_Module'Class;
 #{''}
+   --  Initialize the #{moduleName} module.
    overriding
    procedure Initialize (Plugin : in out #{fn:capitalize(moduleName)}_Module;
-                         App    : access ASF.Applications.Main.Application'Class);
+                         App    : in AWA.Modules.Application_Access);
 #{''}
 private
 #{''}

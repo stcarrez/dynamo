@@ -9,7 +9,8 @@
          You can create a new layout with 'add-layout' command.");
       </help>
       <param optional='false' name='moduleName' arg='NAME'/>
-      <basedir>src</basedir>
+      <basedir></basedir>
+      <template>add-module/module-config.xhtml</template>
       <template>add-module/module-spec.xhtml</template>
       <template>add-module/module-module-spec.xhtml</template>
       <template>add-module/module-module-body.xhtml</template>

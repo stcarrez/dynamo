@@ -1,0 +1,30 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="config/#{moduleName}.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<module version="1.0">
+
+  <filter-mapping>
+    <filter-name>service</filter-name>
+    <url-pattern>/#{moduleName}/*.html</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>auth-filter</filter-name>
+    <url-pattern>/#{moduleName}/*.html</url-pattern>
+  </filter-mapping>
+
+  <entity-permission>
+    <name>#{moduleName}-create</name>
+    <entity-type>table-name</entity-type>
+    <sql>
+       select ACL.ID from ACL
+       where ACL.ENTITY_TYPE = :entity_type
+       and ACL.USER_ID = :user_id   
+    </sql>
+  </entity-permission>
+
+</module>
+]]></f:view>

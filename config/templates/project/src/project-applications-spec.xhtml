@@ -16,7 +16,7 @@ with ASF.Servlets.Measures;
 #{''}
 with Security.Openid.Servlets;
 #{''}
-with AWA.Users.Principals;
+with AWA.Users.Servlets;
 with AWA.Applications;
 with AWA.Services.Filters;
 package #{fn:capitalize(projectName)}.Applications is
@@ -39,7 +39,7 @@ private
 #{''}
       --  Authentication servlet and filter.
       Auth           : aliased Security.Openid.Servlets.Request_Auth_Servlet;
-      Verify_Auth    : aliased AWA.Users.Principals.Verify_Auth_Servlet;
+      Verify_Auth    : aliased AWA.Users.Servlets.Verify_Auth_Servlet;
 #{''}
       --  The application modules.
 --      XXX_Module    : aliased #{fn:capitalize(projectName)}.XXX.Module.XXX_Module;

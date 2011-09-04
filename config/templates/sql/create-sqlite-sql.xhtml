@@ -14,7 +14,7 @@ create table #{table.table} (
   `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} PRIMARY KEY#{column.name eq table.id.name and (table.id.generator eq 'increment') ? ' AUTOINCREMENT' : ''}#{table.members.rowIndex lt table.members.size ? ',' : ''}
   </h:panelGroup>
   <h:panelGroup rendered="#{column.name ne table.id.name}">
-  `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} NOT NULL#{table.members.rowIndex lt table.members.size ? ',' : ''}
+  `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} #{not column.isNull ? 'NOT NULL' : ''}#{table.members.rowIndex lt table.members.size ? ',' : ''}
   </h:panelGroup>
 </h:list>
 );

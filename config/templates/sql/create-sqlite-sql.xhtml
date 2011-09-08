@@ -7,7 +7,7 @@
 /* File generated automatically by dynamo */
 <h:list value="#{model.tables}" var="table">
 /* #{table.comment} */
-create table #{table.table} (
+CREATE TABLE #{table.table} (
 <h:list value="#{table.members}" var="column">
   /* #{column.comment} */
   <h:panelGroup rendered="#{column.name eq table.id.name}">
@@ -21,7 +21,7 @@ create table #{table.table} (
 </h:list>
 <h:panelGroup rendered="#{not empty model.tables}">
   <h:list value="#{model.tables}" var="table">
-insert into entity_type (name) values ("#{table.table}");
+INSERT INTO entity_type (name) VALUES ("#{table.table}");
 </h:list>
 </h:panelGroup>
 </f:view>

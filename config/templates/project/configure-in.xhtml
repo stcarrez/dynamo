@@ -50,12 +50,22 @@ AS_HELP_STRING([--with-ada-awa=x], [Path for the Ada Web Application library (co
   AWA_DIR=\${withval}/
 ],
 [
-  AWA_DIR=../awa/
+  echo "with \"awa\"; project t is for Source_Dirs use (); end t;" > t.gpr
+  gnatmake -p -Pt >/dev/null 2>/dev/null
+  if test $? -eq 0; then
+    AWA_DIR=
+  else
+    AWA_DIR=../awa/
+  fi;
 ])
-if test ! -f \${AWA_DIR}/util/util.gpr; then
-   AC_MSG_ERROR([Ada Utility library not found in \${AWA_DIR}/util/util.gpr])
+echo "with \"${AWA_DIR}awa\"; project t is for Source_Dirs use (); end t;" > t.gpr
+gnatmake -p -Pt >/dev/null 2>/dev/null
+if test $? -ne 0 ; then
+   rm -f t.gpr
+   AC_MSG_ERROR([Ada Web Application not found in ${AWA_DIR}])
 fi
-AC_MSG_RESULT(\${AWA_DIR})
+rm -f t.gpr
+AC_MSG_RESULT(${AWA_DIR})
 AC_SUBST(AWA_DIR)
 
 AC_OUTPUT(

@@ -79,7 +79,7 @@ test:	 build
 	regtests/run.sh 'Dynamo add module user' ../bin/dynamo add-module user
 	regtests/run.sh 'Dynamo add model user' ../bin/dynamo add-model user
 	regtests/run.sh 'Dynamo add model blog' ../bin/dynamo add-model blog
-	regtests/run.sh 'Dynamo configure project' ./configure --with-ada-awa=../../
+	regtests/run.sh 'Dynamo configure project' ./configure
 	regtests/run.sh 'Dynamo build generated app' make
 
 GENERATOR=dynamo

@@ -10,17 +10,17 @@
         <comment>The #{modelName} table.</comment>
         <id name="id" type="ADO.Identifier" unsaved-value="0">
             <comment>the #{modelName} id</comment>
-            <column name="ID" not-null="true" unique="false" sql-type="BIGINT"/>
+            <column name="id" not-null="true" unique="false" sql-type="BIGINT"/>
             <generator class="sequence"/>
         </id>
         <version name="version" type="int" column="version"/>
         <property name="name" type="String">
             <comment>the #{modelName} name</comment>
-            <column name="NAME" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+            <column name="name" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
         </property>
         <property name="create_date" update="false">
             <comment>the #{modelName} creation date</comment>
-            <column name="CREATE_DATE" not-null="false" unique="false" sql-type="DATETIME"/>
+            <column name="create_date" not-null="false" unique="false" sql-type="DATETIME"/>
             <type name="Nullable_Time"/>
         </property>
     </class>

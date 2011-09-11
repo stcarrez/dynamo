@@ -6,7 +6,7 @@
 
 <h:list value="#{package.tables}" var="table">
    --  --------------------
-   --  #{table.comment}
+   --  #{g:comment(table.comment)}
    --  --------------------
    --  Create an object key for #{table.type}.
    function #{table.type}_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key;

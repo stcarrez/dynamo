@@ -78,6 +78,9 @@ package body Gen.Generator is
    --  EL Function to check whether a type is an date or a time type
    function Is_Date_Type (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
+   --  EL function to format an Ada comment
+   function Comment (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class);
 
    --  ------------------------------
@@ -244,6 +247,39 @@ package body Gen.Generator is
    end To_Ada_Ident;
 
    --  ------------------------------
+   --  EL function to format an Ada comment
+   --  ------------------------------
+   function Comment (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+
+      START_POS : constant Natural := 8;
+
+      Comment   : constant String := Util.Beans.Objects.To_String (Value);
+      Result    : Unbounded_String;
+      C         : Character;
+      Pos       : Natural := START_POS;
+   begin
+      for I in Comment'Range loop
+         C := Comment (I);
+         if Pos > START_POS then
+            if C = ASCII.LF then
+               Pos := START_POS;
+            else
+               Append (Result, C);
+               Pos := Pos + 1;
+            end if;
+         elsif C /= ' ' and C /= ASCII.LF then
+            if Length (Result) > 0 then
+               Append (Result, ASCII.LF);
+               Append (Result, "   --  ");
+            end if;
+            Append (Result, C);
+            Pos := Pos + 1;
+         end if;
+      end loop;
+      return Util.Beans.Objects.To_Object (Result);
+   end Comment;
+
+   --  ------------------------------
    --  Register the generator EL functions
    --  ------------------------------
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class) is
@@ -270,6 +306,9 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "keyEnum",
                            Namespace => URI,
                            Func      => To_Key_Enum'Access);
+      Mapper.Set_Function (Name      => "comment",
+                           Namespace => URI,
+                           Func      => Comment'Access);
    end Set_Functions;
 
    --  ------------------------------

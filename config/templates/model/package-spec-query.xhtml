@@ -8,7 +8,12 @@
    --  --------------------
    --  #{query.comment}
    --  --------------------
+<h:panelGroup rendered="#{query.bean eq 'yes'}">
+   type #{query.type} is new Util.Beans.Basic.Readonly_Bean with record
+</h:panelGroup>
+<h:panelGroup rendered="#{query.bean ne 'yes'}">
    type #{query.type} is tagged record
+</h:panelGroup>
    <h:list value="#{query.columns}" var="column">
       --  #{column.comment}
       #{fn:capitalize(column.name)} : #{g:adaType(column,0)};
@@ -16,14 +21,36 @@
    </h:list>
    end record;
 #{''}
+<h:panelGroup rendered="#{query.bean eq 'yes'}">
+   --  Get the bean attribute identified by the given name.
+   overriding
+   function Get_Value (From : in #{query.type};
+                       Name : in String) return Util.Beans.Objects.Object;
+#{''}
 
+   package #{fn:capitalize(query.type)}_Beans is
+      new Util.Beans.Basic.Lists (Element_Type => #{fn:capitalize(query.type)});
+   package #{fn:capitalize(query.type)}_Vectors renames #{fn:capitalize(query.type)}_Beans.Vectors;
+   subtype #{fn:capitalize(query.type)}_List_Bean is #{fn:capitalize(query.type)}_Beans.List_Bean;
+#{''}
+   type #{fn:capitalize(query.type)}_List_Bean_Access is access all #{fn:capitalize(query.type)}_List_Bean;
+#{''}
+   --  Run the query controlled by &lt;b&gt;Context&lt;/b> and append the list in &lt;b>Object&lt;/b>.
+   procedure List (Object  : in out #{fn:capitalize(query.type)}_List_Bean;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+</h:panelGroup>
+<h:panelGroup rendered="#{query.bean ne 'yes'}">
    package #{fn:capitalize(query.type)}_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Natural,
                                   Element_Type => #{fn:capitalize(query.type)},
                                   "="          => "=");
+</h:panelGroup>
+#{''}
    subtype #{fn:capitalize(query.type)}_Vector is #{fn:capitalize(query.type)}_Vectors.Vector;
 #{''}
 
+   --  Run the query controlled by &lt;b&gt;Context&lt;/b> and append the list in &lt;b>Object&lt;/b>.
    procedure List (Object  : in out #{fn:capitalize(query.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class);

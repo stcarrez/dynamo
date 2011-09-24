@@ -20,6 +20,7 @@ with Ada.Strings;
 with Ada.Strings.Maps;
 
 with Gen.Utils;
+with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
 
@@ -50,6 +51,9 @@ package body Gen.Model.Packages is
       elsif Name = "tables" then
          return From.Tables_Bean;
 
+      elsif Name = "enums" then
+         return From.Enums_Bean;
+
       elsif Name = "queries" then
          return From.Queries_Bean;
 
@@ -63,6 +67,17 @@ package body Gen.Model.Packages is
          return Definition (From).Get_Value (Name);
       end if;
    end Get_Value;
+
+   --  ------------------------------
+   --  Register the declaration of the given enum in the model.
+   --  ------------------------------
+   procedure Register_Enum (O      : in out Model_Definition;
+                            Enum   : access Gen.Model.Enums.Enum_Definition'Class) is
+   begin
+      O.Register_Package (Enum.Pkg_Name, Enum.Package_Def);
+      Enum.Package_Def.Enums.Append (Enum.all'Access);
+      O.Enums.Append (Enum.all'Access);
+   end Register_Enum;
 
    --  ------------------------------
    --  Register the declaration of the given table in the model.
@@ -210,6 +225,7 @@ package body Gen.Model.Packages is
    procedure Initialize (O : in out Package_Definition) is
       use Util.Beans.Objects;
    begin
+      O.Enums_Bean   := Util.Beans.Objects.To_Object (O.Enums'Unchecked_Access, STATIC);
       O.Tables_Bean  := Util.Beans.Objects.To_Object (O.Tables'Unchecked_Access, STATIC);
       O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access, STATIC);
       O.Used         := Util.Beans.Objects.To_Object (O.Used_Types'Unchecked_Access, STATIC);

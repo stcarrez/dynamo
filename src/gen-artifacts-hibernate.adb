@@ -21,6 +21,7 @@ with Ada.Directories;
 with DOM.Core.Nodes;
 
 with Gen.Utils;
+with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Projects;
 
@@ -35,6 +36,7 @@ package body Gen.Artifacts.Hibernate is
 
    use Ada.Strings.Unbounded;
    use Gen.Model;
+   use Gen.Model.Enums;
    use Gen.Model.Tables;
 
    use type DOM.Core.Node;
@@ -189,6 +191,59 @@ package body Gen.Artifacts.Hibernate is
    end Register_Class;
 
    --  ------------------------------
+   --  Register the value definition in the enum
+   --  ------------------------------
+   procedure Register_Enum_Value (Enum  : in out Enum_Definition;
+                                  Value : in DOM.Core.Node) is
+      Name : constant DOM.Core.DOM_String      := DOM.Core.Nodes.Node_Name (Value);
+      C    : constant Value_Definition_Access := new Value_Definition;
+   begin
+      Log.Debug ("Register enum value {0}", Name);
+
+      C.Node := Value;
+      C.Number := Enum.Values.Get_Count;
+      Enum.Values.Append (C);
+
+--        C.Is_Inserted := Get_Attribute (Column, "value", True);
+--        C.Is_Updated  := Get_Attribute (Column, "update", True);
+
+   end Register_Enum_Value;
+
+   --  ------------------------------
+   --  Register a new enum definition in the model.
+   --  ------------------------------
+   procedure Register_Enum (O    : in out Gen.Model.Packages.Model_Definition;
+                            Node : in DOM.Core.Node) is
+      procedure Iterate is
+        new Gen.Utils.Iterate_Nodes (T       => Enum_Definition,
+                                     Process => Register_Enum_Value);
+
+      Enum : constant Enum_Definition_Access := new Enum_Definition;
+   begin
+      Enum.Node := Node;
+      Enum.Name := Enum.Get_Attribute ("name");
+      Log.Debug ("Register enum {0}", Enum.Name);
+
+      declare
+         Pos : constant Natural := Index (Enum.Name, ".", Ada.Strings.Backward);
+      begin
+         if Pos > 0 then
+            Enum.Pkg_Name := Unbounded_Slice (Enum.Name, 1, Pos - 1);
+            Enum.Type_Name := Unbounded_Slice (Enum.Name, Pos + 1, Length (Enum.Name));
+         else
+            Enum.Pkg_Name := To_Unbounded_String ("ADO");
+            Enum.Type_Name := Enum.Name;
+         end if;
+      end;
+
+      O.Register_Enum (Enum);
+
+      Log.Debug ("Register enum values from enum {0}", Enum.Name);
+
+      Iterate (Enum_Definition (Enum.all), Enum.Node, "value");
+   end Register_Enum;
+
+   --  ------------------------------
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    --  ------------------------------
@@ -211,7 +266,11 @@ package body Gen.Artifacts.Hibernate is
          procedure Iterate is
            new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
                                         Process => Register_Class);
+         procedure Iterate_Enum is
+           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
+                                        Process => Register_Enum);
       begin
+         Iterate_Enum (Model, Node, "enum");
          Iterate (Model, Node, "class");
          Iterate (Model, Node, "subclass");
       end Register_Mapping;

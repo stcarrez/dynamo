@@ -39,6 +39,9 @@ package Gen.Utils is
    --  Get the Ada package name from a qualified type
    function Get_Package_Name (Name : in String) return String;
 
+   --  Get the Ada type name from a full qualified type
+   function Get_Type_Name (Name : in String) return String;
+
    --  Get a query name from the XML query file name
    function Get_Query_Name (Path : in String) return String;
 

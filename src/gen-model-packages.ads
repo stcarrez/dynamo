@@ -24,6 +24,7 @@ with Util.Beans.Objects;
 with Util.Beans.Objects.Vectors;
 
 with Gen.Model.List;
+limited with Gen.Model.Enums;
 limited with Gen.Model.Tables;
 limited with Gen.Model.Queries;
 package Gen.Model.Packages is
@@ -79,6 +80,10 @@ package Gen.Model.Packages is
    procedure Register_Package (O      : in out Model_Definition;
                                Name   : in Unbounded_String;
                                Result : out Package_Definition_Access);
+
+   --  Register the declaration of the given enum in the model.
+   procedure Register_Enum (O    : in out Model_Definition;
+                            Enum : access Gen.Model.Enums.Enum_Definition'Class);
 
    --  Register the declaration of the given table in the model.
    procedure Register_Table (O     : in out Model_Definition;
@@ -142,6 +147,9 @@ private
    package Table_List is new Gen.Model.List (T        => Definition,
                                              T_Access => Definition_Access);
 
+   subtype Table_List_Definition is Table_List.List_Definition;
+   subtype Enum_List_Definition is Table_List.List_Definition;
+
    type List_Object is new Util.Beans.Basic.List_Bean with record
       Values     : Util.Beans.Objects.Vectors.Vector;
       Row        : Natural;
@@ -168,12 +176,16 @@ private
                        Name : in String) return Util.Beans.Objects.Object;
 
    type Package_Definition is new Definition with record
+      --  Enums defined in the package.
+      Enums        : aliased Enum_List_Definition;
+      Enums_Bean   : Util.Beans.Objects.Object;
+
       --  Hibernate tables
-      Tables       : aliased Table_List.List_Definition;
+      Tables       : aliased Table_List_Definition;
       Tables_Bean  : Util.Beans.Objects.Object;
 
       --  Custom queries
-      Queries      : aliased Table_List.List_Definition;
+      Queries      : aliased Table_List_Definition;
       Queries_Bean : Util.Beans.Objects.Object;
 
       --  A list of external packages which are used (used for with clause generation).
@@ -193,12 +205,16 @@ private
    end record;
 
    type Model_Definition is new Definition with record
+      --  List of all enums.
+      Enums        : aliased Enum_List_Definition;
+      Enums_Bean   : Util.Beans.Objects.Object;
+
       --  List of all tables.
-      Tables      : aliased Table_List.List_Definition;
+      Tables      : aliased Table_List_Definition;
       Tables_Bean : Util.Beans.Objects.Object;
 
       --  List of all queries.
-      Queries      : aliased Table_List.List_Definition;
+      Queries      : aliased Table_List_Definition;
       Queries_Bean : Util.Beans.Objects.Object;
 
       --  Map of all packages.

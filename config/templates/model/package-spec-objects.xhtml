@@ -3,15 +3,6 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core">
-<h:list value="#{package.enums}" var="enum">
- <h:panelGroup rendered="#{not empty comment}">
-   --  --------------------
-   --  #{g:comment(enum.comment)}
-   --  --------------------
- </h:panelGroup>
-   type #{enum.name} is (<h:list value="#{enum.values}" var="value">#{enum.values.rowIndex > 1 ? ', ' : ''}#{value.name}</h:list>);
-</h:list>
-
 
 <h:list value="#{package.tables}" var="table">
  <h:panelGroup rendered="#{not empty table.comment}">

@@ -21,6 +21,7 @@ with Ada.Strings.Unbounded;
 with Util.Beans.Objects;
 
 with Gen.Model.List;
+with Gen.Model.Mappings;
 with Gen.Model.Packages;
 package Gen.Model.Enums is
 
@@ -50,7 +51,7 @@ package Gen.Model.Enums is
    --  ------------------------------
    --  Table Definition
    --  ------------------------------
-   type Enum_Definition is new Definition with record
+   type Enum_Definition is new Mappings.Mapping_Definition with record
       Values         : aliased Value_List.List_Definition;
       Values_Bean    : Util.Beans.Objects.Object;
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;

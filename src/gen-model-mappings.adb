@@ -60,6 +60,8 @@ package body Gen.Model.Mappings is
          return Util.Beans.Objects.To_Object (From.Is_Identifier);
       elsif Name = "isDate" then
          return Util.Beans.Objects.To_Object (From.Is_Date);
+      elsif Name = "isEnum" then
+         return Util.Beans.Objects.To_Object (False);
       else
          return Definition (From).Get_Value (Name);
       end if;
@@ -79,6 +81,18 @@ package body Gen.Model.Mappings is
          return null;
       end if;
    end Find_Type;
+
+   procedure Register_Type (Name    : in String;
+                            Mapping : in Mapping_Definition_Access) is
+      N    : Unbounded_String := To_Unbounded_String (Name);
+      Pos  : constant Mapping_Maps.Cursor := Types.Find (N);
+   begin
+      Log.Debug ("Register type '{0}'", Name);
+
+      if not Mapping_Maps.Has_Element (Pos) then
+         Types.Insert (N, Mapping);
+      end if;
+   end Register_Type;
 
    --  ------------------------------
    --  Register a type mapping <b>From</b> that is mapped to <b>Target</b>.

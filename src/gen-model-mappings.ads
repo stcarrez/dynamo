@@ -46,6 +46,9 @@ package Gen.Model.Mappings is
    function Find_Type (Name : in Ada.Strings.Unbounded.Unbounded_String)
                        return Mapping_Definition_Access;
 
+   procedure Register_Type (Name    : in String;
+                            Mapping : in Mapping_Definition_Access);
+
    --  Register a type mapping <b>From</b> that is mapped to <b>Target</b>.
    procedure Register_Type (Target        : in String;
                             From          : in String;

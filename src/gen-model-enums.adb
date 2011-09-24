@@ -16,12 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-
-with Util.Beans.Objects;
-
-with Gen.Model.List;
-with Gen.Model.Packages;
 package body Gen.Model.Enums is
 
    --  ------------------------------
@@ -50,8 +44,10 @@ package body Gen.Model.Enums is
          return From.Values_Bean;
       elsif Name = "name" then
          return Util.Beans.Objects.To_Object (From.Type_Name);
+      elsif Name = "isEnum" then
+         return Util.Beans.Objects.To_Object (True);
       else
-         return Definition (From).Get_Value (Name);
+         return Mappings.Mapping_Definition (From).Get_Value (Name);
       end if;
    end Get_Value;
 
@@ -59,6 +55,7 @@ package body Gen.Model.Enums is
    overriding
    procedure Prepare (O : in out Enum_Definition) is
    begin
+      O.Target := O.Type_Name;
       null;
    end Prepare;
 

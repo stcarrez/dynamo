@@ -23,6 +23,7 @@ with Gen.Utils;
 with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
+with Gen.Model.Mappings;
 
 with Util.Strings;
 with Util.Strings.Transforms;
@@ -77,6 +78,7 @@ package body Gen.Model.Packages is
       O.Register_Package (Enum.Pkg_Name, Enum.Package_Def);
       Enum.Package_Def.Enums.Append (Enum.all'Access);
       O.Enums.Append (Enum.all'Access);
+      Gen.Model.Mappings.Register_Type (To_String (Enum.Name), Enum.all'Access);
    end Register_Enum;
 
    --  ------------------------------
@@ -184,10 +186,13 @@ package body Gen.Model.Packages is
       begin
          while Table_List.Has_Element (Table_Iter) loop
             declare
-               Table : constant Table_Definition_Access
-                 := Table_Definition_Access (Table_List.Element (Table_Iter));
+               Table : constant Definition_Access := Table_List.Element (Table_Iter);
             begin
-               Prepare_Table (Table);
+               if Table.all in Table_Definition'Class then
+                  Prepare_Table (Table_Definition_Access (Table));
+               else
+                  Table.Prepare;
+               end if;
             end;
             Table_List.Next (Table_Iter);
          end loop;
@@ -201,6 +206,7 @@ package body Gen.Model.Packages is
       O.Used_Types.Values.Clear;
       O.Uses_Calendar_Time := False;
 
+      Prepare_Tables (O.Enums);
       Prepare_Tables (O.Tables);
       Prepare_Tables (O.Queries);
       declare

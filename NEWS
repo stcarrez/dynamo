@@ -1,6 +1,7 @@
 Version 0.5.0   -
   - Support multi-line comments in XML mappings
   - Generate List_Bean types for the XML mapped queries
+  - Add support for Ada enum generation
 
 Version 0.4.0	- Sep 2011
   - Generate ADO database queries

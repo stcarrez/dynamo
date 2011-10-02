@@ -9,7 +9,7 @@
 -----------------------------------------------------------------------
 #{''}
 
-with ASF.Events.Actions;
+with ASF.Events.Faces.Actions;
 package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans is
 #{''}
    --  ------------------------------
@@ -22,9 +22,9 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans is
    end Action;
 #{''}
    package Action_Binding is
-     new ASF.Events.Actions.Action_Method.Bind (Bean   => #{fn:capitalize(moduleName)}_Bean,
-                                                Method => Action,
-                                                Name   => "action");
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => #{fn:capitalize(moduleName)}_Bean,
+                                                      Method => Action,
+                                                      Name   => "action");
 #{''}
    #{fn:capitalize(moduleName)}_Bean_Binding : aliased constant Util.Beans.Methods.Method_Binding_Array
      := (Action_Binding.Proxy'Access, null);

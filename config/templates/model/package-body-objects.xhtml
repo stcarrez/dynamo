@@ -370,9 +370,13 @@
 
    function Get_Value (Item : in #{fn:capitalize(table.type)}_Ref;
                        Name : in String) return Util.Beans.Objects.Object is
-      Impl : constant access #{fn:capitalize(table.type)}_Impl
-         := #{fn:capitalize(table.type)}_Impl (Item.Get_Load_Object.all)'Access;
+      Obj  : constant ADO.Objects.Object_Record_Access := Item.Get_Load_Object;
+      Impl : access #{fn:capitalize(table.type)}_Impl;
    begin
+      if Obj = null then
+         return Util.Beans.Objects.Null_Object;
+      end if;
+      Impl := #{fn:capitalize(table.type)}_Impl (Obj.all)'Access;
 <h:list value="#{table.members}" var="column">
   <h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType}">
       if Name = "#{column.name}" then
@@ -399,7 +403,7 @@
 </h:panelGroup>
       end if;
 </h:panelGroup></h:list>
-      raise ADO.Objects.NOT_FOUND;
+      return Util.Beans.Objects.Null_Object;
    end Get_Value;
 
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;

@@ -74,8 +74,14 @@ package body Gen.Model.Packages is
    --  ------------------------------
    procedure Register_Enum (O      : in out Model_Definition;
                             Enum   : access Gen.Model.Enums.Enum_Definition'Class) is
+      Name : constant String := Enum.Get_Name;
    begin
+      Log.Info ("Registering enum {0}", Name);
+
       O.Register_Package (Enum.Pkg_Name, Enum.Package_Def);
+      if Enum.Package_Def.Enums.Find (Name) /= null then
+         raise Name_Exist with "Enum '" & Name & "' already defined";
+      end if;
       Enum.Package_Def.Enums.Append (Enum.all'Access);
       O.Enums.Append (Enum.all'Access);
       Gen.Model.Mappings.Register_Type (To_String (Enum.Name), Enum.all'Access);
@@ -86,8 +92,14 @@ package body Gen.Model.Packages is
    --  ------------------------------
    procedure Register_Table (O     : in out Model_Definition;
                              Table : access Gen.Model.Tables.Table_Definition'Class) is
+      Name : constant String := Table.Get_Name;
    begin
+      Log.Info ("Registering table {0}", Name);
+
       O.Register_Package (Table.Pkg_Name, Table.Package_Def);
+      if Table.Package_Def.Tables.Find (Name) /= null then
+         raise Name_Exist with "Table '" & Name & "' already defined";
+      end if;
       Table.Package_Def.Tables.Append (Table.all'Access);
       O.Tables.Append (Table.all'Access);
    end Register_Table;

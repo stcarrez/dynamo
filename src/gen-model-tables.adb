@@ -18,6 +18,7 @@
 
 with Ada.Strings;
 with Util.Strings;
+with DOM.Core.Elements;
 package body Gen.Model.Tables is
 
    use type DOM.Core.Node;
@@ -150,6 +151,16 @@ package body Gen.Model.Tables is
       O.Members_Bean := Util.Beans.Objects.To_Object (O.Members'Unchecked_Access,
                                                       Util.Beans.Objects.STATIC);
    end Initialize;
+
+   --  ------------------------------
+   --  Get the table unique name.
+   --  ------------------------------
+   overriding
+   function Get_Name (From : in Table_Definition) return String is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (From.Node, "table");
+   begin
+      return V;
+   end Get_Name;
 
    --  ------------------------------
    --  Get the value identified by the name.

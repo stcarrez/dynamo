@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-list -- List bean interface for model objects
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,6 +66,11 @@ package Gen.Model.List is
    --  Append the item in the list
    procedure Append (Def  : in out List_Definition;
                      Item : in T_Access);
+
+   --  Find a definition given the name.
+   --  Returns the definition object or null.
+   function Find (Def  : in List_Definition;
+                  Name : in String) return T_Access;
 
 private
    type List_Definition is limited new Util.Beans.Basic.List_Bean with record

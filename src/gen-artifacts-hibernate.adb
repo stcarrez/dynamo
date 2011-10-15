@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
 with Ada.Directories;
+with Ada.Exceptions;
 
 with DOM.Core.Nodes;
 
@@ -58,6 +59,14 @@ package body Gen.Artifacts.Hibernate is
    procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
                              Node : in DOM.Core.Node);
 
+   --  Register a new enum definition in the model.
+   procedure Register_Enum (O    : in out Gen.Model.Packages.Model_Definition;
+                            Node : in DOM.Core.Node);
+
+   --  Register the value definition in the enum
+   procedure Register_Enum_Value (Enum  : in out Enum_Definition;
+                                  Value : in DOM.Core.Node);
+
    --  ------------------------------
    --  Register the column definition in the table
    --  ------------------------------
@@ -86,7 +95,7 @@ package body Gen.Artifacts.Hibernate is
             C.Type_Name := To_Unbounded_String (Get_Normalized_Type (Column, "type"));
          end if;
 
-         Log.Debug ("Register column {0}", C.Type_Name);
+         Log.Debug ("Register column {0} of type {1}", Name, To_String (C.Type_Name));
          if N /= null then
             C.Sql_Name := Get_Attribute (N, "name");
             C.Sql_Type := Get_Attribute (N, "sql-type");
@@ -241,6 +250,7 @@ package body Gen.Artifacts.Hibernate is
       Log.Debug ("Register enum values from enum {0}", Enum.Name);
 
       Iterate (Enum_Definition (Enum.all), Enum.Node, "value");
+
    end Register_Enum;
 
    --  ------------------------------
@@ -253,7 +263,7 @@ package body Gen.Artifacts.Hibernate is
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
-      pragma Unreferenced (Handler, Path, Context);
+      pragma Unreferenced (Handler, Path);
 
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
                                   Node  : in DOM.Core.Node);
@@ -282,6 +292,10 @@ package body Gen.Artifacts.Hibernate is
       Log.Debug ("Initializing hibernate artifact for the configuration");
 
       Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "hibernate-mapping");
+
+   exception
+      when E : Name_Exist =>
+         Context.Error (Ada.Exceptions.Exception_Message (E));
    end Initialize;
 
    --  ------------------------------

@@ -24,6 +24,10 @@ with Util.Beans.Objects;
 with DOM.Core;
 package Gen.Model is
 
+   --  Exception raised if a name is already registered in the model.
+   --  This exception is raised if a table, an enum is already defined.
+   Name_Exist : exception;
+
    --  Get the attribute identified by <b>Name</b> on the DOM node
    --  and return it as an EL object.
    function Get_Attribute (Node : DOM.Core.Node;
@@ -45,6 +49,9 @@ package Gen.Model is
 
    --  Prepare the generation of the model.
    procedure Prepare (O : in out Definition) is null;
+
+   --  Get the object unique name.
+   function Get_Name (From : in Definition) return String;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.

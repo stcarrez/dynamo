@@ -74,6 +74,15 @@ package body Gen.Model is
    end Get_Comment;
 
    --  ------------------------------
+   --  Get the object unique name.
+   --  ------------------------------
+   function Get_Name (From : in Definition) return String is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (From.Node, "name");
+   begin
+      return V;
+   end Get_Name;
+
+   --  ------------------------------
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------

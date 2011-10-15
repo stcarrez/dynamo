@@ -522,7 +522,7 @@ package body Gen.Generator is
                     Arg1    : in String := "";
                     Arg2    : in String := "") is
    begin
-      Log.Error (Message, Arg1, Arg2);
+      Log.Error ("error: " & Message, Arg1, Arg2);
       H.Status := 1;
    end Error;
 

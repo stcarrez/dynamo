@@ -87,4 +87,21 @@ package body Gen.Model.List is
       Def.Nodes.Append (Item);
    end Append;
 
+   --  ------------------------------
+   --  Find a definition given the name.
+   --  Returns the definition object or null.
+   --  ------------------------------
+   function Find (Def  : in List_Definition;
+                  Name : in String) return T_Access is
+      Iter : Vectors.Cursor := Def.Nodes.First;
+   begin
+      while Vectors.Has_Element (Iter) loop
+         if Vectors.Element (Iter).Get_Name = Name then
+            return Vectors.Element (Iter);
+         end if;
+         Vectors.Next (Iter);
+      end loop;
+      return null;
+   end Find;
+
 end Gen.Model.List;

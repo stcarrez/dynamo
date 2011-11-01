@@ -1,0 +1,25 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="regtests/#{projectName}_harness.adb">-----------------------------------------------------------------------
+--  #{fn:capitalize(projectName)}-test -- Unit tests
+<ui:include src="../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+#{''}
+with AWA.Testsuite;
+#{''}
+with Util.Tests;
+with AWA.Tests;
+with #{fn:capitalize(projectName)}.Testsuite;
+#{''}
+procedure #{fn:capitalize(projectName)}_Harness is
+#{''}
+   procedure Harness is new Util.Tests.Harness (#{fn:capitalize(projectName)}.Testsuite.Suite,
+                                                AWA.Tests.Initialize);
+#{''}
+begin
+   Harness ("#{fn:toLowerCase(projectName)}-tests.xml");
+end #{fn:capitalize(projectName)}_Harness;
+</f:view>

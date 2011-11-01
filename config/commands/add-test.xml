@@ -1,0 +1,18 @@
+<commands>
+   <command>
+      <name>add-test</name>
+      <title>Add a new test package to the application</title>
+      <usage>add-test MODULE</usage>
+      <help>
+         The test framework consists of a set of test cases that are registered in a testsuite.
+         A test harness allows to execute the tests registered in the testsuite.
+      </help>
+      <param optional='false' name='moduleName' arg='MODULE'/>
+      <basedir></basedir>
+      <template>add-test/test-spec.xhtml</template>
+      <template>add-test/test-body.xhtml</template>
+      <template>add-test/test-testsuite-spec.xhtml</template>
+      <template>add-test/test-testsuite-body.xhtml</template>
+      <template>add-test/test-harness.xhtml</template>
+   </command>
+</commands>

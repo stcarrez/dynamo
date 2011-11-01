@@ -1387,25 +1387,25 @@
 
 /* Define to 1 if you have the <sys/file.h> header file. */
 #ifndef USED_FOR_TARGET
-#define HAVE_SYS_FILE_H 1
+// #define HAVE_SYS_FILE_H 1
 #endif
 
 
 /* Define to 1 if you have the <sys/mman.h> header file. */
 #ifndef USED_FOR_TARGET
-#define HAVE_SYS_MMAN_H 1
+// #define HAVE_SYS_MMAN_H 1
 #endif
 
 
 /* Define to 1 if you have the <sys/param.h> header file. */
 #ifndef USED_FOR_TARGET
-#define HAVE_SYS_PARAM_H 1
+// #define HAVE_SYS_PARAM_H 1
 #endif
 
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #ifndef USED_FOR_TARGET
-#define HAVE_SYS_RESOURCE_H 1
+// #define HAVE_SYS_RESOURCE_H 1
 #endif
 
 
@@ -1417,7 +1417,7 @@
 
 /* Define to 1 if you have the <sys/times.h> header file. */
 #ifndef USED_FOR_TARGET
-#define HAVE_SYS_TIMES_H 1
+// #define HAVE_SYS_TIMES_H 1
 #endif
 
 
@@ -1435,7 +1435,7 @@
 
 /* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
 #ifndef USED_FOR_TARGET
-#define HAVE_SYS_WAIT_H 1
+// #define HAVE_SYS_WAIT_H 1
 #endif
 
 

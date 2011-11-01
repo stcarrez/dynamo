@@ -1,0 +1,18 @@
+<commands>
+   <command>
+      <name>add-service</name>
+      <title>Add a new service to the application</title>
+      <usage>add-service MODULE NAME</usage>
+      <help>
+         The service layer provides an abstraction layer that integrates the business logic
+         of the application.  It provides a set of high level operations that can be used
+         by bean objects to create, update and delete data model entities.  It is responsible
+         for keeping the coherency of the data model.
+      </help>
+      <param optional='false' name='moduleName' arg='MODULE'/>
+      <param optional='false' name='serviceName' arg='NAME'/>
+      <basedir></basedir>
+      <template>add-service/service-spec.xhtml</template>
+      <template>add-service/service-body.xhtml</template>
+   </command>
+</commands>

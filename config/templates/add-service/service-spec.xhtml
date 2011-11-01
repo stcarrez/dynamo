@@ -1,0 +1,37 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="src/#{projectName}-#{moduleName}-services.ads">-----------------------------------------------------------------------
+--  #{projectName}-#{moduleName}-services -- Service #{serviceName}
+<ui:include src="../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+#{''}
+with ADO;
+with AWA.Modules;
+with Security.Permissions;
+package #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Services is
+#{''}
+   --  Define the permissions.
+   package ACL_Create_#{fn:capitalize(serviceName)} is new Security.Permissions.Permission_ACL ("#{fn:toLowerCase(serviceName)}-create");
+   package ACL_Delete_#{fn:capitalize(serviceName)} is new Security.Permissions.Permission_ACL ("#{fn:toLowerCase(serviceName)}-delete");
+   package ACL_Update_#{fn:capitalize(serviceName)} is new Security.Permissions.Permission_ACL ("#{fn:toLowerCase(serviceName)}-update");
+#{''}
+   --  ------------------------------
+   --  Service #{serviceName}
+   --  ------------------------------
+   type #{fn:capitalize(serviceName)}_Service is new AWA.Modules.Module_Manager with private;
+   type #{fn:capitalize(serviceName)}_Service_Access is access all #{fn:capitalize(serviceName)}_Service'Class;
+#{''}
+   --  Create operation
+   procedure Create_#{fn:capitalize(serviceName)} (Model : in out #{fn:capitalize(serviceName)}_Service;
+                    #{g:indent(serviceName)}  Title     : in String;
+                    #{g:indent(serviceName)}  Result    : out ADO.Identifier);
+#{''}
+private
+#{''}
+   type #{fn:capitalize(serviceName)}_Service is new AWA.Modules.Module_Manager with null record;
+#{''}
+end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Services;
+</f:view>

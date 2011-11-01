@@ -1,0 +1,67 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="src/#{projectName}-#{moduleName}-services.adb">-----------------------------------------------------------------------
+--  #{projectName}-#{moduleName}-services -- Service #{serviceName}
+<ui:include src="../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+#{''}
+with AWA.Permissions;
+with AWA.Permissions.Services;
+with AWA.Services.Contexts;
+with AWA.Workspaces.Models;
+with AWA.Workspaces.Module;
+#{''}
+with ADO.Sessions;
+with ADO.Objects;
+#{''}
+with Util.Log.Loggers;
+package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Services is
+#{''}
+   use AWA.Services;
+   use ADO.Sessions;
+   use Util.Log;
+#{''}
+   Log : constant Loggers.Logger := Loggers.Create ("#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Services");
+#{''}
+   --  ------------------------------
+   --  Create operation
+   --  ------------------------------
+   procedure Create_#{fn:capitalize(serviceName)} (Model  : in out #{fn:capitalize(serviceName)}_Service;
+                    #{g:indent(serviceName)}  Title  : in String;
+                    #{g:indent(serviceName)}  Result : out ADO.Identifier) is
+      Ctx   : constant Contexts.Service_Context_Access := AWA.Services.Contexts.Current;
+      User  : constant ADO.Identifier := Ctx.Get_User_Identifier;
+      DB    : Master_Session := AWA.Services.Contexts.Get_Master_Session (Ctx);
+      WS    : AWA.Workspaces.Models.Workspace_Ref;
+      #{fn:capitalize(serviceName)} : AWA.Workspaces.Models.Workspace_Ref;
+   begin
+      Log.Info ("Creating #{fn:capitalize(serviceName)}");
+#{''}
+      Ctx.Start;
+      AWA.Workspaces.Module.Get_Workspace (DB, Ctx, WS);
+#{''}
+      --  Check that the user has the create permission on the given workspace.
+      AWA.Permissions.Check (Permission => ACL_Create_#{fn:capitalize(serviceName)}.Permission,
+                             Entity     => WS.Get_Id);
+#{''}
+      --  #{fn:capitalize(serviceName)}.Set_Name (Title);
+      --  #{fn:capitalize(serviceName)}.Set_Workspace (WS);
+      --  #{fn:capitalize(serviceName)}.Set_Create_Date (Ada.Calendar.Clock);
+      --  #{fn:capitalize(serviceName)}.Save (DB);
+#{''}
+      --  Add the permission for the user to use the new blog.
+      AWA.Permissions.Services.Add_Permission (Session => DB,
+                                               User    => User,
+                                               Entity  => #{fn:capitalize(serviceName)});
+      Ctx.Commit;
+#{''}
+      Result := #{fn:capitalize(serviceName)}.Get_Id;
+      Log.Info ("#{fn:capitalize(serviceName)} {0} created for user {1}",
+                ADO.Identifier'Image (Result), ADO.Identifier'Image (User));
+   end Create_#{fn:capitalize(serviceName)};
+#{''}
+end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Services;
+</f:view>

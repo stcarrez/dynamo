@@ -121,7 +121,8 @@
 </h:list>
 
    --  Copy of the object.
-   function Copy (Object : #{fn:capitalize(table.type)}_Ref) return #{fn:capitalize(table.type)}_Ref is
+   procedure Copy (Object : in #{fn:capitalize(table.type)}_Ref;
+                   Into   : in out #{fn:capitalize(table.type)}_Ref) is
       Result : #{fn:capitalize(table.type)}_Ref;
    begin
       if not Object.Is_Null then
@@ -143,7 +144,7 @@
 </h:list>
          end;
       end if;
-      return Result;
+      Into := Result;
    end Copy;
 
    procedure Find (Object  : in out #{fn:capitalize(table.type)}_Ref;
@@ -405,6 +406,42 @@
 </h:panelGroup></h:list>
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
+   
+<h:panelGroup rendered="#{table.bean eq 'yes'}">
+#{''}
+   --  Set the value identified by the name
+   overriding 
+   procedure Set_Value (Item  : in out #{fn:capitalize(table.type)}_Ref;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+<h:list value="#{table.members}" var="column">
+  <h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType and column.isUpdated and column.name ne table.id.name }">
+      if Name = "#{column.name}" then
+      <h:panelGroup rendered="#{column.type.isIdentifier}">
+         Item.Set_#{fn:capitalize(column.name)} (ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value)));
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isInteger}">
+         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.To_Integer (Value));
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.Time.To_Time (Value));
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+         if Util.Beans.Objects.Is_Null (Value) Impl.#{fn:capitalize(column.name)}.Is_Null then
+            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(True));
+         else
+            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(False, Util.Beans.Objects.Time.To_Time (Value)));
+         end if;
+      </h:panelGroup>
+    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isIdentifier and not column.type.isDate}">
+         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.To_String (Value));
+</h:panelGroup>
+      end if;
+</h:panelGroup></h:list>
+   end Set_Value;
+#{''}
+</h:panelGroup>
 
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;

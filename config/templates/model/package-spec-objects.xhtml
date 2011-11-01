@@ -16,8 +16,12 @@
    --  Raises Constraint_Error if the string cannot be converted into the object key.
    function #{table.type}_Key (Id : in String) return ADO.Objects.Object_Key;
 #{''}
-
+<h:panelGroup rendered="#{table.bean eq 'yes'}">
+   type #{table.type}_Ref is new ADO.Objects.Object_Ref and Util.Beans.Basic.Bean with null record;
+</h:panelGroup>
+<h:panelGroup rendered="#{table.bean ne 'yes'}">
    type #{table.type}_Ref is new ADO.Objects.Object_Ref with null record;
+</h:panelGroup>
 #{''}
 
    Null_#{table.type} : constant #{table.type}_Ref;
@@ -87,7 +91,14 @@
    function Get_Value (Item : in #{fn:capitalize(table.type)}_Ref;
                        Name : in String) return Util.Beans.Objects.Object;
 #{''}
-
+<h:panelGroup rendered="#{table.bean eq 'yes'}">
+   --  Set the value identified by the name
+   overriding 
+   procedure Set_Value (Item  : in out #{fn:capitalize(table.type)}_Ref;
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+#{''}
+</h:panelGroup>
    --  Table definition
    #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping;
 #{''}
@@ -98,7 +109,8 @@
 #{''}
 
    --  Copy of the object.
-   function Copy (Object : #{fn:capitalize(table.type)}_Ref) return #{fn:capitalize(table.type)}_Ref;
+   procedure Copy (Object : in #{fn:capitalize(table.type)}_Ref;
+                   Into   : in out #{fn:capitalize(table.type)}_Ref);
 #{''}
 
    package #{fn:capitalize(table.type)}_Vectors is

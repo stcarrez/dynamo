@@ -16,8 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
-with Ada.Strings.Unbounded.Hash;
-with Ada.Containers.Hashed_Sets;
+with Ada.Containers.Ordered_Sets;
 with Ada.Containers.Indefinite_Vectors;
 
 with DOM.Core;
@@ -47,9 +46,9 @@ package Gen.Utils is
 
    use Ada.Strings.Unbounded;
    package String_Set is
-     new Ada.Containers.Hashed_Sets (Element_Type    => Ada.Strings.Unbounded.Unbounded_String,
-                                     Hash            => Ada.Strings.Unbounded.Hash,
-                                     Equivalent_Elements => Ada.Strings.Unbounded."=");
+     new Ada.Containers.Ordered_Sets (Element_Type => Ada.Strings.Unbounded.Unbounded_String,
+                                      "<"          => Ada.Strings.Unbounded."<",
+                                      "="          => Ada.Strings.Unbounded."=");
 
    package String_List is new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
                                                                  Element_Type => String,

@@ -26,10 +26,15 @@ generic
    type T_Access is access all T'Class;
 package Gen.Model.List is
 
+   --  Compare the two definitions.
+   function "<" (Left, Right : in T_Access) return Boolean;
+
    package Vectors is
       new Ada.Containers.Vectors (Index_Type   => Natural,
                                   Element_Type => T_Access,
                                   "="          => "=");
+
+   package Sorting is new Vectors.Generic_Sorting;
 
    subtype Cursor is Vectors.Cursor;
    subtype Vector is Vectors.Vector;
@@ -66,6 +71,9 @@ package Gen.Model.List is
    --  Append the item in the list
    procedure Append (Def  : in out List_Definition;
                      Item : in T_Access);
+
+   --  Sort the list of items on their names.
+   procedure Sort (List : in out List_Definition);
 
    --  Find a definition given the name.
    --  Returns the definition object or null.

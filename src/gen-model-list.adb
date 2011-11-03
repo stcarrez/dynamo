@@ -18,6 +18,16 @@
 package body Gen.Model.List is
 
    --  ------------------------------
+   --  Compare the two definitions.
+   --  ------------------------------
+   function "<" (Left, Right : in T_Access) return Boolean is
+      Left_Name  : constant String := Left.Get_Name;
+      Right_Name : constant String := Right.Get_Name;
+   begin
+      return Left_Name < Right_Name;
+   end "<";
+
+   --  ------------------------------
    --  Get the first item of the list
    --  ------------------------------
    function First (Def : List_Definition) return Cursor is
@@ -86,6 +96,14 @@ package body Gen.Model.List is
    begin
       Def.Nodes.Append (Item);
    end Append;
+
+   --  ------------------------------
+   --  Sort the list of items on their names.
+   --  ------------------------------
+   procedure Sort (List : in out List_Definition) is
+   begin
+      Sorting.Sort (List.Nodes);
+   end Sort;
 
    --  ------------------------------
    --  Find a definition given the name.

@@ -187,6 +187,8 @@ package body Gen.Model.Packages is
 
                elsif T = "Time" or T = "Date" or T = "Timestamp" or T = "Nullable_Time" then
                   O.Uses_Calendar_Time := True;
+
+
                end if;
             end;
             Column_List.Next (C);
@@ -218,6 +220,8 @@ package body Gen.Model.Packages is
       O.Used_Types.Values.Clear;
       O.Uses_Calendar_Time := False;
 
+      O.Enums.Sort;
+      O.Queries.Sort;
       Prepare_Tables (O.Enums);
       Prepare_Tables (O.Tables);
       Prepare_Tables (O.Queries);

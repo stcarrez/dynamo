@@ -382,7 +382,7 @@ package body Gen.Artifacts.Hibernate is
                if not SHA_Files.Contains (H) then
                   SHA_Files.Include (H);
                   Append (Content, "/* Copied from ");
-                  Append (Content, Path);
+                  Append (Content, Ada.Directories.Simple_Name (Path));
                   Append (Content, "*/");
                   Append (Content, ASCII.LF);
                   Append (Content, SQL);

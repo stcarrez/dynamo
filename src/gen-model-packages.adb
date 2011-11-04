@@ -369,6 +369,7 @@ package body Gen.Model.Packages is
          Element (Iter).Prepare;
          Next (Iter);
       end loop;
+      O.Tables.Sort;
    end Prepare;
 
    --  ------------------------------

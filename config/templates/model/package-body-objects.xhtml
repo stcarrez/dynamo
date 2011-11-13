@@ -309,10 +309,12 @@
          begin
             Stmt.Execute (Result);
             if Result /= 1 then
-               if Result = 0 then
-                  raise ADO.Objects.LAZY_LOCK;
-               else
+               if Result /= 0 then
                   raise ADO.Objects.UPDATE_ERROR;
+<h:panelGroup rendered="#{not empty table.version}">
+               else
+                  raise ADO.Objects.LAZY_LOCK;
+</h:panelGroup>
                end if;
             end if;
          end;

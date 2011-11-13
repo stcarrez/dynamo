@@ -156,6 +156,7 @@ package body Gen.Artifacts.Query is
       begin
          Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
          Table.Pkg_Name  := Pkg;
+         Table.Node      := Node;
          Iterate_Mapping (Query_Definition (Table.all), Node, "class");
          Iterate_Query (Query_Definition (Table.all), Node, "query");
          if Length (Table.Pkg_Name) = 0 then

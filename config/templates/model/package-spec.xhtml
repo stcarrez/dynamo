@@ -31,6 +31,9 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
 with Util.Beans.Objects;
+<h:panelGroup rendered="#{not empty package.enums}">
+with Util.Beans.Objects.Enums;
+</h:panelGroup>
 with Util.Beans.Basic.Lists;
 <h:list value="#{package.usedTypes}" var="type">
 with #{type};

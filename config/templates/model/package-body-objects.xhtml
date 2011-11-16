@@ -27,11 +27,11 @@
    end "=";
 
    procedure Set_Field (Object : in out #{fn:capitalize(table.type)}_Ref'Class;
-                        Impl   : out #{fn:capitalize(table.type)}_Access;
-                        Field  : in Positive) is
+                        Impl   : out #{fn:capitalize(table.type)}_Access) is
+      Result : ADO.Objects.Object_Record_Access;
    begin
-      Object.Set_Field (Field);
-      Impl := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
+      Object.Prepare_Modify (Result);
+      Impl := #{fn:capitalize(table.type)}_Impl (Result.all)'Access;
    end Set_Field;
 
    --  Internal method to allocate the Object_Record instance
@@ -48,6 +48,9 @@
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isInteger}">
       Impl.#{fn:capitalize(column.name)} := 0;
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isEnum}">
+      Impl.#{fn:capitalize(column.name)} := #{column.type.name}'First;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
       Impl.#{fn:capitalize(column.name)}.Is_Null := True;
@@ -67,30 +70,61 @@
     <h:panelGroup rendered="#{column.type.isString}">
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
                    #{g:indent(column.name)} Value : in String) is
+      Impl : #{fn:capitalize(table.type)}_Access;
    begin
-      Object.Set_#{fn:capitalize(column.name)} (Ada.Strings.Unbounded.To_Unbounded_String (Value));
+      Set_Field (Object, Impl);
+      ADO.Objects.Set_Field_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
    end Set_#{fn:capitalize(column.name)};
     </h:panelGroup>
 
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
-                   #{g:indent(column.name)} Value  : in #{g:adaType(column,1)}) is
+                  #{g:indent(column.name)} Value  : in #{g:adaType(column,1)}) is
+     <h:panelGroup rendered="#{column.type.isEnum}">
+      procedure Set_Field_Enum is
+         new ADO.Objects.Set_Field_Operation (#{column.type.name});
+     </h:panelGroup>
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
-      Set_Field (Object, Impl, #{column.index + 1});
+      Set_Field (Object, Impl);
+
     <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isBoolean}">
-      Impl.#{fn:capitalize(column.name)} := Value;
+      ADO.Objects.Set_Field_Boolean (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
+
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isInteger}">
+      ADO.Objects.Set_Field_Integer (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+    </h:panelGroup>
+
     <h:panelGroup rendered="#{column.type.isEnum}">
-      Impl.#{fn:capitalize(column.name)} := Value;
+      Set_Field_Enum (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
+
     <h:panelGroup rendered="#{column.name ne table.id.name and not column.isPrimitiveType and not column.type.isBoolean and not column.type.isEnum}">
-      Impl.#{fn:capitalize(column.name)} := #{g:adaType(column,0)} (Value);
+      ADO.Objects.Set_Field_Object (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
-    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType}">
-      Impl.#{fn:capitalize(column.name)} := Value;
+
+    <h:panelGroup rendered="#{column.type.isDate}">
+      ADO.Objects.Set_Field_Time (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
+
+    <h:panelGroup rendered="#{column.type.isIdentifier and column.name ne table.id.name}">
+      ADO.Objects.Set_Field_Identifier (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{column.type.isString}">
+      ADO.Objects.Set_Field_Unbounded_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type'}">
+      ADO.Objects.Set_Field_Entity_Type (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isDate and not column.type.isString and not column.type.isIdentifier and not column.type.name eq 'ADO.Entity_Type'}">
+      ADO.Objects.Set_Field_#{fn:capitalize(g:adaType(column,2))} (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+    </h:panelGroup>
+
     <h:panelGroup rendered="#{column.name eq table.id.name}">
-      ADO.Objects.Set_Key_Value (Impl.all, Value);
+      ADO.Objects.Set_Field_Key_Value (Impl.all, #{column.index + 1}, Value);
     </h:panelGroup>
    end Set_#{fn:capitalize(column.name)};
   </h:panelGroup>
@@ -381,10 +415,13 @@
       end if;
       Impl := #{fn:capitalize(table.type)}_Impl (Obj.all)'Access;
 <h:list value="#{table.members}" var="column">
-  <h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType}">
+  <h:panelGroup rendered="#{not column.isVersion and (column.isPrimitiveType or column.type.isEnum)}">
       if Name = "#{column.name}" then
     <h:panelGroup rendered="#{column.name eq table.id.name}">
          return ADO.Objects.To_Object (Impl.Get_Key);
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isEnum}">
+         return #{column.type.name}_Objects.To_Object (Impl.#{fn:capitalize(column.name)});
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name ne table.id.name}">
       <h:panelGroup rendered="#{column.type.isInteger or column.type.isIdentifier}">
@@ -400,7 +437,7 @@
             return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)}.Value);
          end if;
       </h:panelGroup>
-    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isIdentifier and not column.type.isDate}">
+    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate}">
          return Util.Beans.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
   </h:panelGroup>
 </h:panelGroup>
@@ -508,10 +545,13 @@
   <h:panelGroup rendered="#{column.type.isDate}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Time (#{column.index});
   </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isEnum}">
+      Object.#{fn:capitalize(column.name)} := #{column.type.name}'Val (Stmt.Get_Integer (#{column.index}));
+  </h:panelGroup>
   <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type'}">
       Object.#{fn:capitalize(column.name)} := ADO.Entity_Type (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isIdentifier and not column.type.isString and not column.type.name eq 'ADO.Entity_Type'}">
+  <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isEnum and not column.type.isIdentifier and not column.type.isString and not column.type.name eq 'ADO.Entity_Type'}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
   </h:panelGroup>
 </h:panelGroup>

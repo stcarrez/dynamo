@@ -91,7 +91,7 @@
       ADO.Objects.Set_Field_Boolean (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
-    <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isInteger}">
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isInteger and column.type.name ne 'ADO.Entity_Type'}">
       ADO.Objects.Set_Field_Integer (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
@@ -119,7 +119,7 @@
       ADO.Objects.Set_Field_Entity_Type (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
-    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isDate and not column.type.isString and not column.type.isIdentifier and not column.type.name eq 'ADO.Entity_Type'}">
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isDate and not column.type.isString and not column.type.isIdentifier and column.type.name ne 'ADO.Entity_Type'}">
       ADO.Objects.Set_Field_#{fn:capitalize(g:adaType(column,2))} (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 

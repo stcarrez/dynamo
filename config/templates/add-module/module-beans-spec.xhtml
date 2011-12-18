@@ -16,35 +16,35 @@ with Util.Beans.Methods;
 with #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module;
 package #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans is
 #{''}
-   type #{fn:capitalize(moduleName)}_Bean is new Util.Beans.Basic.Bean
+   type #{fn:capitalize(g:singular(moduleName))}_Bean is new Util.Beans.Basic.Bean
      and Util.Beans.Methods.Method_Bean with record
-      Module : #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module.#{fn:capitalize(moduleName)}_Module_Access := null;
+      Module : #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module.#{fn:capitalize(g:singular(moduleName))}_Module_Access := null;
       Count  : Natural := 0;
    end record;
-   type #{fn:capitalize(moduleName)}_Bean_Access is access all #{fn:capitalize(moduleName)}_Bean'Class;
+   type #{fn:capitalize(g:singular(moduleName))}_Bean_Access is access all #{fn:capitalize(g:singular(moduleName))}_Bean'Class;
 #{''}
    --  Get the value identified by the name.
    overriding
-   function Get_Value (From : in #{fn:capitalize(moduleName)}_Bean;
+   function Get_Value (From : in #{fn:capitalize(g:singular(moduleName))}_Bean;
                        Name : in String) return Util.Beans.Objects.Object;
 #{''}
    --  Set the value identified by the name.
    overriding
-   procedure Set_Value (From  : in out #{fn:capitalize(moduleName)}_Bean;
+   procedure Set_Value (From  : in out #{fn:capitalize(g:singular(moduleName))}_Bean;
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object);
 #{''}
    --  This bean provides some methods that can be used in a Method_Expression
    overriding
-   function Get_Method_Bindings (From : in #{fn:capitalize(moduleName)}_Bean)
+   function Get_Method_Bindings (From : in #{fn:capitalize(g:singular(moduleName))}_Bean)
                                  return Util.Beans.Methods.Method_Binding_Array_Access;
 #{''}
    --  Example of action method.
-   procedure Action (Bean    : in out #{fn:capitalize(moduleName)}_Bean;
+   procedure Action (Bean    : in out #{fn:capitalize(g:singular(moduleName))}_Bean;
                      Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 #{''}
    --  Create the #{fn:capitalize(moduleName)}_Bean bean instance.
-   function Create_#{fn:capitalize(moduleName)}_Bean (Module : in #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module.#{fn:capitalize(moduleName)}_Module_Access)
+   function Create_#{fn:capitalize(g:singular(moduleName))}_Bean (Module : in #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module.#{fn:capitalize(g:singular(moduleName))}_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access;
 #{''}
 end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans;

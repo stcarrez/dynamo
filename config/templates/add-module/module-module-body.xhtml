@@ -31,7 +31,7 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module i
       --  Register here any bean class, servlet, filter.
       Register.Register (Plugin => Plugin,
                          Name   => "#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.#{fn:capitalize(moduleName)}_Bean",
-                         Handler => #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.Create_#{fn:capitalize(moduleName)}_Bean'Access);
+                         Handler => #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.Create_#{fn:capitalize(g:singular(moduleName))}_Bean'Access);
 #{''}
       AWA.Modules.Module (Plugin).Initialize (App);
 #{''}

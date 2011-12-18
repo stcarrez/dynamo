@@ -4,9 +4,8 @@
       <title>Add a new module to the application</title>
       <usage>add-module NAME</usage>
       <help>
-         The new web page can be configured to use the given layout.
-         The layout file must exist to be used.  The default layout is 'layout'.");
-         You can create a new layout with 'add-layout' command.");
+The module is registered in the AWA application.  It is configured by using
+an XML file which defines the beans, servlets, filters that it provides.
       </help>
       <param optional='false' name='moduleName' arg='NAME'/>
       <basedir></basedir>

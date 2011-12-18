@@ -81,6 +81,9 @@ package body Gen.Generator is
    --  EL function to format an Ada comment
    function Comment (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
+   --  EL function to return a singular form of a name
+   function To_Singular (Value : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class);
 
    --  ------------------------------
@@ -247,6 +250,19 @@ package body Gen.Generator is
    end To_Ada_Ident;
 
    --  ------------------------------
+   --  EL function to return a singular form of a name
+   --  ------------------------------
+   function To_Singular (Value : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      Name   : constant String := Util.Beans.Objects.To_String (Value);
+   begin
+      if Name'Length > 1 and then Name (Name'Last) = 's' then
+         return Util.Beans.Objects.To_Object (Name (Name'First .. Name'Last - 1));
+      else
+         return Value;
+      end if;
+   end To_Singular;
+
+   --  ------------------------------
    --  EL function to format an Ada comment
    --  ------------------------------
    function Comment (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
@@ -309,6 +325,9 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "comment",
                            Namespace => URI,
                            Func      => Comment'Access);
+      Mapper.Set_Function (Name      => "singular",
+                           Namespace => URI,
+                           Func      => To_Singular'Access);
    end Set_Functions;
 
    --  ------------------------------

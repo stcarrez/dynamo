@@ -17,17 +17,20 @@ package #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module is
    --  ------------------------------
    --  Module #{moduleName}
    --  ------------------------------
-   type #{fn:capitalize(moduleName)}_Module is new AWA.Modules.Module with private;
-   type #{fn:capitalize(moduleName)}_Module_Access is access all #{fn:capitalize(moduleName)}_Module'Class;
+   type #{fn:capitalize(g:singular(moduleName))}_Module is new AWA.Modules.Module with private;
+   type #{fn:capitalize(g:singular(moduleName))}_Module_Access is access all #{fn:capitalize(g:singular(moduleName))}_Module'Class;
 #{''}
    --  Initialize the #{moduleName} module.
    overriding
-   procedure Initialize (Plugin : in out #{fn:capitalize(moduleName)}_Module;
+   procedure Initialize (Plugin : in out #{fn:capitalize(g:singular(moduleName))}_Module;
                          App    : in AWA.Modules.Application_Access);
+#{''}
+   --  Get the #{moduleName} module.
+   function Get_#{fn:capitalize(g:singular(moduleName))}_Module return #{fn:capitalize(g:singular(moduleName))}_Module_Access;
 #{''}
 private
 #{''}
-   type #{fn:capitalize(moduleName)}_Module is new AWA.Modules.Module with null record;
+   type #{fn:capitalize(g:singular(moduleName))}_Module is new AWA.Modules.Module with null record;
 #{''}
 end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module;
 </f:view>

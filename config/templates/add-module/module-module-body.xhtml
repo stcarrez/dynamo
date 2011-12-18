@@ -16,14 +16,14 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module i
 #{''}
    Log : constant Util.log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module");
 #{''}
-   package Register is new AWA.Modules.Beans (Module => #{fn:capitalize(moduleName)}_Module,
-                                              Module_Access => #{fn:capitalize(moduleName)}_Module_Access);
+   package Register is new AWA.Modules.Beans (Module => #{fn:capitalize(g:singular(moduleName))}_Module,
+                                              Module_Access => #{fn:capitalize(g:singular(moduleName))}_Module_Access);
 #{''}
    --  ------------------------------
    --  Initialize the #{moduleName} module.
    --  ------------------------------
    overriding
-   procedure Initialize (Plugin : in out #{fn:capitalize(moduleName)}_Module;
+   procedure Initialize (Plugin : in out #{fn:capitalize(g:singular(moduleName))}_Module;
                          App    : in AWA.Modules.Application_Access) is
    begin
       Log.Info ("Initializing the #{moduleName} module");
@@ -37,6 +37,15 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module i
 #{''}
       --  Add here the creation of manager instances.
    end Initialize;
+#{''}
+   --  ------------------------------
+   --  Get the #{moduleName} module.
+   --  ------------------------------
+   function Get_#{fn:capitalize(g:singular(moduleName))}_Module return #{fn:capitalize(g:singular(moduleName))}_Module_Access is
+      function Get is new AWA.Modules.Get (#{fn:capitalize(g:singular(moduleName))}_Module, #{fn:capitalize(g:singular(moduleName))}_Module_Access, NAME);
+   begin
+      return Get;
+   end Get_#{fn:capitalize(g:singular(moduleName))}_Module;
 #{''}
 end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module;
 </f:view>

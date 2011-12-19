@@ -467,10 +467,11 @@
          Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.Time.To_Time (Value));
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-         if Util.Beans.Objects.Is_Null (Value) Impl.#{fn:capitalize(column.name)}.Is_Null then
-            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(True));
+         if Util.Beans.Objects.Is_Null (Value) then
+            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => True, others => &lt;&gt;));
          else
-            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(False, Util.Beans.Objects.Time.To_Time (Value)));
+            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => False,
+								        Value   => Util.Beans.Objects.Time.To_Time (Value)));
          end if;
       </h:panelGroup>
     <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isIdentifier and not column.type.isDate}">

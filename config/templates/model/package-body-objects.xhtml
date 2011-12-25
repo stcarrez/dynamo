@@ -73,7 +73,12 @@
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
       Set_Field (Object, Impl);
+    <h:panelGroup rendered="#{column.name ne table.id.name}">
       ADO.Objects.Set_Field_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.name eq table.id.name}">
+      ADO.Objects.Set_Field_Key_Value (Impl.all, #{column.index + 1}, Value);
+    </h:panelGroup>
    end Set_#{fn:capitalize(column.name)};
     </h:panelGroup>
 
@@ -111,7 +116,7 @@
       ADO.Objects.Set_Field_Identifier (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
-    <h:panelGroup rendered="#{column.type.isString}">
+    <h:panelGroup rendered="#{column.type.isString and column.name ne table.id.name}">
       ADO.Objects.Set_Field_Unbounded_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 

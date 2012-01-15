@@ -1838,8 +1838,8 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 # Current release settings
 GEN_MAJOR_VERSION=0
-GEN_MINOR_VERSION=4
-GEN_MICRO_VERSION=1-dev
+GEN_MINOR_VERSION=5
+GEN_MICRO_VERSION=0
 GEN_VERSION=$GEN_MAJOR_VERSION.$GEN_MINOR_VERSION.$GEN_MICRO_VERSION
 
 # checking for local tools
@@ -2634,8 +2634,6 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-# AM_PATH_GNAT
-# AM_PATH_PERL
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${MAKE-make} sets \$(MAKE)" >&5
 $as_echo_n "checking whether ${MAKE-make} sets \$(MAKE)... " >&6; }
 set x ${MAKE-make}
@@ -2864,7 +2862,7 @@ $as_echo "no, using $LN_S" >&6; }
 fi
 
 
-# Set the version number of GtkAda
+# Set the version number of Dynamo
 
 
 

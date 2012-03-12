@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010, 2011 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -754,6 +754,46 @@ package body Gen.Generator is
    end Read_Project;
 
    --  ------------------------------
+   --  Read the XML package file
+   --  ------------------------------
+   procedure Read_Package (H    : in out Handler;
+                           File : in String) is
+      Read           : Input_Sources.File.File_Input;
+      My_Tree_Reader : DOM.Readers.Tree_Reader;
+      Name_Start     : Natural;
+   begin
+      Log.Info ("Reading package file '{0}'", File);
+
+      --  Base file name should be used as the public Id
+      Name_Start := File'Last;
+      while Name_Start >= File'First  and then File (Name_Start) /= '/' loop
+         Name_Start := Name_Start - 1;
+      end loop;
+      Input_Sources.File.Open (File, Read);
+
+      --  Full name is used as the system id
+      Input_Sources.File.Set_System_Id (Read, File);
+      Input_Sources.File.Set_Public_Id (Read, File (Name_Start + 1 .. File'Last));
+
+      DOM.Readers.Set_Feature (My_Tree_Reader, Sax.Readers.Validation_Feature, False);
+
+      DOM.Readers.Parse (My_Tree_Reader, Read);
+      Input_Sources.File.Close (Read);
+
+      declare
+         Doc  : constant DOM.Core.Document := DOM.Readers.Get_Tree (My_Tree_Reader);
+         Root : constant DOM.Core.Element  := DOM.Core.Documents.Get_Element (Doc);
+      begin
+         H.Distrib.Initialize (Path => File, Model => H.Model, Node => Root, Context => H);
+      end;
+
+   exception
+      when Ada.IO_Exceptions.Name_Error =>
+         H.Error ("Package file {0} does not exist", File);
+
+   end Read_Package;
+
+   --  ------------------------------
    --  Read the XML model file
    --  ------------------------------
    procedure Read_Model (H    : in out Handler;
@@ -871,8 +911,15 @@ package body Gen.Generator is
    procedure Prepare (H : in out Handler) is
    begin
       H.Model.Prepare;
-      H.Hibernate.Prepare (Model => H.Model, Context => H);
-      H.Query.Prepare (Model => H.Model, Context => H);
+      if H.Hibernate.Is_Initialized then
+         H.Hibernate.Prepare (Model => H.Model, Context => H);
+      end if;
+      if H.Query.Is_Initialized then
+         H.Query.Prepare (Model => H.Model, Context => H);
+      end if;
+      if H.Distrib.Is_Initialized then
+         H.Distrib.Prepare (Model => H.Model, Context => H);
+      end if;
    end Prepare;
 
    --  ------------------------------
@@ -881,8 +928,15 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Finish (H : in out Handler) is
    begin
-      H.Hibernate.Finish (Model => H.Model, Project => H.Project, Context => H);
-      H.Query.Finish (Model => H.Model, Project => H.Project, Context => H);
+      if H.Hibernate.Is_Initialized then
+         H.Hibernate.Finish (Model => H.Model, Project => H.Project, Context => H);
+      end if;
+      if H.Query.Is_Initialized then
+         H.Query.Finish (Model => H.Model, Project => H.Project, Context => H);
+      end if;
+      if H.Distrib.Is_Initialized then
+         H.Distrib.Finish (Model => H.Model, Project => H.Project, Context => H);
+      end if;
    end Finish;
 
    --  ------------------------------

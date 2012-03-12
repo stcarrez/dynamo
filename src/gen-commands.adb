@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands -- Commands for dynamo
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@ with Gen.Commands.Model;
 with Gen.Commands.Propset;
 with Gen.Commands.Database;
 with Gen.Commands.Info;
+with Gen.Commands.Distrib;
 
 with Util.Log.Loggers;
 
@@ -178,6 +179,9 @@ package body Gen.Commands is
    --  Project information command.
    Info_Cmd           : aliased Gen.Commands.Info.Command;
 
+   --  Distrib command.
+   Dist_Cmd           : aliased Gen.Commands.Distrib.Command;
+
    --  Help command.
    Help_Cmd           : aliased Help_Command;
 begin
@@ -189,5 +193,6 @@ begin
    Add_Command (Name => "add-model", Cmd => Add_Model_Cmd'Access);
    Add_Command (Name => "propset", Cmd => Propset_Cmd'Access);
    Add_Command (Name => "create-database", Cmd => Database_Cmd'Access);
+   Add_Command (Name => "dist", Cmd => Dist_Cmd'Access);
    Add_Command (Name => "info", Cmd => Info_Cmd'Access);
 end Gen.Commands;

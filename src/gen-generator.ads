@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-generator -- Code Generator
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,7 @@ with Gen.Model.Projects;
 with Gen.Artifacts.Hibernate;
 with Gen.Artifacts.Query;
 with Gen.Artifacts.Mappings;
+with Gen.Artifacts.Distribs;
 package Gen.Generator is
 
    --  A fatal error that prevents the generator to proceed has occurred.
@@ -59,6 +60,10 @@ package Gen.Generator is
                     Message : in String;
                     Arg1    : in String := "";
                     Arg2    : in String := "");
+
+   --  Read the XML package file
+   procedure Read_Package (H    : in out Handler;
+                           File : in String);
 
    --  Read the XML model file
    procedure Read_Model (H    : in out Handler;
@@ -217,6 +222,9 @@ private
 
       --  Type mapping artifact.
       Mappings  : Gen.Artifacts.Mappings.Artifact;
+
+      --  The distribution artifact.
+      Distrib   : Gen.Artifacts.Distribs.Artifact;
 
       --  The list of templates that must be generated.
       Templates : Template_Map.Map;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-hibernate -- Hibernate artifact for Code Generator
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ package Gen.Artifacts.Hibernate is
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    overriding
-   procedure Initialize (Handler : in Artifact;
+   procedure Initialize (Handler : in out Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
@@ -40,7 +40,7 @@ package Gen.Artifacts.Hibernate is
    --  Prepare the model after all the configuration files have been read and before
    --  actually invoking the generation.
    overriding
-   procedure Prepare (Handler : in Artifact;
+   procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class);
 
@@ -48,7 +48,7 @@ package Gen.Artifacts.Hibernate is
    --  For each database SQL mapping, collect the schema files from the different modules
    --  of the project and generate an SQL script that can be used to create the database tables.
    overriding
-   procedure Finish (Handler : in Artifact;
+   procedure Finish (Handler : in out Artifact;
                      Model   : in out Gen.Model.Packages.Model_Definition'Class;
                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                      Context : in out Generator'Class);

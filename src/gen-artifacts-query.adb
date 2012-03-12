@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-query -- Query artifact for Code Generator
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,12 +42,11 @@ package body Gen.Artifacts.Query is
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    --  ------------------------------
-   procedure Initialize (Handler : in Artifact;
+   procedure Initialize (Handler : in out Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
-      pragma Unreferenced (Handler);
 
       procedure Register_Column (Table  : in out Query_Definition;
                                  Column : in DOM.Core.Node);
@@ -176,6 +175,7 @@ package body Gen.Artifacts.Query is
    begin
       Log.Debug ("Initializing query artifact for the configuration");
 
+      Gen.Artifacts.Artifact (Handler).Initialize (Path, Node, Model, Context);
       Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "query-mapping");
    end Initialize;
 
@@ -185,7 +185,7 @@ package body Gen.Artifacts.Query is
    --  o build a list of package for the with clauses.
    --  ------------------------------
    overriding
-   procedure Prepare (Handler : in Artifact;
+   procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
       pragma Unreferenced (Handler);

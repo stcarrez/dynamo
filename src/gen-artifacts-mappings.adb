@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-mappings -- Type mapping artifact for Code Generator
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,12 +39,11 @@ package body Gen.Artifacts.Mappings is
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    overriding
-   procedure Initialize (Handler : in Artifact;
+   procedure Initialize (Handler : in out Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
-      pragma Unreferenced (Handler, Path);
 
       use Ada.Strings.Unbounded;
 
@@ -128,6 +127,7 @@ package body Gen.Artifacts.Mappings is
    begin
       Log.Debug ("Initializing mapping artifact for the configuration");
 
+      Gen.Artifacts.Artifact (Handler).Initialize (Path, Node, Model, Context);
       Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "mappings");
    end Initialize;
 

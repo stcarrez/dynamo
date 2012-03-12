@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-hibernate -- Hibernate artifact for Code Generator
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -258,12 +258,11 @@ package body Gen.Artifacts.Hibernate is
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    --  ------------------------------
    overriding
-   procedure Initialize (Handler : in Artifact;
+   procedure Initialize (Handler : in out Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
-      pragma Unreferenced (Handler, Path);
 
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
                                   Node  : in DOM.Core.Node);
@@ -291,6 +290,7 @@ package body Gen.Artifacts.Hibernate is
    begin
       Log.Debug ("Initializing hibernate artifact for the configuration");
 
+      Gen.Artifacts.Artifact (Handler).Initialize (Path, Node, Model, Context);
       Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "hibernate-mapping");
 
    exception
@@ -304,7 +304,7 @@ package body Gen.Artifacts.Hibernate is
    --  o build a list of package for the with clauses.
    --  ------------------------------
    overriding
-   procedure Prepare (Handler : in Artifact;
+   procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
       pragma Unreferenced (Handler);
@@ -327,7 +327,7 @@ package body Gen.Artifacts.Hibernate is
    --  of the project and generate an SQL script that can be used to create the database tables.
    --  ------------------------------
    overriding
-   procedure Finish (Handler : in Artifact;
+   procedure Finish (Handler : in out Artifact;
                      Model   : in out Gen.Model.Packages.Model_Definition'Class;
                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                      Context : in out Generator'Class) is

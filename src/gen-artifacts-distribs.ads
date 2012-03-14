@@ -109,6 +109,10 @@ private
                       File : in File_Info) is abstract;
 
    procedure Scan (Rule : in Distrib_Rule);
+
+   procedure Scan (Rule : in out Distrib_Rule;
+                   Dir  : in Directory_List);
+
       --  foreach Search_Path
       --
    procedure Scan (Rule     : in out Distrib_Rule;

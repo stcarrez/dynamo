@@ -60,7 +60,7 @@ package body Gen.Artifacts.Distribs is
       --  Register a new type mapping.
       --  ------------------------------
       procedure Register_Rule (O    : in out Gen.Model.Packages.Model_Definition;
-                                  Node : in DOM.Core.Node) is
+                               Node : in DOM.Core.Node) is
 
          use Ada.Strings.Unbounded;
 
@@ -135,9 +135,27 @@ package body Gen.Artifacts.Distribs is
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
+      procedure Process_Rule (Pos : in Distrib_Rule_Vectors.Cursor) is
+         Rule : constant Distrib_Rule_Access := Distrib_Rule_Vectors.Element (Pos);
+      begin
+         Log.Info ("Process rule");
+         Rule.Scan (Handler.Tree.all);
+      end Process_Rule;
+
+      procedure Scan_Directory (Dir : in String) is
+      begin
+         Log.Info ("Directory: {0}", Dir);
+
+         Scan (Dir, ".", Handler.Tree.all);
+      end Scan_Directory;
+
    begin
       Handler.Tree := new Directory_List '(Length => 1, Name => ".", others => <>);
-      Scan (".", ".", Handler.Tree.all);
+
+      --  Scan the directory tree.
+      Context.Scan_Directories (Scan_Directory'Access);
+
+      Handler.Rules.Iterate (Process => Process_Rule'Access);
    end Prepare;
 
    --  ------------------------------
@@ -202,16 +220,16 @@ package body Gen.Artifacts.Distribs is
          Get_Next_Entry (Search, Ent);
          declare
             Name      : constant String := Simple_Name (Ent);
---              File_Path : constant String := Full_Name (Ent);
             File_Path : constant String := Ada.Directories.Compose (Rel_Path, Name);
+            Full_Path : constant String := Ada.Directories.Full_Name (Ent);
          begin
-            Log.Info ("Collect {0}", Name);
+            Log.Debug ("Collect {0}", File_Path);
 
             if Is_Ignored (Name) then
-               Log.Info ("Ignoring {0}", Name);
+               Log.Debug ("Ignoring {0}", Name);
 
             --  If this is a directory, recursively scan it and collect its files.
-            elsif Ada.Directories.Kind (File_Path) = Ada.Directories.Directory then
+            elsif Ada.Directories.Kind (Full_Path) = Ada.Directories.Directory then
                declare
                   Sub_Dir : constant Directory_List_Access
                     := new Directory_List '(Length => Name'Length,
@@ -247,12 +265,26 @@ package body Gen.Artifacts.Distribs is
 
       Pos : File_Tree.Cursor := Rule.Files.Find (Path);
    begin
+      Log.Debug ("Adding {0}", Path);
+
       if File_Tree.Has_Element (Pos) then
          Rule.Files.Update_Element (Pos, Add_File'Access);
       else
          null;
       end if;
    end Add_Source_File;
+
+   procedure Scan (Rule : in out Distrib_Rule;
+                   Dir  : in Directory_List) is
+      procedure Scan_Pattern (Pos : in Util.Strings.Vectors.Cursor) is
+         Pattern : constant String := Util.Strings.Vectors.Element (Pos);
+      begin
+         Rule.Scan (Dir, ".", Pattern);
+      end Scan_Pattern;
+
+   begin
+      Rule.Includes.Iterate (Scan_Pattern'Access);
+   end Scan;
 
    procedure Scan (Rule     : in out Distrib_Rule;
                    Dir      : in Directory_List;
@@ -265,12 +297,36 @@ package body Gen.Artifacts.Distribs is
       Pos : Natural := Pattern'First;
 
 
-      procedure Collect_File (Path : in String) is
+      procedure Collect_Files (Name_Pattern : in String) is
+         Ext_Pos : Natural := 0;
+
+         procedure Collect_File (Path : in String) is
+         begin
+            Log.Debug ("Check {0}", Path);
+
+            if Path = Pattern or Pattern = "*" then
+               Rule.Add_Source_File (Base_Dir, Util.Files.Compose (Base_Dir, Path));
+            elsif Ext_Pos > 0 then
+               declare
+                  Pos : constant Natural := Util.Strings.Rindex (Path, '.');
+               begin
+                  if Pos > 0 and then Path (Pos .. Path'Last) = Name_Pattern (Ext_Pos .. Name_Pattern'Last) then
+                     Rule.Add_Source_File (Base_Dir, Util.Files.Compose (Base_Dir, Path));
+                  end if;
+               end;
+            end if;
+         end Collect_File;
+         Iter : Util.Strings.Vectors.Cursor := Dir.Files.First;
       begin
-         if Path = Pattern or Pattern = "*" then
-            Rule.Add_Source_File (Base_Dir, Util.Files.Compose (Base_Dir, Path));
+         if Name_Pattern'Length > 1 and then Name_Pattern (Name_Pattern'First) = '*'
+           and then Name_Pattern (Name_Pattern'First + 1) = '.' then
+            Ext_Pos := Name_Pattern'First + 1;
          end if;
-      end Collect_File;
+         while Util.Strings.Vectors.Has_Element (Iter) loop
+            Util.Strings.Vectors.Query_Element (Iter, Collect_File'Access);
+            Util.Strings.Vectors.Next (Iter);
+         end loop;
+      end Collect_Files;
 
       procedure Collect_Subdirs (Name_Pattern : in String) is
 
@@ -290,7 +346,10 @@ package body Gen.Artifacts.Distribs is
       end Collect_Subdirs;
 
       N   : Natural := Util.Strings.Index (Pattern, '/');
+      Next : Natural;
    begin
+      Log.Info ("Scan {0}/{1} for pattern {2}", Base_Dir, Dir.Name, Pattern);
+
       if N > 0 then
          if Pattern (Pattern'First .. N) = "*/" then
             Collect_Subdirs (Name_Pattern => "*");
@@ -299,18 +358,14 @@ package body Gen.Artifacts.Distribs is
          else
             Collect_Subdirs (Name_Pattern => Pattern (Pattern'First .. N - 1));
          end if;
-         N := Util.Strings.Index (Pattern, '/', N + 1);
+         Next := Util.Strings.Index (Pattern, '/', N + 1);
+         if Next = 0 then
+            Collect_Files (Name_Pattern => Pattern (N + 1 .. Pattern'Last));
+         end if;
       end if;
       if N = 0 then
          --  No more directory
-         declare
-            Iter : Util.Strings.Vectors.Cursor := Dir.Files.First;
-         begin
-            while Util.Strings.Vectors.Has_Element (Iter) loop
-               Util.Strings.Vectors.Query_Element (Iter, Collect_File'Access);
-               Util.Strings.Vectors.Next (Iter);
-            end loop;
-         end;
+         Collect_Files (Name_Pattern => Pattern);
       end if;
    end Scan;
 

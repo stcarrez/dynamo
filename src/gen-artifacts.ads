@@ -44,6 +44,12 @@ package Gen.Artifacts is
                              Name    : in String;
                              Mode    : in Iteration_Mode) is abstract;
 
+   --  Scan the dynamo directories and execute the <b>Process</b> procedure with the
+   --  directory path.
+   procedure Scan_Directories (Handler : in Generator;
+                               Process : not null access
+                                 procedure (Dir : in String)) is abstract;
+
    --  ------------------------------
    --  Model Definition
    --  ------------------------------

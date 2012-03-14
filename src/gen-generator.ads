@@ -184,6 +184,12 @@ package Gen.Generator is
                              Process : not null access
                                procedure (Project : in out Model.Projects.Project_Definition));
 
+   --  Scan the dynamo directories and execute the <b>Process</b> procedure with the
+   --  directory path.
+   procedure Scan_Directories (H : in Handler;
+                               Process : not null access
+                                 procedure (Dir : in String));
+
 private
 
    use Ada.Strings.Unbounded;

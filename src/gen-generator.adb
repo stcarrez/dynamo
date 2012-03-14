@@ -31,6 +31,7 @@ with ASF.Components.Root;
 with ASF.Components.Base;
 
 with Util.Beans.Basic;
+with Util.Strings.Vectors;
 with EL.Functions;
 
 with Gen.Utils;
@@ -1130,5 +1131,24 @@ package body Gen.Generator is
    begin
       Process (H.Project);
    end Update_Project;
+
+   --  ------------------------------
+   --  Scan the dynamo directories and execute the <b>Process</b> procedure with the
+   --  directory path.
+   --  ------------------------------
+   procedure Scan_Directories (H : in Handler;
+                               Process : not null access
+                                 procedure (Dir : in String)) is
+      Iter : Gen.Utils.String_List.Cursor := H.Project.Dynamo_Files.First;
+   begin
+      while Gen.Utils.String_List.Has_Element (Iter) loop
+         declare
+            Path : constant String := Gen.Utils.String_List.Element (Iter);
+         begin
+            Process (Ada.Directories.Containing_Directory (Path));
+         end;
+         Gen.Utils.String_List.Next (Iter);
+      end loop;
+   end Scan_Directories;
 
 end Gen.Generator;

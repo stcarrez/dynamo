@@ -47,8 +47,10 @@ package body Gen.Artifacts.Distribs is
       end if;
    end Create_Rule;
 
+   --  ------------------------------
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
+   --  ------------------------------
    overriding
    procedure Initialize (Handler : in out Artifact;
                          Path    : in String;
@@ -129,18 +131,42 @@ package body Gen.Artifacts.Distribs is
       Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "package");
    end Initialize;
 
+   --  ------------------------------
    --  Prepare the model after all the configuration files have been read and before
    --  actually invoking the generation.
+   --  ------------------------------
    overriding
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
-      procedure Process_Rule (Pos : in Distrib_Rule_Vectors.Cursor) is
+
+      procedure Scan_Rule (Pos : in Distrib_Rule_Vectors.Cursor);
+      procedure Scan_Directory (Dir : in String);
+      procedure Execute_Rule (Pos : in Distrib_Rule_Vectors.Cursor);
+
+
+      --  ------------------------------
+      --  Process the rule by scaning the directory tree and detecting files that are concerned.
+      --  ------------------------------
+      procedure Scan_Rule (Pos : in Distrib_Rule_Vectors.Cursor) is
          Rule : constant Distrib_Rule_Access := Distrib_Rule_Vectors.Element (Pos);
       begin
-         Log.Info ("Process rule");
+         Log.Info ("Scanning rule");
+
          Rule.Scan (Handler.Tree.all);
-      end Process_Rule;
+      end Scan_Rule;
+
+      --  ------------------------------
+      --  Execute the rules.
+      --  ------------------------------
+      procedure Execute_Rule (Pos : in Distrib_Rule_Vectors.Cursor) is
+         Rule : constant Distrib_Rule_Access := Distrib_Rule_Vectors.Element (Pos);
+         Path : constant String := Context.Get_Result_Directory;
+      begin
+         Log.Info ("Process rule");
+
+         Rule.Execute (Path);
+      end Execute_Rule;
 
       procedure Scan_Directory (Dir : in String) is
       begin
@@ -152,10 +178,14 @@ package body Gen.Artifacts.Distribs is
    begin
       Handler.Tree := new Directory_List '(Length => 1, Name => ".", others => <>);
 
-      --  Scan the directory tree.
+      --  Scan each directory used by the dynamo project.
       Context.Scan_Directories (Scan_Directory'Access);
 
-      Handler.Rules.Iterate (Process => Process_Rule'Access);
+      --  Apply the rules on the directory tree.
+      Handler.Rules.Iterate (Process => Scan_Rule'Access);
+
+      --  Apply the rules on the directory tree.
+      Handler.Rules.Iterate (Process => Execute_Rule'Access);
    end Prepare;
 
    --  ------------------------------
@@ -220,7 +250,7 @@ package body Gen.Artifacts.Distribs is
          Get_Next_Entry (Search, Ent);
          declare
             Name      : constant String := Simple_Name (Ent);
-            File_Path : constant String := Ada.Directories.Compose (Rel_Path, Name);
+            File_Path : constant String := Util.Files.Compose (Rel_Path, Name);
             Full_Path : constant String := Ada.Directories.Full_Name (Ent);
          begin
             Log.Debug ("Collect {0}", File_Path);
@@ -246,6 +276,22 @@ package body Gen.Artifacts.Distribs is
       end loop;
    end Scan;
 
+   procedure Execute (Rule : in out Distrib_Rule;
+                      Path : in String) is
+      procedure Process (Key : in String;
+                         Files : in out File_Info) is
+      begin
+         Distrib_Rule'Class (Rule).Install (Util.Files.Compose (Path, Key), Files);
+      end Process;
+
+      Iter : File_Tree.Cursor := Rule.Files.First;
+   begin
+      while File_Tree.Has_Element (Iter) loop
+         Rule.Files.Update_Element (Iter, Process'Access);
+         File_Tree.Next (Iter);
+      end loop;
+   end Execute;
+
    --  ------------------------------
    --  Add the file to be processed by the distribution rule.  The file has a relative
    --  path represented by <b>Path</b>.  The path is relative from the base directory
@@ -259,18 +305,24 @@ package body Gen.Artifacts.Distribs is
 
       procedure Add_File (Key  : in String;
                           Info : in out File_Info) is
+         pragma Unreferenced (Key);
       begin
-         Info.S.Append (Path);
+         Info.S.Append (Util.Files.Compose (Base_Dir, Path));
       end Add_File;
 
-      Pos : File_Tree.Cursor := Rule.Files.Find (Path);
+      Pos : constant File_Tree.Cursor := Rule.Files.Find (Path);
    begin
-      Log.Debug ("Adding {0}", Path);
+      Log.Debug ("Adding {0} - {1}", Base_Dir, Path);
 
       if File_Tree.Has_Element (Pos) then
          Rule.Files.Update_Element (Pos, Add_File'Access);
       else
-         null;
+         declare
+            Info : File_Info;
+         begin
+            Info.S.Append (Util.Files.Compose (Base_Dir, Path));
+            Rule.Files.Insert (Path, Info);
+         end;
       end if;
    end Add_Source_File;
 
@@ -302,7 +354,7 @@ package body Gen.Artifacts.Distribs is
 
          procedure Collect_File (Path : in String) is
          begin
-            Log.Debug ("Check {0}", Path);
+            Log.Debug ("Check {0} - {1}", Base_Dir, Path);
 
             if Path = Pattern or Pattern = "*" then
                Rule.Add_Source_File (Base_Dir, Util.Files.Compose (Base_Dir, Path));

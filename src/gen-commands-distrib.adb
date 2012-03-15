@@ -18,6 +18,7 @@
 
 with GNAT.Command_Line;
 
+with Ada.Strings.Unbounded;
 with Ada.Directories;
 with Ada.Text_IO;
 package body Gen.Commands.Distrib is
@@ -31,25 +32,30 @@ package body Gen.Commands.Distrib is
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
-
-      File_Count : Natural := 0;
    begin
       Generator.Read_Project ("dynamo.xml", True);
 
-      --  Read the package description.
-      loop
-         declare
-            Model_File : constant String := Get_Argument;
-         begin
-            exit when Model_File'Length = 0;
-            File_Count := File_Count + 1;
-            Gen.Generator.Read_Package (Generator, Model_File);
-         end;
-      end loop;
+      --  Setup the target directory where the distribution is created.
+      declare
+         Target_Dir : constant String := Get_Argument;
+      begin
+         if Target_Dir'Length = 0 then
+            Generator.Error ("Missing target directory");
+            return;
+         end if;
+         Generator.Set_Result_Directory (Ada.Strings.Unbounded.To_Unbounded_String (Target_Dir));
+      end;
 
-      if File_Count = 0 then
-         Gen.Generator.Read_Models (Generator, "db");
-      end if;
+      --  Read the package description.
+      declare
+         Package_File : constant String := Get_Argument;
+      begin
+         if Package_File'Length > 0 then
+            Gen.Generator.Read_Package (Generator, Package_File);
+         else
+            Gen.Generator.Read_Package (Generator, "package.xml");
+         end if;
+      end;
 
       --  Run the generation.
       Gen.Generator.Prepare (Generator);
@@ -66,9 +72,10 @@ package body Gen.Commands.Distrib is
       use Ada.Text_IO;
    begin
       Put_Line ("distrib: Generate the Ada files for the database model or queries");
-      Put_Line ("Usage: distrib [package.xml]");
+      Put_Line ("Usage: distrib target-dir [package.xml]");
       New_Line;
       Put_Line ("  Read the XML package description and build the distribution tree");
+      Put_Line ("  and create the distribution in the target directory.");
    end Help;
 
 end Gen.Commands.Distrib;

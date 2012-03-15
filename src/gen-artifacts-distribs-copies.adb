@@ -17,9 +17,15 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 
+with Util.Log.Loggers;
+
 --  The <b>Gen.Artifacts.Distribs.Copies</b> package provides distribution rules
 --  to copy a file or a directory to the distribution area.
 package body Gen.Artifacts.Distribs.Copies is
+
+   use Util.Log;
+
+   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Distribs.Copies");
 
    --  ------------------------------
    --  Create a distribution rule to copy a set of files or directories.
@@ -32,12 +38,16 @@ package body Gen.Artifacts.Distribs.Copies is
 
    overriding
    procedure Install (Rule : in Copy_Rule;
+                      Path : in String;
                       File : in File_Info) is
       Source : constant String := Get_First_Path (File);
-      Target : constant String := Get_Target_Path (File);
+      Dir    : constant String := Ada.Directories.Containing_Directory (Path);
    begin
+      Log.Info ("copy {0} to {1}", Source, Path);
+
+      Ada.Directories.Create_Path (Dir);
       Ada.Directories.Copy_File (Source_Name => Source,
-                                 Target_Name => Target,
+                                 Target_Name => Path,
                                  Form        => "preserve=all_attributes, mode=overwrite");
    end Install;
 

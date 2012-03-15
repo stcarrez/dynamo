@@ -31,6 +31,7 @@ private package Gen.Artifacts.Distribs.Copies is
 
    overriding
    procedure Install (Rule : in Copy_Rule;
+                      Path : in String;
                       File : in File_Info);
 
 private

@@ -105,8 +105,9 @@ private
    type Distrib_Rule_Access is access all Distrib_Rule'Class;
 
    --  Install the file <b>File</b> according to the distribution rule.
-   procedure Install (Rule : in Distrib_Rule;
-                      File : in File_Info) is abstract;
+   procedure Install (Rule   : in Distrib_Rule;
+                      Target : in String;
+                      File   : in File_Info) is abstract;
 
    procedure Scan (Rule : in Distrib_Rule);
 
@@ -119,6 +120,9 @@ private
                    Dir      : in Directory_List;
                    Base_Dir : in String;
                    Pattern  : in String);
+
+   procedure Execute (Rule : in out Distrib_Rule;
+                      Path : in String);
 
    --  Add the file to be processed by the distribution rule.  The file has a relative
    --  path represented by <b>Path</b>.  The path is relative from the base directory

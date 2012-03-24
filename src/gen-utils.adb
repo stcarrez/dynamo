@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils -- Utilities for model generator
---  Copyright (C) 2010, 2011 Stephane Carrez
+--  Copyright (C) 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,24 @@ package body Gen.Utils is
    end Iterate_Nodes;
 
    --  ------------------------------
+   --  Get the first DOM child from the given entity tag
+   --  ------------------------------
+   function Get_Child (Node : DOM.Core.Node;
+                       Name : String) return DOM.Core.Node is
+      Nodes : DOM.Core.Node_List :=
+        DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
+   begin
+      if DOM.Core.Nodes.Length (Nodes) = 0 then
+         DOM.Core.Free (Nodes);
+         return null;
+      else
+         return Result : constant DOM.Core.Node := DOM.Core.Nodes.Item (Nodes, 0) do
+            DOM.Core.Free (Nodes);
+         end return;
+      end if;
+   end Get_Child;
+
+   --  ------------------------------
    --  Get the content of the node
    --  ------------------------------
    function Get_Data_Content (Node : in DOM.Core.Node) return String is
@@ -55,6 +73,22 @@ package body Gen.Utils is
          Append (Result, DOM.Core.Character_Datas.Data (DOM.Core.Nodes.Item (Nodes, J)));
       end loop;
       return To_String (Result);
+   end Get_Data_Content;
+
+   --  ------------------------------
+   --  Get the content of the node identified by <b>Name</b> under the given DOM node.
+   --  ------------------------------
+   function Get_Data_Content (Node : in DOM.Core.Node;
+                              Name : in String) return String is
+      use type DOM.Core.Node;
+
+      N    : constant DOM.Core.Node := Get_Child (Node, Name);
+   begin
+      if N = null then
+         return "";
+      else
+         return Gen.Utils.Get_Data_Content (N);
+      end if;
    end Get_Data_Content;
 
    --  ------------------------------

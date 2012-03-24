@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils -- Utilities for model generator
---  Copyright (C) 2010, 2011 Stephane Carrez
+--  Copyright (C) 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +32,16 @@ package Gen.Utils is
                             Node    : DOM.Core.Node;
                             Name    : String);
 
+   --  Get the first DOM child from the given entity tag
+   function Get_Child (Node : DOM.Core.Node;
+                       Name : String) return DOM.Core.Node;
+
    --  Get the content of the node
    function Get_Data_Content (Node : in DOM.Core.Node) return String;
+
+   --  Get the content of the node identified by <b>Name</b> under the given DOM node.
+   function Get_Data_Content (Node : in DOM.Core.Node;
+                              Name : in String) return String;
 
    --  Get the Ada package name from a qualified type
    function Get_Package_Name (Name : in String) return String;

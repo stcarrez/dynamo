@@ -432,7 +432,7 @@ package body Gen.Artifacts.Distribs is
          begin
             Log.Debug ("Check {0} - {1}", Base_Dir, File.Name);
 
-            if File.Name = Pattern or Pattern = "*" then
+            if File.Name = Name_Pattern or Name_Pattern = "*" or Name_Pattern = "**" then
                Rule.Add_Source_File (Base_Dir, File);
             elsif Ext_Pos > 0 then
                declare
@@ -481,11 +481,18 @@ package body Gen.Artifacts.Distribs is
       Log.Debug ("Scan {0}/{1} for pattern {2}", Base_Dir, Dir.Name, Pattern);
 
       if N > 0 then
-         if Pattern (Pattern'First .. N) = "*/" then
+         if Pattern = "**" then
+            Collect_Subdirs (Name_Pattern => "**");
+            Collect_Files (Name_Pattern => "*");
+            return;
+
+         elsif Pattern (Pattern'First .. N) = "*/" then
             Pos := N + 1;
             Collect_Subdirs (Name_Pattern => "*");
+
          elsif Pattern (Pattern'First .. N) = "**/" then
             Collect_Subdirs (Name_Pattern => "*");
+
          else
             Pos := N + 1;
             Collect_Subdirs (Name_Pattern => Pattern (Pattern'First .. N - 1));

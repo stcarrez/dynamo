@@ -24,6 +24,7 @@ with Util.Log.Loggers;
 with Gen.Utils;
 with Gen.Artifacts.Distribs.Copies;
 with Gen.Artifacts.Distribs.Exec;
+with Gen.Artifacts.Distribs.Concat;
 
 --  The <b>Gen.Artifacts.Distribs</b> package is an artifact for the generation of
 --  application distributions.
@@ -46,6 +47,8 @@ package body Gen.Artifacts.Distribs is
          return Gen.Artifacts.Distribs.Copies.Create_Rule (Node);
       elsif Kind = "exec" then
          return Gen.Artifacts.Distribs.Exec.Create_Rule (Node);
+      elsif Kind = "concat" then
+         return Gen.Artifacts.Distribs.Concat.Create_Rule (Node);
       else
          return null;
       end if;
@@ -164,10 +167,14 @@ package body Gen.Artifacts.Distribs is
       --  ------------------------------
       procedure Scan_Rule (Pos : in Distrib_Rule_Vectors.Cursor) is
          Rule : constant Distrib_Rule_Access := Distrib_Rule_Vectors.Element (Pos);
+         Iter : Directory_List_Vector.Cursor := Handler.Trees.First;
       begin
          Log.Debug ("Scanning rule");
 
-         Rule.Scan (Handler.Tree.all);
+         while Directory_List_Vector.Has_Element (Iter) loop
+            Rule.Scan (Directory_List_Vector.Element (Iter).all);
+            Directory_List_Vector.Next (Iter);
+         end loop;
       end Scan_Rule;
 
       --  ------------------------------
@@ -187,16 +194,17 @@ package body Gen.Artifacts.Distribs is
       --  processed by the distribution rules.
       --  ------------------------------
       procedure Scan_Directory (Dir : in String) is
+         Tree : Directory_List_Access :=
+           new Directory_List '(Length => 1, Name => ".", Rel_Pos => Dir'Length + 2,
+                                Path_Length => Dir'Length, Path => Dir, others => <>);
       begin
          Log.Info ("Scanning directory: {0}", Dir);
 
-         Scan (Dir, ".", Handler.Tree);
+         Handler.Trees.Append (Tree);
+         Scan (Dir, ".", Tree);
       end Scan_Directory;
 
    begin
-      Handler.Tree := new Directory_List '(Length => 1, Name => ".", Rel_Pos => 1,
-                                           Path_Length => 1, Path => ".", others => <>);
-
       --  Scan each directory used by the dynamo project.
       Context.Scan_Directories (Scan_Directory'Access);
 
@@ -344,6 +352,15 @@ package body Gen.Artifacts.Distribs is
    end Get_Target_Path;
 
    --  ------------------------------
+   --  Get the source path of the file.
+   --  ------------------------------
+   function Get_Source_Path (Rule : in Distrib_Rule;
+                             File : in File_Record) return String is
+   begin
+      return Util.Files.Compose (File.Dir.Path, File.Name);
+   end Get_Source_Path;
+
+   --  ------------------------------
    --  Add the file to be processed by the distribution rule.  The file has a relative
    --  path represented by <b>Path</b>.  The path is relative from the base directory
    --  specified in <b>Base_Dir</b>.
@@ -484,5 +501,5 @@ package body Gen.Artifacts.Distribs is
          Collect_Files (Name_Pattern => Pattern);
       end if;
    end Scan;
-   --
+
 end Gen.Artifacts.Distribs;

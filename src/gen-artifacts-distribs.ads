@@ -128,8 +128,6 @@ private
    procedure Scan (Rule : in out Distrib_Rule;
                    Dir  : in Directory_List);
 
-      --  foreach Search_Path
-      --
    procedure Scan (Rule     : in out Distrib_Rule;
                    Dir      : in Directory_List;
                    Base_Dir : in String;
@@ -141,6 +139,10 @@ private
 
    --  Get the target path associate with the given source file for the distribution rule.
    function Get_Target_Path (Rule : in Distrib_Rule;
+                             File : in File_Record) return String;
+
+   --  Get the source path of the file.
+   function Get_Source_Path (Rule : in Distrib_Rule;
                              File : in File_Record) return String;
 
    --  Add the file to be processed by the distribution rule.  The file has a relative
@@ -162,7 +164,7 @@ private
 
    type Artifact is new Gen.Artifacts.Artifact with record
       Rules : Distrib_Rule_Vectors.Vector;
-      Tree  : Directory_List_Access;
+      Trees : Directory_List_Vector.Vector;
    end record;
 
 end Gen.Artifacts.Distribs;

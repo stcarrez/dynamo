@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
 with Ada.Containers.Vectors;
+with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with DOM.Core;
 with Gen.Model.Packages;
@@ -51,38 +52,52 @@ package Gen.Artifacts.Distribs is
 
 private
 
-   --  A <b>File_Info</b> record holds the information to build a distribution file.
-   --
-   type File_Info is record
-      S : Util.Strings.Vectors.Vector;
+   type Directory_List;
+   type Directory_List_Access is access all Directory_List;
+
+   --  A <b>File_Record</b> refers to a source file that must be processed by a distribution
+   --  rule.  It is linked to the directory which contains it through the <b>Dir</b> member.
+   --  The <b>Name</b> refers to the file name part.
+   type File_Record (Length : Natural) is record
+      Dir  : Directory_List_Access;
+      Name : String (1 .. Length);
    end record;
 
-   --  Get the first source path from the list.
-   function Get_First_Path (From : in File_Info) return String;
+   package File_Record_Vectors is
+     new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
+                                            Element_Type => File_Record);
 
-   function Get_Target_Path (From : in File_Info) return String;
+   subtype File_Vector is File_Record_Vectors.Vector;
+   subtype File_Cursor is File_Record_Vectors.Cursor;
+
+   --  Get the first source path from the list.
+   function Get_First_Path (From : in File_Vector) return String;
 
    --  The file tree represents the target distribution tree that must be built.
-   --  Each key represent a target file and it is associated with a <b>File_Info</b> which
+   --  Each key represent a target file and it is associated with a <b>File_Vector</b> which
    --  represents the list of source files that must be used to build the target.
    package File_Tree is
      new Ada.Containers.Indefinite_Ordered_Maps (Key_Type     => String,
-                                                 Element_Type => File_Info,
+                                                 Element_Type => File_Vector,
                                                  "<"          => "<",
-                                                 "="          => "=");
-
-   type Directory_List;
-   type Directory_List_Access is access all Directory_List;
+                                                 "="          => File_Record_Vectors."=");
 
    package Directory_List_Vector is
       new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => Directory_List_Access);
 
-   type Directory_List (Length : Positive) is record
-      Name        : String (1 .. Length);
-      Files       : Util.Strings.Vectors.Vector;
+   --  The <b>Directory_List<b> describes the content of a source directory.
+   type Directory_List (Length      : Positive;
+                        Path_Length : Natural) is record
+      Files       : File_Record_Vectors.Vector;
       Directories : Directory_List_Vector.Vector;
+      Rel_Pos     : Positive := 1;
+      Name        : String (1 .. Length);
+      Path        : String (1 .. Path_Length);
    end record;
+
+   --  Get the relative path of the directory.
+   function Get_Relative_Path (Dir : in Directory_List) return String;
 
    function Is_Ignored (Name : in String) return Boolean;
 
@@ -90,7 +105,7 @@ private
    --  <b>Rel_Path</b> and build in <b>Dir</b> the list of files and directories.
    procedure Scan (Path     : in String;
                    Rel_Path : in String;
-                   Dir      : in out Directory_List);
+                   Dir      : in Directory_List_Access);
 
    --  ------------------------------
    --  Distribution rule
@@ -105,11 +120,10 @@ private
    type Distrib_Rule_Access is access all Distrib_Rule'Class;
 
    --  Install the file <b>File</b> according to the distribution rule.
-   procedure Install (Rule   : in Distrib_Rule;
-                      Target : in String;
-                      File   : in File_Info) is abstract;
-
-   procedure Scan (Rule : in Distrib_Rule);
+   procedure Install (Rule    : in Distrib_Rule;
+                      Target  : in String;
+                      File    : in File_Vector;
+                      Context : in out Generator'Class) is abstract;
 
    procedure Scan (Rule : in out Distrib_Rule;
                    Dir  : in Directory_List);
@@ -121,15 +135,20 @@ private
                    Base_Dir : in String;
                    Pattern  : in String);
 
-   procedure Execute (Rule : in out Distrib_Rule;
-                      Path : in String);
+   procedure Execute (Rule    : in out Distrib_Rule;
+                      Path    : in String;
+                      Context : in out Generator'Class);
+
+   --  Get the target path associate with the given source file for the distribution rule.
+   function Get_Target_Path (Rule : in Distrib_Rule;
+                             File : in File_Record) return String;
 
    --  Add the file to be processed by the distribution rule.  The file has a relative
    --  path represented by <b>Path</b>.  The path is relative from the base directory
    --  specified in <b>Base_Dir</b>.
    procedure Add_Source_File (Rule     : in out Distrib_Rule;
-                              Base_Dir : in String;
-                              Path     : in String);
+                              Path     : in String;
+                              File     : in File_Record);
 
    --  Create a distribution rule identified by <b>Kind</b>.
    --  The distribution rule is configured according to the DOM tree whose node is <b>Node</b>.

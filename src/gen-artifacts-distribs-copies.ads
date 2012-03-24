@@ -30,9 +30,10 @@ private package Gen.Artifacts.Distribs.Copies is
    type Copy_Rule_Access is access all Copy_Rule'Class;
 
    overriding
-   procedure Install (Rule : in Copy_Rule;
-                      Path : in String;
-                      File : in File_Info);
+   procedure Install (Rule    : in Copy_Rule;
+                      Path    : in String;
+                      Files   : in File_Vector;
+                      Context : in out Generator'Class);
 
 private
 

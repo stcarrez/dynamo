@@ -37,10 +37,11 @@ package body Gen.Artifacts.Distribs.Copies is
    end Create_Rule;
 
    overriding
-   procedure Install (Rule : in Copy_Rule;
-                      Path : in String;
-                      File : in File_Info) is
-      Source : constant String := Get_First_Path (File);
+   procedure Install (Rule    : in Copy_Rule;
+                      Path    : in String;
+                      Files   : in File_Vector;
+                      Context : in out Generator'Class) is
+      Source : constant String := Get_First_Path (Files);
       Dir    : constant String := Ada.Directories.Containing_Directory (Path);
    begin
       Log.Info ("copy {0} to {1}", Source, Path);

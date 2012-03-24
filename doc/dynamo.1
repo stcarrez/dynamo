@@ -87,6 +87,19 @@ a Makefile as well as a
 build file.  The application can be immediately compiled to obtain a web server that is ready
 to run.
 .\"
+.SS The dist command
+.RS 0
+dynamo \fBdist \fItarget-dir\fR [\fIpackage.xml\fR]\fR
+.RE
+.PP
+After the project is compiled, this command allows to build the distribution files that
+must be installed on the server.  The
+.I dist
+command reads a
+.I package.xml
+file which describes how to make such distribution by specifying the files that must
+be copied.
+.\"
 .SS The create-database command
 .RS 0
 dynamo \fBcreate-database \fImodel [connection] admin-user [admin-password]\fR\fR

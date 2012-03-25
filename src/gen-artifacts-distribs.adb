@@ -18,6 +18,8 @@
 with Ada.Directories;
 with Ada.Exceptions;
 
+with GNAT.Regpat;
+
 with Util.Files;
 with Util.Log.Loggers;
 
@@ -416,12 +418,37 @@ package body Gen.Artifacts.Distribs is
 
       procedure Collect_Subdirs (Name_Pattern : in String);
       procedure Collect_Files (Name_Pattern : in String);
+      function Make_Regexp (Pattern : in String) return String;
+
+      function Make_Regexp (Pattern : in String) return String is
+         Result : String (1 .. Pattern'Length * 2 + 2);
+         Pos    : Natural := 1;
+      begin
+         Result (1) := '^';
+         for I in Pattern'Range loop
+            if Pattern (I) = '*' then
+               Pos := Pos + 1;
+               Result (Pos) := '.';
+            elsif Pattern (I) = '.' or Pattern (I) = '$' or Pattern (I) = '^' then
+               Pos := Pos + 1;
+               Result (Pos) := '\';
+            end if;
+            Pos := Pos + 1;
+            Result (Pos) := Pattern (I);
+         end loop;
+         Pos := Pos + 1;
+         Result (Pos) := '$';
+         return Result (1 .. Pos);
+      end Make_Regexp;
 
       --  **/*.xhtml
       --  bin/**
       --  bin/**/test.bin
       N   : constant Natural := Util.Strings.Index (Pattern, '/');
       Pos : Natural := Pattern'First;
+      use GNAT.Regpat;
+
+      Regexp  : constant Pattern_Matcher := Compile (Expression => Make_Regexp (Pattern));
 
       procedure Collect_Files (Name_Pattern : in String) is
          procedure Collect_File (File : in File_Record);
@@ -432,7 +459,7 @@ package body Gen.Artifacts.Distribs is
          begin
             Log.Debug ("Check {0} - {1}", Base_Dir, File.Name);
 
-            if File.Name = Name_Pattern or Name_Pattern = "*" or Name_Pattern = "**" then
+            if Match (Regexp, File.Name) then
                Rule.Add_Source_File (Base_Dir, File);
             elsif Ext_Pos > 0 then
                declare

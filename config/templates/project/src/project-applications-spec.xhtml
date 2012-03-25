@@ -11,15 +11,20 @@
 
 with ASF.Servlets.Faces;
 with ASF.Servlets.Files;
+with ASF.Servlets.Ajax;
 with ASF.Filters.Dump;
 with ASF.Servlets.Measures;
 #{''}
 with Security.Openid.Servlets;
 #{''}
 with AWA.Users.Servlets;
+with AWA.Users.Module;
 with AWA.Applications;
+with AWA.Workspaces.Module;
 with AWA.Services.Filters;
 package #{fn:capitalize(projectName)}.Applications is
+#{''}
+   CONFIG_PATH : constant String := "/#{fn:toLowerCase(projectName)}";
 #{''}
    type Application is new AWA.Applications.Application with private;
    type Application_Access is access all Application'Class;
@@ -27,21 +32,43 @@ package #{fn:capitalize(projectName)}.Applications is
    --  Initialize the application.
    procedure Initialize (App : in Application_Access);
 #{''}
+   --  Initialize the servlets provided by the application.
+   --  This procedure is called by <b>Initialize</b>.
+   --  It should register the application servlets.
+   overriding
+   procedure Initialize_Servlets (App : in out Application);
+#{''}
+   --  Initialize the filters provided by the application.
+   --  This procedure is called by <b>Initialize</b>.
+   --  It should register the application filters.
+   overriding
+   procedure Initialize_Filters (App : in out Application);
+#{''}
+   --  Initialize the AWA modules provided by the application.
+   --  This procedure is called by <b>Initialize</b>.
+   --  It should register the modules used by the application.
+   overriding
+   procedure Initialize_Modules (App : in out Application);
+#{''}
 private
 #{''}
    type Application is new AWA.Applications.Application with record
+      Self              : Application_Access;
       --  Application servlets and filters (add new servlet and filter instances here).
-      Faces          : aliased ASF.Servlets.Faces.Faces_Servlet;
-      Files          : aliased ASF.Servlets.Files.File_Servlet;
-      Dump           : aliased ASF.Filters.Dump.Dump_Filter;
-      Service_Filter : aliased AWA.Services.Filters.Service_Filter;
-      Perf           : aliased ASF.Servlets.Measures.Measure_Servlet;
+      Faces             : aliased ASF.Servlets.Faces.Faces_Servlet;
+      Ajax              : aliased ASF.Servlets.Ajax.Ajax_Servlet;
+      Files             : aliased ASF.Servlets.Files.File_Servlet;
+      Dump              : aliased ASF.Filters.Dump.Dump_Filter;
+      Service_Filter    : aliased AWA.Services.Filters.Service_Filter;
+      Measures          : aliased ASF.Servlets.Measures.Measure_Servlet;
 #{''}
       --  Authentication servlet and filter.
-      Auth           : aliased Security.Openid.Servlets.Request_Auth_Servlet;
-      Verify_Auth    : aliased AWA.Users.Servlets.Verify_Auth_Servlet;
+      Auth              : aliased Security.Openid.Servlets.Request_Auth_Servlet;
+      Verify_Auth       : aliased AWA.Users.Servlets.Verify_Auth_Servlet;
 #{''}
       --  The application modules.
+      User_Module       : aliased AWA.Users.Module.User_Module;
+      Workspace_Module  : aliased AWA.Workspaces.Module.Workspace_Module;
 --      XXX_Module    : aliased #{fn:capitalize(projectName)}.XXX.Module.XXX_Module;
    end record;
 #{''}

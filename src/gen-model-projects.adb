@@ -99,7 +99,7 @@ package body Gen.Model.Projects is
       --  ------------------------------
       procedure Read_Property_Line (Line : in String) is
       begin
-         if Line'Length < 7 or else Line (Line'First .. Line'First + 6) /= "dynamo." then
+         if Line'Length < 7 or else Line (Line'First .. Line'First + 6) /= "dynamo_" then
             Prop_Output.Write (Line);
             Prop_Output.Write (ASCII.LF);
          end if;
@@ -135,7 +135,7 @@ package body Gen.Model.Projects is
                                     Value => Util.Beans.Objects.To_Object (Names (I)));
             Output.Write_String (Value => To_String (Project.Props.Get (Names (I))));
             Output.End_Entity (Name => "property");
-            Prop_Output.Write ("dynamo.");
+            Prop_Output.Write ("dynamo_");
             Prop_Output.Write (Names (I));
             Prop_Output.Write ("=");
             Prop_Output.Write (To_String (Project.Props.Get (Names (I))));

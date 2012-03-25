@@ -3936,7 +3936,7 @@ package body Prj.Nmsc is
       end if;
 
       if Project.Library then
-         Support_For_Libraries := Project.Config.Lib_Support;
+         Support_For_Libraries := Prj.Full; --  Project.Config.Lib_Support;
 
          if Support_For_Libraries = Prj.None then
             Error_Msg

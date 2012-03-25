@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.IO_Exceptions;
+with Ada.Directories;
 
 with Util.Files;
 with Util.Serialize.IO.XML;
@@ -75,10 +77,13 @@ package body Gen.Model.Projects is
    procedure Save (Project : in out Project_Definition;
                    Path    : in String) is
       use Util.Streams.Buffered;
+      use Util.Streams;
 
       procedure Save_Module (Pos : in Project_Vectors.Cursor);
+      procedure Read_Property_Line (Line : in String);
 
-      Output : Util.Serialize.IO.XML.Output_Stream;
+      Output      : Util.Serialize.IO.XML.Output_Stream;
+      Prop_Output : Util.Streams.Texts.Print_Stream;
 
       procedure Save_Module (Pos : in Project_Vectors.Cursor) is
          Module : constant Project_Definition_Access := Project_Vectors.Element (Pos);
@@ -89,10 +94,37 @@ package body Gen.Model.Projects is
          Output.End_Entity (Name => "module");
       end Save_Module;
 
+      --  ------------------------------
+      --  Read the application property file to remove all the dynamo.* properties
+      --  ------------------------------
+      procedure Read_Property_Line (Line : in String) is
+      begin
+         if Line'Length < 7 or else Line (Line'First .. Line'First + 6) /= "dynamo." then
+            Prop_Output.Write (Line);
+            Prop_Output.Write (ASCII.LF);
+         end if;
+      end Read_Property_Line;
+
+      Dir       : constant String := Ada.Directories.Containing_Directory (Path);
+      Name      : constant Util.Beans.Objects.Object := Project.Get_Value ("name");
+      Prop_Name : constant String := Util.Beans.Objects.To_String (Name) & ".properties";
+      Prop_Path : constant String := Ada.Directories.Compose (Dir, Prop_Name);
    begin
+      Prop_Output.Initialize (Size => 100000);
       Output.Initialize (Size => 10000);
+
+      --  Read the current project property file, ignoring the dynamo.* properties.
+      begin
+         Util.Files.Read_File (Prop_Path, Read_Property_Line'Access);
+      exception
+         when Ada.IO_Exceptions.Name_Error =>
+            null;
+      end;
+
+      --  Start building the new dynamo.xml content.
+      --  At the same time, we append in the project property file the list of dynamo properties.
       Output.Start_Entity (Name => "project");
-      Output.Write_Entity (Name => "name", Value => Project.Get_Value ("name"));
+      Output.Write_Entity (Name => "name", Value => Name);
       declare
          Names : constant Util.Properties.Name_Array := Project.Props.Get_Names;
       begin
@@ -103,13 +135,20 @@ package body Gen.Model.Projects is
                                     Value => Util.Beans.Objects.To_Object (Names (I)));
             Output.Write_String (Value => To_String (Project.Props.Get (Names (I))));
             Output.End_Entity (Name => "property");
+            Prop_Output.Write ("dynamo.");
+            Prop_Output.Write (Names (I));
+            Prop_Output.Write ("=");
+            Prop_Output.Write (To_String (Project.Props.Get (Names (I))));
+            Prop_Output.Write (ASCII.LF);
          end loop;
       end;
 
       Project.Modules.Iterate (Save_Module'Access);
       Output.End_Entity (Name => "project");
-      Util.Files.Write_File (Content => Util.Streams.Texts.To_String (Buffered_Stream (Output)),
-                             Path    =>  Path);
+      Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Output)),
+                             Path    => Path);
+      Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Prop_Output)),
+                             Path    => Prop_Path);
    end Save;
 
 end Gen.Model.Projects;

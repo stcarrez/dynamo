@@ -60,5 +60,5 @@ log4j.logger.AWA=DEBUG
 log4j.logger.ASF=DEBUG
 log4j.logger.AWA.Modules=INFO
 
-database=mysql://localhost:3306/#{projectName}?user=#{projectName}
+database=\#{empty dynamo_database?'mysql://localhost:3306/#{projectName}?user=#{projectName}':dynamo_database}
 </f:view>

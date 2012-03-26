@@ -1151,4 +1151,56 @@ package body Gen.Generator is
       end loop;
    end Scan_Directories;
 
+   --  ------------------------------
+   --  Scan the dynamo directories and execute the <b>Process</b> procedure with the
+   --  directory path.
+   --  ------------------------------
+   procedure Scan_Directories (H : in Handler;
+                               Process : not null access
+                                 procedure (Dir : in String)) is
+
+      function Get_Relative_Path (From : in String;
+                                  To   : in String) return String is
+         Result : Unbounded_String;
+         Last   : Natural := 0;
+      begin
+         for I in From'Range loop
+            if I > To'Last or else From (I) /= To (I) then
+               Append (Result, "../");
+               for J in Last .. From'Last loop
+                  if From (J) = '/' or From (J) = '\' then
+                     Append (Result, "../");
+                  end if;
+               end loop;
+               if I <= To'Last then
+                  Append (Result, To (Last .. To'Last));
+               end if;
+               return To_String (Result);
+
+            elsif From (I) = '/' or From (I) = '\' then
+               Last := I;
+
+            end if;
+         end loop;
+         return ".";
+      end Get_Relative_Path;
+
+      Current_Dir : constant String := Ada.Directories.Current_Directory;
+      Iter : Gen.Utils.String_List.Cursor := H.Project.Dynamo_Files.Last;
+      Dirs : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      Append (Dirs, ".");
+      while Gen.Utils.String_List.Has_Element (Iter) loop
+         declare
+            Path : constant String := Gen.Utils.String_List.Element (Iter);
+            Dir  : constant String := Ada.Directories.Containing_Directory (Path);
+         begin
+            Append (Dirs, ";");
+
+            Process (Ada.Directories.Containing_Directory (Path));
+         end;
+         Gen.Utils.String_List.Previous (Iter);
+      end loop;
+   end Scan_Directories;
+
 end Gen.Generator;

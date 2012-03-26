@@ -134,6 +134,10 @@ package Gen.Generator is
    --  Get the dynamo installation directory path.
    function Get_Install_Directory (H : in Handler) return String;
 
+   --  Return the search directories that the AWA application can use to find files.
+   --  The search directories is built by using the project dependencies.
+   function Get_Search_Directories (H : in Handler) return String;
+
    --  Get the exit status
    --  Returns 0 if the generation was successful
    --  Returns 1 if there was a generation error

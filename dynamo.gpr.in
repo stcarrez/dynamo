@@ -1,5 +1,4 @@
 with "config";
-with "aws";
 with "xmlada";
 with "@UTIL_DIR@util";
 with "@EL_DIR@el";

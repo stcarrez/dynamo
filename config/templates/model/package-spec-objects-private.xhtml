@@ -7,7 +7,7 @@
 <h:list value="#{package.tables}" var="table">
    #{fn:toUpperCase(table.type)}_NAME : aliased constant String := "#{table.table}";
    <h:list value="#{table.members}" var="column">
-   COL_#{column.index}_#{package.tables.rowIndex}_NAME : aliased constant String := "#{column.sqlName}";
+   COL_#{column.index}_#{table.rowIndex}_NAME : aliased constant String := "#{column.sqlName}";
    </h:list>
 
    #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping :=
@@ -15,7 +15,7 @@
       Table => #{fn:toUpperCase(table.type)}_NAME'Access,
       Members => (
       <h:list value="#{table.members}" var="column">
-         COL_#{column.index}_#{package.tables.rowIndex}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
+         COL_#{column.index}_#{table.rowIndex}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
       </h:list>)
      );
 

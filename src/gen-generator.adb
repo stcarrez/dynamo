@@ -1164,13 +1164,14 @@ package body Gen.Generator is
       Iter : Gen.Utils.String_List.Cursor := H.Project.Dynamo_Files.Last;
       Dirs : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      Append (Dirs, ".");
       while Gen.Utils.String_List.Has_Element (Iter) loop
          declare
             Path : constant String := Gen.Utils.String_List.Element (Iter);
             Dir  : constant String := Ada.Directories.Containing_Directory (Path);
          begin
-            Append (Dirs, ";");
+            if Length (Dirs) > 0 then
+               Append (Dirs, ";");
+            end if;
             Append (Dirs, Util.Files.Get_Relative_Path (Current_Dir, Dir));
          end;
          Gen.Utils.String_List.Previous (Iter);

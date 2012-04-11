@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-list -- List bean interface for model objects
---  Copyright (C) 2009, 2010, 2011 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +38,7 @@ package body Gen.Model.List is
    --  ------------------------------
    --  Get the number of elements in the list.
    --  ------------------------------
+   overriding
    function Get_Count (From : List_Definition) return Natural is
       Count : constant Natural := Natural (From.Nodes.Length);
    begin
@@ -47,6 +48,7 @@ package body Gen.Model.List is
    --  ------------------------------
    --  Set the current row index.  Valid row indexes start at 1.
    --  ------------------------------
+   overriding
    procedure Set_Row_Index (From  : in out List_Definition;
                             Index : in Natural) is
    begin
@@ -56,6 +58,7 @@ package body Gen.Model.List is
             Current : constant T_Access := From.Nodes.Element (Index - 1);
             Bean    : constant Util.Beans.Basic.Readonly_Bean_Access := Current.all'Access;
          begin
+            Current.Row_Index := Index;
             From.Value_Bean := Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
          end;
       else
@@ -66,6 +69,7 @@ package body Gen.Model.List is
    --  ------------------------------
    --  Get the element at the current row index.
    --  ------------------------------
+   overriding
    function Get_Row (From  : List_Definition) return Util.Beans.Objects.Object is
    begin
       return From.Value_Bean;
@@ -75,17 +79,15 @@ package body Gen.Model.List is
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
+   overriding
    function Get_Value (From : List_Definition;
                        Name : String) return Util.Beans.Objects.Object is
    begin
       if Name = "size" then
          return Util.Beans.Objects.To_Object (From.Get_Count);
-
-      elsif Name = "rowIndex" then
-         return Util.Beans.Objects.To_Object (From.Row);
-
+      else
+         return Util.Beans.Objects.Null_Object;
       end if;
-      return Util.Beans.Objects.Null_Object;
    end Get_Value;
 
    --  ------------------------------

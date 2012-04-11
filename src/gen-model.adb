@@ -86,14 +86,19 @@ package body Gen.Model is
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
-   function Get_Value (From : Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+   function Get_Value (From : in Definition;
+                       Name : in String) return Util.Beans.Objects.Object is
       use type DOM.Core.Node;
    begin
       if From.Node = null then
          return Util.Beans.Objects.Null_Object;
+
       elsif Name = "comment" then
          return Util.Beans.Objects.To_Object (From.Get_Comment);
+
+      elsif Name = "rowIndex" then
+         return Util.Beans.Objects.To_Object (From.Row_Index);
+
       else
          return Get_Attribute (From.Node, Name);
       end if;

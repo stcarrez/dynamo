@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model -- Model for Code Generator
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,8 @@ package Gen.Model is
    --  ------------------------------
    type Definition is new Ada.Finalization.Limited_Controlled
      and Util.Beans.Basic.Readonly_Bean with record
-      Node : DOM.Core.Node;
+      Node      : DOM.Core.Node;
+      Row_Index : Natural;
    end record;
    type Definition_Access is access all Definition'Class;
 

@@ -18,7 +18,7 @@ CREATE TABLE #{table.table} (
 <h:panelGroup rendered="#{not empty model.tables}">
 INSERT INTO entity_type (name) VALUES
   <h:list value="#{model.tables}" var="table">
-#{model.tables.rowIndex ge 2 ? ',' : ''}("#{table.table}")
+#{table.rowIndex ge 2 ? ',' : ''}("#{table.table}")
 </h:list>;
 </h:panelGroup>
 </f:view>

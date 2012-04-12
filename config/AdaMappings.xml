@@ -66,6 +66,12 @@
         <to>Boolean</to>
     </mapping>
     <mapping>
+        <from>blob</from>
+        <from>Blob</from>
+        <from>java.sql.Blob</from>
+        <to>ADO.Blob_Ref</to>
+    </mapping>
+    <mapping>
         <from>String</from>
         <to>Ada.Strings.Unbounded.Unbounded_String</to>
     </mapping>

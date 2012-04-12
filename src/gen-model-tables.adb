@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,11 +97,12 @@ package body Gen.Model.Tables is
    --  ------------------------------
    function Is_Basic_Type (From : Column_Definition) return Boolean is
       use type Gen.Model.Mappings.Mapping_Definition_Access;
+      use type Gen.Model.Mappings.Basic_Type;
+
       Name : constant String := To_String (From.Type_Name);
    begin
       if From.Type_Mapping /= null then
-         return From.Type_Mapping.Is_Primitive or From.Type_Mapping.Is_Date
-           or From.Type_Mapping.Is_Identifier or From.Type_Mapping.Is_String;
+         return From.Type_Mapping.Kind /= Gen.Model.Mappings.T_BLOB;
       end if;
       return Name = "int" or Name = "String"
         or Name = "ADO.Identifier" or Name = "Timestamp"

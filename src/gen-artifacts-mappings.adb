@@ -66,11 +66,7 @@ package body Gen.Artifacts.Mappings is
          To   : constant String := Gen.Utils.Get_Data_Content (N);
          Kind : constant String := To_String (Gen.Model.Get_Attribute (Node, "type"));
 
-         Is_Primitive  : Boolean := False;
-         Is_Date       : Boolean := False;
-         Is_String     : Boolean := False;
-         Is_Identifier : Boolean := False;
-         Is_Boolean    : Boolean := False;
+         Kind_Type     : Gen.Model.Mappings.Basic_Type;
 
          procedure Register_Type (O    : in out Gen.Model.Packages.Model_Definition;
                                   Node : in DOM.Core.Node) is
@@ -79,12 +75,8 @@ package body Gen.Artifacts.Mappings is
             From : constant String := Gen.Utils.Get_Data_Content (Node);
          begin
             Gen.Model.Mappings.Register_Type (Target => To,
-                                              From  => From,
-                                              Is_Primitive => Is_Primitive,
-                                              Is_Boolean   => Is_Boolean,
-                                              Is_Date      => Is_Date,
-                                              Is_String    => Is_String,
-                                              Is_Identifier => Is_Identifier);
+                                              From   => From,
+                                              Kind   => Kind_Type);
          end Register_Type;
 
          procedure Iterate is
@@ -93,19 +85,22 @@ package body Gen.Artifacts.Mappings is
 
       begin
          if Kind = "date" or To = "Ada.Calendar.Time" then
-            Is_Date       := True;
+            Kind_Type := Gen.Model.Mappings.T_DATE;
 
          elsif Kind = "identifier" or To = "ADO.Identifier" then
-            Is_Identifier := True;
+            Kind_Type := Gen.Model.Mappings.T_IDENTIFIER;
 
          elsif Kind = "boolean" then
-            Is_Boolean := True;
+            Kind_Type := Gen.Model.Mappings.T_BOOLEAN;
 
          elsif Kind = "string" or To = "Ada.Strings.Unbounded.Unbounded_String" then
-            Is_String := True;
+            Kind_Type := Gen.Model.Mappings.T_STRING;
+
+         elsif Kind = "blob" or To = "ADO.Blob_Ref" then
+            Kind_Type := Gen.Model.Mappings.T_BLOB;
 
          else
-            Is_Primitive := True;
+            Kind_Type := Gen.Model.Mappings.T_INTEGER;
          end if;
          Iterate (O, Node, "from");
       end Register_Mapping;

@@ -97,6 +97,7 @@ package body Gen.Generator is
    function To_Ada_Type (Value : in Util.Beans.Objects.Object;
                          Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
       use Gen.Model.Tables;
+      use Gen.Model.Mappings;
       use Gen.Model;
       use type Gen.Model.Mappings.Mapping_Definition_Access;
 
@@ -133,7 +134,7 @@ package body Gen.Generator is
       end if;
       if Column /= null then
          if Column.Type_Mapping /= null then
-            if Column.Type_Mapping.Is_Date and Util.Beans.Objects.To_Integer (Param) = 2 then
+            if Column.Type_Mapping.Kind = T_DATE and Util.Beans.Objects.To_Integer (Param) = 2 then
                return Util.Beans.Objects.To_Object (String '("Time"));
             else
                return Util.Beans.Objects.To_Object (Column.Type_Mapping.Target);

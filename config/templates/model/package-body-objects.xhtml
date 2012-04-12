@@ -104,7 +104,11 @@
       Set_Field_Enum (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
-    <h:panelGroup rendered="#{column.name ne table.id.name and not column.isPrimitiveType and not column.type.isBoolean and not column.type.isEnum}">
+    <h:panelGroup rendered="#{column.type.isBlob}">
+      ADO.Objects.Set_Field_Blob (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{column.name ne table.id.name and not column.isPrimitiveType and not column.type.isBoolean and not column.type.isEnum and not column.type.isBlob}">
       ADO.Objects.Set_Field_Object (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
@@ -534,7 +538,7 @@
       Object.#{fn:capitalize(column.name)} := #{column.type.name}'Val (Stmt.Get_Identifier (#{column.index}));
   </h:panelGroup>
 
-  <h:panelGroup rendered="#{not column.isPrimitiveType and not column.type.isBoolean and not column.type.isEnum}">
+  <h:panelGroup rendered="#{not column.isPrimitiveType and not column.type.isBoolean and not column.type.isEnum and not column.type.isBlob}">
       if not Stmt.Is_Null (#{column.index}) then
           Object.#{fn:capitalize(column.name)}.Set_Key_Value (Stmt.Get_Identifier (#{column.index}), Session);
       end if;
@@ -554,10 +558,13 @@
   <h:panelGroup rendered="#{column.type.isEnum}">
       Object.#{fn:capitalize(column.name)} := #{column.type.name}'Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isBlob}">
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_Blob (#{column.index});
+  </h:panelGroup>
   <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type'}">
       Object.#{fn:capitalize(column.name)} := ADO.Entity_Type (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isEnum and not column.type.isIdentifier and not column.type.isString and not column.type.isDate and column.type.name ne 'ADO.Entity_Type'}">
+  <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isEnum and not column.type.isBlob and not column.type.isIdentifier and not column.type.isString and not column.type.isDate and column.type.name ne 'ADO.Entity_Type'}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
   </h:panelGroup>
 </h:panelGroup>

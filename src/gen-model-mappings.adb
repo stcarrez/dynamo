@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,17 +51,19 @@ package body Gen.Model.Mappings is
       if Name = "name" then
          return Util.Beans.Objects.To_Object (From.Target);
       elsif Name = "isBoolean" then
-         return Util.Beans.Objects.To_Object (From.Is_Boolean);
+         return Util.Beans.Objects.To_Object (From.Kind = T_BOOLEAN);
       elsif Name = "isInteger" then
-         return Util.Beans.Objects.To_Object (From.Is_Primitive);
+         return Util.Beans.Objects.To_Object (From.Kind = T_INTEGER);
       elsif Name = "isString" then
-         return Util.Beans.Objects.To_Object (From.Is_String);
+         return Util.Beans.Objects.To_Object (From.Kind = T_STRING);
       elsif Name = "isIdentifier" then
-         return Util.Beans.Objects.To_Object (From.Is_Identifier);
+         return Util.Beans.Objects.To_Object (From.Kind = T_IDENTIFIER);
       elsif Name = "isDate" then
-         return Util.Beans.Objects.To_Object (From.Is_Date);
+         return Util.Beans.Objects.To_Object (From.Kind = T_DATE);
+      elsif Name = "isBlob" then
+         return Util.Beans.Objects.To_Object (From.Kind = T_BLOB);
       elsif Name = "isEnum" then
-         return Util.Beans.Objects.To_Object (False);
+         return Util.Beans.Objects.To_Object (From.Kind = T_ENUM);
       else
          return Definition (From).Get_Value (Name);
       end if;
@@ -99,16 +101,13 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    procedure Register_Type (Target : in String;
                             From   : in String;
-                            Is_Primitive : in Boolean;
-                            Is_Boolean    : in Boolean;
-                            Is_Date       : in Boolean;
-                            Is_Identifier : in Boolean;
-                            Is_String     : in Boolean) is
+                            Kind   : in Basic_Type) is
       Name    : constant Unbounded_String := To_Unbounded_String (From);
       Pos     : constant Mapping_Maps.Cursor := Types.Find (Name);
       Mapping : Mapping_Definition_Access;
    begin
-      Log.Debug ("Register type '{0}' mapped to '{1}'", From, Target);
+      Log.Debug ("Register type '{0}' mapped to '{1}' type {2}",
+                 From, Target, Basic_Type'Image (Kind));
 
       if Mapping_Maps.Has_Element (Pos) then
          Mapping := Mapping_Maps.Element (Pos);
@@ -116,12 +115,8 @@ package body Gen.Model.Mappings is
          Mapping := new Mapping_Definition;
          Types.Insert (Name, Mapping);
       end if;
-      Mapping.Target        := To_Unbounded_String (Target);
-      Mapping.Is_Primitive  := Is_Primitive;
-      Mapping.Is_Date       := Is_Date;
-      Mapping.Is_Identifier := Is_Identifier;
-      Mapping.Is_String     := Is_String;
-      Mapping.Is_Boolean    := Is_Boolean;
+      Mapping.Target := To_Unbounded_String (Target);
+      Mapping.Kind   := Kind;
    end Register_Type;
 
 end Gen.Model.Mappings;

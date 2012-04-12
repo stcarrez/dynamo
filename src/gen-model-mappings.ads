@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,16 +23,14 @@ with Util.Beans.Objects;
 --  type into the Ada type.
 package Gen.Model.Mappings is
 
+   type Basic_Type is (T_BOOLEAN, T_INTEGER, T_DATE, T_ENUM, T_IDENTIFIER, T_STRING, T_BLOB);
+
    --  ------------------------------
    --  Mapping Definition
    --  ------------------------------
    type Mapping_Definition is new Definition with record
       Target        : Ada.Strings.Unbounded.Unbounded_String;
-      Is_Primitive  : Boolean := False;
-      Is_Boolean    : Boolean := False;
-      Is_Date       : Boolean := False;
-      Is_Identifier : Boolean := False;
-      Is_String     : Boolean := False;
+      Kind          : Basic_Type := T_INTEGER;
    end record;
    type Mapping_Definition_Access is access all Mapping_Definition'Class;
 
@@ -52,10 +50,6 @@ package Gen.Model.Mappings is
    --  Register a type mapping <b>From</b> that is mapped to <b>Target</b>.
    procedure Register_Type (Target        : in String;
                             From          : in String;
-                            Is_Primitive  : in Boolean;
-                            Is_Boolean    : in Boolean;
-                            Is_Date       : in Boolean;
-                            Is_Identifier : in Boolean;
-                            Is_String     : in Boolean);
+                            Kind          : in Basic_Type);
 
 end Gen.Model.Mappings;

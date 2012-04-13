@@ -65,7 +65,7 @@
         <from>Boolean</from>
         <to>Boolean</to>
     </mapping>
-    <mapping>
+    <mapping type='blob'>
         <from>blob</from>
         <from>Blob</from>
         <from>java.sql.Blob</from>

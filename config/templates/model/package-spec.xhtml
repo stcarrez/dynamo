@@ -12,7 +12,7 @@
 -----------------------------------------------------------------------
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
-
+pragma Warnings (Off, "unit * is not referenced");
 with ADO.Sessions;
 with ADO.Objects;
 with ADO.Statements;
@@ -38,6 +38,7 @@ with Util.Beans.Basic.Lists;
 <h:list value="#{package.usedTypes}" var="type">
 with #{type};
 </h:list>
+pragma Warnings (On, "unit * is not referenced");
 package #{package.name} is
 
   <!--  Declare model objects -->

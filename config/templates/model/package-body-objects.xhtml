@@ -133,7 +133,7 @@
       ADO.Objects.Set_Field_Entity_Type (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
-    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isDate and not column.type.isString and not column.type.isIdentifier and column.type.name ne 'ADO.Entity_Type'}">
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isEnum and not column.type.isDate and not column.type.isString and not column.type.isIdentifier and column.type.name ne 'ADO.Entity_Type'}">
       ADO.Objects.Set_Field_#{fn:capitalize(g:adaType(column,2))} (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
@@ -280,12 +280,15 @@
    --  Free the object
    --  --------------------
    procedure Destroy (Object : access #{fn:capitalize(table.type)}_Impl) is
+   
       type #{fn:capitalize(table.type)}_Impl_Ptr is access all #{fn:capitalize(table.type)}_Impl;
 
       procedure Unchecked_Free is new Ada.Unchecked_Deallocation
               (#{fn:capitalize(table.type)}_Impl, #{fn:capitalize(table.type)}_Impl_Ptr);
 
+      pragma Warnings (Off, "*redundant conversion*");
       Ptr : #{fn:capitalize(table.type)}_Impl_Ptr := #{fn:capitalize(table.type)}_Impl (Object.all)'Access;
+      pragma Warnings (On, "*redundant conversion*");
    begin
       Unchecked_Free (Ptr);
    end Destroy;
@@ -562,7 +565,7 @@
 
   <h:panelGroup rendered="#{not column.isPrimitiveType and not column.type.isBoolean and not column.type.isEnum and not column.type.isBlob}">
       if not Stmt.Is_Null (#{column.index}) then
-          Object.#{fn:capitalize(column.name)}.Set_Key_Value (Stmt.Get_Identifier (#{column.index}), Session);
+         Object.#{fn:capitalize(column.name)}.Set_Key_Value (Stmt.Get_Identifier (#{column.index}), Session);
       end if;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isIdentifier}">

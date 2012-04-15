@@ -44,6 +44,10 @@
         <from>datatype::Long</from>
         <to>Long</to>
     </mapping>
+    <mapping type='integer'>
+        <from>Natural</from>
+        <to>Natural</to>
+    </mapping>
     <mapping>
         <from>ADO.Identifier</from>
         <from>Identifier</from>

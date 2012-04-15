@@ -112,7 +112,7 @@
    procedure Copy (Object : in #{fn:capitalize(table.type)}_Ref;
                    Into   : in out #{fn:capitalize(table.type)}_Ref);
 #{''}
-
+<h:panelGroup rendered="#{empty table.list or table.list}">
    package #{fn:capitalize(table.type)}_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Natural,
                                   Element_Type => #{fn:capitalize(table.type)}_Ref,
@@ -123,6 +123,7 @@
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class);
+</h:panelGroup>
 </h:list>
 #{''}
 

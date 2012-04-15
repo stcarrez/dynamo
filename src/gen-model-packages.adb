@@ -84,7 +84,8 @@ package body Gen.Model.Packages is
       end if;
       Enum.Package_Def.Enums.Append (Enum.all'Access);
       O.Enums.Append (Enum.all'Access);
-      Gen.Model.Mappings.Register_Type (To_String (Enum.Name), Enum.all'Access);
+      Gen.Model.Mappings.Register_Type (To_String (Enum.Name), Enum.all'Access,
+                                        Gen.Model.Mappings.T_ENUM);
    end Register_Enum;
 
    --  ------------------------------

@@ -45,7 +45,8 @@ package Gen.Model.Mappings is
                        return Mapping_Definition_Access;
 
    procedure Register_Type (Name    : in String;
-                            Mapping : in Mapping_Definition_Access);
+                            Mapping : in Mapping_Definition_Access;
+                            Kind    : in Basic_Type);
 
    --  Register a type mapping <b>From</b> that is mapped to <b>Target</b>.
    procedure Register_Type (Target        : in String;

@@ -85,13 +85,15 @@ package body Gen.Model.Mappings is
    end Find_Type;
 
    procedure Register_Type (Name    : in String;
-                            Mapping : in Mapping_Definition_Access) is
+                            Mapping : in Mapping_Definition_Access;
+                            Kind    : in Basic_Type) is
       N    : Unbounded_String := To_Unbounded_String (Name);
       Pos  : constant Mapping_Maps.Cursor := Types.Find (N);
    begin
       Log.Debug ("Register type '{0}'", Name);
 
       if not Mapping_Maps.Has_Element (Pos) then
+         Mapping.Kind := Kind;
          Types.Insert (N, Mapping);
       end if;
    end Register_Type;

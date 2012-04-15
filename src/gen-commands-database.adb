@@ -29,7 +29,7 @@ with Util.Strings;
 with Util.Files;
 with Util.Log.Loggers;
 
-with ADO.Drivers;
+with ADO.Drivers.Connections;
 with ADO.Sessions.Factory;
 with ADO.Statements;
 with ADO.Queries;
@@ -68,7 +68,7 @@ package body Gen.Commands.Database is
    --  the external command 'mysql' and using the create-xxx-mysql.sql generated scripts.
    procedure Create_Mysql_Tables (Name   : in String;
                                   Model  : in String;
-                                  Config : in ADO.Drivers.Configuration;
+                                  Config : in ADO.Drivers.Connections.Configuration;
                                   Generator : in out Gen.Generator.Handler);
 
    --  Create the database identified by the given name.
@@ -227,7 +227,7 @@ package body Gen.Commands.Database is
    --  ------------------------------
    procedure Create_Mysql_Tables (Name      : in String;
                                   Model     : in String;
-                                  Config    : in ADO.Drivers.Configuration;
+                                  Config    : in ADO.Drivers.Connections.Configuration;
                                   Generator : in out Gen.Generator.Handler) is
       Database : constant String := Config.Get_Database;
       Username : constant String := Config.Get_Property ("user");
@@ -288,7 +288,7 @@ package body Gen.Commands.Database is
                                  Username : in String;
                                  Password : in String) is
          Factory         : ADO.Sessions.Factory.Session_Factory;
-         Config          : ADO.Drivers.Configuration;
+         Config          : ADO.Drivers.Connections.Configuration;
          Root_Connection : Unbounded_String;
          Pos             : Natural;
       begin

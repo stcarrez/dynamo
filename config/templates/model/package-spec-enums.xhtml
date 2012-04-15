@@ -9,8 +9,8 @@
    --  #{g:comment(enum.comment)}
    --  --------------------
     </h:panelGroup>
-   type #{enum.name} is (<h:list value="#{enum.values}" var="value">#{enum.values.rowIndex > 1 ? ', ' : ''}#{value.name}</h:list>);
-   for #{enum.name} use (<h:list value="#{enum.values}" var="value">#{enum.values.rowIndex > 1 ? ', ' : ''}#{value.name} => #{value.value}</h:list>);
+   type #{enum.name} is (<h:list value="#{enum.values}" var="value">#{value.rowIndex > 1 ? ', ' : ''}#{value.name}</h:list>);
+   for #{enum.name} use (<h:list value="#{enum.values}" var="value">#{value.rowIndex > 1 ? ', ' : ''}#{value.name} => #{value.value}</h:list>);
    package #{enum.name}_Objects is
       new Util.Beans.Objects.Enums (#{enum.name});
 #{''}

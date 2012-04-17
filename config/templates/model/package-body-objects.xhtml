@@ -505,9 +505,12 @@
 								        Value   => Util.Beans.Objects.Time.To_Time (Value)));
          end if;
       </h:panelGroup>
-    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isIdentifier and not column.type.isDate}">
+      <h:panelGroup rendered="#{column.type.isEnum}">
+         Item.Set_#{fn:capitalize(column.name)} (#{fn:capitalize(column.type.name)}_Objects.To_Value (Value));
+      </h:panelGroup>
+      <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate}">
          Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.To_String (Value));
-</h:panelGroup>
+      </h:panelGroup>
       end if;
 </h:panelGroup></h:list>
    end Set_Value;

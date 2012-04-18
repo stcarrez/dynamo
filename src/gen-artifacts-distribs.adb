@@ -21,6 +21,7 @@ with Ada.Exceptions;
 with GNAT.Regpat;
 
 with Util.Files;
+with Util.Strings;
 with Util.Log.Loggers;
 
 with Gen.Utils;
@@ -82,11 +83,20 @@ package body Gen.Artifacts.Distribs is
                                Node : in DOM.Core.Node) is
          pragma Unreferenced (O);
 
+         --  Collect the include definitions for the distribution rule.
+         procedure Collect_Includes (Rule  : in out Distrib_Rule_Access;
+                                     Node  : in DOM.Core.Node);
+
+         --  Collect the fileset definitions for the distribution rule.
+         procedure Collect_Filesets (Rule  : in out Distrib_Rule_Access;
+                                     Node  : in DOM.Core.Node);
+
          use Ada.Strings.Unbounded;
 
-         Dir  : constant String := To_String (Gen.Model.Get_Attribute (Node, "dir"));
-         Mode : constant String := To_String (Gen.Model.Get_Attribute (Node, "mode"));
-         Rule : Distrib_Rule_Access := Create_Rule (Kind => Mode, Node => Node);
+         Dir   : constant String := To_String (Gen.Model.Get_Attribute (Node, "dir"));
+         Mode  : constant String := To_String (Gen.Model.Get_Attribute (Node, "mode"));
+         Rule  : Distrib_Rule_Access := Create_Rule (Kind => Mode, Node => Node);
+         Match : Match_Rule;
 
          --  ------------------------------
          --  Collect the include definitions for the distribution rule.
@@ -99,19 +109,42 @@ package body Gen.Artifacts.Distribs is
                Context.Error ("Invalid include name {0}", Name);
                return;
             end if;
-            Rule.Includes.Append (Name);
+            Match.Match := To_Unbounded_String (Name);
+            Rule.Matches.Append (Match);
+            --  Rule.Includes.Append (Name);
          end Collect_Includes;
 
          procedure Iterate is
            new Gen.Utils.Iterate_Nodes (T => Distrib_Rule_Access,
                                         Process => Collect_Includes);
 
+         --  ------------------------------
+         --  Collect the include definitions for the distribution rule.
+         --  ------------------------------
+         procedure Collect_Filesets (Rule  : in out Distrib_Rule_Access;
+                                     Node  : in DOM.Core.Node) is
+            Dir : constant String := To_String (Gen.Model.Get_Attribute (Node, "dir"));
+         begin
+            if Dir = "" then
+               Context.Error ("Invalid fileset directory {0}", Dir);
+               return;
+            end if;
+            Match.Base_Dir := To_Unbounded_String (Dir);
+            Iterate (Rule, Node, "include");
+         end Collect_Filesets;
+
+         procedure Iterate_Filesets is
+           new Gen.Utils.Iterate_Nodes (T => Distrib_Rule_Access,
+                                        Process => Collect_Filesets);
+
       begin
          Log.Debug ("Install {0}", Dir);
 
          if Rule /= null then
+            Rule.Dir := To_Unbounded_String (Dir);
             Handler.Rules.Append (Rule);
-            Iterate (Rule, Node, "include");
+--              Iterate (Rule, Node, "include");
+            Iterate_Filesets (Rule, Node, "fileset");
          end if;
       end Register_Rule;
 
@@ -196,7 +229,7 @@ package body Gen.Artifacts.Distribs is
       --  processed by the distribution rules.
       --  ------------------------------
       procedure Scan_Directory (Dir : in String) is
-         Tree : Directory_List_Access :=
+         Tree : constant Directory_List_Access :=
            new Directory_List '(Length => 1, Name => ".", Rel_Pos => Dir'Length + 2,
                                 Path_Length => Dir'Length, Path => Dir, others => <>);
       begin
@@ -344,13 +377,30 @@ package body Gen.Artifacts.Distribs is
    end Execute;
 
    --  ------------------------------
+   --  Strip the base part of the path
+   --  ------------------------------
+   function Get_Strip_Path (Base : in String;
+                            Path : in String) return String is
+   begin
+      if Base /= "." and then Path (Path'First) = '/'
+        and then Path (Path'First + 1 .. Path'First + Base'Length) = Base then
+         return Path (Path'First + Base'Length + 1 .. Path'Last);
+      else
+         return Path;
+      end if;
+   end Get_Strip_Path;
+
+   --  ------------------------------
    --  Get the target path associate with the given source file for the distribution rule.
    --  ------------------------------
    function Get_Target_Path (Rule : in Distrib_Rule;
+                             Base : in String;
                              File : in File_Record) return String is
-      Path : constant String := Get_Relative_Path (File.Dir.all);
+      Rel_Path : constant String := Get_Relative_Path (File.Dir.all);
+      Path     : constant String := Get_Strip_Path (Base, Rel_Path);
    begin
-      return Util.Files.Compose (Path, File.Name);
+      return Util.Files.Compose (Ada.Strings.Unbounded.To_String (Rule.Dir),
+                                 Util.Files.Compose (Path, File.Name));
    end Get_Target_Path;
 
    --  ------------------------------
@@ -358,6 +408,7 @@ package body Gen.Artifacts.Distribs is
    --  ------------------------------
    function Get_Source_Path (Rule : in Distrib_Rule;
                              File : in File_Record) return String is
+      pragma Unreferenced (Rule);
    begin
       return Util.Files.Compose (File.Dir.Path, File.Name);
    end Get_Source_Path;
@@ -380,10 +431,10 @@ package body Gen.Artifacts.Distribs is
          Info.Append (File);
       end Add_File;
 
-      Target_Path : constant String := Distrib_Rule'Class (Rule).Get_Target_Path (File);
+      Target_Path : constant String := Distrib_Rule'Class (Rule).Get_Target_Path (Path, File);
       Pos         : constant File_Tree.Cursor := Rule.Files.Find (Target_Path);
    begin
-      Log.Debug ("Adding {0}", Target_Path);
+      Log.Debug ("Adding {0} - {1}", Path, Target_Path);
 
       if File_Tree.Has_Element (Pos) then
          Rule.Files.Update_Element (Pos, Add_File'Access);
@@ -399,16 +450,52 @@ package body Gen.Artifacts.Distribs is
 
    procedure Scan (Rule : in out Distrib_Rule;
                    Dir  : in Directory_List) is
-      procedure Scan_Pattern (Pos : in Util.Strings.Vectors.Cursor);
+      procedure Scan_Pattern (Pos : in Match_Rule_Vector.Cursor);
 
-      procedure Scan_Pattern (Pos : in Util.Strings.Vectors.Cursor) is
-         Pattern : constant String := Util.Strings.Vectors.Element (Pos);
+      procedure Scan_Pattern (Pos : in Match_Rule_Vector.Cursor) is
+         Match   : constant Match_Rule := Match_Rule_Vector.Element (Pos);
+         Base    : constant String := Ada.Strings.Unbounded.To_String (Match.Base_Dir);
+         Pattern : constant String := Ada.Strings.Unbounded.To_String (Match.Match);
       begin
-         Rule.Scan (Dir, ".", Pattern);
+         Log.Debug ("Scan pattern base {0} - pat {1}", Base, Pattern);
+         if Base = "" then
+            Rule.Scan (Dir, ".", Pattern);
+            return;
+         end if;
+         declare
+            Iter    : Directory_List_Vector.Cursor := Dir.Directories.First;
+            D       : Directory_List_Access;
+            P       : Natural := Base'First;
+            N       : Natural;
+         begin
+            while P < Base'Last loop
+               N := Util.Strings.Index (Base, '/', P);
+               if N <= 0 then
+                  N := Base'Last;
+               else
+                  N := N - 1;
+               end if;
+
+               while Directory_List_Vector.Has_Element (Iter) loop
+                  D := Directory_List_Vector.Element (Iter);
+                  if D.Name = Base (P .. N) then
+                     if N = Base'Last then
+                        Log.Info ("Scanning from sub directory at {0}", Base);
+                        Rule.Scan (D.all, Base, Pattern);
+                        return;
+                     end if;
+                     Iter := D.Directories.First;
+                     exit;
+                  end if;
+                  Directory_List_Vector.Next (Iter);
+               end loop;
+               P := N + 2;
+            end loop;
+         end;
       end Scan_Pattern;
 
    begin
-      Rule.Includes.Iterate (Scan_Pattern'Access);
+      Rule.Matches.Iterate (Scan_Pattern'Access);
    end Scan;
 
    procedure Scan (Rule     : in out Distrib_Rule;
@@ -446,39 +533,26 @@ package body Gen.Artifacts.Distribs is
       --  bin/**/test.bin
       N   : constant Natural := Util.Strings.Index (Pattern, '/');
       Pos : Natural := Pattern'First;
-      use GNAT.Regpat;
-
-      Regexp  : constant Pattern_Matcher := Compile (Expression => Make_Regexp (Pattern));
 
       procedure Collect_Files (Name_Pattern : in String) is
+         use GNAT.Regpat;
+
          procedure Collect_File (File : in File_Record);
 
-         Ext_Pos : Natural := 0;
+         Regexp  : constant String := Make_Regexp (Name_Pattern);
+         Matcher : constant Pattern_Matcher := Compile (Expression => Regexp);
 
          procedure Collect_File (File : in File_Record) is
          begin
             Log.Debug ("Check {0} - {1}", Base_Dir, File.Name);
 
-            if Match (Regexp, File.Name) then
+            if Match (Matcher, File.Name) then
                Rule.Add_Source_File (Base_Dir, File);
-            elsif Ext_Pos > 0 then
-               declare
-                  Pos : constant Natural := Util.Strings.Rindex (File.Name, '.');
-               begin
-                  if Pos > 0 and
-                  then File.Name (Pos .. File.Name'Last) = Name_Pattern (Ext_Pos .. Name_Pattern'Last) then
-                     Rule.Add_Source_File (Base_Dir, File);
-                  end if;
-               end;
             end if;
          end Collect_File;
 
          Iter : File_Record_Vectors.Cursor := Dir.Files.First;
       begin
-         if Name_Pattern'Length > 1 and then Name_Pattern (Name_Pattern'First) = '*'
-           and then Name_Pattern (Name_Pattern'First + 1) = '.' then
-            Ext_Pos := Name_Pattern'First + 1;
-         end if;
          while File_Record_Vectors.Has_Element (Iter) loop
             File_Record_Vectors.Query_Element (Iter, Collect_File'Access);
             File_Record_Vectors.Next (Iter);
@@ -486,6 +560,7 @@ package body Gen.Artifacts.Distribs is
       end Collect_Files;
 
       procedure Collect_Subdirs (Name_Pattern : in String) is
+         procedure Collect_Dir (Sub_Dir : in Directory_List_Access);
 
          procedure Collect_Dir (Sub_Dir : in Directory_List_Access) is
          begin

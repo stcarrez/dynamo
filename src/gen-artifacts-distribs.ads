@@ -22,9 +22,6 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with DOM.Core;
 with Gen.Model.Packages;
 
-with Util.Strings;
-with Util.Strings.Vectors;
-
 --  The <b>Gen.Artifacts.Distribs</b> package is an artifact for the generation of
 --  application distributions.
 package Gen.Artifacts.Distribs is
@@ -99,6 +96,10 @@ private
    --  Get the relative path of the directory.
    function Get_Relative_Path (Dir : in Directory_List) return String;
 
+   --  Strip the base part of the path
+   function Get_Strip_Path (Base : in String;
+                            Path : in String) return String;
+
    function Is_Ignored (Name : in String) return Boolean;
 
    --  Scan the directory whose root path is <b>Path</b> and with the relative path
@@ -107,6 +108,15 @@ private
                    Rel_Path : in String;
                    Dir      : in Directory_List_Access);
 
+   type Match_Rule is record
+      Base_Dir : Ada.Strings.Unbounded.Unbounded_String;
+      Match    : Ada.Strings.Unbounded.Unbounded_String;
+   end record;
+
+   package Match_Rule_Vector is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Match_Rule);
+
    --  ------------------------------
    --  Distribution rule
    --  ------------------------------
@@ -114,7 +124,7 @@ private
    --  a given file or set of files.
    type Distrib_Rule is abstract tagged record
       Dir      : Ada.Strings.Unbounded.Unbounded_String;
-      Includes : Util.Strings.Vectors.Vector;
+      Matches  : Match_Rule_Vector.Vector;
       Files    : File_Tree.Map;
    end record;
    type Distrib_Rule_Access is access all Distrib_Rule'Class;
@@ -139,6 +149,7 @@ private
 
    --  Get the target path associate with the given source file for the distribution rule.
    function Get_Target_Path (Rule : in Distrib_Rule;
+                             Base : in String;
                              File : in File_Record) return String;
 
    --  Get the source path of the file.

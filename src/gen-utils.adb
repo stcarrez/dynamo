@@ -28,11 +28,18 @@ package body Gen.Utils is
    --  and having the entity name <b>name</b>.
    --  ------------------------------
    procedure Iterate_Nodes (Closure : in out T;
-                            Node    : DOM.Core.Node;
-                            Name    : String) is
-      Nodes : DOM.Core.Node_List := DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
-      Size  : constant Natural   := DOM.Core.Nodes.Length (Nodes);
+                            Node    : in DOM.Core.Node;
+                            Name    : in String;
+                            Recurse : in Boolean := True) is
+      Nodes : DOM.Core.Node_List;
+      Size  : Natural;
    begin
+      if Recurse then
+         Nodes := DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
+      else
+         Nodes := DOM.Core.Nodes.Child_Nodes (Node);
+      end if;
+      Size := DOM.Core.Nodes.Length (Nodes);
       for I in 0 .. Size - 1 loop
          declare
             N : constant DOM.Core.Node := DOM.Core.Nodes.Item (Nodes, I);
@@ -40,7 +47,9 @@ package body Gen.Utils is
             Process (Closure, N);
          end;
       end loop;
-      DOM.Core.Free (Nodes);
+      if Recurse then
+         DOM.Core.Free (Nodes);
+      end if;
    end Iterate_Nodes;
 
    --  ------------------------------

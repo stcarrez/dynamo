@@ -29,8 +29,9 @@ package Gen.Utils is
       with procedure Process (Closure : in out T;
                               Node    : DOM.Core.Node);
    procedure Iterate_Nodes (Closure : in out T;
-                            Node    : DOM.Core.Node;
-                            Name    : String);
+                            Node    : in DOM.Core.Node;
+                            Name    : in String;
+                            Recurse : in Boolean := True);
 
    --  Get the first DOM child from the given entity tag
    function Get_Child (Node : DOM.Core.Node;

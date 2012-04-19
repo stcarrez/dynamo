@@ -19,12 +19,10 @@
 with GNAT.Command_Line;
 
 with Ada.Strings.Unbounded;
-with Ada.Directories;
 with Ada.Text_IO;
 package body Gen.Commands.Distrib is
 
    use GNAT.Command_Line;
-   use Ada.Directories;
 
    --  ------------------------------
    --  Execute the command with the arguments.

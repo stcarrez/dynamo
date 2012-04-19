@@ -31,24 +31,40 @@ package body Gen.Utils is
                             Node    : in DOM.Core.Node;
                             Name    : in String;
                             Recurse : in Boolean := True) is
-      Nodes : DOM.Core.Node_List;
-      Size  : Natural;
    begin
       if Recurse then
-         Nodes := DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
-      else
-         Nodes := DOM.Core.Nodes.Child_Nodes (Node);
-      end if;
-      Size := DOM.Core.Nodes.Length (Nodes);
-      for I in 0 .. Size - 1 loop
          declare
-            N : constant DOM.Core.Node := DOM.Core.Nodes.Item (Nodes, I);
+            Nodes : DOM.Core.Node_List := DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
+            Size  : constant Natural := DOM.Core.Nodes.Length (Nodes);
          begin
-            Process (Closure, N);
+            for I in 0 .. Size - 1 loop
+               declare
+                  N : constant DOM.Core.Node := DOM.Core.Nodes.Item (Nodes, I);
+               begin
+                  Process (Closure, N);
+               end;
+            end loop;
+            DOM.Core.Free (Nodes);
+
          end;
-      end loop;
-      if Recurse then
-         DOM.Core.Free (Nodes);
+      else
+         declare
+            use type DOM.Core.Node_Types;
+
+            Nodes : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
+            Size  : constant Natural := DOM.Core.Nodes.Length (Nodes);
+         begin
+            for I in 0 .. Size - 1 loop
+               declare
+                  N : constant DOM.Core.Node := DOM.Core.Nodes.Item (Nodes, I);
+                  T : constant DOM.Core.Node_Types := DOM.Core.Nodes.Node_Type (N);
+               begin
+                  if T = DOM.Core.Element_Node and then Name = DOM.Core.Nodes.Node_Name (N) then
+                     Process (Closure, N);
+                  end if;
+               end;
+            end loop;
+         end;
       end if;
    end Iterate_Nodes;
 

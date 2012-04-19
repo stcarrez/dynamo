@@ -31,6 +31,8 @@ package body Gen.Artifacts.Distribs.Copies is
    --  Create a distribution rule to copy a set of files or directories.
    --  ------------------------------
    function Create_Rule (Node : in DOM.Core.Node) return Distrib_Rule_Access is
+      pragma Unreferenced (Node);
+
       Result : constant Copy_Rule_Access := new Copy_Rule;
    begin
       return Result.all'Access;
@@ -41,6 +43,8 @@ package body Gen.Artifacts.Distribs.Copies is
                       Path    : in String;
                       Files   : in File_Vector;
                       Context : in out Generator'Class) is
+      pragma Unreferenced (Rule, Context);
+
       Source : constant String := Get_First_Path (Files);
       Dir    : constant String := Ada.Directories.Containing_Directory (Path);
    begin

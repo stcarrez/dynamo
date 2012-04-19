@@ -33,7 +33,7 @@ with Gen.Artifacts.Distribs.Concat;
 --  application distributions.
 --
 --  1/ A package.xml file describes a set of distribution rules which indicate
---     how 
+--     how
 package body Gen.Artifacts.Distribs is
 
    use Util.Log;
@@ -114,7 +114,6 @@ package body Gen.Artifacts.Distribs is
             end if;
             Match.Match := To_Unbounded_String (Name);
             Rule.Matches.Append (Match);
-            --  Rule.Includes.Append (Name);
          end Collect_Includes;
 
          procedure Iterate is
@@ -451,6 +450,10 @@ package body Gen.Artifacts.Distribs is
       end if;
    end Add_Source_File;
 
+   --  ------------------------------
+   --  Scan the directory tree whose root is defined by <b>Dir</b> and find the files
+   --  that match the current rule.
+   --  ------------------------------
    procedure Scan (Rule : in out Distrib_Rule;
                    Dir  : in Directory_List) is
       procedure Scan_Pattern (Pos : in Match_Rule_Vector.Cursor);
@@ -473,7 +476,7 @@ package body Gen.Artifacts.Distribs is
          begin
             while P < Base'Last loop
                N := Util.Strings.Index (Base, '/', P);
-               if N <= 0 then
+               if N = 0 then
                   N := Base'Last;
                else
                   N := N - 1;

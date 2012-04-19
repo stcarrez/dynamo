@@ -154,6 +154,8 @@ private
                       File    : in File_Vector;
                       Context : in out Generator'Class) is abstract;
 
+   --  Scan the directory tree whose root is defined by <b>Dir</b> and find the files
+   --  that match the current rule.
    procedure Scan (Rule : in out Distrib_Rule;
                    Dir  : in Directory_List);
 

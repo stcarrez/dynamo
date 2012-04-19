@@ -34,15 +34,31 @@ package body Gen.Artifacts.Distribs.Exec is
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Distribs.Exec");
 
+   --  ------------------------------
    --  Create a distribution rule to copy a set of files or directories and
    --  execute an external command.
-   function Create_Rule (Node : in DOM.Core.Node) return Distrib_Rule_Access is
-      Ctx     : EL.Contexts.Default.Default_Context;
+   --  ------------------------------
+   function Create_Rule (Node : in DOM.Core.Node;
+                         Copy : in Boolean) return Distrib_Rule_Access is
+      use type DOM.Core.Node;
 
-      Result  : constant Exec_Rule_Access := new Exec_Rule;
+      Ctx     : EL.Contexts.Default.Default_Context;
+      C       : constant DOM.Core.Node := Gen.Utils.Get_Child (Node, "command");
       Command : constant String := Gen.Utils.Get_Data_Content (Node, "command");
+      Result  : constant Exec_Rule_Access := new Exec_Rule;
    begin
+      if C /= null then
+         declare
+            Output : constant String := Gen.Utils.Get_Attribute (C, "output");
+         begin
+            if Output /= "" then
+               Result.Output := EL.Expressions.Create_Expression (Output, Ctx);
+               Result.Output_Append := Gen.Utils.Get_Attribute (C, "append");
+            end if;
+         end;
+      end if;
       Result.Command := EL.Expressions.Create_Expression (Command, Ctx);
+      Result.Copy_First := Copy;
       return Result.all'Access;
    end Create_Rule;
 
@@ -66,13 +82,31 @@ package body Gen.Artifacts.Distribs.Exec is
       Variables.Bind ("src", Util.Beans.Objects.To_Object (Source));
       Variables.Bind ("dst", Util.Beans.Objects.To_Object (Path));
 
+      --  Make sure the target directory exists.
+      Ada.Directories.Create_Path (Dir);
+
+      --  If necessary copy the source file to the destination before running the command.
+      if Rule.Copy_First then
+         Ada.Directories.Copy_File (Source_Name => Source,
+                                    Target_Name => Path,
+                                    Form        => "preserve=all_attributes, mode=overwrite");
+      end if;
+
       Ctx.Set_Variable_Mapper (Variables'Unchecked_Access);
       declare
          Cmd     : constant Util.Beans.Objects.Object := Rule.Command.Get_Value (Ctx);
          Command : constant String := Util.Beans.Objects.To_String (Cmd);
          Proc    : Util.Processes.Process;
       begin
-         Ada.Directories.Create_Path (Dir);
+         --  If an output is specified, redirect the process output stream.
+         if not Rule.Output.Is_Null then
+            declare
+               Output   : constant Util.Beans.Objects.Object := Rule.Output.Get_Value (Ctx);
+               Out_File : constant String := Util.Beans.Objects.To_String (Output);
+            begin
+               Util.Processes.Set_Output_Stream (Proc, Out_File, Rule.Output_Append);
+            end;
+         end if;
          Util.Processes.Spawn (Proc, Command);
          Util.Processes.Wait (Proc);
          if Util.Processes.Get_Exit_Status (Proc) /= 0 then

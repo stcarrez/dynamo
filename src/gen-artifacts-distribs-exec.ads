@@ -39,7 +39,8 @@ private package Gen.Artifacts.Distribs.Exec is
 
    --  Create a distribution rule to copy a set of files or directories and
    --  execute an external command.
-   function Create_Rule (Node : in DOM.Core.Node) return Distrib_Rule_Access;
+   function Create_Rule (Node : in DOM.Core.Node;
+                         Copy : in Boolean) return Distrib_Rule_Access;
 
    --  ------------------------------
    --  Distribution artifact
@@ -56,7 +57,10 @@ private package Gen.Artifacts.Distribs.Exec is
 private
 
    type Exec_Rule is new Distrib_Rule with record
-      Command : EL.Expressions.Expression;
+      Command       : EL.Expressions.Expression;
+      Output        : EL.Expressions.Expression;
+      Output_Append : Boolean;
+      Copy_First    : Boolean := False;
    end record;
 
 end Gen.Artifacts.Distribs.Exec;

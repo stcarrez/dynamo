@@ -52,7 +52,9 @@ package body Gen.Artifacts.Distribs is
       if Kind = "copy" or Kind = "" then
          return Gen.Artifacts.Distribs.Copies.Create_Rule (Node);
       elsif Kind = "exec" then
-         return Gen.Artifacts.Distribs.Exec.Create_Rule (Node);
+         return Gen.Artifacts.Distribs.Exec.Create_Rule (Node, False);
+      elsif Kind = "copy-exec" then
+         return Gen.Artifacts.Distribs.Exec.Create_Rule (Node, True);
       elsif Kind = "concat" then
          return Gen.Artifacts.Distribs.Concat.Create_Rule (Node);
       else

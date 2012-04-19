@@ -117,6 +117,38 @@ package body Gen.Utils is
    end Get_Data_Content;
 
    --  ------------------------------
+   --  Get a boolean attribute
+   --  ------------------------------
+   function Get_Attribute (Node    : in DOM.Core.Node;
+                           Name    : in String;
+                           Default : in Boolean := False) return Boolean is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
+   begin
+      if V = "yes" or V = "true" then
+         return True;
+      elsif V = "no" or V = "false" then
+         return False;
+      else
+         return Default;
+      end if;
+   end Get_Attribute;
+
+   --  ------------------------------
+   --  Get a string attribute
+   --  ------------------------------
+   function Get_Attribute (Node    : in DOM.Core.Node;
+                           Name    : in String;
+                           Default : in String := "") return String is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
+   begin
+      if V = "" then
+         return Default;
+      else
+         return V;
+      end if;
+   end Get_Attribute;
+
+   --  ------------------------------
    --  Get the Ada package name from a qualified type
    --  ------------------------------
    function Get_Package_Name (Name : in String) return String is

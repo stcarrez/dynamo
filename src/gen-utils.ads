@@ -34,8 +34,8 @@ package Gen.Utils is
                             Recurse : in Boolean := True);
 
    --  Get the first DOM child from the given entity tag
-   function Get_Child (Node : DOM.Core.Node;
-                       Name : String) return DOM.Core.Node;
+   function Get_Child (Node : in DOM.Core.Node;
+                       Name : in String) return DOM.Core.Node;
 
    --  Get the content of the node
    function Get_Data_Content (Node : in DOM.Core.Node) return String;
@@ -43,6 +43,16 @@ package Gen.Utils is
    --  Get the content of the node identified by <b>Name</b> under the given DOM node.
    function Get_Data_Content (Node : in DOM.Core.Node;
                               Name : in String) return String;
+
+   --  Get a boolean attribute
+   function Get_Attribute (Node    : in DOM.Core.Node;
+                           Name    : in String;
+                           Default : in Boolean := False) return Boolean;
+
+   --  Get a string attribute
+   function Get_Attribute (Node    : in DOM.Core.Node;
+                           Name    : in String;
+                           Default : in String := "") return String;
 
    --  Get the Ada package name from a qualified type
    function Get_Package_Name (Name : in String) return String;

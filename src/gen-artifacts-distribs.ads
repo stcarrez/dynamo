@@ -24,6 +24,25 @@ with Gen.Model.Packages;
 
 --  The <b>Gen.Artifacts.Distribs</b> package is an artifact for the generation of
 --  application distributions.
+--
+--  1/ The package.xml file contains a set of rules which describe how to build the distribution.
+--     This file is read and distribution rules are collected in the <b>Rules</b> artifact.
+--
+--  2/ The list of source paths to scan is obtained by looking at the GNAT project files
+--     and looking at components which have a <b>dynamo.xml</b> configuration file.
+--
+--  3/ The source paths are then scanned and a complete tree of source files is created
+--     in the <b>Trees</b> artifact member.
+--
+--  4/ The source paths are matched against the distribution rules and each distribution rule
+--     is filled with the source files that they match.
+--
+--  5/ The distribution rules are executed in the order defined in the <b>package.xml</b> file.
+--     Each distribution rule can have its own way to make the distribution for the set of
+--     files that matched the rule definition.  A distribution rule can copy the file, another
+--     can concatenate the source files, another can do some transformation on the source files
+--     and prepare it for the distribution.
+--
 package Gen.Artifacts.Distribs is
 
    --  ------------------------------

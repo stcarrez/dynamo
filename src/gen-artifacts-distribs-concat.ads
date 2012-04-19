@@ -17,7 +17,13 @@
 -----------------------------------------------------------------------
 
 --  The <b>Gen.Artifacts.Distribs.Concat</b> package provides distribution rules
---  to concatenate a list of files to the distribution area.
+--  to concatenate a list of files to the distribution area.  The rule is
+--  created by using the following XML definition:
+--
+--  <install mode='copy' file='NOTICE.txt'>
+--     <include name="NOTICE.txt"/>
+--  </install>
+--
 private package Gen.Artifacts.Distribs.Concat is
 
    --  Create a distribution rule to concatenate a set of files.

@@ -31,6 +31,9 @@ with Gen.Artifacts.Distribs.Concat;
 
 --  The <b>Gen.Artifacts.Distribs</b> package is an artifact for the generation of
 --  application distributions.
+--
+--  1/ A package.xml file describes a set of distribution rules which indicate
+--     how 
 package body Gen.Artifacts.Distribs is
 
    use Util.Log;
@@ -143,7 +146,7 @@ package body Gen.Artifacts.Distribs is
          if Rule /= null then
             Rule.Dir := To_Unbounded_String (Dir);
             Handler.Rules.Append (Rule);
---              Iterate (Rule, Node, "include");
+            Iterate (Rule, Node, "include", False);
             Iterate_Filesets (Rule, Node, "fileset");
          end if;
       end Register_Rule;

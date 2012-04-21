@@ -25,7 +25,7 @@ package Gen.Utils is
    --  Generic procedure to iterate over the DOM nodes children of <b>node</b>
    --  and having the entity name <b>name</b>.
    generic
-      type T is limited private;
+      type T (<>) is limited private;
       with procedure Process (Closure : in out T;
                               Node    : DOM.Core.Node);
    procedure Iterate_Nodes (Closure : in out T;

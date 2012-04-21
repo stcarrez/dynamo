@@ -18,8 +18,6 @@
 with Ada.Directories;
 with Ada.Exceptions;
 
-with GNAT.Regpat;
-
 with Util.Files;
 with Util.Strings;
 with Util.Log.Loggers;
@@ -28,6 +26,7 @@ with Gen.Utils;
 with Gen.Artifacts.Distribs.Copies;
 with Gen.Artifacts.Distribs.Exec;
 with Gen.Artifacts.Distribs.Concat;
+with Gen.Artifacts.Distribs.Libs;
 
 --  The <b>Gen.Artifacts.Distribs</b> package is an artifact for the generation of
 --  application distributions.
@@ -57,6 +56,8 @@ package body Gen.Artifacts.Distribs is
          return Gen.Artifacts.Distribs.Exec.Create_Rule (Node, True);
       elsif Kind = "concat" then
          return Gen.Artifacts.Distribs.Concat.Create_Rule (Node);
+      elsif Kind = "libs" then
+         return Gen.Artifacts.Distribs.Libs.Create_Rule (Node);
       else
          return null;
       end if;
@@ -298,6 +299,39 @@ package body Gen.Artifacts.Distribs is
    end Is_Ignored;
 
    --  ------------------------------
+   --  Build a regular expression pattern from a pattern string.
+   --  ------------------------------
+   function Make_Regexp (Pattern : in String) return String is
+      Result : String (1 .. Pattern'Length * 2 + 2);
+      Pos    : Natural := 1;
+   begin
+      Result (1) := '^';
+      for I in Pattern'Range loop
+         if Pattern (I) = '*' then
+            Pos := Pos + 1;
+            Result (Pos) := '.';
+         elsif Pattern (I) = '.' or Pattern (I) = '$' or Pattern (I) = '^' then
+            Pos := Pos + 1;
+            Result (Pos) := '\';
+         end if;
+         Pos := Pos + 1;
+         Result (Pos) := Pattern (I);
+      end loop;
+      Pos := Pos + 1;
+      Result (Pos) := '$';
+      return Result (1 .. Pos);
+   end Make_Regexp;
+
+   --  ------------------------------
+   --  Build a regular expression pattern from a pattern string.
+   --  ------------------------------
+   function Make_Regexp (Pattern : in String) return GNAT.Regpat.Pattern_Matcher is
+      Expr   : constant String := Make_Regexp (Pattern);
+   begin
+      return GNAT.Regpat.Compile (Expr);
+   end Make_Regexp;
+
+   --  ------------------------------
    --  Scan the directory whose root path is <b>Path</b> and with the relative path
    --  <b>Rel_Path</b> and build in <b>Dir</b> the list of files and directories.
    --  ------------------------------
@@ -488,7 +522,7 @@ package body Gen.Artifacts.Distribs is
                   D := Directory_List_Vector.Element (Iter);
                   if D.Name = Base (P .. N) then
                      if N = Base'Last then
-                        Log.Info ("Scanning from sub directory at {0}", Base);
+                        Log.Debug ("Scanning from sub directory at {0}", Base);
                         Rule.Scan (D.all, Base, Pattern);
                         return;
                      end if;
@@ -513,28 +547,6 @@ package body Gen.Artifacts.Distribs is
 
       procedure Collect_Subdirs (Name_Pattern : in String);
       procedure Collect_Files (Name_Pattern : in String);
-      function Make_Regexp (Pattern : in String) return String;
-
-      function Make_Regexp (Pattern : in String) return String is
-         Result : String (1 .. Pattern'Length * 2 + 2);
-         Pos    : Natural := 1;
-      begin
-         Result (1) := '^';
-         for I in Pattern'Range loop
-            if Pattern (I) = '*' then
-               Pos := Pos + 1;
-               Result (Pos) := '.';
-            elsif Pattern (I) = '.' or Pattern (I) = '$' or Pattern (I) = '^' then
-               Pos := Pos + 1;
-               Result (Pos) := '\';
-            end if;
-            Pos := Pos + 1;
-            Result (Pos) := Pattern (I);
-         end loop;
-         Pos := Pos + 1;
-         Result (Pos) := '$';
-         return Result (1 .. Pos);
-      end Make_Regexp;
 
       --  **/*.xhtml
       --  bin/**
@@ -547,8 +559,7 @@ package body Gen.Artifacts.Distribs is
 
          procedure Collect_File (File : in File_Record);
 
-         Regexp  : constant String := Make_Regexp (Name_Pattern);
-         Matcher : constant Pattern_Matcher := Compile (Expression => Regexp);
+         Matcher : constant Pattern_Matcher := Make_Regexp (Name_Pattern);
 
          procedure Collect_File (File : in File_Record) is
          begin

@@ -6,7 +6,7 @@
 
 <h:list value="#{package.queries}" var="query">
 #{''}
-   package File#{not empty query.type ? '_' : ''}#{fn:capitalize(g:adaIdent(query.type))} is
+   package File_#{query.rowIndex} is
       new ADO.Queries.Loaders.File (Path => "#{query.path}",
                                     Sha1 => "#{query.sha1}");
 
@@ -14,7 +14,7 @@
 #{''}
    package Def_#{fn:capitalize(g:adaIdent(query.type))}#{not empty query.type ? '_' : ''}#{fn:capitalize(g:adaIdent(basic_query.name))} is
       new ADO.Queries.Loaders.Query (Name => "#{basic_query.name}",
-                                     File => File#{not empty query.type ? '_' : ''}#{fn:capitalize(g:adaIdent(query.type))}.File'Access);
+                                     File => File_#{query.rowIndex}.File'Access);
 
    Query_#{fn:capitalize(g:adaIdent(basic_query.name))} : constant ADO.Queries.Query_Definition_Access
    := Def_#{fn:capitalize(g:adaIdent(query.type))}#{not empty query.type ? '_' : ''}#{fn:capitalize(g:adaIdent(basic_query.name))}.Query'Access;

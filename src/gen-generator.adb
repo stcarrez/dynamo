@@ -31,6 +31,7 @@ with ASF.Components.Root;
 with ASF.Components.Base;
 
 with Util.Beans.Basic;
+with Util.Strings.Vectors;
 with EL.Functions;
 
 with Gen.Utils;
@@ -829,6 +830,10 @@ package body Gen.Generator is
       Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
       Search  : Search_Type;
       Ent     : Directory_Entry_Type;
+      Files   : Util.Strings.Vectors.Vector;
+
+      package Sort_Names is
+         new Util.Strings.Vectors.Generic_Sorting;
    begin
       Log.Info ("Reading model file stored in '{0}'", Path);
 
@@ -842,14 +847,26 @@ package body Gen.Generator is
             H.Model.Set_Dirname ("src", Path);
          end if;
          Start_Search (Search, Directory => Path, Pattern => "*.xml", Filter => Filter);
+
+         --  Collect the files in the vector array.
          while More_Entries (Search) loop
             Get_Next_Entry (Search, Ent);
-            declare
-               Name : constant String := Full_Name (Ent);
-            begin
-               H.Read_Model (Name);
-            end;
+            Files.Append (Full_Name (Ent));
          end loop;
+
+         --  Sort the files on their name to get a reproducible generation of some database
+         --  models.
+         Sort_Names.Sort (Files);
+
+         --  Read the model files
+         declare
+            Iter : Util.Strings.Vectors.Cursor := Files.First;
+         begin
+            while Util.Strings.Vectors.Has_Element (Iter) loop
+               H.Read_Model (Util.Strings.Vectors.Element (Iter));
+               Util.Strings.Vectors.Next (Iter);
+            end loop;
+         end;
       end if;
    end Read_Models;
 

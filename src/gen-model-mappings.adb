@@ -87,7 +87,7 @@ package body Gen.Model.Mappings is
    procedure Register_Type (Name    : in String;
                             Mapping : in Mapping_Definition_Access;
                             Kind    : in Basic_Type) is
-      N    : Unbounded_String := To_Unbounded_String (Name);
+      N    : constant Unbounded_String := To_Unbounded_String (Name);
       Pos  : constant Mapping_Maps.Cursor := Types.Find (N);
    begin
       Log.Debug ("Register type '{0}'", Name);

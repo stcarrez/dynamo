@@ -27,6 +27,7 @@ package body Gen.Artifacts is
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
+      pragma Unreferenced (Path, Node, Model, Context);
    begin
       Handler.Initialized := True;
    end Initialize;

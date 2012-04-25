@@ -22,18 +22,6 @@ package Gen is
    SVN_URL : constant String := "https://ada-gen.googlecode.com/svn/trunk";
 
    --  Revision used (must run 'make version' to update)
-   SVN_REV : constant Positive := 166;
-
-   RELEASE             : constant String := "Dynamo Ada Generator 0.4 - Revision"
-                              & Positive'Image (SVN_REV) & ", Stephane Carrez";
-   GEN_PACKAGE_BODY    : constant String := "generator.template.package.body";
-   GEN_PACKAGE_SPEC    : constant String := "generator.template.package.spec";
-   GEN_MYSQL_SQL_FILE  : constant String := "generator.template.sql.mysql";
-   GEN_SQLITE_SQL_FILE : constant String := "generator.template.sql.sqlite";
-   GEN_MYSQL_DROP_SQL_FILE  : constant String := "generator.template.drop.sql.mysql";
-   GEN_SQLITE_DROP_SQL_FILE : constant String := "generator.template.drop.sql.sqlite";
-
-   --  Path of the config directory
-   CONFIG_DIR       : constant String := "/usr/local/share/dynamo/base";
+   SVN_REV : constant Positive := 305;
 
 end Gen;

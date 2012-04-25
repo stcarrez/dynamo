@@ -41,7 +41,7 @@ MKDIR=mkdir
 CP=cp
 
 # Build executables for all mains defined by the project.
-build:
+build:	src/gen-configs.ads
 	$(GNATMAKE) -P "$(GPRPATH)"
 
 # Not intended for manual invocation.
@@ -81,6 +81,7 @@ test:	 build
 	regtests/run.sh 'Dynamo add model blog' ../bin/dynamo add-model blog
 	regtests/run.sh 'Dynamo configure project' ./configure
 	regtests/run.sh 'Dynamo build generated app' make
+	regtests/run.sh 'Dynamo dist' ../bin/dynamo dist ../test-dist
 
 GENERATOR=dynamo
 
@@ -122,6 +123,10 @@ version:
 	gnatprep -DCONFIG_DIR='"$(config_dir)/base"' \
 	   `svn info | grep '^[UR][eR][Lv]' | sed -e 's,URL: \(.*\),-DURL="\1",' -e 's,Revision: ,-DREVISION=,'` \
 		  src/gen.gpb src/gen.ads
+
+src/gen-configs.ads:   Makefile src/gen-configs.gpb
+	gnatprep -DCONFIG_DIR='"$(config_dir)/base"' \
+		  src/gen-configs.gpb src/gen-configs.ads
 
 install:	  install_dirs
 	$(INSTALL) bin/dynamo $(prefix)/bin/dynamo

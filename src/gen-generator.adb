@@ -307,6 +307,8 @@ package body Gen.Generator is
       Factory : ASF.Applications.Main.Application_Factory;
       Path    : constant String := Compose (Dir, "generator.properties");
    begin
+      Log.Debug ("Initialize dynamo with {0}", Path);
+
       begin
          H.Conf.Load_Properties (Path => Path);
       exception
@@ -628,7 +630,6 @@ package body Gen.Generator is
          --  ------------------------------
          function Get_Dynamo_Path (Project_Path : in String) return String is
             Name   : constant String := Ada.Directories.Base_Name (Project_Path);
-            Pos    : Natural;
          begin
             --  Check in the directory which contains the project file.
             declare
@@ -640,19 +641,16 @@ package body Gen.Generator is
                end if;
             end;
 
-            Pos := Util.Strings.Index (Name, '.');
-            if Pos > Name'First then
-               declare
-                  Dir  : constant String := H.Get_Install_Directory;
-                  Path : constant String := Util.Files.Compose (Dir,
-                                                                Name (Name'First .. Pos - 1));
-                  Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
-               begin
-                  if Ada.Directories.Exists (Dynamo) then
-                     return Dynamo;
-                  end if;
-               end;
-            end if;
+            declare
+               Dir    : constant String := H.Get_Install_Directory;
+               Path   : constant String := Util.Files.Compose (Dir, Name);
+               Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+            begin
+               Log.Debug ("Checking dynamo file {0}", Dynamo);
+               if Ada.Directories.Exists (Dynamo) then
+                  return Dynamo;
+               end if;
+            end;
             return "";
          end Get_Dynamo_Path;
 

@@ -21,6 +21,7 @@ with Ada.Exceptions;
 
 with DOM.Core.Nodes;
 
+with Gen.Configs;
 with Gen.Utils;
 with Gen.Model.Enums;
 with Gen.Model.Tables;
@@ -39,6 +40,7 @@ package body Gen.Artifacts.Hibernate is
    use Gen.Model;
    use Gen.Model.Enums;
    use Gen.Model.Tables;
+   use Gen.Configs;
 
    use type DOM.Core.Node;
    use Util.Log;

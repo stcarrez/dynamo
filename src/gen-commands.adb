@@ -17,9 +17,11 @@
 -----------------------------------------------------------------------
 
 with Ada.Text_IO;
+with Ada.Command_Line;
 
 with GNAT.Command_Line;
-with Ada.Command_Line;
+
+with Gen.Configs;
 with Gen.Commands.Generate;
 with Gen.Commands.Project;
 with Gen.Commands.Page;
@@ -66,7 +68,7 @@ package body Gen.Commands is
    procedure Usage is
       use Ada.Text_IO;
    begin
-      Put_Line (Gen.RELEASE);
+      Put_Line (Gen.Configs.RELEASE);
       New_Line;
       Put ("Usage: ");
       Put (Ada.Command_Line.Command_Name);

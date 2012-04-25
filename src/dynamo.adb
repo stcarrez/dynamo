@@ -30,6 +30,7 @@ with Util.Files;
 with Util.Log.Loggers;
 with Gen.Generator;
 with Gen.Commands;
+with Gen.Configs;
 procedure Dynamo is
    use Ada;
    use Ada.Strings.Unbounded;
@@ -99,7 +100,7 @@ begin
       begin
          Set_Config_Directory (Compose (Dir, "config"), True);
          Set_Config_Directory (Util.Files.Compose (Dir, "share/dynamo/base"), True);
-         Set_Config_Directory (Gen.CONFIG_DIR, True);
+         Set_Config_Directory (Gen.Configs.CONFIG_DIR, True);
       end;
    end if;
    if Status /= Success then
@@ -127,7 +128,7 @@ begin
          if Cmd_Name'Length > 0 then
             Ada.Text_IO.Put_Line ("Invalid command: '" & Cmd_Name & "'");
          else
-            Ada.Text_IO.Put_Line (Gen.RELEASE);
+            Ada.Text_IO.Put_Line (Gen.Configs.RELEASE);
             Ada.Text_IO.Put ("Type '");
             Ada.Text_IO.Put (Ada.Command_Line.Command_Name);
             Ada.Text_IO.Put_Line (" help' for usage.");

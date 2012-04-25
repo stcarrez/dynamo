@@ -18,9 +18,11 @@
 with Ada.Strings.Unbounded;
 with Ada.Directories;
 
+with Gen.Configs;
 with Gen.Utils;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
+
 with Util.Log.Loggers;
 with Util.Encoders.HMAC.SHA1;
 
@@ -32,6 +34,7 @@ package body Gen.Artifacts.Query is
    use Gen.Model;
    use Gen.Model.Tables;
    use Gen.Model.Queries;
+   use Gen.Configs;
 
    use type DOM.Core.Node;
    use Util.Log;

@@ -4,9 +4,10 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{projectName}.properties">
-app_search_dirs=.;samples;../awa/awa;../awa/asf;../ada-awa/awa;../ada-awa/asf
+app_search_dirs=\#{empty dynamo_search_dirs ? . : dynamo_search_dirs}
 
 app.modules.dir=\#{fn:composePath(app_search_dirs,'config')}
+
 contextPath=/#{fn:toLowerCase(projectName)}
 
 web.dir=\#{fn:composePath(app_search_dirs,'web')}
@@ -20,8 +21,6 @@ view.ext=.html
 
 content-type.default=text/plain
 ado.queries.load=true
-bundle.var.layoutMsg=layouts
-bundle.var.loginMsg=login
 
 ado.queries.paths=\#{fn:composePath(app_search_dirs,'db')}
 ado.queries.load=true
@@ -37,7 +36,7 @@ openid.provider.orange=http://openid.orange.fr
 openid.provider.google=https://www.google.com/accounts/o8/id
 openid.provider.yahoo=http://open.login.yahooapis.com/openid20/www.yahoo.com/xrds
 openid.provider.myopenid=http://www.myopenid.com/server
-
+#{''}
 # Configuration for log4j
 log4j.rootCategory=DEBUG,console,result
 
@@ -55,10 +54,15 @@ log4j.logger.log.util=DEBUG
 log4j.logger.Util.Properties=DEBUG
 log4j.logger.Util.Log=WARN
 log4j.logger.Util=DEBUG
+log4j.logger.Util.Serialize.Mappers=WARN
 
 log4j.logger.AWA=DEBUG
 log4j.logger.ASF=DEBUG
 log4j.logger.AWA.Modules=INFO
+
+log4j.logger.ADO.Databases=INFO
+log4j.logger.ASF.Views.Nodes.Reader=INFO
+log4j.logger.AWA.Applications.Configs=WARN
 
 database=\#{empty dynamo_database?'mysql://localhost:3306/#{projectName}?user=#{projectName}':dynamo_database}
 </f:view>

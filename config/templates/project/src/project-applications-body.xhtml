@@ -68,6 +68,8 @@ package body #{fn:capitalize(projectName)}.Applications is
       App.Add_Servlet (Name => "files", Server => App.Self.Files'Access);
       App.Add_Servlet (Name => "ajax", Server => App.Self.Ajax'Access);
       App.Add_Servlet (Name => "measures", Server => App.Self.Measures'Access);
+      App.Add_Servlet (Name => "auth", Server => App.Self.Auth'Access);
+      App.Add_Servlet (Name => "verify-auth", Server => App.Self.Verify_Auth'Access);
    end Initialize_Servlets;
 #{''}
    --  ------------------------------
@@ -105,6 +107,26 @@ package body #{fn:capitalize(projectName)}.Applications is
                 Name   => "workspaces",
                 URI    => "workspaces",
                 Module => App.Workspace_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
+                Name   => AWA.Mail.Module.NAME,
+                URI    => "mail",
+                Module => App.Mail_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
+                Name   => AWA.Storages.Modules.NAME,
+                URI    => "storages",
+                Module => App.Storage_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
+                Name   => AWA.Blogs.Module.NAME,
+                URI    => "blogs",
+                Module => App.Blog_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
+                Name   => AWA.Comments.Module.NAME,
+                URI    => "comments",
+                Module => App.Comment_Module'Access);
    end Initialize_Modules;
 #{''}
 end #{fn:capitalize(projectName)}.Applications;

@@ -19,6 +19,10 @@ with Security.Openid.Servlets;
 #{''}
 with AWA.Users.Servlets;
 with AWA.Users.Module;
+with AWA.Mail.Module;
+with AWA.Comments.Module;
+with AWA.Blogs.Module;
+with AWA.Storages.Modules;
 with AWA.Applications;
 with AWA.Workspaces.Module;
 with AWA.Services.Filters;
@@ -69,6 +73,10 @@ private
       --  The application modules.
       User_Module       : aliased AWA.Users.Module.User_Module;
       Workspace_Module  : aliased AWA.Workspaces.Module.Workspace_Module;
+      Blog_Module       : aliased AWA.Blogs.Module.Blog_Module;
+      Mail_Module       : aliased AWA.Mail.Module.Mail_Module;
+      Comment_Module    : aliased AWA.Comments.Module.Comment_Module;
+      Storage_Module    : aliased AWA.Storages.Modules.Storage_Module;
 --      XXX_Module    : aliased #{fn:capitalize(projectName)}.XXX.Module.XXX_Module;
    end record;
 #{''}

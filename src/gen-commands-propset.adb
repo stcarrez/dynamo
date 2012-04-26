@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-propset -- Set a property on dynamo project
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ package body Gen.Commands.Propset is
          return;
       end if;
 
-      Generator.Read_Project ("dynamo.xml");
+      Generator.Read_Project ("dynamo.xml", True);
       Generator.Set_Project_Property (Name, Value);
       Generator.Save_Project;
    end Execute;

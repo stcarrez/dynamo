@@ -55,6 +55,7 @@ log4j.logger.Util.Properties=DEBUG
 log4j.logger.Util.Log=WARN
 log4j.logger.Util=DEBUG
 log4j.logger.Util.Serialize.Mappers=WARN
+log4j.logger.Util.Serialize.IO=INFO
 
 log4j.logger.AWA=DEBUG
 log4j.logger.ASF=DEBUG
@@ -63,6 +64,8 @@ log4j.logger.AWA.Modules=INFO
 log4j.logger.ADO.Databases=INFO
 log4j.logger.ASF.Views.Nodes.Reader=INFO
 log4j.logger.AWA.Applications.Configs=WARN
+log4j.logger.AWA.Modules=WARN
+#{''}
 
 database=\#{empty dynamo_database?'mysql://localhost:3306/#{projectName}?user=#{projectName}':dynamo_database}
 </f:view>

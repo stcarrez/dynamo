@@ -48,6 +48,9 @@ package Gen.Model.Projects is
 
       --  The list of 'dynamo.xml' files used by the project (gathered from GNAT files).
       Dynamo_Files  : Gen.Utils.String_List.Vector;
+
+      --  Whether we did a recursive scan of GNAT project files.
+      Recursive_Scan : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

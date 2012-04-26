@@ -487,10 +487,14 @@ package body Gen.Generator is
    procedure Save_Project (H : in out Handler) is
       Path : constant String := Ada.Directories.Compose (H.Get_Result_Directory, "dynamo.xml");
    begin
-      if H.Get_Project_Property ("search_dirs", ".") = "." then
-         H.Read_Project ("dynamo.xml", True);
+      --  Set the 'search_dirs' property only if we did a recursive scan of GNAT project files.
+      --  Otherwise we don't know which Dynamo module or library is used.
+      if H.Project.Recursive_Scan then
+         if H.Get_Project_Property ("search_dirs", ".") = "." then
+            H.Read_Project ("dynamo.xml", True);
+         end if;
+         H.Set_Project_Property ("search_dirs", H.Get_Search_Directories);
       end if;
-      H.Set_Project_Property ("search_dirs", H.Get_Search_Directories);
       H.Project.Save (Path);
    end Save_Project;
 
@@ -711,6 +715,9 @@ package body Gen.Generator is
                return;
             end if;
          end;
+
+         --  Mark the fact we did a recursive scan.
+         H.Project.Recursive_Scan := True;
 
          --  Look for the projects that define the 'dynamo.xml' configuration.
          Collect_Dynamo_Files (H.Project.Project_Files, H.Project.Dynamo_Files);

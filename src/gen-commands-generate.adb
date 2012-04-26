@@ -35,6 +35,7 @@ package body Gen.Commands.Generate is
       File_Count : Natural := 0;
    begin
       Generator.Read_Project ("dynamo.xml", True);
+      Gen.Generator.Read_Mappings (Generator);
 
       --  Read the model files.
       loop

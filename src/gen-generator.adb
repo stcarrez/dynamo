@@ -759,6 +759,19 @@ package body Gen.Generator is
    end Read_Package;
 
    --  ------------------------------
+   --  Read the model mapping types and initialize the hibernate artifact.
+   --  ------------------------------
+   procedure Read_Mappings (H    : in out Handler) is
+      Mapping : constant String := H.Get_Parameter ("generator.mapping",
+                                                    "AdaMappings.xml");
+      Dir     : constant String := H.Get_Config_Directory;
+   begin
+      --  Read the type mappings
+      H.Type_Mapping_Loaded := True;
+      H.Read_Model (File => Ada.Directories.Compose (Dir, Mapping));
+   end Read_Mappings;
+
+   --  ------------------------------
    --  Read the XML model file
    --  ------------------------------
    procedure Read_Model (H    : in out Handler;
@@ -771,15 +784,7 @@ package body Gen.Generator is
       --  Before loading a model file, we should know the type mappings.
       --  Load them first if needed.
       if not H.Type_Mapping_Loaded then
-         declare
-            Mapping : constant String := H.Get_Parameter ("generator.mapping",
-                                                          "AdaMappings.xml");
-            Dir     : constant String := H.Get_Config_Directory;
-         begin
-            --  Read the type mappings
-            H.Type_Mapping_Loaded := True;
-            H.Read_Model (File => Ada.Directories.Compose (Dir, Mapping));
-         end;
+         H.Read_Mappings;
       end if;
 
       Log.Info ("Reading model file '{0}'", File);

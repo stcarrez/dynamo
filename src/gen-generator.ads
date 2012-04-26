@@ -65,6 +65,9 @@ package Gen.Generator is
    procedure Read_Package (H    : in out Handler;
                            File : in String);
 
+   --  Read the model mapping types and initialize the hibernate artifact.
+   procedure Read_Mappings (H    : in out Handler);
+
    --  Read the XML model file
    procedure Read_Model (H    : in out Handler;
                          File : in String);

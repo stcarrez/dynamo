@@ -82,6 +82,7 @@ package body Gen.Commands.Model is
          --  Run the generation.
          Gen.Generator.Prepare (Generator);
          Gen.Generator.Generate_All (Generator);
+         Gen.Generator.Finish (Generator);
       end if;
    end Execute;
 

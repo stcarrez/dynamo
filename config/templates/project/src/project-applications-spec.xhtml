@@ -28,7 +28,8 @@ with AWA.Workspaces.Module;
 with AWA.Services.Filters;
 package #{fn:capitalize(projectName)}.Applications is
 #{''}
-   CONFIG_PATH : constant String := "/#{fn:toLowerCase(projectName)}";
+   CONFIG_PATH  : constant String := "/#{fn:toLowerCase(projectName)}";
+   CONTEXT_PATH : constant String := "/#{projectName}";
 #{''}
    type Application is new AWA.Applications.Application with private;
    type Application_Access is access all Application'Class;

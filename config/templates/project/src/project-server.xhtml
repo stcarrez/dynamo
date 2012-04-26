@@ -16,7 +16,6 @@ with ASF.Server.Web;
 with #{fn:capitalize(projectName)}.Applications;
 procedure #{fn:capitalize(projectName)}.Server is
 #{''}
-   CONTEXT_PATH : constant String := "/#{projectName}";
    Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.Server");
 
    App     : constant #{fn:capitalize(projectName)}.Applications.Application_Access := new #{fn:capitalize(projectName)}.Applications.Application;
@@ -26,7 +25,7 @@ procedure #{fn:capitalize(projectName)}.Server is
 begin
    #{fn:capitalize(projectName)}.Applications.Initialize (App);
 
-   WS.Register_Application (CONTEXT_PATH, App.all'Access);
+   WS.Register_Application (#{fn:capitalize(projectName)}.Applications.CONTEXT_PATH, App.all'Access);
 
    Log.Info ("Connect you browser to: http://localhost:8080/#{projectName}/index.html");
    WS.Start;

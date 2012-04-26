@@ -18,6 +18,7 @@ with ASF.Applications;
 with ASF.Applications.Main;
 with ASF.Applications.Main.Configs;
 #{''}
+with AWA.Applications.Factory;
 #{''}
 --  with #{fn:capitalize(projectName)}.XXX.Module;
 package body #{fn:capitalize(projectName)}.Applications is
@@ -35,7 +36,7 @@ package body #{fn:capitalize(projectName)}.Applications is
    --  &lt;/ul&gt;
    --  ------------------------------
    procedure Initialize (App : in Application_Access) is
-      Fact  : ASF.Applications.Main.Application_Factory;
+      Fact  : AWA.Applications.Factory.Application_Factory;
       C     : ASF.Applications.Config;
    begin
       App.Self := App;

@@ -3,6 +3,7 @@
       Get the list of users (compact form).
     </description>
     <class name="Gen.Database.Model.Database_Info">
+        <comment>information about the database</comment>
         <property type='String' name="name">
             <comment>the database name.</comment>
         </property>

@@ -86,7 +86,7 @@ test:	 build
 GENERATOR=dynamo
 
 generate:
-	$(GENERATOR) generate db
+	$(GENERATOR) generate config/db
 
 # Files to package in source distribution
 DISTFILES=README LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess configure config.sub \

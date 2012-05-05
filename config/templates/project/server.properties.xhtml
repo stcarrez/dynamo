@@ -27,7 +27,19 @@ ado.queries.load=true
 
 # Login page
 user.auth-filter.redirect=/\#{contextPath}/auth/login.html
+#{''}
 
+# The base URL to construct URL to the application page.
+app_base_url=http://localhost:8080#{contextPath}
+#{''}
+
+# The application name
+app_name=Atlas
+#{''}
+
+# Redirect to a page if the access key is invalid.
+user.verify-filter.redirect=#{contextPath}/auth/login.html
+#{''}
 bundle.var.samplesMsg=samples
 openid.realm=http://localhost:8080/\#{contextPath}/auth
 openid.callback_url=http://localhost:8080/\#{contextPath}/auth/verify
@@ -49,7 +61,6 @@ log4j.appender.result.File=#{projectName}.log
 
 # Logger configuration
 log4j.logger.log=WARN
-log4j.logger.log.util=DEBUG
 
 log4j.logger.Util.Properties=DEBUG
 log4j.logger.Util.Log=WARN

@@ -10,7 +10,7 @@ GNATMAKE=gnatmake
 GNATCLEAN=gnatclean
 GPRPATH=#{projectName}.gpr
 
-distdir=awa-@#{fn:toUpperCase(projectName)}_VERSION@
+distdir=#{projectName}-@#{fn:toUpperCase(projectName)}_VERSION@
 
 DIST_FILE=#{projectName}-@#{fn:toUpperCase(projectName)}_VERSION@.tar.gz
 
@@ -48,19 +48,17 @@ analyze:
 # Clean, then build executables for all mains defined by the project.
 rebuild: clean build
 
-GENERATOR=@AWA_DIR@/bin/dynamo -c ../ada-gen/config
+GENERATOR=dynamo
 
 generate:
-	$(GENERATOR) -o src/model generate src/alloc-sequence.xml
-	$(GENERATOR) -o regtests/model generate regtests/simple-model.xml regtests/Comment.hbm.xml
-	$(GENERATOR) -o samples/model generate samples/user.hbm.xml
+	$(GENERATOR) generate db
 
 # Files to package in source distribution
 DISTFILES=README LICENSE.txt NOTICE.txt CHANGES config.guess configure config.sub \
 configure.in Makefile.in install-sh \
-ado.gpr.in tests.gpr.in samples.gpr.in config.gpr \
-src samples regtests \
-bin obj lib
+#{projectName}.gpr.in tests.gpr.in config.gpr dynamo.xml #{projectName}.properties package.xml \
+src regtests \
+bin obj web bundles db
 
 dist:
 	-rm -rf $(distdir)

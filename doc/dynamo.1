@@ -35,7 +35,7 @@ describes how to map a database table into an Ada record type for the
 framework.  The
 .B generate
 command is then used to build the Ada model files from the database mapping files.
-At the same time, it generate the SQL database creation schemas for MySQL and SQLite databases.
+At the same time, it generates the SQL database creation schemas for MySQL and SQLite databases.
 .PP
 The
 .B add-page
@@ -43,6 +43,14 @@ command is then used to add web pages for the application.  When a new applicati
 layout is necessary, the
 .B add-layout
 command can be used.
+.\"
+.PP
+To deploy an application on a production server, the
+.B dist
+command can be used to prepare the distribution tree, merge various files and directories,
+perform CSS and Javascript compression by using the
+.B yui-compressor
+or other tools.
 .\"
 .PP
 .I dynamo
@@ -98,7 +106,16 @@ must be installed on the server.  The
 command reads a
 .I package.xml
 file which describes how to make such distribution by specifying the files that must
-be copied.
+be copied.  For some files, it is possible to execute an external application that will
+do some transformation on the source file and prepare it for the installation.
+For example the
+.I package.xml
+description can compress the Javascript and CSS files by using the
+.B yui-compressor
+tool.  Images can be optimized by using
+.B pngcrush
+or
+.B jpegtran.
 .\"
 .SS The create-database command
 .RS 0
@@ -276,11 +293,19 @@ This property defines the author name inserted in file headers.
 .\"
 .SS author_email
 The author email address inserted in file headers.
+.\"
 .SS license
 This property controls the license header in file headers.
 The following license names are recognized:
 .B gpl
 .B apache
+.\"
+.SS search_dirs
+This property is generated automatically by
+.B dynamo
+from the GNAT project paths.  It indicates the search paths
+that the Ada Web Application should use to search configuration files,
+resource bundles and XHTML presentation files.
 .\"
 .SS database
 The default database connection string.
@@ -306,8 +331,8 @@ This directory contains the template files associated with
 commands.
 .\"
 .SH SEE ALSO
-\fIgnatmake(1)\fR, \fIgcc(1)\fR
+\fIgnatmake(1)\fR, \fIgcc(1)\fR, \fIyui-compressor(1)\fR, \fIpngcrush(1)\fR, \fIjpegtran(1)\fR
 .\"
-.SH COPYRIGHT
-Copyright 2011 by Stephane Carrez.
+.SH AUTHOR
+Written by Stephane Carrez.
 .\"

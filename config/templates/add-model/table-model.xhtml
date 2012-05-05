@@ -5,7 +5,7 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{moduleName}#{empty moduleName ? '' : '-'}#{modelName}.hbm.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <hibernate-mapping default-cascade="none">
-    <class name="#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}#{empty moduleName ? '' : '.'}Model.#{fn:capitalize(modelName)}" table="#{modelName}"
+    <class name="#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}#{empty moduleName ? '' : '.'}Models.#{fn:capitalize(modelName)}" table="#{modelName}"
            dynamic-insert="true" dynamic-update="true">
         <comment>The #{modelName} table.</comment>
         <id name="id" type="ADO.Identifier" unsaved-value="0">

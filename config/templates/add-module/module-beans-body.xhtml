@@ -70,7 +70,7 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans is
    --  ------------------------------
    --  Create the #{fn:capitalize(g:singular(moduleName))}_Bean bean instance.
    --  ------------------------------
-   function Create_#{fn:capitalize(g:singular(moduleName))}_Bean (Module : in #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module.#{fn:capitalize(g:singular(moduleName))}_Module_Access)
+   function Create_#{fn:capitalize(g:singular(moduleName))}_Bean (Module : in #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Modules.#{fn:capitalize(g:singular(moduleName))}_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access is
       Object : constant #{fn:capitalize(g:singular(moduleName))}_Bean_Access := new #{fn:capitalize(g:singular(moduleName))}_Bean;
    begin

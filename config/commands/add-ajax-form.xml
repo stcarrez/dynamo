@@ -1,0 +1,18 @@
+<commands>
+   <command>
+      <name>add-ajax-form</name>
+      <title>Add an AJAX form to the module</title>
+      <usage>add-ajax-form MODULE FORM-NAME</usage>
+      <help><![CDATA[
+         This command adds a new AJAX form to the given module.
+
+         web/<module>/forms/<form-name>-form.xhtml
+         web/<module>/forms/<form-name>-response.xhtml
+]]>   </help>
+      <param name='moduleName'/>
+      <param name='formName'/>
+      <basedir>web</basedir>
+      <template>add-ajax-form/form.xhtml</template>
+      <template>add-ajax-form/form-response.xhtml</template>
+   </command>
+</commands>

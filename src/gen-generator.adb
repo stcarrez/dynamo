@@ -1082,14 +1082,19 @@ package body Gen.Generator is
             Base_Name : constant String := Simple_Name (Ent);
             File_Path : constant String := Full_Name (Ent);
             Ext       : constant String := Extension (Base_Name);
+            Target    : constant String := Compose (To_String (Base_Dir), Base_Name);
             Content   : Unbounded_String;
          begin
             if Ext = "xhtml" then
                H.Generate (Mode, File_Path);
             elsif Util.Strings.Index (Base_Name, '~') = 0 then
-               Util.Files.Read_File (Path => File_Path, Into => Content);
-               Util.Files.Write_File (Path => Compose (To_String (Base_Dir), Base_Name),
-                                      Content => Content);
+               if Ada.Directories.Exists (Target) and not H.Force_Save then
+                  H.Error ("Cannot copy file: '{0}' exists already.", Target);
+               else
+                  Util.Files.Read_File (Path => File_Path, Into => Content);
+                  Util.Files.Write_File (Path => Target,
+                                         Content => Content);
+               end if;
             end if;
          end;
       end loop;

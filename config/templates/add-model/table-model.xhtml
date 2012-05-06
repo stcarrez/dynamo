@@ -13,7 +13,9 @@
             <column name="id" not-null="true" unique="false" sql-type="BIGINT"/>
             <generator class="sequence"/>
         </id>
-        <version name="version" type="int" column="version"/>
+        <version name="version" type="int" column="version">
+            <comment>the #{modelName} version</comment>
+	</version>
         <property name="name" type="String">
             <comment>the #{modelName} name</comment>
             <column name="name" not-null="false" unique="false" sql-type="VARCHAR(256)"/>

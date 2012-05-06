@@ -82,7 +82,7 @@ templates provided by \fIdynamo\fR.
 .\"
 .SS The create-project command
 .RS 0
-dynamo \fBcreate-project \fIname\fR\fR
+dynamo \fBcreate-project\fR [-l \fI{apache|gpl|proprietary}\fR] \fIname\fR \fIauthor\fR \fIemail\fR
 .RE
 .PP
 Create a new project in the current working directory or in the
@@ -93,7 +93,11 @@ package name for the project.  The command creates a set of Ada files, a configu
 a Makefile as well as a
 .I gnatmake
 build file.  The application can be immediately compiled to obtain a web server that is ready
-to run.
+to run.  The
+.B -l
+option allows to choose the license headers.  The tool supports the generation
+of Apache, the GNU license or a proprietary license.  The author's name and email address
+can be specified in the command line so that the license headers integrates them correctly.
 .\"
 .SS The dist command
 .RS 0

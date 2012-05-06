@@ -93,7 +93,7 @@ DISTFILES=README LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess configure 
 configure.in Makefile.in install-sh ChangeLog \
 dynamo.gpr.in config.gpr \
 src \
-bin obj config doc db regtests
+bin obj config doc regtests
 
 dist:
 	-rm -rf $(distdir)

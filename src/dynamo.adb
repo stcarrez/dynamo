@@ -73,9 +73,10 @@ procedure Dynamo is
    end Set_Config_Directory;
 
 begin
+   Initialize_Option_Scan (Stop_At_First_Non_Switch => True, Section_Delimiters => "targs");
    --  Parse the command line
    loop
-      case Getopt ("o: t: c:") is
+      case Getopt ("* o: t: c:") is
          when ASCII.NUL => exit;
 
          when 'o' =>
@@ -86,6 +87,9 @@ begin
 
          when 'c' =>
             Set_Config_Directory (Parameter);
+
+         when '*' =>
+            exit;
 
          when others =>
             null;
@@ -109,7 +113,7 @@ begin
    end if;
 
    declare
-      Cmd_Name  : constant String := Get_Argument;
+      Cmd_Name  : constant String := Full_Switch;
       Cmd       : Gen.Commands.Command_Access;
       Generator : Gen.Generator.Handler;
    begin

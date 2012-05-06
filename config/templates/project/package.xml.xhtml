@@ -10,7 +10,6 @@
      <install mode='copy'>
          <include name="bin/*-server"/>
          <include name="config/*.xml"/>
-         <include name="LICENSE.txt"/>
          <include name="#{projectName}*.properties"/>
      </install>
      <install mode='exec'>
@@ -23,8 +22,14 @@
          <include name="**/*.properties"/>
        </fileset>
      </install>
+     <install mode='copy' dir='licenses'>
+         <include name="LICENSE"/>
+         <include name="LICENSE.*"/>
+         <include name="COPYING"/>
+         <include name="COPYING3"/>
+     </install>
 
-     <install mode='concat'>
+     <install mode='concat' dir='licenses'>
        <include name="NOTICE.txt"/>
      </install>
 

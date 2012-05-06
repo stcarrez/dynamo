@@ -894,7 +894,9 @@ package body Gen.Generator is
          Root    : constant access Components.Base.UIComponent'Class
            := Components.Root.Get_Root (View);
       begin
-         App.File.all := Root.Get_Attribute (Context, "file");
+         if Root /= null then
+            App.File.all := Root.Get_Attribute (Context, "file");
+         end if;
       end;
    end Execute_Lifecycle;
 
@@ -995,7 +997,7 @@ package body Gen.Generator is
       begin
          if not H.Force_Save and Exists then
             H.Error ("Cannot generate file: '{0}' exists already.", Path);
-         else
+         elsif not Util.Beans.Objects.Is_Null (H.File.all) then
             Log.Info ("Generating file '{0}'", Path);
             Reply.Read_Content (Content);
 

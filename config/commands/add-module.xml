@@ -3,10 +3,20 @@
       <name>add-module</name>
       <title>Add a new module to the application</title>
       <usage>add-module NAME</usage>
-      <help>
-The module is registered in the AWA application.  It is configured by using
-an XML file which defines the beans, servlets, filters that it provides.
-      </help>
+      <help><![CDATA[
+  This command adds a new module in the application.  The module name is
+  given as argument.  Once generated, the module should be registered in
+  the AWA application.  It is configured by using an XML file which defines
+  the beans, servlets, filters that it provides.
+  The following files are created:
+  
+    src/<project>-<module>.ads
+    src/<project>-<module>-Modules.ads
+    src/<project>-<module>-Modules.adb
+    src/<project>-<module>-Beans.ads
+    src/<project>-<module>-Beans.adb
+    config/<module>.xml
+]]>      </help>
       <param optional='false' name='moduleName' arg='NAME'/>
       <basedir></basedir>
       <template>add-module/module-config.xhtml</template>

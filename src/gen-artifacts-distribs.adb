@@ -391,6 +391,8 @@ package body Gen.Artifacts.Distribs is
    procedure Execute (Rule    : in out Distrib_Rule;
                       Path    : in String;
                       Context : in out Generator'Class) is
+      use Ada.Containers;
+
       procedure Process (Key : in String;
                          Files : in out File_Vector);
 
@@ -406,8 +408,17 @@ package body Gen.Artifacts.Distribs is
                            Name, Ada.Exceptions.Exception_Message (Ex));
       end Process;
 
-      Iter : File_Tree.Cursor := Rule.Files.First;
+      Iter  : File_Tree.Cursor := Rule.Files.First;
+      Count : constant Count_Type := Rule.Files.Length;
+      Name  : constant String := Distrib_Rule'Class (Rule).Get_Install_Name;
    begin
+      if Count = 0 then
+         return;
+      elsif Count = 1 then
+         Log.Info ("Installing 1 file with {0}", Name);
+      else
+         Log.Info ("Installing{0} files with {1}", Count_Type'Image (Count), Name);
+      end if;
       while File_Tree.Has_Element (Iter) loop
          Rule.Files.Update_Element (Iter, Process'Access);
          File_Tree.Next (Iter);

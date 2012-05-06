@@ -38,6 +38,16 @@ package body Gen.Artifacts.Distribs.Copies is
       return Result.all'Access;
    end Create_Rule;
 
+   --  ------------------------------
+   --  Get a name to qualify the installation rule (used for logs).
+   --  ------------------------------
+   overriding
+   function Get_Install_Name (Rule : in Copy_Rule) return String is
+      pragma Unreferenced (Rule);
+   begin
+      return "copy";
+   end Get_Install_Name;
+
    overriding
    procedure Install (Rule    : in Copy_Rule;
                       Path    : in String;

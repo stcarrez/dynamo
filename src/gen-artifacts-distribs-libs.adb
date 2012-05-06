@@ -70,6 +70,16 @@ package body Gen.Artifacts.Distribs.Libs is
    end Create_Rule;
 
    --  ------------------------------
+   --  Get a name to qualify the installation rule (used for logs).
+   --  ------------------------------
+   overriding
+   function Get_Install_Name (Rule : in Libs_Rule) return String is
+      pragma Unreferenced (Rule);
+   begin
+      return "libs";
+   end Get_Install_Name;
+
+   --  ------------------------------
    --  Get the target path associate with the given source file for the distribution rule.
    --  ------------------------------
    overriding

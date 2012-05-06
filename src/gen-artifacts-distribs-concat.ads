@@ -35,6 +35,10 @@ private package Gen.Artifacts.Distribs.Concat is
    type Concat_Rule is new Distrib_Rule with private;
    type Concat_Rule_Access is access all Concat_Rule'Class;
 
+   --  Get a name to qualify the installation rule (used for logs).
+   overriding
+   function Get_Install_Name (Rule : in Concat_Rule) return String;
+
    --  Install the file <b>File</b> according to the distribution rule.
    --  Concatenate the files listed in <b>Files</b> in the target path specified by <b>Path</b>.
    overriding

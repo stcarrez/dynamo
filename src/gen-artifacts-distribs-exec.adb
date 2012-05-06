@@ -55,6 +55,10 @@ package body Gen.Artifacts.Distribs.Exec is
                Result.Output := EL.Expressions.Create_Expression (Output, Ctx);
                Result.Output_Append := Gen.Utils.Get_Attribute (C, "append");
             end if;
+            Result.Slow_Flag := Gen.Utils.Get_Attribute (C, "slow");
+            if Result.Slow_Flag then
+               Result.Level := Util.Log.INFO_LEVEL;
+            end if;
          end;
       end if;
       Result.Command := EL.Expressions.Create_Expression (Command, Ctx);
@@ -65,6 +69,16 @@ package body Gen.Artifacts.Distribs.Exec is
    --  ------------------------------
    --  Distribution artifact
    --  ------------------------------
+
+   --  ------------------------------
+   --  Get a name to qualify the installation rule (used for logs).
+   --  ------------------------------
+   overriding
+   function Get_Install_Name (Rule    : in Exec_Rule) return String is
+      E : constant String := Rule.Command.Get_Expression;
+   begin
+      return E;
+   end Get_Install_Name;
 
    overriding
    procedure Install (Rule    : in Exec_Rule;
@@ -77,7 +91,7 @@ package body Gen.Artifacts.Distribs.Exec is
       Source    : constant String := Get_First_Path (Files);
       Dir       : constant String := Ada.Directories.Containing_Directory (Path);
    begin
-      Log.Info ("install {0} to {1}", Source, Path);
+      Log.Print (Rule.Level, "install {0} to {1}", Source, Path);
 
       Variables.Bind ("src", Util.Beans.Objects.To_Object (Source));
       Variables.Bind ("dst", Util.Beans.Objects.To_Object (Path));

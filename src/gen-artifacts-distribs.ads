@@ -22,6 +22,7 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with GNAT.Regpat;
 with DOM.Core;
 with Gen.Model.Packages;
+with Util.Log;
 
 --  The <b>Gen.Artifacts.Distribs</b> package is an artifact for the generation of
 --  application distributions.
@@ -152,8 +153,12 @@ private
       Dir      : Ada.Strings.Unbounded.Unbounded_String;
       Matches  : Match_Rule_Vector.Vector;
       Files    : File_Tree.Map;
+      Level    : Util.Log.Level_Type := Util.Log.DEBUG_LEVEL;
    end record;
    type Distrib_Rule_Access is access all Distrib_Rule'Class;
+
+   --  Get a name to qualify the installation rule (used for logs).
+   function Get_Install_Name (Rule    : in Distrib_Rule) return String is abstract;
 
    --  Install the file <b>File</b> according to the distribution rule.
    procedure Install (Rule    : in Distrib_Rule;

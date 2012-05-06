@@ -48,6 +48,10 @@ private package Gen.Artifacts.Distribs.Exec is
    type Exec_Rule is new Distrib_Rule with private;
    type Exec_Rule_Access is access all Exec_Rule'Class;
 
+   --  Get a name to qualify the installation rule (used for logs).
+   overriding
+   function Get_Install_Name (Rule    : in Exec_Rule) return String;
+
    overriding
    procedure Install (Rule    : in Exec_Rule;
                       Path    : in String;
@@ -61,6 +65,7 @@ private
       Output        : EL.Expressions.Expression;
       Output_Append : Boolean;
       Copy_First    : Boolean := False;
+      Slow_Flag     : Boolean := False;
    end record;
 
 end Gen.Artifacts.Distribs.Exec;

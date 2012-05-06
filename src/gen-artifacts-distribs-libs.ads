@@ -55,6 +55,10 @@ private package Gen.Artifacts.Distribs.Libs is
                    Dir    : in String;
                    Source : in String);
 
+   --  Get a name to qualify the installation rule (used for logs).
+   overriding
+   function Get_Install_Name (Rule : in Libs_Rule) return String;
+
    --  Get the target path associate with the given source file for the distribution rule.
    overriding
    function Get_Target_Path (Rule : in Libs_Rule;

@@ -42,6 +42,16 @@ package body Gen.Artifacts.Distribs.Concat is
    end Create_Rule;
 
    --  ------------------------------
+   --  Get a name to qualify the installation rule (used for logs).
+   --  ------------------------------
+   overriding
+   function Get_Install_Name (Rule : in Concat_Rule) return String is
+      pragma Unreferenced (Rule);
+   begin
+      return "concat";
+   end Get_Install_Name;
+
+   --  ------------------------------
    --  Install the file <b>File</b> according to the distribution rule.
    --  Concatenate the files listed in <b>Files</b> in the target path specified by <b>Path</b>.
    --  ------------------------------

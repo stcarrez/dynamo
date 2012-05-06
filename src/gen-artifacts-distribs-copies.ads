@@ -29,6 +29,10 @@ private package Gen.Artifacts.Distribs.Copies is
    type Copy_Rule is new Distrib_Rule with private;
    type Copy_Rule_Access is access all Copy_Rule'Class;
 
+   --  Get a name to qualify the installation rule (used for logs).
+   overriding
+   function Get_Install_Name (Rule : in Copy_Rule) return String;
+
    overriding
    procedure Install (Rule    : in Copy_Rule;
                       Path    : in String;

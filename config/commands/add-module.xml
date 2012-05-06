@@ -11,10 +11,10 @@
   The following files are created:
   
     src/<project>-<module>.ads
-    src/<project>-<module>-Modules.ads
-    src/<project>-<module>-Modules.adb
-    src/<project>-<module>-Beans.ads
-    src/<project>-<module>-Beans.adb
+    src/<project>-<module>-modules.ads
+    src/<project>-<module>-modules.adb
+    src/<project>-<module>-beans.ads
+    src/<project>-<module>-beans.adb
     config/<module>.xml
 ]]>      </help>
       <param optional='false' name='moduleName' arg='NAME'/>

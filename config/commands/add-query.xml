@@ -1,0 +1,16 @@
+<commands>
+   <command>
+      <name>add-query</name>
+      <title>Add an XML query definition</title>
+      <usage>add-query MODULE-NAME QUERY-NAME</usage>
+      <help><![CDATA[
+         This command adds a new XML query for the application.
+
+         db/<module-name>-<query-name>.xml
+]]>   </help>
+      <param name='moduleName'/>
+      <param name='queryName'/>
+      <basedir>db</basedir>
+      <template>add-query/query.xhtml</template>
+   </command>
+</commands>

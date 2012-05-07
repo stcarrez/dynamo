@@ -1,0 +1,43 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{moduleName}#{empty moduleName ? '' : '-'}#{queryName}.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<query-mapping package='#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}#{empty moduleName ? '' : '.'}Models'>
+    <description>
+      List of blogs
+    </description>
+
+    <class name="#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}#{empty moduleName ? '' : '.'}Models.#{fn:capitalize(queryName)}_Info" bean="yes">
+        <comment>The list of blogs.</comment>
+        <property type='Identifier' name="id">
+            <comment>the blog identifier.</comment>
+        </property>
+        <property type='String' name="title">
+            <comment>the blog title.</comment>
+        </property>
+        <property type='String' name="uid">
+            <comment>the blog uuid.</comment>
+        </property>
+        <property type='Date' name="create_date">
+            <comment>the blog creation date.</comment>
+        </property>
+    </class>
+
+    <query name='#{queryName}'>
+       <comment>Get the list of blogs that the current user can update</comment>
+       <sql>
+    SELECT
+      blog.id,
+      blog.name,
+      blog.uid,
+      blog.create_date
+    FROM blog AS blog
+    INNER JOIN acl ON acl.entity_id = blog.id AND acl.entity_type = :table AND acl.user_id = :user_id
+    ORDER BY blog.create_date DESC
+       </sql>
+    </query>
+
+</query-mapping>
+]]></f:view>

@@ -101,7 +101,7 @@ package body #{fn:capitalize(projectName)}.Applications is
       Log.Info ("Initializing application modules...");
 #{''}
       Register (App    => App.Self.all'Access,
-                Name   => AWA.Users.Module.NAME,
+                Name   => AWA.Users.Modules.NAME,
                 URI    => "user",
                 Module => App.User_Module'Access);
 #{''}
@@ -111,7 +111,7 @@ package body #{fn:capitalize(projectName)}.Applications is
                 Module => App.Workspace_Module'Access);
 #{''}
       Register (App    => App.Self.all'Access,
-                Name   => AWA.Mail.Module.NAME,
+                Name   => AWA.Mail.Modules.NAME,
                 URI    => "mail",
                 Module => App.Mail_Module'Access);
 #{''}
@@ -121,12 +121,12 @@ package body #{fn:capitalize(projectName)}.Applications is
                 Module => App.Storage_Module'Access);
 #{''}
       Register (App    => App.Self.all'Access,
-                Name   => AWA.Blogs.Module.NAME,
+                Name   => AWA.Blogs.Modules.NAME,
                 URI    => "blogs",
                 Module => App.Blog_Module'Access);
 #{''}
       Register (App    => App.Self.all'Access,
-                Name   => AWA.Comments.Module.NAME,
+                Name   => AWA.Comments.Modules.NAME,
                 URI    => "comments",
                 Module => App.Comment_Module'Access);
    end Initialize_Modules;

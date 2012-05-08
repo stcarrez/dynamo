@@ -1,11 +1,11 @@
-Version 0.5.0   -
+Version 0.5.0   - May 2012
   - Support multi-line comments in XML mappings
   - Generate List_Bean types for the XML mapped queries
   - Add support for Ada enum generation
   - Add test template generation
   - Add AWA service template generation
   - Add support for blob model mapping
-  - New command 'add-ajax-form', 'dist'
+  - New command 'add-ajax-form', 'add-query', 'dist'
 
 Version 0.4.0	- Sep 2011
   - Generate ADO database queries

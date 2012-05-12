@@ -245,22 +245,19 @@ package body Gen.Commands.Database is
 
       if Password'Length > 0 then
          declare
-            Args : GNAT.OS_Lib.Argument_List (1 .. 5);
+            Args : GNAT.OS_Lib.Argument_List (1 .. 3);
          begin
-            Args (1) := new String '("--user");
-            Args (2) := new String '(Username);
-            Args (3) := new String '("--password");
-            Args (4) := new String '(Password);
-            Args (5) := new String '(Database);
+            Args (1) := new String '("--user=" & Username);
+            Args (2) := new String '("--password=" & Password);
+            Args (3) := new String '(Database);
             Execute_Command ("mysql", Args, File);
          end;
       else
          declare
-            Args : GNAT.OS_Lib.Argument_List (1 .. 3);
+            Args : GNAT.OS_Lib.Argument_List (1 .. 2);
          begin
-            Args (1) := new String '("--user");
-            Args (2) := new String '(Username);
-            Args (3) := new String '(Database);
+            Args (1) := new String '("--user=" & Username);
+            Args (2) := new String '(Database);
             Execute_Command ("mysql", Args, File);
          end;
       end if;

@@ -22,6 +22,7 @@ with Util.Files;
 with Util.Serialize.IO.XML;
 with Util.Streams.Buffered;
 with Util.Streams.Texts;
+with Util.Strings.Transforms;
 
 package body Gen.Model.Projects is
 
@@ -133,12 +134,14 @@ package body Gen.Model.Projects is
             Output.Start_Entity (Name => "property");
             Output.Write_Attribute (Name  => "name",
                                     Value => Util.Beans.Objects.To_Object (Names (I)));
-            Output.Write_String (Value => To_String (Project.Props.Get (Names (I))));
+            Output.Write_String (Value => Util.Strings.Transforms.Escape_Xml
+                                 (To_String (Project.Props.Get (Names (I)))));
             Output.End_Entity (Name => "property");
             Prop_Output.Write ("dynamo_");
             Prop_Output.Write (Names (I));
             Prop_Output.Write ("=");
             Prop_Output.Write (To_String (Project.Props.Get (Names (I))));
+
             Prop_Output.Write (ASCII.LF);
          end loop;
       end;

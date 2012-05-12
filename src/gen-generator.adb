@@ -1115,7 +1115,9 @@ package body Gen.Generator is
          begin
             if Dir_Name /= "." and Dir_Name /= ".." and Dir_Name /= ".svn" then
                H.Output_Dir := To_Unbounded_String (Dir);
-               Ada.Directories.Create_Directory (Dir);
+               if not Ada.Directories.Exists (Dir) then
+                  Ada.Directories.Create_Directory (Dir);
+               end if;
                H.Generate_All (Mode, Compose (Name, Dir_Name));
             end if;
          end;

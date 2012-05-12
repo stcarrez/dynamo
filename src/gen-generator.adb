@@ -708,6 +708,11 @@ package body Gen.Generator is
          declare
             Name : constant String := H.Get_GNAT_Project_Name;
          begin
+            if not Ada.Directories.Exists (Name) then
+               Log.Warn ("GNAT project file {0} does not exist.", Name);
+               return;
+            end if;
+
             Gen.Utils.GNAT.Initialize (H.Conf);
             Gen.Utils.GNAT.Read_GNAT_Project_List (Name, H.Project.Project_Files);
             if H.Project.Project_Files.Is_Empty then

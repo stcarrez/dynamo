@@ -22,6 +22,6 @@ package Gen is
    SVN_URL : constant String := "https://ada-gen.googlecode.com/svn/trunk";
 
    --  Revision used (must run 'make version' to update)
-   SVN_REV : constant Positive := 313;
+   SVN_REV : constant Positive := 339;
 
 end Gen;

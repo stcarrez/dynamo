@@ -61,6 +61,7 @@ package body Gen.Commands.Generate is
       Gen.Generator.Prepare (Generator);
       Gen.Generator.Generate_All (Generator);
       Gen.Generator.Finish (Generator);
+      Generator.Save_Project;
    end Execute;
 
    --  ------------------------------

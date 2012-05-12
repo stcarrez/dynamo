@@ -1106,9 +1106,11 @@ package body Gen.Generator is
          Get_Next_Entry (Search, Ent);
          declare
             Dir_Name : constant String := Simple_Name (Ent);
+            Dir      : constant String := Compose (To_String (Base_Dir), Dir_Name);
          begin
             if Dir_Name /= "." and Dir_Name /= ".." and Dir_Name /= ".svn" then
-               H.Output_Dir := To_Unbounded_String (Compose (To_String (Base_Dir), Dir_Name));
+               H.Output_Dir := To_Unbounded_String (Dir);
+               Ada.Directories.Create_Directory (Dir);
                H.Generate_All (Mode, Compose (Name, Dir_Name));
             end if;
          end;

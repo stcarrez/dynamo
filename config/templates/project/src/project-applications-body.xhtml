@@ -52,7 +52,6 @@ package body #{fn:capitalize(projectName)}.Applications is
       App.Initialize (C, Fact);
 #{''}
       App.Set_Global ("contextPath", CONTEXT_PATH);
-      ASF.Applications.Main.Configs.Read_Configuration (App.all, "web/WEB-INF/web.xml");
    end Initialize;
 #{''}
    --  ------------------------------
@@ -106,7 +105,7 @@ package body #{fn:capitalize(projectName)}.Applications is
                 Module => App.User_Module'Access);
 #{''}
       Register (App    => App.Self.all'Access,
-                Name   => "workspaces",
+                Name   => AWA.Workspaces.Modules.NAME,
                 URI    => "workspaces",
                 Module => App.Workspace_Module'Access);
 #{''}

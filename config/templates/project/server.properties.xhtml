@@ -7,6 +7,7 @@
 app_search_dirs=\#{empty dynamo_search_dirs ? . : dynamo_search_dirs}
 
 app.modules.dir=\#{fn:composePath(app_search_dirs,'config')}
+app.config=awa.xml;#{projectName}.xml
 
 contextPath=/#{fn:toLowerCase(projectName)}
 
@@ -24,6 +25,7 @@ ado.queries.load=true
 
 ado.queries.paths=\#{fn:composePath(app_search_dirs,'db')}
 ado.queries.load=true
+#{''}
 
 # Login page
 user.auth-filter.redirect=/\#{contextPath}/auth/login.html
@@ -34,16 +36,16 @@ app_base_url=http://localhost:8080#{contextPath}
 #{''}
 
 # The application name
-app_name=Atlas
+app_name=#{fn:capitalize(projectName)}
 #{''}
 
 # Redirect to a page if the access key is invalid.
 user.verify-filter.redirect=#{contextPath}/auth/login.html
 #{''}
 bundle.var.samplesMsg=samples
-openid.realm=http://localhost:8080/\#{contextPath}/auth
-openid.callback_url=http://localhost:8080/\#{contextPath}/auth/verify
-openid.success_url=http://localhost:8080/\#{contextPath}/auth/success.html
+openid.realm=http://localhost:8080\#{contextPath}/auth
+openid.callback_url=http://localhost:8080\#{contextPath}/auth/verify
+openid.success_url=http://localhost:8080\#{contextPath}/auth/success.html
 openid.provider.orange=http://openid.orange.fr
 openid.provider.google=https://www.google.com/accounts/o8/id
 openid.provider.yahoo=http://open.login.yahooapis.com/openid20/www.yahoo.com/xrds

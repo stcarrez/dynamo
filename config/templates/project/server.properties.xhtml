@@ -4,7 +4,7 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{projectName}.properties">
-app_search_dirs=\#{empty dynamo_search_dirs ? . : dynamo_search_dirs}
+app_search_dirs=\#{empty dynamo_search_dirs ? '.' : dynamo_search_dirs}
 
 app.modules.dir=\#{fn:composePath(app_search_dirs,'config')}
 app.config=awa.xml;#{projectName}.xml

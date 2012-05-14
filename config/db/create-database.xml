@@ -35,7 +35,7 @@
     <query name='create-user-with-password'>
        <comment>Create the user grant</comment>
        <sql driver='mysql'>grant select, insert, update, delete,
-     create temporary tables, execute,
+     create, create temporary tables, execute,
      show view on `:name`.* to :user@'localhost' identified by :password
        </sql>
     </query>

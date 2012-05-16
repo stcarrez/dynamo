@@ -71,4 +71,7 @@ package Gen.Model.Projects is
    procedure Save (Project : in out Project_Definition;
                    Path    : in String);
 
+   --  Read the XML project description into the project description.
+   procedure Read_Project (Project : in out Project_Definition);
+
 end Gen.Model.Projects;

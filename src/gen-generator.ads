@@ -83,9 +83,10 @@ package Gen.Generator is
                            File      : in String;
                            Recursive : in Boolean := False);
 
-   --  Read the XML project description into the project description.
-   procedure Read_Project (H    : in out Handler;
-                           Into : in Gen.Model.Projects.Project_Definition_Access);
+   --  Scan and read the possible modules used by the application.  Modules are stored in the
+   --  <b>modules</b> directory.  Each module is stored in its own directory and has its own
+   --  <b>dynamo.xml</b> file.
+   procedure Read_Modules (H    : in out Handler);
 
    --  Prepare the model by checking, verifying and initializing it after it is completely known.
    procedure Prepare (H : in out Handler);
@@ -179,6 +180,9 @@ package Gen.Generator is
    function Get_Project_Property (H       : in Handler;
                                   Name    : in String;
                                   Default : in String := "") return String;
+
+   --  Get the directory path which holds application modules.
+   function Get_Module_Dir (H : in Handler) return String;
 
    --  Save the project description and parameters.
    procedure Save_Project (H : in out Handler);

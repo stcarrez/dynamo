@@ -19,12 +19,16 @@ with Ada.IO_Exceptions;
 with Ada.Directories;
 
 with Util.Files;
+with Util.Log.Loggers;
 with Util.Serialize.IO.XML;
+with Util.Serialize.Mappers.Record_Mapper;
 with Util.Streams.Buffered;
 with Util.Streams.Texts;
 with Util.Strings.Transforms;
 
 package body Gen.Model.Projects is
+
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Projects");
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -153,5 +157,91 @@ package body Gen.Model.Projects is
       Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Prop_Output)),
                              Path    => Prop_Path);
    end Save;
+
+   --  ------------------------------
+   --  Read the XML project description into the project description.
+   --  ------------------------------
+   procedure Read_Project (Project : in out Project_Definition) is
+
+      type Project_Fields is (FIELD_PROJECT_NAME,
+                              FIELD_PROPERTY_NAME,
+                              FIELD_PROPERTY_VALUE,
+                              FIELD_MODULE_NAME);
+
+      type Project_Loader is record
+         Name : Unbounded_String;
+      end record;
+      type Project_Loader_Access is access all Project_Loader;
+
+      procedure Set_Member (Closure : in out Project_Loader;
+                            Field   : in Project_Fields;
+                            Value   : in Util.Beans.Objects.Object);
+
+      --  ------------------------------
+      --  Called by the de-serialization when a given field is recognized.
+      --  ------------------------------
+      procedure Set_Member (Closure : in out Project_Loader;
+                            Field   : in Project_Fields;
+                            Value   : in Util.Beans.Objects.Object) is
+      begin
+         case Field is
+         when FIELD_PROJECT_NAME =>
+            Project.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+
+         when FIELD_MODULE_NAME =>
+            declare
+               P : constant Model.Projects.Project_Definition_Access
+                 := new Model.Projects.Project_Definition;
+            begin
+               P.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+               Project.Modules.Append (P);
+            end;
+
+         when FIELD_PROPERTY_NAME =>
+            Closure.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+
+         when FIELD_PROPERTY_VALUE =>
+            Project.Props.Set (Closure.Name, Util.Beans.Objects.To_Unbounded_String (Value));
+
+         end case;
+      end Set_Member;
+
+      package Project_Mapper is
+        new Util.Serialize.Mappers.Record_Mapper (Element_Type        => Project_Loader,
+                                                  Element_Type_Access => Project_Loader_Access,
+                                                  Fields              => Project_Fields,
+                                                  Set_Member          => Set_Member);
+
+      Path   : constant String := To_String (Project.Path);
+      Loader : aliased Project_Loader;
+      Mapper : aliased Project_Mapper.Mapper;
+      Reader : Util.Serialize.IO.XML.Parser;
+   begin
+      Log.Info ("Reading project file '{0}'", Path);
+
+      --  Create the mapping to load the XML project file.
+      Mapper.Add_Mapping ("name", FIELD_PROJECT_NAME);
+      Mapper.Add_Mapping ("property/@name", FIELD_PROPERTY_NAME);
+      Mapper.Add_Mapping ("property", FIELD_PROPERTY_VALUE);
+      Mapper.Add_Mapping ("module/@name", FIELD_MODULE_NAME);
+      Reader.Add_Mapping ("project", Mapper'Unchecked_Access);
+
+      --  Set the context for Set_Member.
+      Project_Mapper.Set_Context (Reader, Loader'Access);
+
+      Project.Name := Null_Unbounded_String;
+
+      --  Read the XML query file.
+      Reader.Parse (Path);
+--
+--        if Length (Into.Name) = 0 then
+--           H.Error ("Project file {0} does not contain the project name.", Path);
+--        end if;
+
+   exception
+      when Ada.IO_Exceptions.Name_Error =>
+         --           H.Error ("Project file {0} does not exist", Path);
+         Log.Error ("Project file {0} does not exist", Path);
+   end Read_Project;
 
 end Gen.Model.Projects;

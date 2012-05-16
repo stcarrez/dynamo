@@ -641,8 +641,72 @@ package body Gen.Generator is
          --  Look for the projects that define the 'dynamo.xml' configuration.
          Collect_Dynamo_Files (H.Project.Project_Files, H.Project.Dynamo_Files);
 
+         H.Read_Modules;
       end if;
    end Read_Project;
+
+   --  ------------------------------
+   --  Get the directory path which holds application modules.
+   --  ------------------------------
+   function Get_Module_Dir (H : in Handler) return String is
+   begin
+      return "modules";
+   end Get_Module_Dir;
+
+   --  ------------------------------
+   --  Scan and read the possible modules used by the application.  Modules are stored in the
+   --  <b>modules</b> directory.  Each module is stored in its own directory and has its own
+   --  <b>dynamo.xml</b> file.
+   --  ------------------------------
+   procedure Read_Modules (H    : in out Handler) is
+      use Ada.Directories;
+
+      Search     : Search_Type;
+      Filter     : constant Filter_Type := (Ordinary_File => True, others => False);
+      Dir_Filter : constant Filter_Type := (Directory => True, others => False);
+      Ent        : Directory_Entry_Type;
+      Module_Dir : constant String := H.Get_Module_Dir;
+   begin
+      if not Exists (Module_Dir) then
+         return;
+      end if;
+      if Kind (Module_Dir) /= Directory then
+         return;
+      end if;
+
+      Start_Search (Search, Directory => Module_Dir, Pattern => "*", Filter => Dir_Filter);
+      while More_Entries (Search) loop
+         Get_Next_Entry (Search, Ent);
+         declare
+            Dir_Name : constant String := Simple_Name (Ent);
+            Dir      : constant String := Compose (Module_Dir, Dir_Name);
+            File     : constant String := Compose (Dir, "dynamo.xml");
+         begin
+            if Dir_Name /= "." and then Dir_Name /= ".." and then Dir_Name /= ".svn" and then
+              Exists (File) then
+               declare
+                  use type Model.Projects.Project_Definition_Access;
+
+                  P        : Model.Projects.Project_Definition_Access;
+               begin
+                  P := H.Project.Find_Project (File);
+                  if P = null then
+                     P := new Model.Projects.Project_Definition;
+                     P.Path := To_Unbounded_String (File);
+                     H.Project.Modules.Append (P);
+                     H.Project.Dynamo_Files.Append (File);
+                     P.Read_Project;
+                  end if;
+               end;
+            end if;
+         end;
+      end loop;
+
+   exception
+      when E : Ada.IO_Exceptions.Name_Error =>
+         H.Error ("Template directory {0} does not exist", Module_Dir);
+         Log.Info ("Exception: {0}", GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
+   end Read_Modules;
 
    --  ------------------------------
    --  Read the XML package file

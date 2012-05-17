@@ -17,9 +17,9 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
 with Ada.Containers.Ordered_Sets;
-with Ada.Containers.Indefinite_Vectors;
 
 with DOM.Core;
+with Util.Strings.Vectors;
 package Gen.Utils is
 
    --  Generic procedure to iterate over the DOM nodes children of <b>node</b>
@@ -69,9 +69,7 @@ package Gen.Utils is
                                       "<"          => Ada.Strings.Unbounded."<",
                                       "="          => Ada.Strings.Unbounded."=");
 
-   package String_List is new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
-                                                                 Element_Type => String,
-                                                                 "="          => "=");
+   package String_List renames Util.Strings.Vectors;
 
    --  Returns True if the Name is a valid project or module name.
    --  The name must be a valid Ada identifier.

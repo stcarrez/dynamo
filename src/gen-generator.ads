@@ -159,11 +159,6 @@ package Gen.Generator is
    --  Get the project name.
    function Get_Project_Name (H : in Handler) return String;
 
-   --  Get the GNAT project file name.  The default is to use the Dynamo project
-   --  name and add the <b>.gpr</b> extension.  The <b>gnat.project</b> configuration
-   --  property allows to override this default.
-   function Get_GNAT_Project_Name (H : in Handler) return String;
-
    --  Set the project property.
    procedure Set_Project_Property (H     : in out Handler;
                                    Name  : in String;

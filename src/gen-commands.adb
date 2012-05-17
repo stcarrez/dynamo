@@ -31,6 +31,7 @@ with Gen.Commands.Propset;
 with Gen.Commands.Database;
 with Gen.Commands.Info;
 with Gen.Commands.Distrib;
+with Gen.Commands.Plugins;
 
 with Util.Log.Loggers;
 
@@ -184,6 +185,9 @@ package body Gen.Commands is
    --  Distrib command.
    Dist_Cmd           : aliased Gen.Commands.Distrib.Command;
 
+   --  Create plugin command.
+   Create_Plugin_Cmd  : aliased Gen.Commands.Plugins.Command;
+
    --  Help command.
    Help_Cmd           : aliased Help_Command;
 begin
@@ -195,6 +199,7 @@ begin
    Add_Command (Name => "add-model", Cmd => Add_Model_Cmd'Access);
    Add_Command (Name => "propset", Cmd => Propset_Cmd'Access);
    Add_Command (Name => "create-database", Cmd => Database_Cmd'Access);
+   Add_Command (Name => "create-plugin", Cmd => Create_Plugin_Cmd'Access);
    Add_Command (Name => "dist", Cmd => Dist_Cmd'Access);
    Add_Command (Name => "info", Cmd => Info_Cmd'Access);
 end Gen.Commands;

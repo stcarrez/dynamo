@@ -127,6 +127,9 @@ package Gen.Generator is
    --  Get the result directory path.
    function Get_Result_Directory (H : in Handler) return String;
 
+   --  Get the project plugin directory path.
+   function Get_Plugin_Directory (H : in Handler) return String;
+
    --  Get the config directory path.
    function Get_Config_Directory (H : in Handler) return String;
 

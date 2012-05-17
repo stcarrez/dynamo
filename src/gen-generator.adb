@@ -367,6 +367,14 @@ package body Gen.Generator is
    end Get_Result_Directory;
 
    --  ------------------------------
+   --  Get the project plugin directory path.
+   --  ------------------------------
+   function Get_Plugin_Directory (H : in Handler) return String is
+   begin
+      return Util.Files.Compose (H.Get_Result_Directory, H.Project.Get_Module_Dir);
+   end Get_Plugin_Directory;
+
+   --  ------------------------------
    --  Get the config directory path.
    --  ------------------------------
    function Get_Config_Directory (H : in Handler) return String is

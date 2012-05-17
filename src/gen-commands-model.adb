@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-model -- Model creation command for dynamo
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,6 @@ package body Gen.Commands.Model is
       pragma Unreferenced (Cmd);
       use GNAT.Command_Line;
       use Ada.Command_Line;
-      use Ada.Strings.Unbounded;
 
       Name     : constant String := Get_Argument;
       Arg2     : constant String := Get_Argument;
@@ -46,7 +45,7 @@ package body Gen.Commands.Model is
 
       Generator.Read_Project ("dynamo.xml");
       Generator.Set_Force_Save (False);
-      Generator.Set_Result_Directory (To_Unbounded_String (Dir));
+      Generator.Set_Result_Directory (Dir);
       if Arg2'Length = 0 then
          --  Verify that we can use the name for an Ada identifier.
          if not Gen.Utils.Is_Valid_Name (Name) then
@@ -75,7 +74,7 @@ package body Gen.Commands.Model is
       --  If the generation succeeds, run the generate command to generate the Ada files.
       if Generator.Get_Status = Ada.Command_Line.Success then
 
-         Generator.Set_Result_Directory (To_Unbounded_String (Root_Dir));
+         Generator.Set_Result_Directory (Root_Dir);
          Generator.Set_Force_Save (True);
          Gen.Generator.Read_Models (Generator, "db");
 

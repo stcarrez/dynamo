@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-page -- Page creation command for dynamo
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,7 +59,7 @@ package body Gen.Commands.Page is
       end if;
 
       Generator.Set_Force_Save (False);
-      Generator.Set_Result_Directory (To_Unbounded_String (Dir));
+      Generator.Set_Result_Directory (Dir);
       Generator.Set_Global ("pageName", Name);
       Generator.Set_Global ("layout", Layout);
       Generator.Set_Global ("projectCode", Util.Strings.Transforms.To_Upper_Case (Name));

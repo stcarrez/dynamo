@@ -122,7 +122,7 @@ package Gen.Generator is
 
    --  Set the directory where results files are generated.
    procedure Set_Result_Directory (H    : in out Handler;
-                                   Path : in Ada.Strings.Unbounded.Unbounded_String);
+                                   Path : in String);
 
    --  Get the result directory path.
    function Get_Result_Directory (H : in Handler) return String;

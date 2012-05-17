@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  dynamo -- Ada Code Generator
---  Copyright (C) 2009, 2010, 2011 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,7 +118,7 @@ begin
       Generator : Gen.Generator.Handler;
    begin
       if Length (Out_Dir) > 0 then
-         Gen.Generator.Set_Result_Directory (Generator, Out_Dir);
+         Gen.Generator.Set_Result_Directory (Generator, To_String (Out_Dir));
       end if;
       if Length (Template_Dir) > 0 then
          Gen.Generator.Set_Template_Directory (Generator, Template_Dir);

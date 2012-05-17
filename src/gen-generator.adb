@@ -352,10 +352,10 @@ package body Gen.Generator is
    --  Set the directory where results files are generated.
    --  ------------------------------
    procedure Set_Result_Directory (H    : in out Handler;
-                                   Path : in Ada.Strings.Unbounded.Unbounded_String) is
+                                   Path : in String) is
    begin
       H.Conf.Set (RESULT_DIR, Path);
-      H.Output_Dir := Path;
+      H.Output_Dir := To_Unbounded_String (Path);
    end Set_Result_Directory;
 
    --  ------------------------------

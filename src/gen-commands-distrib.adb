@@ -41,7 +41,7 @@ package body Gen.Commands.Distrib is
             Generator.Error ("Missing target directory");
             return;
          end if;
-         Generator.Set_Result_Directory (Ada.Strings.Unbounded.To_Unbounded_String (Target_Dir));
+         Generator.Set_Result_Directory (Target_Dir);
       end;
 
       --  Read the package description.

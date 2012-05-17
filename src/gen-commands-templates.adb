@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,7 +76,7 @@ package body Gen.Commands.Templates is
       end loop;
 
       Generator.Set_Force_Save (False);
-      Generator.Set_Result_Directory (To_Unbounded_String (Out_Dir));
+      Generator.Set_Result_Directory (Out_Dir);
       declare
          Iter : Util.Strings.Sets.Cursor := Cmd.Templates.First;
       begin

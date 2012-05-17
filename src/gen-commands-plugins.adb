@@ -38,6 +38,7 @@ package body Gen.Commands.Plugins is
       pragma Unreferenced (Cmd);
       use GNAT.Command_Line;
 
+      Result_Dir : constant String := Generator.Get_Result_Directory;
    begin
       --  If a dynamo.xml file exists, read it.
       if Ada.Directories.Exists ("dynamo.xml") then
@@ -97,12 +98,13 @@ package body Gen.Commands.Plugins is
          end if;
          Ada.Directories.Create_Directory (Path);
 
-         Generator.Set_Result_Directory (Ada.Strings.Unbounded.To_Unbounded_String (Path));
+         Generator.Set_Result_Directory (Path);
 
          Generator.Set_Project_Name (Name);
          Generator.Set_Force_Save (False);
          Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "create-plugin");
 
+         Generator.Set_Result_Directory (Result_Dir);
          Generator.Save_Project;
 --           declare
 --              Path   : constant GNAT.OS_Lib.String_Access

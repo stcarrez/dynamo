@@ -558,7 +558,7 @@ package body Gen.Model.Projects is
                   if P = null then
                      Project.Create_Project (Path => File, Name => "", Project => P);
 
-                     --  Project.Dynamo_Files.Append (File);
+                     Project.Dynamo_Files.Append (File);
                      P.Read_Project;
                      Project.Add_Module (P);
                   end if;

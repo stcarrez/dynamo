@@ -18,8 +18,8 @@
 with Ada.Directories;
 with Ada.Text_IO;
 with Gen.Artifacts;
+with Gen.Model.Projects;
 with GNAT.Command_Line;
-with GNAT.OS_Lib;
 
 with Util.Files;
 with Util.Log.Loggers;
@@ -100,25 +100,37 @@ package body Gen.Commands.Plugins is
 
          Generator.Set_Result_Directory (Path);
 
-         Generator.Set_Project_Name (Name);
+         --  Create the plugin project instance and generate its dynamo.xml file.
+         --  The new plugin is added to the current project so that it will be referenced.
+         declare
+            procedure Create_Plugin (Project : in out Model.Projects.Root_Project_Definition);
+
+            procedure Create_Plugin (Project : in out Model.Projects.Root_Project_Definition) is
+               Plugin : Gen.Model.Projects.Project_Definition_Access;
+               File   : constant String := Util.Files.Compose (Path, "dynamo.xml");
+            begin
+               Project.Create_Project (Name    => Name,
+                                       Path    => File,
+                                       Project => Plugin);
+               Project.Add_Module (Plugin);
+
+               Plugin.Props.Set ("license", Project.Props.Get ("license", "none"));
+               Plugin.Props.Set ("author", Project.Props.Get ("author", ""));
+               Plugin.Props.Set ("author_email", Project.Props.Get ("author_email", ""));
+               Plugin.Save (File);
+            end Create_Plugin;
+
+         begin
+            Generator.Update_Project (Create_Plugin'Access);
+         end;
+
+         --  Generate the new plugin content.
          Generator.Set_Force_Save (False);
          Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "create-plugin");
 
+         --  And save the project dynamo.xml file which now refers to the new plugin.
          Generator.Set_Result_Directory (Result_Dir);
          Generator.Save_Project;
---           declare
---              Path   : constant GNAT.OS_Lib.String_Access
---                := GNAT.OS_Lib.Locate_Exec_On_Path ("autoconf");
---              Args   : GNAT.OS_Lib.Argument_List (1 .. 0);
---              Status : Boolean;
---           begin
---              Ada.Directories.Set_Directory (Generator.Get_Result_Directory);
---              Log.Info ("Executing {0}", Path.all);
---              GNAT.OS_Lib.Spawn (Path.all, Args, Status);
---              if not Status then
---                 Generator.Error ("Execution of {0} failed", Path.all);
---              end if;
---           end;
       end;
    end Execute;
 

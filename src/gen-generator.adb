@@ -35,13 +35,11 @@ with Util.Strings.Vectors;
 with EL.Functions;
 
 with Gen.Utils;
-with Gen.Utils.GNAT;
 with Gen.Model;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
 with Gen.Commands.Templates;
 
-with GNAT.Traceback.Symbolic;
 with Util.Strings;
 with Util.Files;
 with Util.Strings.Transforms;
@@ -522,186 +520,12 @@ package body Gen.Generator is
    procedure Read_Project (H         : in out Handler;
                            File      : in String;
                            Recursive : in Boolean := False) is
-
-      procedure Collect_Dynamo_Files (List   : in Gen.Utils.String_List.Vector;
-                                      Result : out Gen.Utils.String_List.Vector);
-
-      --  ------------------------------
-      --  Collect the <b>dynamo.xml</b> files used by the projects.
-      --  Keep the list in the dependency order so that it can be used
-      --  to build the database schema and take into account schema dependencies.
-      --  ------------------------------
-      procedure Collect_Dynamo_Files (List   : in Gen.Utils.String_List.Vector;
-                                      Result : out Gen.Utils.String_List.Vector) is
-         use type Gen.Model.Projects.Project_Definition_Access;
-
-         function Get_Dynamo_Path (Project_Path : in String) return String;
-
-         Iter : Gen.Utils.String_List.Cursor := List.First;
-
-         --  ------------------------------
-         --  Find the Dynamo.xml path associated with the given GNAT project file.
-         --  ------------------------------
-         function Get_Dynamo_Path (Project_Path : in String) return String is
-            Name   : constant String := Ada.Directories.Base_Name (Project_Path);
-         begin
-            --  Check in the directory which contains the project file.
-            declare
-               Dir    : constant String := Ada.Directories.Containing_Directory (Project_Path);
-               Dynamo : constant String := Util.Files.Compose (Dir, "dynamo.xml");
-            begin
-               if Ada.Directories.Exists (Dynamo) then
-                  return Dynamo;
-               end if;
-            end;
-
-            declare
-               Dir    : constant String := H.Get_Install_Directory;
-               Path   : constant String := Util.Files.Compose (Dir, Name);
-               Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
-            begin
-               Log.Debug ("Checking dynamo file {0}", Dynamo);
-               if Ada.Directories.Exists (Dynamo) then
-                  return Dynamo;
-               end if;
-            end;
-            return "";
-         end Get_Dynamo_Path;
-
-      begin
-         while Gen.Utils.String_List.Has_Element (Iter) loop
-            declare
-               Path     : constant String := Gen.Utils.String_List.Element (Iter);
-               Dynamo   : constant String := Get_Dynamo_Path (Path);
-               Has_File : constant Boolean := Result.Contains (Dynamo);
-               P        : Model.Projects.Project_Definition_Access;
-            begin
-               Gen.Utils.String_List.Next (Iter);
-
-               --  Do not include the 'dynamo.xml' path if it is already in the list
-               --  (this happens if a project uses several GNAT project files).
-               --  We have to make sure that the 'dynamo.xml' stored in the current directory
-               --  appears last in the list.
-               if (not Has_File or else not Gen.Utils.String_List.Has_Element (Iter))
-                 --  Insert only if there is a file.
-                 and Dynamo'Length > 0 then
-                  if Has_File then
-                     Result.Delete (Result.Find_Index (Dynamo));
-                  end if;
-                  Result.Append (Dynamo);
-
-                  --  Find the project associated with the dynamo.xml file.
-                  --  Create it and load the XML if necessary.
-                  P := H.Project.Find_Project (Dynamo);
-                  if P = null then
-                     P := new Model.Projects.Project_Definition;
-                     P.Path := To_Unbounded_String (Dynamo);
-                     H.Project.Modules.Append (P);
-                     P.Read_Project; --  SCz (Into => P);
-                  end if;
-               end if;
-            end;
-         end loop;
-      end Collect_Dynamo_Files;
-
    begin
-      H.Project.Path := To_Unbounded_String (File);
-      H.Project.Read_Project;
+      H.Project.Read_Project (File      => File,
+                              Config    => H.Conf,
+                              Recursive => Recursive);
       H.Set_Global ("projectName", H.Get_Project_Name);
-
-      --  When necessary, read the GNAT project files.  We get a list of absolute GNAT path
-      --  files that we can use known the project dependencies with other modules.
-      --  This is useful for database schema generation for example.
-      if Recursive then
-
-         --  Read GNAT project files.
-         declare
-            Name : constant String := H.Get_GNAT_Project_Name;
-         begin
-            if not Ada.Directories.Exists (Name) then
-               Log.Warn ("GNAT project file {0} does not exist.", Name);
-               return;
-            end if;
-
-            Gen.Utils.GNAT.Initialize (H.Conf);
-            Gen.Utils.GNAT.Read_GNAT_Project_List (Name, H.Project.Project_Files);
-            if H.Project.Project_Files.Is_Empty then
-               H.Error ("Error while reading GNAT project {0}", Name);
-               return;
-            end if;
-         end;
-
-         --  Mark the fact we did a recursive scan.
-         H.Project.Recursive_Scan := True;
-
-         --  Look for the projects that define the 'dynamo.xml' configuration.
-         Collect_Dynamo_Files (H.Project.Project_Files, H.Project.Dynamo_Files);
-
-         H.Read_Modules;
-      end if;
    end Read_Project;
-
-   --  ------------------------------
-   --  Get the directory path which holds application modules.
-   --  ------------------------------
-   function Get_Module_Dir (H : in Handler) return String is
-   begin
-      return "modules";
-   end Get_Module_Dir;
-
-   --  ------------------------------
-   --  Scan and read the possible modules used by the application.  Modules are stored in the
-   --  <b>modules</b> directory.  Each module is stored in its own directory and has its own
-   --  <b>dynamo.xml</b> file.
-   --  ------------------------------
-   procedure Read_Modules (H    : in out Handler) is
-      use Ada.Directories;
-
-      Search     : Search_Type;
-      Dir_Filter : constant Filter_Type := (Directory => True, others => False);
-      Ent        : Directory_Entry_Type;
-      Module_Dir : constant String := H.Get_Module_Dir;
-   begin
-      if not Exists (Module_Dir) then
-         return;
-      end if;
-      if Kind (Module_Dir) /= Directory then
-         return;
-      end if;
-
-      Start_Search (Search, Directory => Module_Dir, Pattern => "*", Filter => Dir_Filter);
-      while More_Entries (Search) loop
-         Get_Next_Entry (Search, Ent);
-         declare
-            Dir_Name : constant String := Simple_Name (Ent);
-            Dir      : constant String := Compose (Module_Dir, Dir_Name);
-            File     : constant String := Compose (Dir, "dynamo.xml");
-         begin
-            if Dir_Name /= "." and then Dir_Name /= ".." and then Dir_Name /= ".svn" and then
-              Exists (File) then
-               declare
-                  use type Model.Projects.Project_Definition_Access;
-
-                  P        : Model.Projects.Project_Definition_Access;
-               begin
-                  P := H.Project.Find_Project (File);
-                  if P = null then
-                     P := new Model.Projects.Project_Definition;
-                     P.Path := To_Unbounded_String (File);
-                     H.Project.Modules.Append (P);
-                     H.Project.Dynamo_Files.Append (File);
-                     P.Read_Project;
-                  end if;
-               end;
-            end if;
-         end;
-      end loop;
-
-   exception
-      when E : Ada.IO_Exceptions.Name_Error =>
-         H.Error ("Template directory {0} does not exist", Module_Dir);
-         Log.Info ("Exception: {0}", GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
-   end Read_Modules;
 
    --  ------------------------------
    --  Read the XML package file
@@ -1100,7 +924,7 @@ package body Gen.Generator is
    exception
       when E : Ada.IO_Exceptions.Name_Error =>
          H.Error ("Template directory {0} does not exist", Path);
-         Log.Info ("Exception: {0}", GNAT.Traceback.Symbolic.Symbolic_Traceback (E));
+         Log.Info ("Exception: {0}", Util.Log.Loggers.Traceback (E));
    end Generate_All;
 
    --  ------------------------------
@@ -1108,7 +932,7 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Update_Project (H : in out Handler;
                              Process : not null access
-                               procedure (Project : in out Model.Projects.Project_Definition)) is
+                               procedure (Project : in out Model.Projects.Root_Project_Definition)) is
    begin
       Process (H.Project);
    end Update_Project;

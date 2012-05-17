@@ -41,9 +41,9 @@ package body Gen.Commands.Info is
 
       procedure Print_GNAT_Projects (Project : in out Gen.Model.Projects.Project_Definition);
 
-      procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Project_Definition);
+      procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Root_Project_Definition);
 
-      procedure Print_Project (Project : in out Gen.Model.Projects.Project_Definition);
+      procedure Print_Project (Project : in out Gen.Model.Projects.Root_Project_Definition);
 
       List : Gen.Utils.String_List.Vector;
 
@@ -107,7 +107,7 @@ package body Gen.Commands.Info is
       --  ------------------------------
       --  Print the list of Dynamo projects used by the main project.
       --  ------------------------------
-      procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Project_Definition) is
+      procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Root_Project_Definition) is
          Iter : Gen.Utils.String_List.Cursor := Project.Dynamo_Files.First;
       begin
          if Gen.Utils.String_List.Has_Element (Iter) then
@@ -120,9 +120,9 @@ package body Gen.Commands.Info is
          end if;
       end Print_Dynamo_Projects;
 
-      procedure Print_Project (Project : in out Gen.Model.Projects.Project_Definition) is
+      procedure Print_Project (Project : in out Gen.Model.Projects.Root_Project_Definition) is
       begin
-         Print_GNAT_Projects (Project);
+         Print_GNAT_Projects (Gen.Model.Projects.Project_Definition (Project));
          Print_Dynamo_Projects (Project);
 
          declare

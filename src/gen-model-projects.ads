@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,17 @@ package Gen.Model.Projects is
      new Ada.Containers.Vectors (Element_Type => Project_Definition_Access,
                                  Index_Type   => Natural);
 
+   type Dependency_Type is (NONE, DIRECT, INDIRECT, BOTH);
+
+   type Project_Dependency is record
+      Project : Project_Definition_Access := null;
+      Kind    : Dependency_Type := NONE;
+   end record;
+
+   package Dependency_Vectors is
+     new Ada.Containers.Vectors (Element_Type => Project_Dependency,
+                                 Index_Type   => Natural);
+
    --  ------------------------------
    --  Project Definition
    --  ------------------------------
@@ -43,10 +54,17 @@ package Gen.Model.Projects is
       Props   : Util.Properties.Manager;
       Modules : Project_Vectors.Vector;
 
+      --  The root project definition.
+      Root          : Project_Definition_Access := null;
+
+      --  The list of plugin names that this plugin or project depends on.
+      Dependencies  : Dependency_Vectors.Vector;
+
       --  The list of GNAT project files used by the project.
       Project_Files : Gen.Utils.String_List.Vector;
 
-      --  The list of 'dynamo.xml' files used by the project (gathered from GNAT files).
+      --  The list of 'dynamo.xml' files used by the project (gathered from GNAT files
+      --  and by scanning the 'plugins' directory).
       Dynamo_Files  : Gen.Utils.String_List.Vector;
 
       --  Whether we did a recursive scan of GNAT project files.
@@ -62,10 +80,36 @@ package Gen.Model.Projects is
    --  Get the project name.
    function Get_Project_Name (Project : in Project_Definition) return String;
 
+   --  Get the GNAT project file name.  The default is to use the Dynamo project
+   --  name and add the <b>.gpr</b> extension.  The <b>gnat.project</b> configuration
+   --  property allows to override this default.
+   function Get_GNAT_Project_Name (Project : in Project_Definition) return String;
+
+   --  Get the directory path which holds application modules.
+   --  This is controlled by the <b>modules_dir</b> configuration property.
+   --  The default is <tt>plugins</tt>.
+   --  ------------------------------
+   function Get_Module_Dir (Project : in Project_Definition) return String;
+
+   --  Find the dependency for the <b>Name</b> plugin.
+   --  Returns a null dependency if the project does not depend on that plugin.
+   function Find_Dependency (From : in Project_Definition;
+                             Name : in String) return Project_Dependency;
+
+   --  Add a dependency to the plugin identified by <b>Name</b>.
+   procedure Add_Dependency (Into : in out Project_Definition;
+                             Name : in String;
+                             Kind : in Dependency_Type);
+
    --  Find the project definition associated with the dynamo XML file <b>Path</b>.
    --  Returns null if there is no such project
    function Find_Project (From : in Project_Definition;
                           Path : in String) return Project_Definition_Access;
+
+   --  Find the project definition having the name <b>Name</b>.
+   --  Returns null if there is no such project
+   function Find_Project_By_Name (From : in Project_Definition;
+                                  Name : in String) return Project_Definition_Access;
 
    --  Save the project description and parameters.
    procedure Save (Project : in out Project_Definition;
@@ -73,5 +117,34 @@ package Gen.Model.Projects is
 
    --  Read the XML project description into the project description.
    procedure Read_Project (Project : in out Project_Definition);
+
+   --  Scan and read the possible modules used by the application.  Modules are stored in the
+   --  <b>modules</b> directory.  Each module is stored in its own directory and has its own
+   --  <b>dynamo.xml</b> file.
+   procedure Read_Modules (Project  : in out Project_Definition);
+
+   --  ------------------------------
+   --  Root Project Definition
+   --  ------------------------------
+   --  The root project is the project that is actually read by Dynamo.
+   --  It contains the lists of all projects that are necessary and which are found either
+   --  by scanning GNAT projects or by looking at plugin dependencies.
+   type Root_Project_Definition is new Project_Definition with record
+      Projects : Project_Vectors.Vector;
+   end record;
+
+   --  Find the project definition having the name <b>Name</b>.
+   --  Returns null if there is no such project
+   overriding
+   function Find_Project_By_Name (From : in Root_Project_Definition;
+                                  Name : in String) return Project_Definition_Access;
+
+   --  Read the XML project file.  When <b>Recursive</b> is set, read the GNAT project
+   --  files used by the main project and load all the <b>dynamo.xml</b> files defined
+   --  by these project.
+   procedure Read_Project (Project   : in out Root_Project_Definition;
+                           File      : in String;
+                           Config    : in Util.Properties.Manager'Class;
+                           Recursive : in Boolean := False);
 
 end Gen.Model.Projects;

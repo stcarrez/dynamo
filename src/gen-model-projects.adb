@@ -93,10 +93,13 @@ package body Gen.Model.Projects is
       procedure Save_Module (Pos : in Project_Vectors.Cursor) is
          Module : constant Project_Definition_Access := Project_Vectors.Element (Pos);
       begin
-         Output.Start_Entity (Name => "module");
-         Output.Write_Attribute (Name  => "name",
-                                 Value => Util.Beans.Objects.To_Object (Module.Path));
-         Output.End_Entity (Name => "module");
+         if Length (Module.Path) > 0 then
+            Output.Write_String (ASCII.LF & "    ");
+            Output.Start_Entity (Name => "module");
+            Output.Write_Attribute (Name  => "name",
+                                    Value => Util.Beans.Objects.To_Object (Module.Path));
+            Output.End_Entity (Name => "module");
+         end if;
       end Save_Module;
 
       --  ------------------------------
@@ -129,12 +132,13 @@ package body Gen.Model.Projects is
       --  Start building the new dynamo.xml content.
       --  At the same time, we append in the project property file the list of dynamo properties.
       Output.Start_Entity (Name => "project");
+      Output.Write_String (ASCII.LF & "    ");
       Output.Write_Entity (Name => "name", Value => Name);
       declare
          Names : constant Util.Properties.Name_Array := Project.Props.Get_Names;
       begin
          for I in Names'Range loop
-            Output.Write (ASCII.LF);
+            Output.Write_String (ASCII.LF & "    ");
             Output.Start_Entity (Name => "property");
             Output.Write_Attribute (Name  => "name",
                                     Value => Util.Beans.Objects.To_Object (Names (I)));
@@ -151,6 +155,7 @@ package body Gen.Model.Projects is
       end;
 
       Project.Modules.Iterate (Save_Module'Access);
+      Output.Write_String (ASCII.LF & "");
       Output.End_Entity (Name => "project");
       Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Output)),
                              Path    => Path);

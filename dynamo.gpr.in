@@ -9,6 +9,12 @@ project Dynamo is
 
    Mains := ("dynamo.adb");
 
+   Version      := "@GEN_VERSION@";
+   Library_Dir  := "lib";
+   Exec_Dir     := "./" &  Config'Exec_Dir & "/bin";
+
+   Library_Type : Config.Library_Type_Type := external ("LIBRARY_TYPE", "static");
+
    for Main use Mains;
 
    for Languages use ("Ada", "C");

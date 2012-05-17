@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-info -- Collect and give information about the project
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +42,8 @@ package body Gen.Commands.Info is
       procedure Print_GNAT_Projects (Project : in out Gen.Model.Projects.Project_Definition);
 
       procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Root_Project_Definition);
+
+      procedure Print_Modules (Project : in out Gen.Model.Projects.Project_Definition'Class);
 
       procedure Print_Project (Project : in out Gen.Model.Projects.Root_Project_Definition);
 
@@ -105,6 +107,24 @@ package body Gen.Commands.Info is
       end Print_GNAT_Projects;
 
       --  ------------------------------
+      --  Print the list of Dynamo modules
+      --  ------------------------------
+      procedure Print_Modules (Project : in out Gen.Model.Projects.Project_Definition'Class) is
+         use Gen.Model.Projects;
+
+         Iter : Project_Vectors.Cursor := Project.Modules.First;
+      begin
+         if Project_Vectors.Has_Element (Iter) then
+            Ada.Text_IO.Put_Line ("Dynamo plugins:");
+            while Project_Vectors.Has_Element (Iter) loop
+               Ada.Text_IO.Put ("   ");
+               Ada.Text_IO.Put_Line (Project_Vectors.Element (Iter).Get_Project_Name);
+               Project_Vectors.Next (Iter);
+            end loop;
+         end if;
+      end Print_Modules;
+
+      --  ------------------------------
       --  Print the list of Dynamo projects used by the main project.
       --  ------------------------------
       procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Root_Project_Definition) is
@@ -125,6 +145,7 @@ package body Gen.Commands.Info is
          Print_GNAT_Projects (Gen.Model.Projects.Project_Definition (Project));
          Print_Dynamo_Projects (Project);
 
+         Print_Modules (Project);
          declare
             Model_Dirs : Gen.Utils.String_List.Vector;
          begin

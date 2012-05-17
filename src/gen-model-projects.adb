@@ -361,10 +361,10 @@ package body Gen.Model.Projects is
 
       --  Read the XML query file.
       Reader.Parse (Path);
---
---        if Length (Into.Name) = 0 then
---           H.Error ("Project file {0} does not contain the project name.", Path);
---        end if;
+
+      if Length (Project.Name) = 0 then
+         Log.Error ("Project file {0} does not contain the project name.", Path);
+      end if;
 
    exception
       when Ada.IO_Exceptions.Name_Error =>
@@ -386,12 +386,15 @@ package body Gen.Model.Projects is
       Search     : Search_Type;
    begin
       if not Exists (Module_Dir) then
+         Log.Debug ("Project {0} has no module", Project.Name);
          return;
       end if;
       if Kind (Module_Dir) /= Directory then
+         Log.Debug ("Project {0} has no module", Project.Name);
          return;
       end if;
 
+      Log.Info ("Scanning project modules in {0}", Module_Dir);
       Start_Search (Search, Directory => Module_Dir, Pattern => "*", Filter => Dir_Filter);
       while More_Entries (Search) loop
          Get_Next_Entry (Search, Ent);
@@ -403,9 +406,7 @@ package body Gen.Model.Projects is
             if Dir_Name /= "." and then Dir_Name /= ".." and then Dir_Name /= ".svn" and then
               Exists (File) then
                declare
-                  use type Model.Projects.Project_Definition_Access;
-
-                  P        : Model.Projects.Project_Definition_Access;
+                  P        : Project_Definition_Access;
                begin
                   P := Project.Find_Project (File);
                   if P = null then

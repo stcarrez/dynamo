@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Dynamo" "25 July 2011" ""
+.TH DYNAMO 1 "May 17, 2012" "Ada Web Application"
 .SH NAME
 dynamo - Ada Web Application Generator
 .SH SYNOPSIS
@@ -153,6 +153,21 @@ The database tables are created by using the
 script where
 .I name
 represents the Dynamo project name.
+.\"
+.SS The create-plugin command
+.RS 0
+dynamo \fBcreate-plugin \fIname\fR [ada | web]\fR
+.RE
+.PP
+Create a new plugin for the current project.  The plugin sources are created in the
+.B plugins/\fIname\fR
+directory.  The optional last argument controls whether the new plugin contains
+Ada sources or is a Web plugin.  The plugin can be seen as a separate small
+.I Dynamo
+project that is used by a project.  Once create, the other
+.I Dynamo
+commands can be executed in the new plugin.
+.\"
 .\"
 .SS The add-layout command
 .RS 0

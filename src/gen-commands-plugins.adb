@@ -78,14 +78,17 @@ package body Gen.Commands.Plugins is
       end loop;
       declare
          Name  : constant String := Get_Argument;
-         Arg2  : constant String := Get_Argument;
-         Arg3  : constant String := Get_Argument;
+         Kind  : constant String := Get_Argument;
          Dir   : constant String := Generator.Get_Plugin_Directory;
          Path  : constant String := Util.Files.Compose (Dir, Name);
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing plugin name");
             Gen.Commands.Usage;
+            return;
+         end if;
+         if Kind /= "ada" and Kind /= "web" and Kind /= "" then
+            Generator.Error ("Invalid plugin type (must be 'ada' or 'web')");
             return;
          end if;
 
@@ -126,7 +129,13 @@ package body Gen.Commands.Plugins is
 
          --  Generate the new plugin content.
          Generator.Set_Force_Save (False);
-         Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "create-plugin");
+         Generator.Set_Global ("pluginName", Name);
+         Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE,
+                                     "create-plugin");
+         if Kind /= "" then
+            Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE,
+                                        "create-plugin-" & Kind);
+         end if;
 
          --  And save the project dynamo.xml file which now refers to the new plugin.
          Generator.Set_Result_Directory (Result_Dir);

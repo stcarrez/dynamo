@@ -109,17 +109,89 @@ package body Gen.Model.Projects is
                              Kind : in Dependency_Type) is
       Depend  : Project_Dependency := Into.Find_Dependency (Name);
    begin
+      Log.Debug ("Adding dependency {0}", Name);
+
       if Depend.Project = null then
          Depend.Project := Into.Find_Project_By_Name (Name);
          if Depend.Project = null then
             Depend.Project := new Project_Definition;
             Depend.Project.Name := To_Unbounded_String (Name);
-            Root_Project_Definition'Class (Into.Root.all).Projects.Append (Depend.Project);
+            Into.Add_Project (Depend.Project);
          end if;
          Depend.Kind := Kind;
          Into.Dependencies.Append (Depend);
       end if;
    end Add_Dependency;
+
+   --  ------------------------------
+   --  Add the project in the global project list on the root project instance.
+   --  ------------------------------
+   procedure Add_Project (Into    : in out Project_Definition;
+                          Project : in Project_Definition_Access) is
+   begin
+      if Into.Root /= null then
+         Root_Project_Definition'Class (Into.Root.all).Add_Project (Project);
+      end if;
+   end Add_Project;
+
+   --  ------------------------------
+   --  Create a project definition instance to record a project with the dynamo XML file path.
+   --  ------------------------------
+   procedure Create_Project (Into    : in out Project_Definition;
+                             Name    : in String;
+                             Path    : in String;
+                             Project : out Project_Definition_Access) is
+   begin
+      Project      := new Project_Definition;
+      Project.Path := To_Unbounded_String (Path);
+      Project.Name := To_Unbounded_String (Name);
+      Into.Add_Project (Project);
+   end Create_Project;
+
+   --  ------------------------------
+   --  Add the project <b>Name</b> as a module.
+   --  ------------------------------
+   procedure Add_Module (Into : in out Project_Definition;
+                         Name : in String) is
+      Iter    : Project_Vectors.Cursor := Into.Modules.First;
+      Project : Project_Reference;
+   begin
+      while Project_Vectors.Has_Element (Iter) loop
+         Project := Project_Vectors.Element (Iter);
+         if Project.Name = Name then
+            Log.Debug ("Module {0} already present", Name);
+            return;
+         end if;
+         Project_Vectors.Next (Iter);
+      end loop;
+
+      Log.Debug ("Adding module {0}", Name);
+      Project.Name    := To_Unbounded_String (Name);
+      Project.Project := Into.Find_Project_By_Name (Name);
+      Into.Modules.Append (Project);
+   end Add_Module;
+
+   --  ------------------------------
+   --  Add the project represented by <b>Project</b> if it is not already part of the modules.
+   --  ------------------------------
+   procedure Add_Module (Into    : in out Project_Definition;
+                         Project : in Project_Definition_Access) is
+      Iter : Project_Vectors.Cursor := Into.Modules.First;
+      P    : Project_Reference;
+   begin
+      while Project_Vectors.Has_Element (Iter) loop
+         P := Project_Vectors.Element (Iter);
+         if P.Project = Project then
+            return;
+         end if;
+         Project_Vectors.Next (Iter);
+      end loop;
+
+      Log.Debug ("Adding module {0}", Project.Name);
+      P.Project := Project;
+      P.Name    := Project.Name;
+      Into.Modules.Append (P);
+   end Add_Module;
 
    --  ------------------------------
    --  Find the project definition associated with the dynamo XML file <b>Path</b>.
@@ -131,14 +203,15 @@ package body Gen.Model.Projects is
    begin
       while Project_Vectors.Has_Element (Iter) loop
          declare
-            P : constant Project_Definition_Access := Project_Vectors.Element (Iter);
+            P : constant Project_Reference := Project_Vectors.Element (Iter);
          begin
-            if P.Path = Path then
-               return P;
+            if P.Project /= null and then P.Project.Path = Path then
+               return P.Project;
             end if;
          end;
          Project_Vectors.Next (Iter);
       end loop;
+      Log.Debug ("Project {0} not read yet", Path);
       return null;
    end Find_Project;
 
@@ -157,6 +230,20 @@ package body Gen.Model.Projects is
    end Find_Project_By_Name;
 
    --  ------------------------------
+   --  Add the project in the global project list on the root project instance.
+   --  ------------------------------
+   overriding
+   procedure Add_Project (Into    : in out Root_Project_Definition;
+                          Project : in Project_Definition_Access) is
+      Ref : Project_Reference;
+   begin
+      Project.Root := Into'Unchecked_Access;
+      Ref.Project  := Project;
+      Ref.Name     := To_Unbounded_String (Project.Get_Project_Name);
+      Into.Projects.Append (Ref);
+   end Add_Project;
+
+   --  ------------------------------
    --  Find the project definition having the name <b>Name</b>.
    --  Returns null if there is no such project
    --  ------------------------------
@@ -167,16 +254,60 @@ package body Gen.Model.Projects is
    begin
       while Project_Vectors.Has_Element (Iter) loop
          declare
-            P : constant Project_Definition_Access := Project_Vectors.Element (Iter);
+            P : constant Project_Reference := Project_Vectors.Element (Iter);
          begin
             if P.Name = Name then
-               return P;
+               return P.Project;
             end if;
          end;
          Project_Vectors.Next (Iter);
       end loop;
+      Log.Debug ("Project {0} not found", Name);
       return null;
    end Find_Project_By_Name;
+
+   procedure Update_Project (Root    : in out Root_Project_Definition;
+                             Project : in Project_Definition'Class) is
+
+      procedure Update (Item : in out Project_Reference);
+
+      procedure Update (Item : in out Project_Reference) is
+      begin
+         if Item.Project.Path = Project.Path then
+            Item.Name := Project.Name;
+         end if;
+      end Update;
+
+      Iter : Project_Vectors.Cursor := Root.Projects.First;
+   begin
+      while Project_Vectors.Has_Element (Iter) loop
+         Project_Vectors.Update_Element (Root.Projects, Iter, Update'Access);
+         Project_Vectors.Next (Iter);
+      end loop;
+   end Update_Project;
+
+   --  ------------------------------
+   --  Find the project definition associated with the dynamo XML file <b>Path</b>.
+   --  Returns null if there is no such project
+   --  ------------------------------
+   overriding
+   function Find_Project (From : in Root_Project_Definition;
+                          Path : in String) return Project_Definition_Access is
+      Iter : Project_Vectors.Cursor := From.Projects.First;
+   begin
+      while Project_Vectors.Has_Element (Iter) loop
+         declare
+            P : constant Project_Reference := Project_Vectors.Element (Iter);
+         begin
+            if P.Project.Path = Path then
+               return P.Project;
+            end if;
+         end;
+         Project_Vectors.Next (Iter);
+      end loop;
+      Log.Debug ("Project {0} not read yet", Path);
+      return null;
+   end Find_Project;
 
    --  ------------------------------
    --  Save the project description and parameters.
@@ -206,13 +337,14 @@ package body Gen.Model.Projects is
       end Save_Dependency;
 
       procedure Save_Module (Pos : in Project_Vectors.Cursor) is
-         Module : constant Project_Definition_Access := Project_Vectors.Element (Pos);
+         Module : constant Project_Reference := Project_Vectors.Element (Pos);
+         Name   : constant String := To_String (Module.Name);
       begin
-         if Length (Module.Path) > 0 then
+         if Name'Length > 0 then
             Output.Write_String (ASCII.LF & "    ");
             Output.Start_Entity (Name => "module");
             Output.Write_Attribute (Name  => "name",
-                                    Value => Util.Beans.Objects.To_Object (Module.Path));
+                                    Value => Util.Beans.Objects.To_Object (Name));
             Output.End_Entity (Name => "module");
          end if;
       end Save_Module;
@@ -229,8 +361,8 @@ package body Gen.Model.Projects is
       end Read_Property_Line;
 
       Dir       : constant String := Ada.Directories.Containing_Directory (Path);
-      Name      : constant Util.Beans.Objects.Object := Project.Get_Value ("name");
-      Prop_Name : constant String := Util.Beans.Objects.To_String (Name) & ".properties";
+      Name      : constant String := Project.Get_Project_Name;
+      Prop_Name : constant String := Name & ".properties";
       Prop_Path : constant String := Ada.Directories.Compose (Dir, Prop_Name);
    begin
       Prop_Output.Initialize (Size => 100000);
@@ -248,7 +380,7 @@ package body Gen.Model.Projects is
       --  At the same time, we append in the project property file the list of dynamo properties.
       Output.Start_Entity (Name => "project");
       Output.Write_String (ASCII.LF & "    ");
-      Output.Write_Entity (Name => "name", Value => Name);
+      Output.Write_Entity (Name => "name", Value => Util.Beans.Objects.To_Object (Name));
       declare
          Names : constant Util.Properties.Name_Array := Project.Props.Get_Names;
       begin
@@ -312,11 +444,9 @@ package body Gen.Model.Projects is
 
          when FIELD_MODULE_NAME =>
             declare
-               P : constant Model.Projects.Project_Definition_Access
-                 := new Model.Projects.Project_Definition;
+               Name : constant String := Util.Beans.Objects.To_String (Value);
             begin
-               P.Name := Util.Beans.Objects.To_Unbounded_String (Value);
-               Project.Modules.Append (P);
+               Project.Add_Module (Name);
             end;
 
          when FIELD_DEPEND_NAME =>
@@ -364,6 +494,10 @@ package body Gen.Model.Projects is
 
       if Length (Project.Name) = 0 then
          Log.Error ("Project file {0} does not contain the project name.", Path);
+
+      elsif Project.Root /= null then
+         Root_Project_Definition'Class (Project.Root.all).Update_Project (Project);
+
       end if;
 
    exception
@@ -406,15 +540,15 @@ package body Gen.Model.Projects is
             if Dir_Name /= "." and then Dir_Name /= ".." and then Dir_Name /= ".svn" and then
               Exists (File) then
                declare
-                  P        : Project_Definition_Access;
+                  P : Project_Definition_Access;
                begin
                   P := Project.Find_Project (File);
                   if P = null then
-                     P := new Model.Projects.Project_Definition;
-                     P.Path := To_Unbounded_String (File);
-                     Project.Modules.Append (P);
-                     Project.Dynamo_Files.Append (File);
+                     Project.Create_Project (Path => File, Name => "", Project => P);
+
+                     --  Project.Dynamo_Files.Append (File);
                      P.Read_Project;
+                     Project.Add_Module (P);
                   end if;
                end;
             end if;
@@ -469,7 +603,7 @@ package body Gen.Model.Projects is
             end;
 
             declare
-               Dir    : constant String := ""; --  H.Get_Install_Directory;
+               Dir    : constant String := To_String (Project.Install_Dir);
                Path   : constant String := Util.Files.Compose (Dir, Name);
                Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
             begin
@@ -507,10 +641,9 @@ package body Gen.Model.Projects is
                   --  Create it and load the XML if necessary.
                   P := Project.Find_Project (Dynamo);
                   if P = null then
-                     P := new Model.Projects.Project_Definition;
-                     P.Path := To_Unbounded_String (Dynamo);
-                     Project.Modules.Append (P);
-                     P.Read_Project; --  SCz (Into => P);
+                     Project.Create_Project (Path => Dynamo, Name => "", Project => P);
+                     P.Read_Project;
+                     Project.Add_Module (P);
                   end if;
                end if;
             end;
@@ -518,6 +651,7 @@ package body Gen.Model.Projects is
       end Collect_Dynamo_Files;
 
    begin
+      Project.Root := null;
       Project.Path := To_Unbounded_String (File);
       Project.Read_Project;
 

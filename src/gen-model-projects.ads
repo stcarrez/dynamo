@@ -30,8 +30,13 @@ package Gen.Model.Projects is
    type Project_Definition;
    type Project_Definition_Access is access all Project_Definition'Class;
 
+   type Project_Reference is record
+      Project : Project_Definition_Access := null;
+      Name    : Unbounded_String;
+   end record;
+
    package Project_Vectors is
-     new Ada.Containers.Vectors (Element_Type => Project_Definition_Access,
+     new Ada.Containers.Vectors (Element_Type => Project_Reference,
                                  Index_Type   => Natural);
 
    type Dependency_Type is (NONE, DIRECT, INDIRECT, BOTH);
@@ -101,6 +106,24 @@ package Gen.Model.Projects is
                              Name : in String;
                              Kind : in Dependency_Type);
 
+   --  Create a project definition instance to record a project with the dynamo XML file path.
+   procedure Create_Project (Into    : in out Project_Definition;
+                             Name    : in String;
+                             Path    : in String;
+                             Project : out Project_Definition_Access);
+
+   --  Add the project in the global project list on the root project instance.
+   procedure Add_Project (Into    : in out Project_Definition;
+                          Project : in Project_Definition_Access);
+
+   --  Add the project <b>Name</b> as a module.
+   procedure Add_Module (Into : in out Project_Definition;
+                         Name : in String);
+
+   --  Add the project represented by <b>Project</b> if it is not already part of the modules.
+   procedure Add_Module (Into    : in out Project_Definition;
+                         Project : in Project_Definition_Access);
+
    --  Find the project definition associated with the dynamo XML file <b>Path</b>.
    --  Returns null if there is no such project
    function Find_Project (From : in Project_Definition;
@@ -130,14 +153,30 @@ package Gen.Model.Projects is
    --  It contains the lists of all projects that are necessary and which are found either
    --  by scanning GNAT projects or by looking at plugin dependencies.
    type Root_Project_Definition is new Project_Definition with record
-      Projects : Project_Vectors.Vector;
+      Projects    : Project_Vectors.Vector;
+
+      Install_Dir : Unbounded_String;
    end record;
+
+   --  Add the project in the global project list on the root project instance.
+   overriding
+   procedure Add_Project (Into    : in out Root_Project_Definition;
+                          Project : in Project_Definition_Access);
 
    --  Find the project definition having the name <b>Name</b>.
    --  Returns null if there is no such project
    overriding
    function Find_Project_By_Name (From : in Root_Project_Definition;
                                   Name : in String) return Project_Definition_Access;
+
+   --  Find the project definition associated with the dynamo XML file <b>Path</b>.
+   --  Returns null if there is no such project
+   overriding
+   function Find_Project (From : in Root_Project_Definition;
+                          Path : in String) return Project_Definition_Access;
+
+   procedure Update_Project (Root    : in out Root_Project_Definition;
+                             Project : in Project_Definition'Class);
 
    --  Read the XML project file.  When <b>Recursive</b> is set, read the GNAT project
    --  files used by the main project and load all the <b>dynamo.xml</b> files defined

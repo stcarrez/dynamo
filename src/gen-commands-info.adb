@@ -118,7 +118,7 @@ package body Gen.Commands.Info is
             Ada.Text_IO.Put_Line ("Dynamo plugins:");
             while Project_Vectors.Has_Element (Iter) loop
                Ada.Text_IO.Put ("   ");
-               Ada.Text_IO.Put_Line (Project_Vectors.Element (Iter).Get_Project_Name);
+               Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Project_Vectors.Element (Iter).Name));
                Project_Vectors.Next (Iter);
             end loop;
          end if;

@@ -506,6 +506,7 @@ package body Gen.Generator is
                            File      : in String;
                            Recursive : in Boolean := False) is
    begin
+      H.Project.Install_Dir := H.Config_Dir;
       H.Project.Read_Project (File      => File,
                               Config    => H.Conf,
                               Recursive => Recursive);

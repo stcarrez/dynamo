@@ -505,8 +505,9 @@ package body Gen.Generator is
    procedure Read_Project (H         : in out Handler;
                            File      : in String;
                            Recursive : in Boolean := False) is
+      Dir : constant String := Ada.Directories.Containing_Directory (To_String (H.Config_Dir));
    begin
-      H.Project.Install_Dir := H.Config_Dir;
+      H.Project.Install_Dir := To_Unbounded_String (Dir);
       H.Project.Read_Project (File      => File,
                               Config    => H.Conf,
                               Recursive => Recursive);

@@ -176,6 +176,14 @@ package body Gen.Model.Projects is
    --  ------------------------------
    procedure Add_Module (Into    : in out Project_Definition;
                          Project : in Project_Definition_Access) is
+
+      procedure Update (Item : in out Project_Reference);
+
+      procedure Update (Item : in out Project_Reference) is
+      begin
+         Item.Project := Project;
+      end Update;
+
       Iter : Project_Vectors.Cursor := Into.Modules.First;
       P    : Project_Reference;
    begin
@@ -184,10 +192,14 @@ package body Gen.Model.Projects is
          if P.Project = Project then
             return;
          end if;
+         if P.Name = Project.Name then
+            Project_Vectors.Update_Element (Into.Modules, Iter, Update'Access);
+            return;
+         end if;
          Project_Vectors.Next (Iter);
       end loop;
 
-      Log.Debug ("Adding module {0}", Project.Name);
+      Log.Debug ("Adding module {0} in {1}-{2}", Project.Name, Into.Name & "-" & Into.Path);
       P.Project := Project;
       P.Name    := Project.Name;
       Into.Modules.Append (P);
@@ -273,7 +285,7 @@ package body Gen.Model.Projects is
 
       procedure Update (Item : in out Project_Reference) is
       begin
-         if Item.Project.Path = Project.Path then
+         if Item.Project /= null and then Item.Project.Path = Project.Path then
             Item.Name := Project.Name;
          end if;
       end Update;

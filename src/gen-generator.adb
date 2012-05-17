@@ -47,10 +47,6 @@ with Util.Files;
 with Util.Strings.Transforms;
 with Util.Log.Loggers;
 
-with Util.Serialize.Mappers.Record_Mapper;
-with Util.Serialize.IO.XML;
-
---  with Util.Beans.Objects.To_Access;
 package body Gen.Generator is
 
    use ASF;
@@ -662,7 +658,6 @@ package body Gen.Generator is
       use Ada.Directories;
 
       Search     : Search_Type;
-      Filter     : constant Filter_Type := (Ordinary_File => True, others => False);
       Dir_Filter : constant Filter_Type := (Directory => True, others => False);
       Ent        : Directory_Entry_Type;
       Module_Dir : constant String := H.Get_Module_Dir;

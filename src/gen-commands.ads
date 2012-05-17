@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands -- Commands for dynamo
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,6 +65,9 @@ package Gen.Commands is
 
    --  Print dynamo usage
    procedure Usage;
+
+   --  Print dynamo short usage.
+   procedure Short_Help_Usage;
 
 private
 

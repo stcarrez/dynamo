@@ -108,7 +108,14 @@ begin
       end;
    end if;
    if Status /= Success then
+      Gen.Commands.Short_Help_Usage;
       Ada.Command_Line.Set_Exit_Status (Status);
+      return;
+   end if;
+
+   if Ada.Command_Line.Argument_Count = 0 then
+      Gen.Commands.Short_Help_Usage;
+      Set_Exit_Status (Failure);
       return;
    end if;
 
@@ -131,12 +138,8 @@ begin
       if Cmd = null then
          if Cmd_Name'Length > 0 then
             Ada.Text_IO.Put_Line ("Invalid command: '" & Cmd_Name & "'");
-         else
-            Ada.Text_IO.Put_Line (Gen.Configs.RELEASE);
-            Ada.Text_IO.Put ("Type '");
-            Ada.Text_IO.Put (Ada.Command_Line.Command_Name);
-            Ada.Text_IO.Put_Line (" help' for usage.");
          end if;
+         Gen.Commands.Short_Help_Usage;
          Set_Exit_Status (Failure);
          return;
       end if;
@@ -149,7 +152,7 @@ begin
 exception
    when Invalid_Switch =>
       Ada.Text_IO.Put_Line ("Invalid option.");
-      Ada.Text_IO.Put_Line ("Use the 'help' command.");
+      Gen.Commands.Short_Help_Usage;
       Ada.Command_Line.Set_Exit_Status (2);
 
    when E : Gen.Generator.Fatal_Error =>

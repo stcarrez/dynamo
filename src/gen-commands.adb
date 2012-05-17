@@ -82,6 +82,18 @@ package body Gen.Commands is
    end Usage;
 
    --  ------------------------------
+   --  Print dynamo short usage.
+   --  ------------------------------
+   procedure Short_Help_Usage is
+      use Ada.Text_IO;
+   begin
+      New_Line;
+      Put ("Type '");
+      Put (Ada.Command_Line.Command_Name);
+      Put_Line (" help' for the list of commands.");
+   end Short_Help_Usage;
+
+   --  ------------------------------
    --  Execute the command with the arguments.
    --  ------------------------------
    procedure Execute (Cmd       : in Help_Command;

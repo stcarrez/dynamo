@@ -78,4 +78,7 @@ package Gen.Utils is
    --  Returns True if the path referred to by <b>Path</b> is an absolute path.
    function Is_Absolute_Path (Path : in String) return Boolean;
 
+   --  Returns the path if this is an absolute path, otherwise build and return an absolute path.
+   function Absolute_Path (Path : in String) return String;
+
 end Gen.Utils;

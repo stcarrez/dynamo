@@ -15,11 +15,14 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Directories;
 
 with DOM.Core.Nodes;
 with DOM.Core.Elements;
 with DOM.Core.Character_Datas;
+
 with Util.Strings;
+with Util.Files;
 
 package body Gen.Utils is
 
@@ -233,5 +236,17 @@ package body Gen.Utils is
          return False;
       end if;
    end Is_Absolute_Path;
+
+   --  ------------------------------
+   --  Returns the path if this is an absolute path, otherwise build and return an absolute path.
+   --  ------------------------------
+   function Absolute_Path (Path : in String) return String is
+   begin
+      if Is_Absolute_Path (Path) then
+         return Path;
+      else
+         return Util.Files.Compose (Ada.Directories.Current_Directory, Path);
+      end if;
+   end Absolute_Path;
 
 end Gen.Utils;

@@ -693,12 +693,7 @@ package body Gen.Model.Projects is
       end Collect_Dynamo_Files;
 
    begin
-      if Gen.Utils.Is_Absolute_Path (File) then
-         Project.Path := To_Unbounded_String (File);
-      else
-         Project.Path := To_Unbounded_String (Util.Files.Compose (Ada.Directories.Current_Directory,
-           File));
-      end if;
+      Project.Path := To_Unbounded_String (Gen.Utils.Absolute_Path (File));
       Project.Root := null;
       Project.Add_Project (Project'Unchecked_Access);
       Project.Read_Project;

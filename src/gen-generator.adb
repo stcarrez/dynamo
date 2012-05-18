@@ -968,7 +968,7 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Update_Project (H : in out Handler;
                              Process : not null access
-                               procedure (Project : in out Model.Projects.Root_Project_Definition)) is
+                               procedure (P : in out Model.Projects.Root_Project_Definition)) is
    begin
       Process (H.Project);
    end Update_Project;

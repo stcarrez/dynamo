@@ -183,7 +183,7 @@ package Gen.Generator is
    --  Update the project model through the <b>Process</b> procedure.
    procedure Update_Project (H : in out Handler;
                              Process : not null access
-                               procedure (Project : in out Model.Projects.Root_Project_Definition));
+                               procedure (P : in out Model.Projects.Root_Project_Definition));
 
    --  Scan the dynamo directories and execute the <b>Process</b> procedure with the
    --  directory path.

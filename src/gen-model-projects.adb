@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 with Ada.IO_Exceptions;
 with Ada.Directories;
-with Ada.Strings.Fixed;
 
 with Util.Files;
 with Util.Log.Loggers;
@@ -26,8 +25,6 @@ with Util.Serialize.Mappers.Record_Mapper;
 with Util.Streams.Buffered;
 with Util.Streams.Texts;
 with Util.Strings.Transforms;
-
-with Gen.Utils.GNAT;
 
 package body Gen.Model.Projects is
 
@@ -227,8 +224,6 @@ package body Gen.Model.Projects is
    function Find_Project (List : in Project_Vectors.Vector;
                           Name : in String) return Project_Reference is
       Iter    : Project_Vectors.Cursor := List.First;
-      Is_Path : constant Boolean
-        := Util.Strings.Index (Name, '/') > 0 or Ada.Strings.Fixed.Index (Name, "dynamo.xml") > 0;
    begin
       while Project_Vectors.Has_Element (Iter) loop
          declare
@@ -356,6 +351,7 @@ package body Gen.Model.Projects is
                    Path    : in String) is
       use Util.Streams.Buffered;
       use Util.Streams;
+      use Util.Beans.Objects;
 
       procedure Save_Dependency (Pos : in Project_Vectors.Cursor);
       procedure Save_Module (Pos : in Project_Vectors.Cursor);
@@ -371,7 +367,7 @@ package body Gen.Model.Projects is
             Output.Write_String (ASCII.LF & "    ");
             Output.Start_Entity (Name => "depend");
             Output.Write_Attribute (Name  => "name",
-                                    Value => Util.Beans.Objects.To_Object (Depend.Project.Get_Name));
+                                    Value => To_Object (Depend.Project.Get_Name));
             Output.End_Entity (Name => "depend");
          end if;
       end Save_Dependency;
@@ -536,7 +532,8 @@ package body Gen.Model.Projects is
          Log.Error ("Project file {0} does not contain the project name.", Path);
 
       elsif Project.Root /= null then
-         Root_Project_Definition'Class (Project.Root.all).Update_Project (Project'Unchecked_Access);
+         Root_Project_Definition'Class (Project.Root.all).
+           Update_Project (Project'Unchecked_Access);
 
       end if;
 
@@ -732,10 +729,6 @@ package body Gen.Model.Projects is
 
             Gen.Utils.GNAT.Initialize (Config);
             Gen.Utils.GNAT.Read_GNAT_Project_List (Name, Project.Project_Files);
---              if Project.Project_Files.Is_Empty then
---  --                 H.Error ("Error while reading GNAT project {0}", Name);
---                 return;
---              end if;
          end;
 
          --  Mark the fact we did a recursive scan.
@@ -751,7 +744,6 @@ package body Gen.Model.Projects is
          declare
             Install_Dir : constant String := To_String (Project.Install_Dir);
             Pending     : Project_Vectors.Vector;
-            Count       : Ada.Containers.Count_Type := Project.Projects.Length;
 
             procedure Update (Item : in out Project_Reference);
 
@@ -782,7 +774,7 @@ package body Gen.Model.Projects is
 
             Iter : Project_Vectors.Cursor;
          begin
-            loop
+            for Pass in 1 .. 2 loop
                Iter := Project.Projects.First;
 
                Log.Info ("Checking {0} projects",
@@ -790,16 +782,13 @@ package body Gen.Model.Projects is
                Iterate (Project.Projects, Update'Access);
 
                exit when Pending.Is_Empty;
-               loop
+               while not Pending.Is_Empty loop
                   Iter := Pending.First;
-                  exit when Pending.Is_Empty;
 
                   Project.Projects.Append (Project_Vectors.Element (Iter));
                   Project_Vectors.Element (Iter).Project.Read_Project;
                   Pending.Delete_First;
                end loop;
-               Count := Project.Projects.Length;
-               exit;
             end loop;
          end;
       end if;

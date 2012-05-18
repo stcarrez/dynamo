@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Directories;
 with Ada.IO_Exceptions;
+with Ada.Strings.Fixed;
 
 with Input_Sources.File;
 
@@ -72,6 +73,11 @@ package body Gen.Generator is
 
    --  EL function to return a singular form of a name
    function To_Singular (Value : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+
+   --  Returns a string resulting from replacing in an input string all occurrences of
+   --  a "Item" string into an "By" substring.
+   function Replace (Value, Item, By : in Util.Beans.Objects.Object)
+                     return Util.Beans.Objects.Object;
 
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class);
 
@@ -226,6 +232,38 @@ package body Gen.Generator is
    end To_Singular;
 
    --  ------------------------------
+   --  Returns a string resulting from replacing in an input string all occurrences of
+   --  a "Item" string into an "By" substring.
+   --  ------------------------------
+   function Replace (Value, Item, By : in Util.Beans.Objects.Object)
+                     return Util.Beans.Objects.Object is
+      Content : constant String := Util.Beans.Objects.To_String (Value);
+      Pattern : constant String := Util.Beans.Objects.To_String (Item);
+      Token   : constant String := Util.Beans.Objects.To_String (By);
+      Last    : Natural := Content'First;
+      Result  : Ada.Strings.Unbounded.Unbounded_String;
+      Pos     : Natural;
+   begin
+      if Pattern'Length = 0 then
+         return Value;
+      end if;
+      while Last <= Content'Last loop
+         Pos := Ada.Strings.Fixed.Index (Content, Pattern, Last);
+         if Pos = 0 then
+            Append (Result, Content (Last .. Content'Last));
+            exit;
+         else
+            if Last < Pos then
+               Append (Result, Content (Last .. Pos - 1));
+            end if;
+            Append (Result, Token);
+         end if;
+         Last := Pos + Pattern'Length;
+      end loop;
+      return Util.Beans.Objects.To_Object (Result);
+   end Replace;
+
+   --  ------------------------------
    --  EL function to format an Ada comment
    --  ------------------------------
    function Comment (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
@@ -285,6 +323,9 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "singular",
                            Namespace => URI,
                            Func      => To_Singular'Access);
+      Mapper.Set_Function (Name      => "replace",
+                           Namespace => URI,
+                           Func      => Replace'Access);
    end Set_Functions;
 
    --  ------------------------------

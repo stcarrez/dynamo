@@ -152,9 +152,16 @@ package body Gen.Commands.Plugins is
       use Ada.Text_IO;
    begin
       Put_Line ("create-plugin: Create a new plugin for the current project");
-      Put_Line ("Usage: create-plugin NAME");
+      Put_Line ("Usage: create-plugin NAME [ada | web]");
       New_Line;
       Put_Line ("  Creates a new AWA plugin for the application with the name passed in NAME.");
+      Put_Line ("  The plugin type is specified as the last argument which can be one of:");
+      New_Line;
+      Put_Line ("    ada  the plugin contains Ada code and a GNAT project is created");
+      Put_Line ("    web  the plugin contains XHTML, CSS, Javascript files only");
+      New_Line;
+      Put_Line ("  The plugin is created in the directory:");
+      Put_Line ("    plugins/NAME");
    end Help;
 
 end Gen.Commands.Plugins;

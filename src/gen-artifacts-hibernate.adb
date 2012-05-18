@@ -18,6 +18,7 @@
 with Ada.Strings.Unbounded;
 with Ada.Directories;
 with Ada.Exceptions;
+with Ada.Containers;
 
 with DOM.Core.Nodes;
 
@@ -339,12 +340,15 @@ package body Gen.Artifacts.Hibernate is
                              Dir     : in String;
                              Driver  : in String;
                              Prefix  : in String;
+                             Dynamo  : in String;
                              Content : in out Unbounded_String);
 
       procedure Build_SQL_Schemas (Driver : in String;
                                    Prefix : in String;
                                    Name   : in String;
                                    Is_Reverse : in Boolean);
+
+      procedure Print_Info;
 
       use Util.Encoders;
 
@@ -356,6 +360,10 @@ package body Gen.Artifacts.Hibernate is
       SHA_Files   : Util.Strings.Sets.Set;
       SHA_Encoder : constant Encoder := Util.Encoders.Create (Util.Encoders.HASH_SHA1);
 
+      --  The module names whose data model is imported by the current project.
+      --  This is only used to report a message to the user.
+      Modules     : Util.Strings.Sets.Set;
+
       Model_Dir   : constant String := Model.Get_Model_Directory;
 
       --  ------------------------------
@@ -366,6 +374,7 @@ package body Gen.Artifacts.Hibernate is
                              Dir     : in String;
                              Driver  : in String;
                              Prefix  : in String;
+                             Dynamo  : in String;
                              Content : in out Unbounded_String) is
          Name : constant String := Project.Get_Project_Name;
          Dir2 : constant String := Util.Files.Compose (Dir, Driver);
@@ -382,6 +391,9 @@ package body Gen.Artifacts.Hibernate is
                H : constant String := SHA_Encoder.Encode (To_String (SQL));
             begin
                if not SHA_Files.Contains (H) then
+                  if Dynamo'Length > 0 then
+                     Modules.Include (Dynamo);
+                  end if;
                   SHA_Files.Include (H);
                   Append (Content, "/* Copied from ");
                   Append (Content, Ada.Directories.Simple_Name (Path));
@@ -412,7 +424,7 @@ package body Gen.Artifacts.Hibernate is
          if Is_Reverse then
             Pos  := Project.Dynamo_Files.Last_Index;
             Incr := -1;
-            Collect_SQL (Project, Model_Dir, Driver, Prefix, SQL_Content);
+            Collect_SQL (Project, Model_Dir, Driver, Prefix, "", SQL_Content);
          else
             Pos  := Project.Dynamo_Files.First_Index;
             Incr := 1;
@@ -428,13 +440,13 @@ package body Gen.Artifacts.Hibernate is
                Log.Debug ("Checking project {0}", Name);
                if Prj /= null then
                   Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), Driver,
-                               Prefix, SQL_Content);
+                               Prefix, Name, SQL_Content);
                end if;
             end;
             Pos := Pos + Incr;
          end loop;
          if not Is_Reverse then
-            Collect_SQL (Project, Model_Dir, Driver, Prefix, SQL_Content);
+            Collect_SQL (Project, Model_Dir, Driver, Prefix, "", SQL_Content);
          end if;
 
          Log.Info ("Generating " & Driver & " creation schema in '{0}'",
@@ -444,12 +456,30 @@ package body Gen.Artifacts.Hibernate is
 
       end Build_SQL_Schemas;
 
+      --  ------------------------------
+      --  Print information about the generated SQLfiles.
+      --  ------------------------------
+      procedure Print_Info is
+         Iter : Util.Strings.Sets.Cursor := Modules.First;
+      begin
+         if Util.Strings.Sets.Has_Element (Iter) then
+            Log.Info ("Generated the SQL model from{0} Dynamo projects: ",
+                      Ada.Containers.Count_Type'Image (Modules.Length));
+
+            while Util.Strings.Sets.Has_Element (Iter) loop
+               Log.Info ("  {0}", Util.Strings.Sets.Element (Iter));
+               Util.Strings.Sets.Next (Iter);
+            end loop;
+         end if;
+      end Print_Info;
+
       Name       : constant String := Project.Get_Project_Name;
    begin
       Build_SQL_Schemas ("mysql", "", "create-" & Name, False);
       Build_SQL_Schemas ("sqlite", "", "create-" & Name, False);
       Build_SQL_Schemas ("mysql", "drop-", "drop-" & Name, True);
       Build_SQL_Schemas ("sqlite", "drop-", "drop-" & Name, True);
+      Print_Info;
    end Finish;
 
 end Gen.Artifacts.Hibernate;

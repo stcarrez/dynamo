@@ -216,4 +216,22 @@ package body Gen.Utils is
       return True;
    end Is_Valid_Name;
 
+   --  ------------------------------
+   --  Returns True if the path referred to by <b>Path</b> is an absolute path.
+   --  ------------------------------
+   function Is_Absolute_Path (Path : in String) return Boolean is
+   begin
+      if Path'Length = 0 then
+         return False;
+      elsif Path (Path'First) = '/' or Path (Path'First) = '\' then
+         return True;
+      elsif Path'Length = 1 then
+         return False;
+      elsif Path (Path'First + 1) = ':' then
+         return True;
+      else
+         return False;
+      end if;
+   end Is_Absolute_Path;
+
 end Gen.Utils;

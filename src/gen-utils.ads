@@ -75,4 +75,7 @@ package Gen.Utils is
    --  The name must be a valid Ada identifier.
    function Is_Valid_Name (Name : in String) return Boolean;
 
+   --  Returns True if the path referred to by <b>Path</b> is an absolute path.
+   function Is_Absolute_Path (Path : in String) return Boolean;
+
 end Gen.Utils;

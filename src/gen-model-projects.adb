@@ -692,23 +692,8 @@ package body Gen.Model.Projects is
          end loop;
       end Collect_Dynamo_Files;
 
-      function Is_Absolute_Path (Path : in String) return Boolean is
-      begin
-         if Path'Length = 0 then
-            return False;
-         elsif Path (Path'First) = '/' or Path (Path'First) = '\' then
-            return True;
-         elsif Path'Length = 1 then
-            return False;
-         elsif Path (Path'First + 1) = ':' then
-            return True;
-         else
-            return False;
-         end if;
-      end Is_Absolute_Path;
-
    begin
-      if Is_Absolute_Path (File) then
+      if Gen.Utils.Is_Absolute_Path (File) then
          Project.Path := To_Unbounded_String (File);
       else
          Project.Path := To_Unbounded_String (Util.Files.Compose (Ada.Directories.Current_Directory,

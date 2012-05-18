@@ -42,7 +42,7 @@ package body Gen.Commands.Info is
 
       procedure Print_GNAT_Projects (Project : in out Gen.Model.Projects.Project_Definition);
 
-      procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Root_Project_Definition);
+      procedure Print_Dynamo_Projects (Project : in out Model.Projects.Root_Project_Definition);
 
       procedure Print_Modules (Project : in out Gen.Model.Projects.Project_Definition'Class;
                                Indent  : in Ada.Text_IO.Positive_Count);
@@ -143,7 +143,7 @@ package body Gen.Commands.Info is
             Iter := Project.Modules.First;
             while Project_Vectors.Has_Element (Iter) loop
                Ref := Project_Vectors.Element (Iter);
-               if Ref.Project /= null then
+               if Ref.Project /= null and then not Ref.Project.Modules.Is_Empty then
                   Ada.Text_IO.Set_Col (Indent);
                   Ada.Text_IO.Put_Line ("== " & Ada.Strings.Unbounded.To_String (Ref.Name));
                   Print_Modules (Ref.Project.all, Indent + 4);
@@ -156,7 +156,7 @@ package body Gen.Commands.Info is
       --  ------------------------------
       --  Print the list of Dynamo projects used by the main project.
       --  ------------------------------
-      procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Root_Project_Definition) is
+      procedure Print_Dynamo_Projects (Project : in out Model.Projects.Root_Project_Definition) is
          Iter : Gen.Utils.String_List.Cursor := Project.Dynamo_Files.First;
       begin
          if Gen.Utils.String_List.Has_Element (Iter) then

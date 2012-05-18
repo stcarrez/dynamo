@@ -78,8 +78,8 @@ test:	 build
 	regtests/run.sh 'Dynamo propset license' ../bin/dynamo propset license 'Apache'
 	regtests/run.sh 'Dynamo add module blog' ../bin/dynamo add-module blog
 	regtests/run.sh 'Dynamo add module user' ../bin/dynamo add-module user
-	regtests/run.sh 'Dynamo add model user' ../bin/dynamo add-model user
-	regtests/run.sh 'Dynamo add model blog' ../bin/dynamo add-model blog
+	regtests/run.sh 'Dynamo add model user' ../bin/dynamo add-model user test_user
+	regtests/run.sh 'Dynamo add model blog' ../bin/dynamo add-model blog test_blog
 	regtests/run.sh 'Dynamo add service blog' ../bin/dynamo add-service user user_service
 	regtests/run.sh 'Dynamo add query' ../bin/dynamo add-query user user_query
 	regtests/run.sh 'Dynamo generate db' ../bin/dynamo generate db

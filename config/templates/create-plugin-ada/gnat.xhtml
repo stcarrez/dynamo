@@ -3,13 +3,13 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="#{pluginName}.gpr">
+        file="#{g:replace(pluginName,'-','_')}.gpr">
 with "../../#{projectName}";
 
-project #{pluginName} is
+project #{g:replace(pluginName,'-','_')} is
 
    Version      := #{projectName}.Version;
-   Name         := "#{projectName}-#{pluginName}";
+   Name         := "#{pluginName}";
 
    for Source_Dirs use ("src");
 
@@ -27,5 +27,5 @@ project #{pluginName} is
    package Compiler renames #{projectName}.Compiler;
    package Linker renames #{projectName}.Linker;
 
-end #{pluginName};
+end #{g:replace(pluginName,'-','_')};
 </f:view>

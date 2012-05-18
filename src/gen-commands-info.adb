@@ -43,7 +43,8 @@ package body Gen.Commands.Info is
 
       procedure Print_Dynamo_Projects (Project : in out Gen.Model.Projects.Root_Project_Definition);
 
-      procedure Print_Modules (Project : in out Gen.Model.Projects.Project_Definition'Class);
+      procedure Print_Modules (Project : in out Gen.Model.Projects.Project_Definition'Class;
+                               Indent  : in Ada.Text_IO.Positive_Count);
 
       procedure Print_Project (Project : in out Gen.Model.Projects.Root_Project_Definition);
 
@@ -109,16 +110,39 @@ package body Gen.Commands.Info is
       --  ------------------------------
       --  Print the list of Dynamo modules
       --  ------------------------------
-      procedure Print_Modules (Project : in out Gen.Model.Projects.Project_Definition'Class) is
+      procedure Print_Modules (Project : in out Gen.Model.Projects.Project_Definition'Class;
+                               Indent  : in Ada.Text_IO.Positive_Count) is
          use Gen.Model.Projects;
+         use type Ada.Text_IO.Positive_Count;
 
          Iter : Project_Vectors.Cursor := Project.Modules.First;
+         Ref  : Model.Projects.Project_Reference;
       begin
          if Project_Vectors.Has_Element (Iter) then
+            Ada.Text_IO.Set_Col (Indent);
             Ada.Text_IO.Put_Line ("Dynamo plugins:");
             while Project_Vectors.Has_Element (Iter) loop
+               Ref := Project_Vectors.Element (Iter);
+               Ada.Text_IO.Set_Col (Indent);
                Ada.Text_IO.Put ("   ");
-               Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Project_Vectors.Element (Iter).Name));
+               Ada.Text_IO.Put (Ada.Strings.Unbounded.To_String (Ref.Name));
+               Ada.Text_IO.Set_Col (Indent + 30);
+               if Ref.Project /= null then
+                  Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Ref.Project.Path));
+               else
+                  Ada.Text_IO.Put_Line ("?");
+               end if;
+               Project_Vectors.Next (Iter);
+            end loop;
+
+            Iter := Project.Modules.First;
+            while Project_Vectors.Has_Element (Iter) loop
+               Ref := Project_Vectors.Element (Iter);
+               if Ref.Project /= null then
+                  Ada.Text_IO.Set_Col (Indent);
+                  Ada.Text_IO.Put_Line ("== " & Ada.Strings.Unbounded.To_String (Ref.Name));
+                  Print_Modules (Ref.Project.all, Indent + 4);
+               end if;
                Project_Vectors.Next (Iter);
             end loop;
          end if;
@@ -145,7 +169,7 @@ package body Gen.Commands.Info is
          Print_GNAT_Projects (Gen.Model.Projects.Project_Definition (Project));
          Print_Dynamo_Projects (Project);
 
-         Print_Modules (Project);
+         Print_Modules (Project, 1);
          declare
             Model_Dirs : Gen.Utils.String_List.Vector;
          begin

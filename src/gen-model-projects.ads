@@ -30,16 +30,17 @@ package Gen.Model.Projects is
    type Project_Definition;
    type Project_Definition_Access is access all Project_Definition'Class;
 
+   type Dependency_Type is (NONE, DIRECT, INDIRECT, BOTH);
+
    type Project_Reference is record
       Project : Project_Definition_Access := null;
       Name    : Unbounded_String;
+      Kind    : Dependency_Type := NONE;
    end record;
 
    package Project_Vectors is
      new Ada.Containers.Vectors (Element_Type => Project_Reference,
                                  Index_Type   => Natural);
-
-   type Dependency_Type is (NONE, DIRECT, INDIRECT, BOTH);
 
    type Project_Dependency is record
       Project : Project_Definition_Access := null;
@@ -176,7 +177,7 @@ package Gen.Model.Projects is
                           Path : in String) return Project_Definition_Access;
 
    procedure Update_Project (Root    : in out Root_Project_Definition;
-                             Project : in Project_Definition'Class);
+                             Project : in Project_Definition_Access);
 
    --  Read the XML project file.  When <b>Recursive</b> is set, read the GNAT project
    --  files used by the main project and load all the <b>dynamo.xml</b> files defined
@@ -185,5 +186,14 @@ package Gen.Model.Projects is
                            File      : in String;
                            Config    : in Util.Properties.Manager'Class;
                            Recursive : in Boolean := False);
+
+private
+   --  Iterate over the project referenced in the list and execute the <b>Process</b> procedure.
+   procedure Iterate (List    : in out Project_Vectors.Vector;
+                      Process : access procedure (Item : in out Project_Reference));
+
+   --  Find a project from the list
+   function Find_Project (List : in Project_Vectors.Vector;
+                          Name : in String) return Project_Reference;
 
 end Gen.Model.Projects;

@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.IO_Exceptions;
 with Ada.Directories;
+with Ada.Strings.Fixed;
 
 with Util.Files;
 with Util.Log.Loggers;
@@ -37,8 +38,8 @@ package body Gen.Model.Projects is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    overriding
-   function Get_Value (From : Project_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+   function Get_Value (From : in Project_Definition;
+                       Name : in String) return Util.Beans.Objects.Object is
    begin
       if Name = "name" then
          return Util.Beans.Objects.To_Object (From.Name);
@@ -116,7 +117,7 @@ package body Gen.Model.Projects is
          if Depend.Project = null then
             Depend.Project := new Project_Definition;
             Depend.Project.Name := To_Unbounded_String (Name);
-            Into.Add_Project (Depend.Project);
+            Project_Definition'Class (Into).Add_Project (Depend.Project);
          end if;
          Depend.Kind := Kind;
          Into.Dependencies.Append (Depend);
@@ -131,6 +132,8 @@ package body Gen.Model.Projects is
    begin
       if Into.Root /= null then
          Root_Project_Definition'Class (Into.Root.all).Add_Project (Project);
+      else
+         Log.Error ("Project not added");
       end if;
    end Add_Project;
 
@@ -145,7 +148,8 @@ package body Gen.Model.Projects is
       Project      := new Project_Definition;
       Project.Path := To_Unbounded_String (Path);
       Project.Name := To_Unbounded_String (Name);
-      Into.Add_Project (Project);
+      Log.Info ("Creating project {0} - {1}", Name, Path);
+      Project_Definition'Class (Into).Add_Project (Project);
    end Create_Project;
 
    --  ------------------------------
@@ -153,21 +157,19 @@ package body Gen.Model.Projects is
    --  ------------------------------
    procedure Add_Module (Into : in out Project_Definition;
                          Name : in String) is
-      Iter    : Project_Vectors.Cursor := Into.Modules.First;
-      Project : Project_Reference;
+      Project : Project_Reference := Find_Project (Into.Modules, Name);
    begin
-      while Project_Vectors.Has_Element (Iter) loop
-         Project := Project_Vectors.Element (Iter);
-         if Project.Name = Name then
-            Log.Debug ("Module {0} already present", Name);
-            return;
-         end if;
-         Project_Vectors.Next (Iter);
-      end loop;
+      if Project.Name /= Null_Unbounded_String then
+         Log.Debug ("Module {0} already present", Name);
+         return;
+      end if;
 
       Log.Debug ("Adding module {0}", Name);
       Project.Name    := To_Unbounded_String (Name);
-      Project.Project := Into.Find_Project_By_Name (Name);
+      Project.Project := Into.Find_Project (Name);
+      if Project.Project /= null then
+         Project.Name := Project.Project.Name;
+      end if;
       Into.Modules.Append (Project);
    end Add_Module;
 
@@ -181,6 +183,7 @@ package body Gen.Model.Projects is
 
       procedure Update (Item : in out Project_Reference) is
       begin
+         Item.Name    := Project.Name;
          Item.Project := Project;
       end Update;
 
@@ -206,25 +209,52 @@ package body Gen.Model.Projects is
    end Add_Module;
 
    --  ------------------------------
-   --  Find the project definition associated with the dynamo XML file <b>Path</b>.
-   --  Returns null if there is no such project
+   --  Iterate over the project referenced in the list and execute the <b>Process</b> procedure.
    --  ------------------------------
-   function Find_Project (From : in Project_Definition;
-                          Path : in String) return Project_Definition_Access is
-      Iter : Project_Vectors.Cursor := From.Modules.First;
+   procedure Iterate (List    : in out Project_Vectors.Vector;
+                      Process : access procedure (Item : in out Project_Reference)) is
+      Iter : Project_Vectors.Cursor := List.First;
+   begin
+      while Project_Vectors.Has_Element (Iter) loop
+         Project_Vectors.Update_Element (List, Iter, Process);
+         Project_Vectors.Next (Iter);
+      end loop;
+   end Iterate;
+
+   --  ------------------------------
+   --  Find a project from the list
+   --  ------------------------------
+   function Find_Project (List : in Project_Vectors.Vector;
+                          Name : in String) return Project_Reference is
+      Iter    : Project_Vectors.Cursor := List.First;
+      Is_Path : constant Boolean
+        := Util.Strings.Index (Name, '/') > 0 or Ada.Strings.Fixed.Index (Name, "dynamo.xml") > 0;
    begin
       while Project_Vectors.Has_Element (Iter) loop
          declare
             P : constant Project_Reference := Project_Vectors.Element (Iter);
          begin
-            if P.Project /= null and then P.Project.Path = Path then
-               return P.Project;
+            if P.Name = Name then
+               return P;
+            end if;
+            if P.Project /= null and then P.Project.Path = Name then
+               return P;
             end if;
          end;
          Project_Vectors.Next (Iter);
       end loop;
-      Log.Debug ("Project {0} not read yet", Path);
-      return null;
+      Log.Debug ("Project {0} not read yet", Name);
+      return Project_Reference '(null, Null_Unbounded_String, NONE);
+   end Find_Project;
+
+   --  ------------------------------
+   --  Find the project definition associated with the dynamo XML file <b>Path</b>.
+   --  Returns null if there is no such project
+   --  ------------------------------
+   function Find_Project (From : in Project_Definition;
+                          Path : in String) return Project_Definition_Access is
+   begin
+      return Find_Project (From.Modules, Path).Project;
    end Find_Project;
 
    --  ------------------------------
@@ -279,23 +309,33 @@ package body Gen.Model.Projects is
    end Find_Project_By_Name;
 
    procedure Update_Project (Root    : in out Root_Project_Definition;
-                             Project : in Project_Definition'Class) is
+                             Project : in Project_Definition_Access) is
 
       procedure Update (Item : in out Project_Reference);
 
       procedure Update (Item : in out Project_Reference) is
       begin
-         if Item.Project /= null and then Item.Project.Path = Project.Path then
+         if Item.Name = Project.Name or Item.Name = Project.Path then
+            if Item.Project = null then
+               Item.Project := Project;
+
+            elsif Item.Project /= Project then
+               Log.Error ("Project {0} found in {1} and {2}",
+                          To_String (Item.Name), To_String (Item.Project.Path),
+                          To_String (Project.Path));
+            end if;
+
+         elsif Item.Project /= null and then Item.Project.Path = Project.Path then
             Item.Name := Project.Name;
+
+         end if;
+         if Item.Project /= null and Item.Project /= Project then
+            Iterate (Item.Project.Modules, Update'Access);
          end if;
       end Update;
 
-      Iter : Project_Vectors.Cursor := Root.Projects.First;
    begin
-      while Project_Vectors.Has_Element (Iter) loop
-         Project_Vectors.Update_Element (Root.Projects, Iter, Update'Access);
-         Project_Vectors.Next (Iter);
-      end loop;
+      Iterate (Root.Projects, Update'Access);
    end Update_Project;
 
    --  ------------------------------
@@ -305,20 +345,8 @@ package body Gen.Model.Projects is
    overriding
    function Find_Project (From : in Root_Project_Definition;
                           Path : in String) return Project_Definition_Access is
-      Iter : Project_Vectors.Cursor := From.Projects.First;
    begin
-      while Project_Vectors.Has_Element (Iter) loop
-         declare
-            P : constant Project_Reference := Project_Vectors.Element (Iter);
-         begin
-            if P.Project.Path = Path then
-               return P.Project;
-            end if;
-         end;
-         Project_Vectors.Next (Iter);
-      end loop;
-      Log.Debug ("Project {0} not read yet", Path);
-      return null;
+      return Find_Project (From.Projects, Path).Project;
    end Find_Project;
 
    --  ------------------------------
@@ -508,9 +536,11 @@ package body Gen.Model.Projects is
          Log.Error ("Project file {0} does not contain the project name.", Path);
 
       elsif Project.Root /= null then
-         Root_Project_Definition'Class (Project.Root.all).Update_Project (Project);
+         Root_Project_Definition'Class (Project.Root.all).Update_Project (Project'Unchecked_Access);
 
       end if;
+
+      Log.Info ("Project {0} is {1}", To_String (Project.Path), To_String (Project.Name));
 
    exception
       when Ada.IO_Exceptions.Name_Error =>
@@ -662,9 +692,30 @@ package body Gen.Model.Projects is
          end loop;
       end Collect_Dynamo_Files;
 
+      function Is_Absolute_Path (Path : in String) return Boolean is
+      begin
+         if Path'Length = 0 then
+            return False;
+         elsif Path (Path'First) = '/' or Path (Path'First) = '\' then
+            return True;
+         elsif Path'Length = 1 then
+            return False;
+         elsif Path (Path'First + 1) = ':' then
+            return True;
+         else
+            return False;
+         end if;
+      end Is_Absolute_Path;
+
    begin
+      if Is_Absolute_Path (File) then
+         Project.Path := To_Unbounded_String (File);
+      else
+         Project.Path := To_Unbounded_String (Util.Files.Compose (Ada.Directories.Current_Directory,
+           File));
+      end if;
       Project.Root := null;
-      Project.Path := To_Unbounded_String (File);
+      Project.Add_Project (Project'Unchecked_Access);
       Project.Read_Project;
 
       --  When necessary, read the GNAT project files.  We get a list of absolute GNAT path
@@ -683,10 +734,10 @@ package body Gen.Model.Projects is
 
             Gen.Utils.GNAT.Initialize (Config);
             Gen.Utils.GNAT.Read_GNAT_Project_List (Name, Project.Project_Files);
-            if Project.Project_Files.Is_Empty then
---                 H.Error ("Error while reading GNAT project {0}", Name);
-               return;
-            end if;
+--              if Project.Project_Files.Is_Empty then
+--  --                 H.Error ("Error while reading GNAT project {0}", Name);
+--                 return;
+--              end if;
          end;
 
          --  Mark the fact we did a recursive scan.
@@ -696,6 +747,63 @@ package body Gen.Model.Projects is
          Collect_Dynamo_Files (Project.Project_Files, Project.Dynamo_Files);
 
          Project.Read_Modules;
+
+         --  Last step, look for each project that was not yet found and try to load it
+         --  from the Dynamo installation.
+         declare
+            Install_Dir : constant String := To_String (Project.Install_Dir);
+            Pending     : Project_Vectors.Vector;
+            Count       : Ada.Containers.Count_Type := Project.Projects.Length;
+
+            procedure Update (Item : in out Project_Reference);
+
+            procedure Update (Item : in out Project_Reference) is
+            begin
+               Log.Debug ("Checking project {0}", Item.Name);
+               if Item.Project = null then
+                  declare
+                     Name   : constant String := To_String (Item.Name);
+                     Path   : constant String := Util.Files.Compose (Install_Dir, Name);
+                     Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+                  begin
+                     Log.Debug ("Checking dynamo file {0}", Dynamo);
+                     if Ada.Directories.Exists (Dynamo) then
+                        Item.Project      := new Project_Definition;
+                        Item.Project.Path := To_Unbounded_String (Dynamo);
+                        Item.Project.Name := Item.Name;
+                        Pending.Append (Item);
+                        Log.Info ("Preparing to load {0} from {1}", Name, Dynamo);
+                     else
+                        Log.Error ("Project {0} not found in dynamo search path", Name);
+                     end if;
+                  end;
+               else
+                  Iterate (Item.Project.Modules, Update'Access);
+               end if;
+            end Update;
+
+            Iter : Project_Vectors.Cursor;
+         begin
+            loop
+               Iter := Project.Projects.First;
+
+               Log.Info ("Checking {0} projects",
+                         Ada.Containers.Count_Type'Image (Project.Projects.Length));
+               Iterate (Project.Projects, Update'Access);
+
+               exit when Pending.Is_Empty;
+               loop
+                  Iter := Pending.First;
+                  exit when Pending.Is_Empty;
+
+                  Project.Projects.Append (Project_Vectors.Element (Iter));
+                  Project_Vectors.Element (Iter).Project.Read_Project;
+                  Pending.Delete_First;
+               end loop;
+               Count := Project.Projects.Length;
+               exit;
+            end loop;
+         end;
       end if;
    end Read_Project;
 

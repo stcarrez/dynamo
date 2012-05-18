@@ -24,6 +24,7 @@ with Namet;
 with Prj.Pars;
 with Prj.Tree;
 with Prj.Env;
+with Prj.Util;
 with Makeutl;
 with Output;
 package body Gen.Utils.GNAT is
@@ -60,10 +61,37 @@ package body Gen.Utils.GNAT is
    --  the root project.
    --  ------------------------------
    procedure Read_GNAT_Project_List (Project_File_Name : in String;
-                                     Project_List      : out String_List.Vector) is
+                                     Project_List      : out Project_Info_Vectors.Vector) is
 
       procedure Recursive_Add (Proj : in Prj.Project_Id;
                                Dummy : in out Boolean);
+
+      function Get_Variable_Value (Proj : in Prj.Project_Id;
+                                   Name : in String) return String;
+
+
+      --  Get the variable value represented by the name <b>Name</b>.
+      --  ??? There are probably other efficient ways to get this but I couldn't find them.
+      function Get_Variable_Value (Proj : in Prj.Project_Id;
+                                   Name : in String) return String is
+         use type Prj.Variable_Id;
+
+         Current      : Prj.Variable_Id;
+         The_Variable : Prj.Variable;
+         In_Tree      : constant Prj.Project_Tree_Ref := Makeutl.Project_Tree;
+      begin
+         Current := Proj.Decl.Variables;
+         while Current /= Prj.No_Variable loop
+            The_Variable := In_Tree.Variable_Elements.Table (Current);
+
+            if Namet.Get_Name_String (The_Variable.Name) = Name then
+               return Prj.Util.Value_Of (The_Variable.Value, "");
+            end if;
+
+            Current := The_Variable.Next;
+         end loop;
+         return "";
+      end Get_Variable_Value;
 
       --  ------------------------------
       --  Add the full path of the GNAT project in the project list.
@@ -72,11 +100,15 @@ package body Gen.Utils.GNAT is
                                Dummy : in out Boolean) is
          pragma Unreferenced (Dummy);
 
-         Path : constant String := Namet.Get_Name_String (Proj.Path.Name);
+         Path    : constant String := Namet.Get_Name_String (Proj.Path.Name);
+         Name    : constant String := Get_Variable_Value (Proj, "name");
+         Project : Project_Info;
       begin
          Log.Info ("Using GNAT project: {0}", Path);
 
-         Project_List.Append (Path);
+         Project.Path := To_Unbounded_String (Path);
+         Project.Name := To_Unbounded_String (Name);
+         Project_List.Append (Project);
       end Recursive_Add;
 
       procedure For_All_Projects is

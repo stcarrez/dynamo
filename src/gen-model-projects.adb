@@ -612,7 +612,7 @@ package body Gen.Model.Projects is
                            Config    : in Util.Properties.Manager'Class;
                            Recursive : in Boolean := False) is
 
-      procedure Collect_Dynamo_Files (List   : in Gen.Utils.String_List.Vector;
+      procedure Collect_Dynamo_Files (List   : in Gen.Utils.GNAT.Project_Info_Vectors.Vector;
                                       Result : out Gen.Utils.String_List.Vector);
 
       --  ------------------------------
@@ -620,19 +620,19 @@ package body Gen.Model.Projects is
       --  Keep the list in the dependency order so that it can be used
       --  to build the database schema and take into account schema dependencies.
       --  ------------------------------
-      procedure Collect_Dynamo_Files (List   : in Gen.Utils.String_List.Vector;
+      procedure Collect_Dynamo_Files (List   : in Gen.Utils.GNAT.Project_Info_Vectors.Vector;
                                       Result : out Gen.Utils.String_List.Vector) is
-         use type Gen.Model.Projects.Project_Definition_Access;
+         use Gen.Utils.GNAT;
 
-         function Get_Dynamo_Path (Project_Path : in String) return String;
+         function Get_Dynamo_Path (Info : in Project_Info) return String;
 
-         Iter : Gen.Utils.String_List.Cursor := List.First;
+         Iter : Gen.Utils.GNAT.Project_Info_Vectors.Cursor := List.First;
 
          --  ------------------------------
          --  Find the Dynamo.xml path associated with the given GNAT project file.
          --  ------------------------------
-         function Get_Dynamo_Path (Project_Path : in String) return String is
-            Name   : constant String := Ada.Directories.Base_Name (Project_Path);
+         function Get_Dynamo_Path (Info : in Project_Info) return String is
+            Project_Path : constant String := To_String (Info.Path);
          begin
             --  Check in the directory which contains the project file.
             declare
@@ -646,32 +646,50 @@ package body Gen.Model.Projects is
 
             declare
                Dir    : constant String := To_String (Project.Install_Dir);
-               Path   : constant String := Util.Files.Compose (Dir, Name);
-               Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
             begin
-               Log.Debug ("Checking dynamo file {0}", Dynamo);
-               if Ada.Directories.Exists (Dynamo) then
-                  return Dynamo;
+               if Length (Info.Name) > 0 then
+                  declare
+                     Name   : constant String := To_String (Info.Name);
+                     Path   : constant String := Util.Files.Compose (Dir, Name);
+                     Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+                  begin
+                     Log.Debug ("Checking dynamo file {0}", Dynamo);
+                     if Ada.Directories.Exists (Dynamo) then
+                        return Dynamo;
+                     end if;
+                  end;
                end if;
+               declare
+                  Name   : constant String := Ada.Directories.Base_Name (Project_Path);
+                  Path   : constant String := Util.Files.Compose (Dir, Name);
+                  Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+               begin
+                  Log.Debug ("Checking dynamo file {0}", Dynamo);
+                  if Ada.Directories.Exists (Dynamo) then
+                     return Dynamo;
+                  end if;
+               end;
             end;
             return "";
          end Get_Dynamo_Path;
 
       begin
-         while Gen.Utils.String_List.Has_Element (Iter) loop
+         while Gen.Utils.GNAT.Project_Info_Vectors.Has_Element (Iter) loop
             declare
-               Path     : constant String := Gen.Utils.String_List.Element (Iter);
-               Dynamo   : constant String := Get_Dynamo_Path (Path);
+               Info     : constant Project_Info := Project_Info_Vectors.Element (Iter);
+               Dynamo   : constant String := Get_Dynamo_Path (Info);
                Has_File : constant Boolean := Result.Contains (Dynamo);
                P        : Model.Projects.Project_Definition_Access;
             begin
-               Gen.Utils.String_List.Next (Iter);
+               Project_Info_Vectors.Next (Iter);
+
+               Log.Debug ("Dynamo file {0} is used", Dynamo);
 
                --  Do not include the 'dynamo.xml' path if it is already in the list
                --  (this happens if a project uses several GNAT project files).
                --  We have to make sure that the 'dynamo.xml' stored in the current directory
                --  appears last in the list.
-               if (not Has_File or else not Gen.Utils.String_List.Has_Element (Iter))
+               if (not Has_File or else not Project_Info_Vectors.Has_Element (Iter))
                --  Insert only if there is a file.
                  and Dynamo'Length > 0 then
                   if Has_File then

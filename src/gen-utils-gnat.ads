@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils-gnat -- GNAT utilities
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Containers.Vectors;
 
 with Util.Properties;
 
@@ -29,6 +30,15 @@ package Gen.Utils.GNAT is
    --  This is overriden by the configuration property 'generator.gnat.projects.dir'.
    DEFAULT_GNAT_PROJECT_DIR : constant String := "/usr/lib/gnat";
 
+   type Project_Info is record
+      Path : Ada.Strings.Unbounded.Unbounded_String;
+      Name : Ada.Strings.Unbounded.Unbounded_String;
+   end record;
+
+   package Project_Info_Vectors is
+      new Ada.Containers.Vectors (Index_Type   => Positive,
+                                  Element_Type => Project_Info);
+
    --  Initialize the GNAT project runtime for reading the GNAT project tree.
    --  Configure it according to the dynamo configuration properties.
    procedure Initialize (Config : in Util.Properties.Manager'Class);
@@ -37,6 +47,6 @@ package Gen.Utils.GNAT is
    --  in <b>Project_List</b> an ordered list of absolute project paths used by
    --  the root project.
    procedure Read_GNAT_Project_List (Project_File_Name : in String;
-                                     Project_List      : out String_List.Vector);
+                                     Project_List      : out Project_Info_Vectors.Vector);
 
 end Gen.Utils.GNAT;

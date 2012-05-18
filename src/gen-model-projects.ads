@@ -23,6 +23,7 @@ with Util.Beans.Objects;
 with Util.Properties;
 
 with Gen.Utils;
+with Gen.Utils.GNAT;
 package Gen.Model.Projects is
 
    use Ada.Strings.Unbounded;
@@ -58,7 +59,7 @@ package Gen.Model.Projects is
       Dependencies  : Project_Vectors.Vector;
 
       --  The list of GNAT project files used by the project.
-      Project_Files : Gen.Utils.String_List.Vector;
+      Project_Files : Gen.Utils.GNAT.Project_Info_Vectors.Vector;
 
       --  The list of 'dynamo.xml' files used by the project (gathered from GNAT files
       --  and by scanning the 'plugins' directory).

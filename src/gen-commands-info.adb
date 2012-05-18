@@ -20,6 +20,7 @@ with Ada.Text_IO;
 with Ada.Directories;
 
 with Gen.Utils;
+with Gen.Utils.GNAT;
 with Gen.Model.Projects;
 
 with Util.Files;
@@ -95,14 +96,18 @@ package body Gen.Commands.Info is
       --  Print the list of GNAT projects used by the main project.
       --  ------------------------------
       procedure Print_GNAT_Projects (Project : in out Gen.Model.Projects.Project_Definition) is
-         Iter : Gen.Utils.String_List.Cursor := Project.Project_Files.First;
+         use Gen.Utils.GNAT;
+
+         Iter : Project_Info_Vectors.Cursor := Project.Project_Files.First;
+         Info : Project_Info;
       begin
-         if Gen.Utils.String_List.Has_Element (Iter) then
+         if Project_Info_Vectors.Has_Element (Iter) then
             Ada.Text_IO.Put_Line ("GNAT project files:");
-            while Gen.Utils.String_List.Has_Element (Iter) loop
+            while Project_Info_Vectors.Has_Element (Iter) loop
                Ada.Text_IO.Put ("   ");
-               Ada.Text_IO.Put_Line (Gen.Utils.String_List.Element (Iter));
-               Gen.Utils.String_List.Next (Iter);
+               Info := Project_Info_Vectors.Element (Iter);
+               Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Info.Path));
+               Project_Info_Vectors.Next (Iter);
             end loop;
          end if;
       end Print_GNAT_Projects;

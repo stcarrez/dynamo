@@ -88,18 +88,18 @@ package body Gen.Model.Projects is
    --  Returns a null dependency if the project does not depend on that plugin.
    --  ------------------------------
    function Find_Dependency (From : in Project_Definition;
-                             Name : in String) return Project_Dependency is
-      Iter   : Dependency_Vectors.Cursor := From.Dependencies.First;
-      Result : Project_Dependency;
+                             Name : in String) return Project_Reference is
+      Iter   : Project_Vectors.Cursor := From.Dependencies.First;
+      Result : Project_Reference;
    begin
-      while not Dependency_Vectors.Has_Element (Iter) loop
-         Result := Dependency_Vectors.Element (Iter);
+      while not Project_Vectors.Has_Element (Iter) loop
+         Result := Project_Vectors.Element (Iter);
          if Result.Project.Get_Name = Name then
             return Result;
          end if;
-         Dependency_Vectors.Next (Iter);
+         Project_Vectors.Next (Iter);
       end loop;
-      return Project_Dependency '(null, NONE);
+      return Project_Reference '(null, Null_Unbounded_String, NONE);
    end Find_Dependency;
 
    --  ------------------------------
@@ -108,7 +108,7 @@ package body Gen.Model.Projects is
    procedure Add_Dependency (Into : in out Project_Definition;
                              Name : in String;
                              Kind : in Dependency_Type) is
-      Depend  : Project_Dependency := Into.Find_Dependency (Name);
+      Depend  : Project_Reference := Into.Find_Dependency (Name);
    begin
       Log.Debug ("Adding dependency {0}", Name);
 
@@ -357,15 +357,15 @@ package body Gen.Model.Projects is
       use Util.Streams.Buffered;
       use Util.Streams;
 
-      procedure Save_Dependency (Pos : in Dependency_Vectors.Cursor);
+      procedure Save_Dependency (Pos : in Project_Vectors.Cursor);
       procedure Save_Module (Pos : in Project_Vectors.Cursor);
       procedure Read_Property_Line (Line : in String);
 
       Output      : Util.Serialize.IO.XML.Output_Stream;
       Prop_Output : Util.Streams.Texts.Print_Stream;
 
-      procedure Save_Dependency (Pos : in Dependency_Vectors.Cursor) is
-         Depend : constant Project_Dependency := Dependency_Vectors.Element (Pos);
+      procedure Save_Dependency (Pos : in Project_Vectors.Cursor) is
+         Depend : constant Project_Reference := Project_Vectors.Element (Pos);
       begin
          if Depend.Kind = DIRECT then
             Output.Write_String (ASCII.LF & "    ");

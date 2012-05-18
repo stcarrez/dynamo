@@ -42,15 +42,6 @@ package Gen.Model.Projects is
      new Ada.Containers.Vectors (Element_Type => Project_Reference,
                                  Index_Type   => Natural);
 
-   type Project_Dependency is record
-      Project : Project_Definition_Access := null;
-      Kind    : Dependency_Type := NONE;
-   end record;
-
-   package Dependency_Vectors is
-     new Ada.Containers.Vectors (Element_Type => Project_Dependency,
-                                 Index_Type   => Natural);
-
    --  ------------------------------
    --  Project Definition
    --  ------------------------------
@@ -64,7 +55,7 @@ package Gen.Model.Projects is
       Root          : Project_Definition_Access := null;
 
       --  The list of plugin names that this plugin or project depends on.
-      Dependencies  : Dependency_Vectors.Vector;
+      Dependencies  : Project_Vectors.Vector;
 
       --  The list of GNAT project files used by the project.
       Project_Files : Gen.Utils.String_List.Vector;
@@ -100,7 +91,7 @@ package Gen.Model.Projects is
    --  Find the dependency for the <b>Name</b> plugin.
    --  Returns a null dependency if the project does not depend on that plugin.
    function Find_Dependency (From : in Project_Definition;
-                             Name : in String) return Project_Dependency;
+                             Name : in String) return Project_Reference;
 
    --  Add a dependency to the plugin identified by <b>Name</b>.
    procedure Add_Dependency (Into : in out Project_Definition;

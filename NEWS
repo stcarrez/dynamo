@@ -1,3 +1,5 @@
+Version 0.6.0   -
+
 Version 0.5.0   - May 2012
   - Support multi-line comments in XML mappings
   - Generate List_Bean types for the XML mapped queries

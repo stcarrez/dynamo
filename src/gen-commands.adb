@@ -32,6 +32,7 @@ with Gen.Commands.Database;
 with Gen.Commands.Info;
 with Gen.Commands.Distrib;
 with Gen.Commands.Plugins;
+with Gen.Commands.Docs;
 
 with Util.Log.Loggers;
 
@@ -200,6 +201,9 @@ package body Gen.Commands is
    --  Create plugin command.
    Create_Plugin_Cmd  : aliased Gen.Commands.Plugins.Command;
 
+   --  Documentation command.
+   Doc_Plugin_Cmd     : aliased Gen.Commands.Docs.Command;
+
    --  Help command.
    Help_Cmd           : aliased Help_Command;
 begin
@@ -214,4 +218,5 @@ begin
    Add_Command (Name => "create-plugin", Cmd => Create_Plugin_Cmd'Access);
    Add_Command (Name => "dist", Cmd => Dist_Cmd'Access);
    Add_Command (Name => "info", Cmd => Info_Cmd'Access);
+   Add_Command (Name => "build-doc", Cmd => Doc_Plugin_Cmd'Access);
 end Gen.Commands;

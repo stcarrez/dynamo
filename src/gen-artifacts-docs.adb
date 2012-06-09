@@ -118,11 +118,11 @@ package body Gen.Artifacts.Docs is
                             Doc    : in out File_Document) is
          pragma Unreferenced (Source);
 
-         Iter : Line_Vectors.Cursor := Doc.Lines.First;
+         Iter : Line_Vectors.Cursor := Doc.Lines.Last;
       begin
          while Line_Vectors.Has_Element (Iter) loop
             Into.Lines.Insert (Before => Position, New_Item => Line_Vectors.Element (Iter));
-            Line_Vectors.Next (Iter);
+            Line_Vectors.Previous (Iter);
          end loop;
          Doc.Was_Included := True;
       end Do_Include;
@@ -142,8 +142,20 @@ package body Gen.Artifacts.Docs is
       procedure Merge (Source : in String;
                        Doc    : in out File_Document) is
          use type Ada.Containers.Count_Type;
+         Pos : Natural := 1;
       begin
-         null;
+         while Pos <= Natural (Doc.Lines.Length) loop
+            declare
+               L : constant Line_Type := Line_Vectors.Element (Doc.Lines, Pos);
+            begin
+               if L.Kind = L_INCLUDE then
+                  Line_Vectors.Delete (Doc.Lines, Pos);
+                  Include (Docs, Doc, L.Content, Pos);
+               else
+                  Pos := Pos + 1;
+               end if;
+            end;
+         end loop;
       end Merge;
 
       Iter : Doc_Maps.Cursor := Docs.First;
@@ -186,6 +198,8 @@ package body Gen.Artifacts.Docs is
             Log.Debug ("Collect {0}", Full_Path);
 
             Read_Ada_File (Full_Path, Doc);
+
+            Log.Info ("Adding document {0}", Name);
             Docs.Include (Name, Doc);
          end;
       end loop;

@@ -263,6 +263,23 @@ package body Gen.Artifacts.Docs is
    end Set_Name;
 
    --  ------------------------------
+   --  Set the title associated with the document extract.
+   --  ------------------------------
+   procedure Set_Title (Doc   : in out File_Document;
+                        Title : in String) is
+      use Ada.Strings;
+
+      Pos : Natural := Ada.Strings.Fixed.Index (Title, " -- ");
+   begin
+      if Pos = 0 then
+         Pos := Title'First;
+      else
+         Pos := Pos + 4;
+      end if;
+      Doc.Title := Unbounded.To_Unbounded_String (Fixed.Trim (Title (Pos .. Title'Last), Both));
+   end Set_Title;
+
+   --  ------------------------------
    --  Read the Ada specification file and collect the useful documentation.
    --  To keep the implementation simple, we don't use the ASIS packages to scan and extract
    --  the documentation.  We don't need to look at the Ada specification itself.  Instead,
@@ -277,6 +294,7 @@ package body Gen.Artifacts.Docs is
 
       procedure Process (Line : in String) is
       begin
+         Result.Line_Number := Result.Line_Number + 1;
          if Done then
             return;
 
@@ -294,6 +312,10 @@ package body Gen.Artifacts.Docs is
             elsif Line'Length >= 7 and then Line (Line'First .. Line'First + 6) = "--  == " then
                Doc_Block := True;
                Append (Result, Line (Line'First + 4 .. Line'Last));
+
+            elsif Result.Line_Number = 2 then
+               Set_Title (Result, Line (Line'First + 2 .. Line'Last));
+
             end if;
 
          else

@@ -95,10 +95,11 @@ private
    type Doc_State is (IN_PARA, IN_SEPARATOR, IN_CODE, IN_CODE_SEPARATOR, IN_LIST);
 
    type File_Document is record
-      Name  : Ada.Strings.Unbounded.Unbounded_String;
-      Title : Ada.Strings.Unbounded.Unbounded_String;
-      State : Doc_State := IN_PARA;
-      Lines : Line_Vectors.Vector;
+      Name        : Ada.Strings.Unbounded.Unbounded_String;
+      Title       : Ada.Strings.Unbounded.Unbounded_String;
+      State       : Doc_State := IN_PARA;
+      Line_Number : Natural := 0;
+      Lines       : Line_Vectors.Vector;
    end record;
 
    package Doc_Maps is
@@ -132,6 +133,10 @@ private
    --  Set the name associated with the document extract.
    procedure Set_Name (Doc  : in out File_Document;
                        Name : in String);
+
+   --  Set the title associated with the document extract.
+   procedure Set_Title (Doc   : in out File_Document;
+                        Title : in String);
 
    --  Read the Ada specification file and collect the useful documentation.
    --  To keep the implementation simple, we don't use the ASIS packages to scan and extract

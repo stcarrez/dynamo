@@ -36,6 +36,9 @@ package Gen.Artifacts is
                     Arg1    : in String := "";
                     Arg2    : in String := "") is abstract;
 
+   --  Get the config directory path.
+   function Get_Config_Directory (Handler : in Generator) return String is abstract;
+
    --  Get the result directory path.
    function Get_Result_Directory (Handler : in Generator) return String is abstract;
 

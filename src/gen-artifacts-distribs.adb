@@ -281,24 +281,6 @@ package body Gen.Artifacts.Distribs is
    end Get_First_Path;
 
    --  ------------------------------
-   --  Returns true if the file name must be ignored.
-   --  ------------------------------
-   function Is_Ignored (Name : in String) return Boolean is
-   begin
-      if Name =  ".svn" then
-         return True;
-      elsif Name = ".git" then
-         return True;
-      elsif Name = "CVS" then
-         return True;
-      elsif Name = "." or else Name = ".." then
-         return True;
-      else
-         return False;
-      end if;
-   end Is_Ignored;
-
-   --  ------------------------------
    --  Build a regular expression pattern from a pattern string.
    --  ------------------------------
    function Make_Regexp (Pattern : in String) return String is
@@ -362,7 +344,7 @@ package body Gen.Artifacts.Distribs is
          begin
             Log.Debug ("Collect {0}", File_Path);
 
-            if Is_Ignored (Name) then
+            if Gen.Utils.Is_File_Ignored (Name) then
                Log.Debug ("Ignoring {0}", Name);
 
             --  If this is a directory, recursively scan it and collect its files.

@@ -121,8 +121,6 @@ private
    function Get_Strip_Path (Base : in String;
                             Path : in String) return String;
 
-   function Is_Ignored (Name : in String) return Boolean;
-
    --  Build a regular expression pattern from a pattern string.
    function Make_Regexp (Pattern : in String) return String;
 

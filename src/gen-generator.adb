@@ -344,11 +344,12 @@ package body Gen.Generator is
       Factory : ASF.Applications.Main.Application_Factory;
       Path    : constant String := Compose (Dir, "generator.properties");
       Context : EL.Contexts.Default.Default_Context;
+      Props   : Util.Properties.Manager;
    begin
       Log.Debug ("Initialize dynamo with {0}", Path);
 
       begin
-         H.Conf.Load_Properties (Path => Path);
+         Props.Load_Properties (Path => Path);
       exception
          when Ada.IO_Exceptions.Name_Error =>
             H.Error ("Cannot load configuration file {0}", Path);
@@ -359,12 +360,12 @@ package body Gen.Generator is
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_EMPTY_LINES, "true");
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
       H.Conf.Set ("ado.queries.paths", Compose (Dir, "db"));
+      Props.Set ("generator_config_dir", Dir);
+      EL.Utils.Expand (Source => Props, Into => H.Conf, Context => Context);
       H.Initialize (H.Conf, Factory);
 
       H.Config_Dir := To_Unbounded_String (Dir);
       H.Output_Dir := To_Unbounded_String (H.Conf.Get (RESULT_DIR, "./"));
-      H.Conf.Set ("generator.config.dir", Dir);
-      EL.Utils.Expand (H.Conf, H.Conf, Context);
 
       Register_Funcs (H);
       H.File := new Util.Beans.Objects.Object;

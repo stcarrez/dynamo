@@ -39,6 +39,11 @@ package Gen.Artifacts is
    --  Get the result directory path.
    function Get_Result_Directory (Handler : in Generator) return String is abstract;
 
+   --  Get the configuration parameter.
+   function Get_Parameter (Handler : in Generator;
+                           Name    : in String;
+                           Default : in String := "") return String is abstract;
+
    --  Tell the generator to activate the generation of the given template name.
    --  The name is a property name that must be defined in generator.properties to
    --  indicate the template file.  Several artifacts can trigger the generation

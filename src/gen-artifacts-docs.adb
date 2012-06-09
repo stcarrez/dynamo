@@ -44,27 +44,15 @@ package body Gen.Artifacts.Docs is
      or Ada.Strings.Maps.To_Set (ASCII.LF);
 
    --  ------------------------------
-   --  Documentation artifact
-   --  ------------------------------
-
-   --  After the configuration file is read, processes the node whose root
-   --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
-   overriding
-   procedure Initialize (Handler : in out Artifact;
-                         Path    : in String;
-                         Node    : in DOM.Core.Node;
-                         Model   : in out Gen.Model.Packages.Model_Definition'Class;
-                         Context : in out Generator'Class) is
-   begin
-      null;
-   end Initialize;
-
    --  Prepare the model after all the configuration files have been read and before
    --  actually invoking the generation.
+   --  ------------------------------
    overriding
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
+      pragma Unreferenced (Model);
+
       Docs : Doc_Maps.Map;
       Command : constant String := Context.Get_Parameter ("generator.doc.xslt.command");
    begin
@@ -206,6 +194,10 @@ package body Gen.Artifacts.Docs is
       end loop;
    end Generate;
 
+   --  ------------------------------
+   --  Scan the files in the directory refered to by <b>Path</b> and collect the documentation
+   --  in the <b>Docs</b> hashed map.
+   --  ------------------------------
    procedure Scan_Files (Handler : in out Artifact;
                          Path    : in String;
                          Docs    : in out Doc_Maps.Map) is
@@ -434,6 +426,8 @@ package body Gen.Artifacts.Docs is
    procedure Read_Ada_File (Handler : in out Artifact;
                             File    : in String;
                             Result  : in out File_Document) is
+      pragma Unreferenced (Handler);
+
       procedure Process (Line : in String);
 
       Done              : Boolean := False;
@@ -487,8 +481,10 @@ package body Gen.Artifacts.Docs is
       Finish (Result);
    end Read_Ada_File;
 
+   --  ------------------------------
    --  Read the XML file and extract the documentation.  For this extraction we use
    --  an XSLT stylesheet and run the external tool <b>xstlproc</b>.
+   --  ------------------------------
    procedure Read_Xml_File (Handler : in out Artifact;
                             File    : in String;
                             Result  : in out File_Document) is

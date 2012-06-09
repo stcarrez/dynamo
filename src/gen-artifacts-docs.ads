@@ -20,7 +20,6 @@ with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
 with Ada.Strings.Unbounded;
 
-with DOM.Core;
 with Gen.Model.Packages;
 
 --  The <b>Gen.Artifacts.Docs</b> package is an artifact for the generation of
@@ -65,15 +64,6 @@ package Gen.Artifacts.Docs is
    --  Documentation artifact
    --  ------------------------------
    type Artifact is new Gen.Artifacts.Artifact with private;
-
-   --  After the configuration file is read, processes the node whose root
-   --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
-   overriding
-   procedure Initialize (Handler : in out Artifact;
-                         Path    : in String;
-                         Node    : in DOM.Core.Node;
-                         Model   : in out Gen.Model.Packages.Model_Definition'Class;
-                         Context : in out Generator'Class);
 
    --  Prepare the model after all the configuration files have been read and before
    --  actually invoking the generation.
@@ -155,6 +145,8 @@ private
    procedure Set_Title (Doc   : in out File_Document;
                         Title : in String);
 
+   --  Scan the files in the directory refered to by <b>Path</b> and collect the documentation
+   --  in the <b>Docs</b> hashed map.
    procedure Scan_Files (Handler : in out Artifact;
                          Path    : in String;
                          Docs    : in out Doc_Maps.Map);

@@ -26,13 +26,22 @@ with Ada.Directories;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Ada.Characters.Handling;
+with Ada.Strings.Maps;
 
 with Gen.Utils;
 package body Gen.Artifacts.Docs is
 
    use Util.Log;
+   use type Ada.Strings.Maps.Character_Set;
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Docs");
+
+   Spaces : constant Ada.Strings.Maps.Character_Set
+     := Ada.Strings.Maps.To_Set (' ')
+     or Ada.Strings.Maps.To_Set (ASCII.HT)
+     or Ada.Strings.Maps.To_Set (ASCII.VT)
+     or Ada.Strings.Maps.To_Set (ASCII.CR)
+     or Ada.Strings.Maps.To_Set (ASCII.LF);
 
    --  ------------------------------
    --  Documentation artifact
@@ -95,7 +104,7 @@ package body Gen.Artifacts.Docs is
       Pos : constant Doc_Maps.Cursor := Docs.Find (Name);
    begin
       if not Doc_Maps.Has_Element (Pos) then
-         Log.Error ("Cannot include document {0}", Name);
+         Log.Error ("Cannot include document '{0}'", Name);
          return;
       end if;
       Docs.Update_Element (Pos, Do_Include'Access);
@@ -232,7 +241,7 @@ package body Gen.Artifacts.Docs is
                   Read_Xml_File (Full_Path, Doc);
 
                end if;
-               Log.Info ("Adding document {0}", Name);
+               Log.Info ("Adding document '{0}'", Name);
                Docs.Include (Name, Doc);
             end if;
          end;
@@ -300,7 +309,7 @@ package body Gen.Artifacts.Docs is
          return;
       end if;
       declare
-         Value : constant String := Ada.Strings.Fixed.Trim (Tag (Pos .. Tag'Last), Both);
+         Value : constant String := Ada.Strings.Fixed.Trim (Tag (Pos .. Tag'Last), Spaces, Spaces);
       begin
          if Tag (Tag'First .. Pos - 1) = TAG_TITLE then
             Doc.Title := To_Unbounded_String (Value);

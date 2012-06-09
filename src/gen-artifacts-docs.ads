@@ -98,11 +98,12 @@ private
    type Doc_State is (IN_PARA, IN_SEPARATOR, IN_CODE, IN_CODE_SEPARATOR, IN_LIST);
 
    type File_Document is record
-      Name        : Ada.Strings.Unbounded.Unbounded_String;
-      Title       : Ada.Strings.Unbounded.Unbounded_String;
-      State       : Doc_State := IN_PARA;
-      Line_Number : Natural := 0;
-      Lines       : Line_Vectors.Vector;
+      Name         : Ada.Strings.Unbounded.Unbounded_String;
+      Title        : Ada.Strings.Unbounded.Unbounded_String;
+      State        : Doc_State := IN_PARA;
+      Line_Number  : Natural := 0;
+      Lines        : Line_Vectors.Vector;
+      Was_Included : Boolean := False;
    end record;
 
    package Doc_Maps is
@@ -110,6 +111,13 @@ private
                                                 Element_Type    => File_Document,
                                                 Hash            => Ada.Strings.Hash,
                                                 Equivalent_Keys => "=");
+
+   --  Include the document extract represented by <b>Name</b> into the document <b>Into</b>.
+   --  The included document is marked so that it will not be generated.
+   procedure Include (Docs     : in out Doc_Maps.Map;
+                      Into     : in out File_Document;
+                      Name     : in String;
+                      Position : in Natural);
 
    --  Returns True if the line indicates a bullet or numbered list.
    function Is_List (Line : in String) return Boolean;

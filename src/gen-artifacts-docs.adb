@@ -99,6 +99,43 @@ package body Gen.Artifacts.Docs is
       Ada.Text_IO.Close (File);
    end Generate;
 
+   --  ------------------------------
+   --  Include the document extract represented by <b>Name</b> into the document <b>Into</b>.
+   --  The included document is marked so that it will not be generated.
+   --  ------------------------------
+   procedure Include (Docs     : in out Doc_Maps.Map;
+                      Into     : in out File_Document;
+                      Name     : in String;
+                      Position : in Natural) is
+      --  Include the lines from the document into another.
+      procedure Do_Include (Source : in String;
+                            Doc    : in out File_Document);
+
+      --  ------------------------------
+      --  Include the lines from the document into another.
+      --  ------------------------------
+      procedure Do_Include (Source : in String;
+                            Doc    : in out File_Document) is
+         pragma Unreferenced (Source);
+
+         Iter : Line_Vectors.Cursor := Doc.Lines.First;
+      begin
+         while Line_Vectors.Has_Element (Iter) loop
+            Into.Lines.Insert (Before => Position, New_Item => Line_Vectors.Element (Iter));
+            Line_Vectors.Next (Iter);
+         end loop;
+         Doc.Was_Included := True;
+      end Do_Include;
+
+      Pos : constant Doc_Maps.Cursor := Docs.Find (Name);
+   begin
+      if not Doc_Maps.Has_Element (Pos) then
+         Log.Error ("Cannot include document {0}", Name);
+         return;
+      end if;
+      Docs.Update_Element (Pos, Do_Include'Access);
+   end Include;
+
    procedure Generate (Docs : in out Doc_Maps.Map) is
 
       --  Merge the documentation.

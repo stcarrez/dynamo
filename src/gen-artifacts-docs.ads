@@ -52,6 +52,15 @@ with Gen.Model.Packages;
 --  tags are extracted.
 package Gen.Artifacts.Docs is
 
+   --  Tag marker (same as Java).
+   TAG_CHAR     : constant Character := '@';
+
+   --  Specific tags recognized when analyzing the documentation.
+   TAG_AUTHOR   : constant String := "author";
+   TAG_TITLE    : constant String := "title";
+   TAG_INCLUDE  : constant String := "include";
+   TAG_SEE      : constant String := "see";
+
    --  ------------------------------
    --  Documentation artifact
    --  ------------------------------
@@ -87,6 +96,7 @@ private
 
    type File_Document is record
       Name  : Ada.Strings.Unbounded.Unbounded_String;
+      Title : Ada.Strings.Unbounded.Unbounded_String;
       State : Doc_State := IN_PARA;
       Lines : Line_Vectors.Vector;
    end record;

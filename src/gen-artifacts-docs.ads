@@ -111,6 +111,10 @@ private
    procedure Append (Doc   : in out File_Document;
                      Line  : in String);
 
+   --  After having collected the documentation, terminate the document by making sure
+   --  the opened elements are closed.
+   procedure Finish (Doc : in out File_Document);
+
    --  Set the name associated with the document extract.
    procedure Set_Name (Doc  : in out File_Document;
                        Name : in String);

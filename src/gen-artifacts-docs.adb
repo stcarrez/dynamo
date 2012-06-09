@@ -215,6 +215,18 @@ package body Gen.Artifacts.Docs is
    end Append;
 
    --  ------------------------------
+   --  After having collected the documentation, terminate the document by making sure
+   --  the opened elements are closed.
+   --  ------------------------------
+   procedure Finish (Doc : in out File_Document) is
+   begin
+      if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
+         Append_Line (Doc, "}}}");
+         Doc.State := IN_PARA;
+      end if;
+   end Finish;
+
+   --  ------------------------------
    --  Set the name associated with the document extract.
    --  ------------------------------
    procedure Set_Name (Doc  : in out File_Document;
@@ -276,6 +288,7 @@ package body Gen.Artifacts.Docs is
       end Process;
    begin
       Util.Files.Read_File (File, Process'Access);
+      Finish (Result);
    end Read_Ada_File;
 
 end Gen.Artifacts.Docs;

@@ -155,15 +155,21 @@ private
    procedure Set_Title (Doc   : in out File_Document;
                         Title : in String);
 
+   procedure Scan_Files (Handler : in out Artifact;
+                         Path    : in String;
+                         Docs    : in out Doc_Maps.Map);
+
    --  Read the Ada specification file and collect the useful documentation.
    --  To keep the implementation simple, we don't use the ASIS packages to scan and extract
    --  the documentation.  We don't need to look at the Ada specification itself.  Instead,
    --  we assume that the Ada source follows some Ada style guidelines.
-   procedure Read_Ada_File (File   : in String;
-                            Result : in out File_Document);
+   procedure Read_Ada_File (Handler : in out Artifact;
+                            File    : in String;
+                            Result  : in out File_Document);
 
-   procedure Read_Xml_File (File   : in String;
-                            Result : in out File_Document);
+   procedure Read_Xml_File (Handler : in out Artifact;
+                            File    : in String;
+                            Result  : in out File_Document);
 
    type Artifact is new Gen.Artifacts.Artifact with record
       A : Natural;

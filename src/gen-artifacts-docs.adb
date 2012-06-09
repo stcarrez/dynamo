@@ -46,8 +46,6 @@ package body Gen.Artifacts.Docs is
    --  ------------------------------
    --  Documentation artifact
    --  ------------------------------
-   procedure Scan_Files (Path : in String;
-                         Docs : in out Doc_Maps.Map);
 
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
@@ -69,7 +67,7 @@ package body Gen.Artifacts.Docs is
                       Context : in out Generator'Class) is
       Docs : Doc_Maps.Map;
    begin
-      Scan_Files (".", Docs);
+      Handler.Scan_Files (".", Docs);
       Generate (Docs, Context.Get_Result_Directory);
    end Prepare;
 
@@ -204,8 +202,9 @@ package body Gen.Artifacts.Docs is
       end loop;
    end Generate;
 
-   procedure Scan_Files (Path : in String;
-                         Docs : in out Doc_Maps.Map) is
+   procedure Scan_Files (Handler : in out Artifact;
+                         Path    : in String;
+                         Docs    : in out Doc_Maps.Map) is
       use Ada.Directories;
 
       File_Filter  : constant Filter_Type := (Ordinary_File => True,
@@ -235,10 +234,10 @@ package body Gen.Artifacts.Docs is
                Log.Debug ("Collect {0}", Full_Path);
 
                if Name (Pos .. Name'Last) = ".ads" then
-                  Read_Ada_File (Full_Path, Doc);
+                  Handler.Read_Ada_File (Full_Path, Doc);
 
                elsif Name (Pos .. Name'Last) = ".xml" then
-                  Read_Xml_File (Full_Path, Doc);
+                  Handler.Read_Xml_File (Full_Path, Doc);
 
                end if;
                Log.Info ("Adding document '{0}'", Name);
@@ -256,7 +255,7 @@ package body Gen.Artifacts.Docs is
          begin
             if not Gen.Utils.Is_File_Ignored (Name)
               and Name /= "regtests" then
-               Scan_Files (Ada.Directories.Full_Name (Ent), Docs);
+               Handler.Scan_Files (Ada.Directories.Full_Name (Ent), Docs);
             end if;
          end;
       end loop;
@@ -422,44 +421,15 @@ package body Gen.Artifacts.Docs is
       Doc.Title := Unbounded.To_Unbounded_String (Fixed.Trim (Title (Pos .. Title'Last), Both));
    end Set_Title;
 
-   --  Read the XML file and extract the documentation.  For this extraction we use
-   --  an XSLT stylesheet and run the external tool <b>xstlproc</b>.
-   procedure Read_Xml_File (File   : in String;
-                            Result : in out File_Document) is
-      Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
-      Reader  : Util.Streams.Texts.Reader_Stream;
-      Name    : constant String := Ada.Directories.Base_Name (File);
-   begin
-      Pipe.Open ("xsltproc extract-doc.xsl " & File, Util.Processes.READ);
-      Reader.Initialize (Pipe'Unchecked_Access);
-
-      while not Reader.Is_Eof loop
-         declare
-            Line : Ada.Strings.Unbounded.Unbounded_String;
-         begin
-            Reader.Read_Line (Line, True);
-            Log.Debug ("Doc: {0}", Line);
-
-            Append_Line (Result, Ada.Strings.Unbounded.To_String (Line));
-         end;
-      end loop;
-      Pipe.Close;
-      Set_Title (Result, Name);
-      Set_Name (Result, Name);
-      if Pipe.Get_Exit_Status /= 0 then
-         Log.Error ("Command {0} exited with status {1}", "xsltproc",
-                        Integer'Image (Pipe.Get_Exit_Status));
-      end if;
-   end Read_Xml_File;
-
    --  ------------------------------
    --  Read the Ada specification file and collect the useful documentation.
    --  To keep the implementation simple, we don't use the ASIS packages to scan and extract
    --  the documentation.  We don't need to look at the Ada specification itself.  Instead,
    --  we assume that the Ada source follows some Ada style guidelines.
    --  ------------------------------
-   procedure Read_Ada_File (File   : in String;
-                            Result : in out File_Document) is
+   procedure Read_Ada_File (Handler : in out Artifact;
+                            File    : in String;
+                            Result  : in out File_Document) is
       procedure Process (Line : in String);
 
       Done              : Boolean := False;
@@ -512,5 +482,36 @@ package body Gen.Artifacts.Docs is
       Util.Files.Read_File (File, Process'Access);
       Finish (Result);
    end Read_Ada_File;
+
+   --  Read the XML file and extract the documentation.  For this extraction we use
+   --  an XSLT stylesheet and run the external tool <b>xstlproc</b>.
+   procedure Read_Xml_File (Handler : in out Artifact;
+                            File    : in String;
+                            Result  : in out File_Document) is
+      Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
+      Reader  : Util.Streams.Texts.Reader_Stream;
+      Name    : constant String := Ada.Directories.Base_Name (File);
+   begin
+      Pipe.Open ("xsltproc extract-doc.xsl " & File, Util.Processes.READ);
+      Reader.Initialize (Pipe'Unchecked_Access);
+
+      while not Reader.Is_Eof loop
+         declare
+            Line : Ada.Strings.Unbounded.Unbounded_String;
+         begin
+            Reader.Read_Line (Line, True);
+            Log.Debug ("Doc: {0}", Line);
+
+            Append_Line (Result, Ada.Strings.Unbounded.To_String (Line));
+         end;
+      end loop;
+      Pipe.Close;
+      Set_Title (Result, Name);
+      Set_Name (Result, Name);
+      if Pipe.Get_Exit_Status /= 0 then
+         Log.Error ("Command {0} exited with status {1}", "xsltproc",
+                    Integer'Image (Pipe.Get_Exit_Status));
+      end if;
+   end Read_Xml_File;
 
 end Gen.Artifacts.Docs;

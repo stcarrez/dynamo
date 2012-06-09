@@ -81,4 +81,7 @@ package Gen.Utils is
    --  Returns the path if this is an absolute path, otherwise build and return an absolute path.
    function Absolute_Path (Path : in String) return String;
 
+   --  Returns True if the file name must be ignored (.svn, CVS, .git, are ignored).
+   function Is_File_Ignored (Name : in String) return Boolean;
+
 end Gen.Utils;

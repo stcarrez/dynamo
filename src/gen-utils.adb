@@ -249,4 +249,22 @@ package body Gen.Utils is
       end if;
    end Absolute_Path;
 
+   --  ------------------------------
+   --  Returns True if the file name must be ignored (.svn, CVS, .git, are ignored).
+   --  ------------------------------
+   function Is_File_Ignored (Name : in String) return Boolean is
+   begin
+      if Name =  ".svn" then
+         return True;
+      elsif Name = ".git" then
+         return True;
+      elsif Name = "CVS" then
+         return True;
+      elsif Name = "." or else Name = ".." then
+         return True;
+      else
+         return False;
+      end if;
+   end Is_File_Ignored;
+
 end Gen.Utils;

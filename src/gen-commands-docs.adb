@@ -48,23 +48,8 @@ package body Gen.Commands.Docs is
          end if;
          Generator.Set_Result_Directory (Target_Dir);
       end;
---
---        --  Read the package description.
---        declare
---           Package_File : constant String := Get_Argument;
---        begin
---           if Package_File'Length > 0 then
---              Gen.Generator.Read_Package (Generator, Package_File);
---           else
---              Gen.Generator.Read_Package (Generator, "package.xml");
---           end if;
---        end;
 
       Doc.Prepare (M, Generator);
---        --  Run the generation.
---        Gen.Generator.Prepare (Generator);
---        Gen.Generator.Generate_All (Generator);
---        Gen.Generator.Finish (Generator);
    end Execute;
 
    --  ------------------------------

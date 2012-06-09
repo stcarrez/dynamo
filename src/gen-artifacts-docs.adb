@@ -24,10 +24,6 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Ada.Characters.Handling;
 
-with DOM.Core;
-with Gen.Model.Packages;
-
-
 package body Gen.Artifacts.Docs is
 
    use Util.Log;
@@ -40,7 +36,8 @@ package body Gen.Artifacts.Docs is
    procedure Scan_Files (Path : in String;
                          Docs : in out Doc_Maps.Map);
 
-   procedure Generate (Docs : in out Doc_Maps.Map);
+   procedure Generate (Docs : in out Doc_Maps.Map;
+                       Dir  : in String);
 
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
@@ -63,41 +60,8 @@ package body Gen.Artifacts.Docs is
       Docs : Doc_Maps.Map;
    begin
       Scan_Files ("src", Docs);
-      Generate (Docs);
+      Generate (Docs, Context.Get_Result_Directory);
    end Prepare;
-
-   procedure Generate (Source : in String;
-                       Doc    : in File_Document) is
-      use type Ada.Containers.Count_Type;
-
-      Name : constant String := Ada.Strings.Unbounded.To_String (Doc.Name) & ".wiki";
-      Path : String := Util.Files.Compose ("doc", Name);
-      File : Ada.Text_IO.File_Type;
-      Iter : Line_Vectors.Cursor := Doc.Lines.First;
-
-      procedure Write (Line : in Line_Type) is
-      begin
-         Ada.Text_IO.Put_Line (File, Line.Content);
-      end Write;
-
-   begin
-      if Doc.Lines.Length = 0 or Doc.Was_Included then
-         return;
-      end if;
-      Ada.Directories.Create_Path ("doc");
-
-      Ada.Text_IO.Create (File => File,
-                          Mode => Ada.Text_IO.Out_File,
-                          Name => Path);
-      Ada.Text_IO.Put_Line (File, "#summary " & Ada.Strings.Unbounded.To_String (Doc.Title));
-      Ada.Text_IO.New_Line (File);
-
-      while Line_Vectors.Has_Element (Iter) loop
-         Line_Vectors.Query_Element (Iter, Write'Access);
-         Line_Vectors.Next (Iter);
-      end loop;
-      Ada.Text_IO.Close (File);
-   end Generate;
 
    --  ------------------------------
    --  Include the document extract represented by <b>Name</b> into the document <b>Into</b>.
@@ -136,12 +100,23 @@ package body Gen.Artifacts.Docs is
       Docs.Update_Element (Pos, Do_Include'Access);
    end Include;
 
-   procedure Generate (Docs : in out Doc_Maps.Map) is
-
+   procedure Generate (Docs : in out Doc_Maps.Map;
+                       Dir  : in String) is
       --  Merge the documentation.
       procedure Merge (Source : in String;
+                       Doc    : in out File_Document);
+
+      --  Generate the documentation.
+      procedure Generate (Source : in String;
+                          Doc    : in File_Document);
+
+      --  ------------------------------
+      --  Merge the documentation.
+      --  ------------------------------
+      procedure Merge (Source : in String;
                        Doc    : in out File_Document) is
-         use type Ada.Containers.Count_Type;
+         pragma Unreferenced (Source);
+
          Pos : Natural := 1;
       begin
          while Pos <= Natural (Doc.Lines.Length) loop
@@ -157,6 +132,44 @@ package body Gen.Artifacts.Docs is
             end;
          end loop;
       end Merge;
+
+      --  ------------------------------
+      --  Generate the documentation.
+      --  ------------------------------
+      procedure Generate (Source : in String;
+                          Doc    : in File_Document) is
+         pragma Unreferenced (Source);
+
+         procedure Write (Line : in Line_Type);
+
+         Name : constant String := Ada.Strings.Unbounded.To_String (Doc.Name) & ".wiki";
+         Path : constant String := Util.Files.Compose (Dir, Name);
+         File : Ada.Text_IO.File_Type;
+         Iter : Line_Vectors.Cursor := Doc.Lines.First;
+
+         procedure Write (Line : in Line_Type) is
+         begin
+            Ada.Text_IO.Put_Line (File, Line.Content);
+         end Write;
+
+      begin
+         if Doc.Lines.Is_Empty or Doc.Was_Included then
+            return;
+         end if;
+         Ada.Directories.Create_Path (Dir);
+
+         Ada.Text_IO.Create (File => File,
+                             Mode => Ada.Text_IO.Out_File,
+                             Name => Path);
+         Ada.Text_IO.Put_Line (File, "#summary " & Ada.Strings.Unbounded.To_String (Doc.Title));
+         Ada.Text_IO.New_Line (File);
+
+         while Line_Vectors.Has_Element (Iter) loop
+            Line_Vectors.Query_Element (Iter, Write'Access);
+            Line_Vectors.Next (Iter);
+         end loop;
+         Ada.Text_IO.Close (File);
+      end Generate;
 
       Iter : Doc_Maps.Cursor := Docs.First;
    begin

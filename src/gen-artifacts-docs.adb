@@ -36,9 +36,6 @@ package body Gen.Artifacts.Docs is
    procedure Scan_Files (Path : in String;
                          Docs : in out Doc_Maps.Map);
 
-   procedure Generate (Docs : in out Doc_Maps.Map;
-                       Dir  : in String);
-
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    overriding
@@ -100,6 +97,11 @@ package body Gen.Artifacts.Docs is
       Docs.Update_Element (Pos, Do_Include'Access);
    end Include;
 
+   --  ------------------------------
+   --  Generate the project documentation that was collected in <b>Docs</b>.
+   --  The documentation is merged so that the @include tags are replaced by the matching
+   --  document extracts.
+   --  ------------------------------
    procedure Generate (Docs : in out Doc_Maps.Map;
                        Dir  : in String) is
       --  Merge the documentation.

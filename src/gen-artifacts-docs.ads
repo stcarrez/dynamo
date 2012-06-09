@@ -119,6 +119,12 @@ private
                       Name     : in String;
                       Position : in Natural);
 
+   --  Generate the project documentation that was collected in <b>Docs</b>.
+   --  The documentation is merged so that the @include tags are replaced by the matching
+   --  document extracts.
+   procedure Generate (Docs : in out Doc_Maps.Map;
+                       Dir  : in String);
+
    --  Returns True if the line indicates a bullet or numbered list.
    function Is_List (Line : in String) return Boolean;
 

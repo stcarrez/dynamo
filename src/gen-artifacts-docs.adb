@@ -456,7 +456,7 @@ package body Gen.Artifacts.Docs is
                elsif Line (Line'First + 2) = ' ' and Line (Line'First + 3) = ' ' then
                   Append (Result, Line (Line'First + 4 .. Line'Last));
                end if;
-            elsif Line'Length >= 7 and then Line (Line'First .. Line'First + 6) = "--  == " then
+            elsif Line'Length >= 5 and then Line (Line'First .. Line'First + 4) = "--  =" then
                Doc_Block := True;
                Append (Result, Line (Line'First + 4 .. Line'Last));
 

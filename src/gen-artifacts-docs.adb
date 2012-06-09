@@ -60,7 +60,7 @@ package body Gen.Artifacts.Docs is
                       Context : in out Generator'Class) is
       Docs : Doc_Maps.Map;
    begin
-      Scan_Files ("src", Docs);
+      Scan_Files (".", Docs);
       Generate (Docs, Context.Get_Result_Directory);
    end Prepare;
 
@@ -162,6 +162,8 @@ package body Gen.Artifacts.Docs is
          if Doc.Lines.Is_Empty or Doc.Was_Included then
             return;
          end if;
+
+         Log.Info ("Generating doc {0}", Path);
          Ada.Directories.Create_Path (Dir);
 
          Ada.Text_IO.Create (File => File,
@@ -243,7 +245,8 @@ package body Gen.Artifacts.Docs is
          declare
             Name      : constant String := Simple_Name (Ent);
          begin
-            if not Gen.Utils.Is_File_Ignored (Name) then
+            if not Gen.Utils.Is_File_Ignored (Name)
+              and Name /= "regtests" then
                Scan_Files (Ada.Directories.Full_Name (Ent), Docs);
             end if;
          end;
@@ -386,7 +389,7 @@ package body Gen.Artifacts.Docs is
       S1 : String := Ada.Strings.Fixed.Trim (Name, Ada.Strings.Both);
    begin
       for I in S1'Range loop
-         if S1 (I) = '.' then
+         if S1 (I) = '.' or S1 (I) = '/' or S1 (I) = '\' then
             S1 (I) := '_';
          end if;
       end loop;
@@ -410,10 +413,13 @@ package body Gen.Artifacts.Docs is
       Doc.Title := Unbounded.To_Unbounded_String (Fixed.Trim (Title (Pos .. Title'Last), Both));
    end Set_Title;
 
-   procedure Read_Xml_File (File : in String;
+   --  Read the XML file and extract the documentation.  For this extraction we use
+   --  an XSLT stylesheet and run the external tool <b>xstlproc</b>.
+   procedure Read_Xml_File (File   : in String;
                             Result : in out File_Document) is
       Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
       Reader  : Util.Streams.Texts.Reader_Stream;
+      Name    : constant String := Ada.Directories.Base_Name (File);
    begin
       Pipe.Open ("xsltproc extract-doc.xsl " & File, Util.Processes.READ);
       Reader.Initialize (Pipe'Unchecked_Access);
@@ -423,14 +429,18 @@ package body Gen.Artifacts.Docs is
             Line : Ada.Strings.Unbounded.Unbounded_String;
          begin
             Reader.Read_Line (Line, True);
+            Log.Debug ("Doc: {0}", Line);
+
             Append_Line (Result, Ada.Strings.Unbounded.To_String (Line));
          end;
       end loop;
       Pipe.Close;
---        if Pipe.Get_Exit_Status /= 0 then
---           Context.Error ("Command {0} exited with status {1}", Command,
---                          Integer'Image (Pipe.Get_Exit_Status));
---        end if;
+      Set_Title (Result, Name);
+      Set_Name (Result, Name);
+      if Pipe.Get_Exit_Status /= 0 then
+         Log.Error ("Command {0} exited with status {1}", "xsltproc",
+                        Integer'Image (Pipe.Get_Exit_Status));
+      end if;
    end Read_Xml_File;
 
    --  ------------------------------

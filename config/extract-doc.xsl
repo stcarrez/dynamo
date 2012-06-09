@@ -8,16 +8,25 @@
     <xsl:template match="/module">
       <xsl:if test="count(managed-bean) &gt; 0">
         <h3>Ada Beans</h3>
-        <xsl:element name="table">
-          <xsl:apply-templates match="managed-bean"/>          
-        </xsl:element>
+        <table width="100%">
+          <tr>
+            <th width="30%">Name</th>
+            <th width="70%">Description</th>
+          </tr>
+          <xsl:apply-templates select="managed-bean"/>          
+        </table>
       </xsl:if>
 
       <xsl:if test="count(entity-permission) &gt; 0">
         <h3>Permissions</h3>
-        <xsl:element name="table">
-          <xsl:apply-templates match="entity-permission"/>          
-        </xsl:element>
+        <table width="100%">
+          <tr>
+            <th width="20%">Name</th>
+            <th width="10%">Name</th>
+            <th width="70%">Description</th>
+          </tr>
+          <xsl:apply-templates select="entity-permission"/>          
+        </table>
       </xsl:if>
 
     </xsl:template>
@@ -34,7 +43,7 @@
     <xsl:template match="class">
       <h4><xsl:value-of select="@name"/></h4>
       <p><xsl:value-of select="comment"/></p>
-      <table>
+      <table width="100%">
         <xsl:apply-templates select="id"/>
         <xsl:apply-templates select="version"/>
         <xsl:apply-templates select="property"/>

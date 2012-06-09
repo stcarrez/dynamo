@@ -34,7 +34,6 @@
     <xsl:template match="/hibernate-mapping">
 
       <xsl:if test="count(class) &gt; 0">
-        <h3>Database Model</h3>
         <xsl:apply-templates match="class"/>
       </xsl:if>
 

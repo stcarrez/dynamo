@@ -19,6 +19,9 @@
 with GNAT.Command_Line;
 
 with Ada.Text_IO;
+
+with Gen.Artifacts.Docs;
+with Gen.Model.Packages;
 package body Gen.Commands.Docs is
 
    use GNAT.Command_Line;
@@ -29,8 +32,11 @@ package body Gen.Commands.Docs is
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
+
+      Doc : Gen.Artifacts.Docs.Artifact;
+      M   : Gen.Model.Packages.Model_Definition;
    begin
-      Generator.Read_Project ("dynamo.xml", True);
+      Generator.Read_Project ("dynamo.xml", False);
 
       --  Setup the target directory where the distribution is created.
       declare
@@ -42,22 +48,23 @@ package body Gen.Commands.Docs is
          end if;
          Generator.Set_Result_Directory (Target_Dir);
       end;
+--
+--        --  Read the package description.
+--        declare
+--           Package_File : constant String := Get_Argument;
+--        begin
+--           if Package_File'Length > 0 then
+--              Gen.Generator.Read_Package (Generator, Package_File);
+--           else
+--              Gen.Generator.Read_Package (Generator, "package.xml");
+--           end if;
+--        end;
 
-      --  Read the package description.
-      declare
-         Package_File : constant String := Get_Argument;
-      begin
-         if Package_File'Length > 0 then
-            Gen.Generator.Read_Package (Generator, Package_File);
-         else
-            Gen.Generator.Read_Package (Generator, "package.xml");
-         end if;
-      end;
-
-      --  Run the generation.
-      Gen.Generator.Prepare (Generator);
-      Gen.Generator.Generate_All (Generator);
-      Gen.Generator.Finish (Generator);
+      Doc.Prepare (M, Generator);
+--        --  Run the generation.
+--        Gen.Generator.Prepare (Generator);
+--        Gen.Generator.Generate_All (Generator);
+--        Gen.Generator.Finish (Generator);
    end Execute;
 
    --  ------------------------------

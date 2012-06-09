@@ -81,7 +81,7 @@ package body Gen.Artifacts.Docs is
       end Write;
 
    begin
-      if Doc.Lines.Length = 0 then
+      if Doc.Lines.Length = 0 or Doc.Was_Included then
          return;
       end if;
       Ada.Directories.Create_Path ("doc");

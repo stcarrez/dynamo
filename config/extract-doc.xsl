@@ -10,8 +10,8 @@
         <h3>Ada Beans</h3>
         <table width="100%">
           <tr>
-            <th width="30%">Name</th>
-            <th width="70%">Description</th>
+            <th width="30%" align="left">Name</th>
+            <th width="70%" align="left">Description</th>
           </tr>
           <xsl:apply-templates select="managed-bean"/>          
         </table>
@@ -21,9 +21,9 @@
         <h3>Permissions</h3>
         <table width="100%">
           <tr>
-            <th width="20%">Name</th>
-            <th width="10%">Name</th>
-            <th width="70%">Description</th>
+            <th width="20%" align="left">Name</th>
+            <th width="10%" align="left">Name</th>
+            <th width="70%" align="left">Description</th>
           </tr>
           <xsl:apply-templates select="entity-permission"/>          
         </table>
@@ -40,20 +40,6 @@
 
     </xsl:template>
 
-    <xsl:template match="class">
-      <h4><xsl:value-of select="@name"/></h4>
-      <p><xsl:value-of select="comment"/></p>
-      <table width="100%">
-        <xsl:apply-templates select="id"/>
-        <xsl:apply-templates select="version"/>
-        <xsl:apply-templates select="property"/>
-        <xsl:apply-templates select="many-to-one"/>
-      </table>
-      <xsl:text>
-
-      </xsl:text>
-    </xsl:template>
-
     <xsl:template match="managed-bean">
       <tr>
         <td><xsl:value-of select="managed-bean-name"/></td>
@@ -67,6 +53,26 @@
         <td><xsl:value-of select="entity-type"/></td>
         <td><xsl:value-of select="description"/></td>
       </tr>
+    </xsl:template>
+
+    <xsl:template match="class">
+      <h4><xsl:value-of select="@name"/></h4>
+      <p><xsl:value-of select="comment"/></p>
+      <table width="100%">
+        <tr>
+          <th width="15%" align="left">Type</th>
+          <th width="15%" align="left">Ada</th>
+          <th width="20%" align="left">Name</th>
+          <th width="50%" align="left">Description</th>
+        </tr>
+        <xsl:apply-templates select="id"/>
+        <xsl:apply-templates select="version"/>
+        <xsl:apply-templates select="property"/>
+        <xsl:apply-templates select="many-to-one"/>
+      </table>
+      <xsl:text>
+
+      </xsl:text>
     </xsl:template>
 
     <xsl:template match="property">

@@ -248,6 +248,19 @@ Each Ada bean type must be registered in the
 package.  The generated files are intended to be modified to implement the
 module functionality.
 .\"
+.SS The build-doc command
+.RS 0
+dynamo \fBbuild-doc \fIdirectory\fR\fR
+.RE
+.PP
+Extract the documentation from the project source files and generate the
+project documentation.  The Ada specification files are scanned and the
+package specification header comment is used as the main structure for
+the project documentation.  The XML files are also scanned and the documentation
+is extracted from these files.  It can be merged together with other
+documentation to build up the final project user documentation.
+.\"
+.\"
 .SS The info command
 .RS 0
 dynamo \fBinfo\fR

@@ -117,6 +117,10 @@ private
    procedure Append_Line (Doc  : in out File_Document;
                           Line : in String);
 
+   --  Look and analyze the tag defined on the line.
+   procedure Append_Tag (Doc : in out File_Document;
+                         Tag : in String);
+
    --  Analyse the documentation line and collect the documentation text.
    procedure Append (Doc   : in out File_Document;
                      Line  : in String);

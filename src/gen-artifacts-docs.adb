@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Util.Files;
 with Util.Log.Loggers;
+with Util.Strings;
 
 with Ada.Directories;
 with Ada.Strings.Fixed;
@@ -167,11 +168,34 @@ package body Gen.Artifacts.Docs is
    end Append_Line;
 
    --  ------------------------------
+   --  Look and analyze the tag defined on the line.
+   --  ------------------------------
+   procedure Append_Tag (Doc : in out File_Document;
+                         Tag : in String) is
+      use Ada.Strings.Unbounded;
+      use Ada.Strings;
+
+      Pos : constant Natural := Util.Strings.Index (Tag, ' ');
+   begin
+      if Pos = 0 then
+         return;
+      end if;
+      if Tag (Tag'First .. Pos - 1) = TAG_TITLE then
+         Doc.Title := To_Unbounded_String (Ada.Strings.Fixed.Trim (Tag (Pos .. Tag'Last), Both));
+      end if;
+   end Append_Tag;
+
+   --  ------------------------------
    --  Analyse the documentation line and collect the documentation text.
    --  ------------------------------
    procedure Append (Doc   : in out File_Document;
                      Line  : in String) is
    begin
+      if Line'Length >= 1 and then Line (Line'First) = TAG_CHAR then
+         Append_Tag (Doc, Line (Line'First + 1 .. Line'Last));
+         return;
+      end if;
+
       case Doc.State is
          when IN_PARA =>
             if Line'Length = 0 then

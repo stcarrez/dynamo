@@ -40,7 +40,7 @@ package body Gen.Artifacts.Docs is
    procedure Scan_Files (Path : in String;
                          Docs : in out Doc_Maps.Map);
 
-   procedure Generate (Docs : in Doc_Maps.Map);
+   procedure Generate (Docs : in out Doc_Maps.Map);
 
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
@@ -99,9 +99,26 @@ package body Gen.Artifacts.Docs is
       Ada.Text_IO.Close (File);
    end Generate;
 
-   procedure Generate (Docs : in Doc_Maps.Map) is
+   procedure Generate (Docs : in out Doc_Maps.Map) is
+
+      --  Merge the documentation.
+      procedure Merge (Source : in String;
+                       Doc    : in out File_Document) is
+         use type Ada.Containers.Count_Type;
+      begin
+         null;
+      end Merge;
+
       Iter : Doc_Maps.Cursor := Docs.First;
    begin
+      --  First pass: merge the documentation.
+      while Doc_Maps.Has_Element (Iter) loop
+         Docs.Update_Element (Position => Iter, Process => Merge'Access);
+         Doc_Maps.Next (Iter);
+      end loop;
+
+      --  Second pass: build the documentation.
+      Iter := Docs.First;
       while Doc_Maps.Has_Element (Iter) loop
          Doc_Maps.Query_Element (Iter, Generate'Access);
          Doc_Maps.Next (Iter);
@@ -167,7 +184,7 @@ package body Gen.Artifacts.Docs is
    procedure Append_Line (Doc  : in out File_Document;
                           Line : in String) is
    begin
-      Doc.Lines.Append (Line_Type '(Len => Line'Length, Content => Line));
+      Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_TEXT, Content => Line));
    end Append_Line;
 
    --  ------------------------------
@@ -183,9 +200,24 @@ package body Gen.Artifacts.Docs is
       if Pos = 0 then
          return;
       end if;
-      if Tag (Tag'First .. Pos - 1) = TAG_TITLE then
-         Doc.Title := To_Unbounded_String (Ada.Strings.Fixed.Trim (Tag (Pos .. Tag'Last), Both));
-      end if;
+      declare
+         Value : constant String := Ada.Strings.Fixed.Trim (Tag (Pos .. Tag'Last), Both);
+      begin
+         if Tag (Tag'First .. Pos - 1) = TAG_TITLE then
+            Doc.Title := To_Unbounded_String (Value);
+
+         elsif Tag (Tag'First .. Pos - 1) = TAG_SEE then
+            Doc.Lines.Append (Line_Type '(Len     => Value'Length,
+                                          Kind    => L_SEE,
+                                          Content => Value));
+
+         elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE then
+            Doc.Lines.Append (Line_Type '(Len     => Value'Length,
+                                          Kind    => L_INCLUDE,
+                                          Content => Value));
+
+         end if;
+      end;
    end Append_Tag;
 
    --  ------------------------------

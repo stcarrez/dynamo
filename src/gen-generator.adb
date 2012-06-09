@@ -34,6 +34,8 @@ with ASF.Components.Base;
 with Util.Beans.Basic;
 with Util.Strings.Vectors;
 with EL.Functions;
+with EL.Utils;
+with EL.Contexts.Default;
 
 with Gen.Utils;
 with Gen.Model;
@@ -341,6 +343,7 @@ package body Gen.Generator is
       Dir     : constant String := Ada.Strings.Unbounded.To_String (Config_Dir);
       Factory : ASF.Applications.Main.Application_Factory;
       Path    : constant String := Compose (Dir, "generator.properties");
+      Context : EL.Contexts.Default.Default_Context;
    begin
       Log.Debug ("Initialize dynamo with {0}", Path);
 
@@ -360,6 +363,8 @@ package body Gen.Generator is
 
       H.Config_Dir := To_Unbounded_String (Dir);
       H.Output_Dir := To_Unbounded_String (H.Conf.Get (RESULT_DIR, "./"));
+      H.Conf.Set ("generator.config.dir", Dir);
+      EL.Utils.Expand (H.Conf, H.Conf, Context);
 
       Register_Funcs (H);
       H.File := new Util.Beans.Objects.Object;

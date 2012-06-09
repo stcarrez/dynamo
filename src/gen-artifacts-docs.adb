@@ -66,7 +66,11 @@ package body Gen.Artifacts.Docs is
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
       Docs : Doc_Maps.Map;
+      Command : constant String := Context.Get_Parameter ("generator.doc.xslt.command");
    begin
+      Log.Info ("Using command: {0}", Command);
+
+      Handler.Xslt_Command := Ada.Strings.Unbounded.To_Unbounded_String (Command);
       Handler.Scan_Files (".", Docs);
       Generate (Docs, Context.Get_Result_Directory);
    end Prepare;
@@ -491,8 +495,9 @@ package body Gen.Artifacts.Docs is
       Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
       Reader  : Util.Streams.Texts.Reader_Stream;
       Name    : constant String := Ada.Directories.Base_Name (File);
+      Command : constant String := Ada.Strings.Unbounded.To_String (Handler.Xslt_Command);
    begin
-      Pipe.Open ("xsltproc extract-doc.xsl " & File, Util.Processes.READ);
+      Pipe.Open (Command & " " & File, Util.Processes.READ);
       Reader.Initialize (Pipe'Unchecked_Access);
 
       while not Reader.Is_Eof loop
@@ -509,7 +514,7 @@ package body Gen.Artifacts.Docs is
       Set_Title (Result, Name);
       Set_Name (Result, Name);
       if Pipe.Get_Exit_Status /= 0 then
-         Log.Error ("Command {0} exited with status {1}", "xsltproc",
+         Log.Error ("Command {0} exited with status {1}", Command,
                     Integer'Image (Pipe.Get_Exit_Status));
       end if;
    end Read_Xml_File;

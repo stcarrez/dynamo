@@ -172,7 +172,7 @@ private
                             Result  : in out File_Document);
 
    type Artifact is new Gen.Artifacts.Artifact with record
-      A : Natural;
+      Xslt_Command : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 
 end Gen.Artifacts.Docs;

@@ -119,6 +119,13 @@ private
    procedure Set_Name (Doc  : in out File_Document;
                        Name : in String);
 
+   --  Read the Ada specification file and collect the useful documentation.
+   --  To keep the implementation simple, we don't use the ASIS packages to scan and extract
+   --  the documentation.  We don't need to look at the Ada specification itself.  Instead,
+   --  we assume that the Ada source follows some Ada style guidelines.
+   procedure Read_Ada_File (File   : in String;
+                            Result : in out File_Document);
+
    type Artifact is new Gen.Artifacts.Artifact with record
       A : Natural;
    end record;

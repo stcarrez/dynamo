@@ -36,9 +36,6 @@ package body Gen.Artifacts.Docs is
    --  ------------------------------
    --  Documentation artifact
    --  ------------------------------
-   procedure Read_Ada_File (File   : in String;
-                            Result : in out File_Document);
-
    procedure Scan_Files (Path : in String;
                          Docs : in out Doc_Maps.Map);
 
@@ -241,6 +238,12 @@ package body Gen.Artifacts.Docs is
       Doc.Name := Ada.Strings.Unbounded.To_Unbounded_String (S1);
    end Set_Name;
 
+   --  ------------------------------
+   --  Read the Ada specification file and collect the useful documentation.
+   --  To keep the implementation simple, we don't use the ASIS packages to scan and extract
+   --  the documentation.  We don't need to look at the Ada specification itself.  Instead,
+   --  we assume that the Ada source follows some Ada style guidelines.
+   --  ------------------------------
    procedure Read_Ada_File (File   : in String;
                             Result : in out File_Document) is
       procedure Process (Line : in String);

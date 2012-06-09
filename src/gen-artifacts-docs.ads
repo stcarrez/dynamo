@@ -15,6 +15,10 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Containers.Indefinite_Vectors;
+with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Strings.Hash;
+with Ada.Strings.Unbounded;
 
 with DOM.Core;
 with Gen.Model.Packages;
@@ -70,6 +74,46 @@ package Gen.Artifacts.Docs is
                       Context : in out Generator'Class);
 
 private
+
+   type Line_Type (Len : Natural) is record
+      Content : String (1 .. Len);
+   end record;
+
+   package Line_Vectors is
+      new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
+                                             Element_Type => Line_Type);
+
+   type Doc_State is (IN_PARA, IN_SEPARATOR, IN_CODE, IN_CODE_SEPARATOR, IN_LIST);
+
+   type File_Document is record
+      Name  : Ada.Strings.Unbounded.Unbounded_String;
+      State : Doc_State := IN_PARA;
+      Lines : Line_Vectors.Vector;
+   end record;
+
+   package Doc_Maps is
+     new Ada.Containers.Indefinite_Hashed_Maps (Key_Type        => String,
+                                                Element_Type    => File_Document,
+                                                Hash            => Ada.Strings.Hash,
+                                                Equivalent_Keys => "=");
+
+   --  Returns True if the line indicates a bullet or numbered list.
+   function Is_List (Line : in String) return Boolean;
+
+   --  Returns True if the line indicates a code sample.
+   function Is_Code (Line : in String) return Boolean;
+
+   --  Append a raw text line to the document.
+   procedure Append_Line (Doc  : in out File_Document;
+                          Line : in String);
+
+   --  Analyse the documentation line and collect the documentation text.
+   procedure Append (Doc   : in out File_Document;
+                     Line  : in String);
+
+   --  Set the name associated with the document extract.
+   procedure Set_Name (Doc  : in out File_Document;
+                       Name : in String);
 
    type Artifact is new Gen.Artifacts.Artifact with record
       A : Natural;

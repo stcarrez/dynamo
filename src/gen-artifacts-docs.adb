@@ -496,6 +496,7 @@ package body Gen.Artifacts.Docs is
       Reader  : Util.Streams.Texts.Reader_Stream;
       Name    : constant String := Ada.Directories.Base_Name (File);
       Command : constant String := Ada.Strings.Unbounded.To_String (Handler.Xslt_Command);
+      Is_Empty : Boolean := True;
    begin
       Pipe.Open (Command & " " & File, Util.Processes.READ);
       Reader.Initialize (Pipe'Unchecked_Access);
@@ -507,7 +508,12 @@ package body Gen.Artifacts.Docs is
             Reader.Read_Line (Line, True);
             Log.Debug ("Doc: {0}", Line);
 
-            Append_Line (Result, Ada.Strings.Unbounded.To_String (Line));
+            if Ada.Strings.Unbounded.Length (Line) > 0 then
+               Is_Empty := False;
+            end if;
+            Append_Line (Result,
+                         Ada.Strings.Fixed.Trim (Ada.Strings.Unbounded.To_String (Line),
+                Spaces, Spaces));
          end;
       end loop;
       Pipe.Close;
@@ -516,6 +522,9 @@ package body Gen.Artifacts.Docs is
       if Pipe.Get_Exit_Status /= 0 then
          Log.Error ("Command {0} exited with status {1}", Command,
                     Integer'Image (Pipe.Get_Exit_Status));
+      end if;
+      if Is_Empty then
+         Line_Vectors.Clear (Result.Lines);
       end if;
    end Read_Xml_File;
 

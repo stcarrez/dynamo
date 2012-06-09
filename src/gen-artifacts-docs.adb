@@ -18,12 +18,16 @@
 with Util.Files;
 with Util.Log.Loggers;
 with Util.Strings;
+with Util.Streams.Pipes;
+with Util.Streams.Texts;
+with Util.Processes;
 
 with Ada.Directories;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Ada.Characters.Handling;
 
+with Gen.Utils;
 package body Gen.Artifacts.Docs is
 
    use Util.Log;
@@ -193,29 +197,55 @@ package body Gen.Artifacts.Docs is
                          Docs : in out Doc_Maps.Map) is
       use Ada.Directories;
 
-      Filter  : constant Filter_Type := (Ordinary_File => True,
-                                         Directory     => True,
-                                         others        => False);
+      File_Filter  : constant Filter_Type := (Ordinary_File => True,
+                                              Directory     => False,
+                                              others        => False);
+      Dir_Filter  : constant Filter_Type := (Ordinary_File => False,
+                                             Directory     => True,
+                                             others        => False);
       Ent     : Ada.Directories.Directory_Entry_Type;
       Search  : Search_Type;
 
    begin
-
       Start_Search (Search, Directory => Path,
-                    Pattern => "*.ads", Filter => Filter);
+                    Pattern => "*", Filter => File_Filter);
       while More_Entries (Search) loop
          Get_Next_Entry (Search, Ent);
          declare
             Name      : constant String := Simple_Name (Ent);
             Full_Path : constant String := Ada.Directories.Full_Name (Ent);
             Doc       : File_Document;
+            Pos       : constant Natural := Util.Strings.Rindex (Name, '.');
          begin
-            Log.Debug ("Collect {0}", Full_Path);
+            if Gen.Utils.Is_File_Ignored (Name) or Pos = 0 then
+               Log.Debug ("File {0} ignored", Name);
 
-            Read_Ada_File (Full_Path, Doc);
+            else
+               Log.Debug ("Collect {0}", Full_Path);
 
-            Log.Info ("Adding document {0}", Name);
-            Docs.Include (Name, Doc);
+               if Name (Pos .. Name'Last) = ".ads" then
+                  Read_Ada_File (Full_Path, Doc);
+
+               elsif Name (Pos .. Name'Last) = ".xml" then
+                  Read_Xml_File (Full_Path, Doc);
+
+               end if;
+               Log.Info ("Adding document {0}", Name);
+               Docs.Include (Name, Doc);
+            end if;
+         end;
+      end loop;
+
+      Start_Search (Search, Directory => Path,
+                    Pattern => "*", Filter => Dir_Filter);
+      while More_Entries (Search) loop
+         Get_Next_Entry (Search, Ent);
+         declare
+            Name      : constant String := Simple_Name (Ent);
+         begin
+            if not Gen.Utils.Is_File_Ignored (Name) then
+               Scan_Files (Ada.Directories.Full_Name (Ent), Docs);
+            end if;
          end;
       end loop;
    end Scan_Files;
@@ -379,6 +409,29 @@ package body Gen.Artifacts.Docs is
       end if;
       Doc.Title := Unbounded.To_Unbounded_String (Fixed.Trim (Title (Pos .. Title'Last), Both));
    end Set_Title;
+
+   procedure Read_Xml_File (File : in String;
+                            Result : in out File_Document) is
+      Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
+      Reader  : Util.Streams.Texts.Reader_Stream;
+   begin
+      Pipe.Open ("xsltproc extract-doc.xsl " & File, Util.Processes.READ);
+      Reader.Initialize (Pipe'Unchecked_Access);
+
+      while not Reader.Is_Eof loop
+         declare
+            Line : Ada.Strings.Unbounded.Unbounded_String;
+         begin
+            Reader.Read_Line (Line, True);
+            Append_Line (Result, Ada.Strings.Unbounded.To_String (Line));
+         end;
+      end loop;
+      Pipe.Close;
+--        if Pipe.Get_Exit_Status /= 0 then
+--           Context.Error ("Command {0} exited with status {1}", Command,
+--                          Integer'Image (Pipe.Get_Exit_Status));
+--        end if;
+   end Read_Xml_File;
 
    --  ------------------------------
    --  Read the Ada specification file and collect the useful documentation.

@@ -162,6 +162,9 @@ private
    procedure Read_Ada_File (File   : in String;
                             Result : in out File_Document);
 
+   procedure Read_Xml_File (File   : in String;
+                            Result : in out File_Document);
+
    type Artifact is new Gen.Artifacts.Artifact with record
       A : Natural;
    end record;

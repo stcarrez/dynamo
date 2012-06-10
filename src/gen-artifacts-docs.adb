@@ -362,7 +362,9 @@ package body Gen.Artifacts.Docs is
             end if;
 
          when IN_CODE_SEPARATOR =>
-            if Line'Length > 0 and then Ada.Characters.Handling.Is_Letter (Line (Line'First)) then
+            if Line'Length > 0 and
+            then (Ada.Characters.Handling.Is_Letter (Line (Line'First))
+                  or Line (Line'First) = '=') then
                Append_Line (Doc, "}}}");
                Append_Line (Doc, "");
                Doc.State := IN_PARA;

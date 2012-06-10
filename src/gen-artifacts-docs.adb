@@ -59,7 +59,10 @@ package body Gen.Artifacts.Docs is
       Log.Info ("Using command: {0}", Command);
 
       Handler.Xslt_Command := Ada.Strings.Unbounded.To_Unbounded_String (Command);
-      Handler.Scan_Files (".", Docs);
+      Handler.Scan_Files ("src", Docs);
+      Handler.Scan_Files ("config", Docs);
+      Handler.Scan_Files ("db", Docs);
+      Handler.Scan_Files ("plugins", Docs);
       Generate (Docs, Context.Get_Result_Directory);
    end Prepare;
 

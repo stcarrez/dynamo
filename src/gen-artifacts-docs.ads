@@ -74,7 +74,7 @@ package Gen.Artifacts.Docs is
 
 private
 
-   type Line_Kind is (L_TEXT, L_SEE, L_INCLUDE);
+   type Line_Kind is (L_TEXT, L_LIST, L_SEE, L_INCLUDE);
 
    type Line_Type (Len : Natural) is record
       Kind    : Line_Kind := L_TEXT;

@@ -154,10 +154,20 @@ package body Gen.Artifacts.Docs is
          Path : constant String := Util.Files.Compose (Dir, Name);
          File : Ada.Text_IO.File_Type;
          Iter : Line_Vectors.Cursor := Doc.Lines.First;
+         Need_Newline : Boolean := False;
 
          procedure Write (Line : in Line_Type) is
          begin
-            Ada.Text_IO.Put_Line (File, Line.Content);
+            if Line.Kind = L_LIST then
+               Ada.Text_IO.Put (File, Line.Content);
+               Need_Newline := True;
+            else
+               if Need_Newline then
+                  Ada.Text_IO.New_Line (File);
+                  Need_Newline := False;
+               end if;
+               Ada.Text_IO.Put_Line (File, Line.Content);
+            end if;
          end Write;
 
       begin
@@ -290,7 +300,11 @@ package body Gen.Artifacts.Docs is
    procedure Append_Line (Doc  : in out File_Document;
                           Line : in String) is
    begin
-      Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_TEXT, Content => Line));
+      if Doc.State = IN_LIST then
+         Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_LIST, Content => Line));
+      else
+         Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_TEXT, Content => Line));
+      end if;
    end Append_Line;
 
    --  ------------------------------
@@ -371,7 +385,9 @@ package body Gen.Artifacts.Docs is
             end if;
 
          when IN_LIST =>
-            if Line'Length = 0 then
+            if Is_List (Line) then
+               Append_Line (Doc, "");
+            elsif Line'Length = 0 then
                Doc.State := IN_SEPARATOR;
             end if;
       end case;

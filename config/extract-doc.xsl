@@ -28,6 +28,17 @@
         </table>
       </xsl:if>
 
+      <xsl:if test="count(context-param) &gt; 0">
+        <h3>Configuration</h3>
+        <table width="100%">
+          <tr>
+            <th width="30%" align="left">Name</th>
+            <th width="70%" align="left">Description</th>
+          </tr>
+          <xsl:apply-templates select="context-param"/>
+        </table>
+      </xsl:if>
+
     </xsl:template>
 
     <xsl:template match="/hibernate-mapping">
@@ -42,6 +53,17 @@
       <tr>
         <td><xsl:value-of select="managed-bean-name"/></td>
         <td><xsl:value-of select="description"/></td>
+      </tr>
+    </xsl:template>
+
+    <xsl:template match="context-param">
+      <tr>
+        <td><xsl:value-of select="param-name"/></td>
+        <td><xsl:value-of select="description"/></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><tt><xsl:value-of select="param-value"/></tt></td>
       </tr>
     </xsl:template>
 

@@ -7,7 +7,6 @@
 
     <xsl:template match="/module">
       <xsl:if test="count(managed-bean) &gt; 0">
-        <h3>Ada Beans</h3>
         <table width="100%">
           <tr>
             <th width="30%" align="left">Name</th>

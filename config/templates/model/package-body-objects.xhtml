@@ -299,9 +299,8 @@
                    Query   : in ADO.SQL.Query'Class;
                    Found   : out Boolean) is
       Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
+          := Session.Create_Statement (Query, #{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
-      Stmt.Set_Parameters (Query);
       Stmt.Execute;
       if Stmt.Has_Elements then
          Object.Load (Stmt, Session);
@@ -521,9 +520,8 @@
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class) is
-      Stmt : ADO.Statements.Query_Statement := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
+      Stmt : ADO.Statements.Query_Statement := Session.Create_Statement (Query, #{fn:toUpperCase(table.type)}_TABLE'Access);
    begin
-      Stmt.Set_Parameters (Query);
       Stmt.Execute;
       #{fn:capitalize(table.type)}_Vectors.Clear (Object);
       while Stmt.Has_Elements loop

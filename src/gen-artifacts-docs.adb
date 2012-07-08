@@ -146,7 +146,6 @@ package body Gen.Artifacts.Docs is
       --  ------------------------------
       procedure Generate (Source : in String;
                           Doc    : in File_Document) is
-         pragma Unreferenced (Source);
 
          procedure Write (Line : in Line_Type);
 
@@ -231,6 +230,9 @@ package body Gen.Artifacts.Docs is
       Search  : Search_Type;
 
    begin
+      if not Ada.Directories.Exists (Path) then
+         return;
+      end if;
       Start_Search (Search, Directory => Path,
                     Pattern => "*", Filter => File_Filter);
       while More_Entries (Search) loop

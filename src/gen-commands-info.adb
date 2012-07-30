@@ -23,6 +23,7 @@ with Gen.Utils;
 with Gen.Utils.GNAT;
 with Gen.Model.Projects;
 
+with Util.Strings.Sets;
 with Util.Files;
 package body Gen.Commands.Info is
 
@@ -49,7 +50,8 @@ package body Gen.Commands.Info is
 
       procedure Print_Project (Project : in out Gen.Model.Projects.Root_Project_Definition);
 
-      List : Gen.Utils.String_List.Vector;
+      List  : Gen.Utils.String_List.Vector;
+      Names : Util.Strings.Sets.Set;
 
       procedure Collect_Directories (List : in Gen.Utils.String_List.Vector;
                                      Result : out Gen.Utils.String_List.Vector) is
@@ -144,9 +146,19 @@ package body Gen.Commands.Info is
             while Project_Vectors.Has_Element (Iter) loop
                Ref := Project_Vectors.Element (Iter);
                if Ref.Project /= null and then not Ref.Project.Modules.Is_Empty then
-                  Ada.Text_IO.Set_Col (Indent);
-                  Ada.Text_IO.Put_Line ("== " & Ada.Strings.Unbounded.To_String (Ref.Name));
-                  Print_Modules (Ref.Project.all, Indent + 4);
+                  declare
+                     Name : constant String := Ada.Strings.Unbounded.To_String (Ref.Name);
+                  begin
+                     Ada.Text_IO.Set_Col (Indent);
+                     if Names.Contains (Name) then
+                        Ada.Text_IO.Put_Line ("!! " & Name);
+                     else
+                        Names.Insert (Name);
+                        Ada.Text_IO.Put_Line ("== " & Name);
+                        Print_Modules (Ref.Project.all, Indent + 4);
+                        Names.Delete (Name);
+                     end if;
+                  end;
                end if;
                Project_Vectors.Next (Iter);
             end loop;

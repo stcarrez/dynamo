@@ -199,6 +199,11 @@ package body Gen.Model.Projects is
          Project_Vectors.Next (Iter);
       end loop;
 
+      if Project.Name = Into.Name then
+         Log.Debug ("Ignoring recursive reference to {0}", Into.Name);
+         return;
+      end if;
+
       Log.Debug ("Adding module {0} in {1}-{2}", Project.Name, Into.Name & "-" & Into.Path);
       P.Project := Project;
       P.Name    := Project.Name;
@@ -547,7 +552,7 @@ package body Gen.Model.Projects is
 
    --  ------------------------------
    --  Scan and read the possible modules used by the application.  Modules are stored in the
-   --  <b>modules</b> directory.  Each module is stored in its own directory and has its own
+   --  <b>plugins</b> directory.  Each module is stored in its own directory and has its own
    --  <b>dynamo.xml</b> file.
    --  ------------------------------
    procedure Read_Modules (Project : in out Project_Definition) is
@@ -636,6 +641,7 @@ package body Gen.Model.Projects is
                Dir    : constant String := Ada.Directories.Containing_Directory (Project_Path);
                Dynamo : constant String := Util.Files.Compose (Dir, "dynamo.xml");
             begin
+               Log.Debug ("Checking dynamo file {0}", Dynamo);
                if Ada.Directories.Exists (Dynamo) then
                   return Dynamo;
                end if;
@@ -751,6 +757,9 @@ package body Gen.Model.Projects is
             begin
                Log.Debug ("Checking project {0}", Item.Name);
                if Item.Project = null then
+                  Item.Project := Project.Find_Project_By_Name (To_String (Item.Name));
+               end if;
+               if Item.Project = null then
                   declare
                      Name   : constant String := To_String (Item.Name);
                      Path   : constant String := Util.Files.Compose (Install_Dir, Name);
@@ -767,7 +776,8 @@ package body Gen.Model.Projects is
                         Log.Error ("Project {0} not found in dynamo search path", Name);
                      end if;
                   end;
-               else
+               elsif not Item.Project.Recursive_Scan then
+                  Item.Project.Recursive_Scan := True;
                   Iterate (Item.Project.Modules, Update'Access);
                end if;
             end Update;

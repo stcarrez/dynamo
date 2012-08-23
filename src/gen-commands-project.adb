@@ -135,11 +135,17 @@ package body Gen.Commands.Project is
             Args   : GNAT.OS_Lib.Argument_List (1 .. 0);
             Status : Boolean;
          begin
-            Ada.Directories.Set_Directory (Generator.Get_Result_Directory);
-            Log.Info ("Executing {0}", Path.all);
-            GNAT.OS_Lib.Spawn (Path.all, Args, Status);
-            if not Status then
-               Generator.Error ("Execution of {0} failed", Path.all);
+            if Path = null then
+               Generator.Error ("The 'autoconf' tool was not found.  It is necessary to "
+                                & "generate the configure script.");
+               Generator.Error ("Install 'autoconf' or launch it manually.");
+            else
+               Ada.Directories.Set_Directory (Generator.Get_Result_Directory);
+               Log.Info ("Executing {0}", Path.all);
+               GNAT.OS_Lib.Spawn (Path.all, Args, Status);
+               if not Status then
+                  Generator.Error ("Execution of {0} failed", Path.all);
+               end if;
             end if;
          end;
       end;

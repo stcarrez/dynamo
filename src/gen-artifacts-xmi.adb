@@ -22,6 +22,7 @@ with Gen.Configs;
 with Gen.Utils;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
+with Gen.Model.XMI;
 
 with Util.Log.Loggers;
 with Util.Encoders.HMAC.SHA1;
@@ -46,7 +47,9 @@ package body Gen.Artifacts.XMI is
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.XMIls con");
 
-   type XMI_Fields is (FIELD_CLASS_NAME, FIELD_CLASS_ID, FIELD_STEREOTYPE,
+   type XMI_Fields is (FIELD_NAME,
+                       FIELD_ID,
+                       FIELD_CLASS_NAME, FIELD_CLASS_ID, FIELD_STEREOTYPE,
                        FIELD_ATTRIBUTE_NAME,
                        FIELD_PACKAGE_NAME,
                        FIELD_PACKAGE_END,
@@ -60,23 +63,36 @@ package body Gen.Artifacts.XMI is
                        FIELD_ASSOCIATION_NAME,
                        FIELD_ASSOCIATION_VISIBILITY,
                        FIELD_ASSOCIATION_END_ID,
-                       FIELD_TAG_DEFINITION_ID,
-                       FIELD_TAG_DEFINITION_NAME,
                        FIELD_OPERATION_NAME,
                        FIELD_COMMENT_NAME,
                        FIELD_COMMENT_BODY,
                        FIELD_COMMENT_CLASS_ID,
+
+                       FIELD_TAG_DEFINITION,
+
+                       FIELD_ENUMERATION,
+                       FIELD_ENUMERATION_LITERAL,
+
                        FIELD_TAGGED_VALUE_TYPE,
                        FIELD_TAGGED_VALUE_VALUE);
 
    type XMI_Info is record
       Indent : Natural := 1;
+      Class_Element    : Gen.Model.XMI.Class_Element_Access;
       Class_Name       : Util.Beans.Objects.Object;
       Class_Visibility : Util.Beans.Objects.Object;
       Class_Id         : Util.Beans.Objects.Object;
 
+      Attr_Name          : Util.Beans.Objects.Object;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
+
+      Name               : Util.Beans.Objects.Object;
+      Id                 : Util.Beans.Objects.Object;
+
+      Data_Type          : Gen.Model.XMI.Data_Type_Element_Access;
+      Enumeration        : Gen.Model.XMI.Enum_Element_Access;
+      Tag_Definition     : Gen.Model.XMI.Tag_Definition_Access;
    end record;
    type XMI_Access is access all XMI_Info;
 
@@ -89,7 +105,14 @@ package body Gen.Artifacts.XMI is
                          Value : in Util.Beans.Objects.Object) is
    begin
       case Field is
+         when FIELD_NAME =>
+            P.Name := Value;
+
+         when FIELD_ID =>
+            P.Id := Value;
+
       when FIELD_CLASS_NAME =>
+         P.Class_Element := new Gen.Model.XMI.Class_Element;
          P.Class_Name := Value;
 
       when FIELD_CLASS_VISIBILITY =>
@@ -110,17 +133,11 @@ package body Gen.Artifacts.XMI is
       when FIELD_MULTIPLICITY_UPPER =>
          P.Multiplicity_Upper := Util.Beans.Objects.To_Integer (Value);
 
-      when FIELD_STEREOTYPE =>
-         Print (P.Indent, "<<" & Util.Beans.Objects.To_String (Value) & ">>");
-
-      when FIELD_DATA_TYPE =>
-         Print (P.Indent, "  data-type:" & Util.Beans.Objects.To_String (Value));
-
       when FIELD_ENUM_DATA_TYPE =>
          Print (P.Indent, "  enum-type:" & Util.Beans.Objects.To_String (Value));
 
       when FIELD_OPERATION_NAME =>
-         Print (P.Indent, "operation:" & Util.Beans.Objects.To_String (Value));
+         P.Operation_Name := Value;
 
       when FIELD_ASSOCIATION_NAME =>
          Print (P.Indent, "association " & Util.Beans.Objects.To_String (Value));
@@ -147,12 +164,6 @@ package body Gen.Artifacts.XMI is
       when FIELD_TAGGED_VALUE_TYPE =>
          Print (P.Indent, "tag-type: " & Util.Beans.Objects.To_String (Value));
 
-      when FIELD_TAG_DEFINITION_NAME =>
-         Print (P.Indent, "Tag: " & Util.Beans.Objects.To_String (Value));
-
-      when FIELD_TAG_DEFINITION_ID =>
-         Print (P.Indent, "  tag-id: " & Util.Beans.Objects.To_String (Value));
-
       when FIELD_COMMENT_NAME =>
          Print (P.Indent, "Comment: " & Util.Beans.Objects.To_String (Value));
 
@@ -161,6 +172,31 @@ package body Gen.Artifacts.XMI is
 
       when FIELD_COMMENT_CLASS_ID =>
          Print (P.Indent, "   for-id: " & Util.Beans.Objects.To_String (Value));
+
+            --  Data type mapping.
+         when FIELD_DATA_TYPE =>
+            P.Data_Type := new Gen.Model.XMI.Data_Type_Element;
+            P.Data_Type.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
+            P.Data_Type.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+
+            --  Enumeration mapping.
+         when FIELD_ENUMERATION =>
+            P.Enumeration := new Gen.Model.XMI.Enum_Element;
+            P.Enumeration.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+
+         when FIELD_ENUMERATION_LITERAL =>
+            P.Enumeration.Add_Literal (P.Id, P.Name);
+
+         when FIELD_STEREOTYPE =>
+            P.Stereotype := new Gen.Model.XMI.Stereotype_Element;
+            P.Stereotype.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
+            P.Stereotype.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+
+         when FIELD_TAG_DEFINITION =>
+            P.Tag_Definition := new Gen.Model.XMI.Tag_Definition_Element;
+            P.Tag_Definition.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
+            P.Tag_Definition.XMI_ID := Util.Beans.Objects.To_Unbounded_String (P.Id);
+
       end case;
    end Set_Member;
 
@@ -181,130 +217,6 @@ package body Gen.Artifacts.XMI is
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
-
-      procedure Register_Column (Table  : in out Query_Definition;
-                                 Column : in DOM.Core.Node);
-
-      procedure Register_Columns (Table : in out Query_Definition);
-
-      procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
-                                  Node  : in DOM.Core.Node);
-
-      procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
-                                  Node  : in DOM.Core.Node);
-
-      procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
-                                Node  : in DOM.Core.Node);
-
-      Hash : Unbounded_String;
-
-      --  ------------------------------
-      --  Register the column definition in the table
-      --  ------------------------------
-      procedure Register_Column (Table  : in out Query_Definition;
-                                 Column : in DOM.Core.Node) is
-         Name  : constant Unbounded_String := Gen.Model.Get_Attribute (Column, "name");
-         C     : constant Column_Definition_Access := new Column_Definition;
-      begin
-         C.Node := Column;
-         C.Number := Table.Members.Get_Count;
-         Table.Members.Append (C);
-
-         C.Type_Name := To_Unbounded_String (Get_Normalized_Type (Column, "type"));
-
-         C.Is_Inserted := False;
-         C.Is_Updated  := False;
-         C.Not_Null    := False;
-         C.Unique      := False;
-
-         --  Construct the hash for this column mapping.
-         Append (Hash, ",type=");
-         Append (Hash, C.Type_Name);
-         Append (Hash, ",name=");
-         Append (Hash, Name);
-      end Register_Column;
-
-      --  ------------------------------
-      --  Register all the columns defined in the table
-      --  ------------------------------
-      procedure Register_Columns (Table : in out Query_Definition) is
-         procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Query_Definition,
-                                                           Process => Register_Column);
-      begin
-         Log.Debug ("Register columns from query {0}", Table.Name);
-
-         Iterate (Table, Table.Node, "property");
-      end Register_Columns;
-
-      --  ------------------------------
-      --  Register a new class definition in the model.
-      --  ------------------------------
-      procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
-                                  Node  : in DOM.Core.Node) is
-         Name  : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "name");
-      begin
-         Query.Node := Node;
-         Query.Set_Table_Name (Query.Get_Attribute ("name"));
-
-         if Name /= "" then
-            Query.Name := Name;
-         else
-            Query.Name := To_Unbounded_String (Gen.Utils.Get_Query_Name (Path));
-         end if;
-
-         --  Construct the hash for this column mapping.
-         Append (Hash, "class=");
-         Append (Hash, Query.Name);
-
-         Log.Debug ("Register query {0} with type {0}", Query.Name, Query.Type_Name);
-         Register_Columns (Query);
-      end Register_Mapping;
-
-      --  ------------------------------
-      --  Register a new query.
-      --  ------------------------------
-      procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
-                                Node  : in DOM.Core.Node) is
-         C    : constant Column_Definition_Access := new Column_Definition;
-      begin
-         C.Node := Node;
-         C.Number := Query.Queries.Get_Count;
-         Query.Queries.Append (C);
-      end Register_Query;
-
-      --  ------------------------------
-      --  Register a model mapping
-      --  ------------------------------
-      procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
-                                  Node  : in DOM.Core.Node) is
-         procedure Iterate_Mapping is
-           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Queries.Query_Definition,
-                                        Process => Register_Mapping);
-         procedure Iterate_Query is
-           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Queries.Query_Definition,
-                                        Process => Register_Query);
-
-         Table : constant Query_Definition_Access := new Query_Definition;
-         Pkg   : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "package");
-      begin
-         Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
-         Table.Pkg_Name  := Pkg;
-         Table.Node      := Node;
-         Iterate_Mapping (Query_Definition (Table.all), Node, "class");
-         Iterate_Query (Query_Definition (Table.all), Node, "query");
-         if Length (Table.Pkg_Name) = 0 then
-            Context.Error ("Missing or empty package attribute");
-         else
-            Model.Register_Query (Table);
-         end if;
-
-         Log.Info ("Query hash for {0} is {1}", Path, To_String (Hash));
-         Table.Sha1 := Util.Encoders.HMAC.SHA1.Sign (Key  => "ADO.Queries",
-                                                     Data => To_String (Hash));
-      end Register_Mapping;
-
-      procedure Iterate is new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
-                                                        Process => Register_Mapping);
 
    begin
       Log.Debug ("Initializing query artifact for the configuration");
@@ -390,4 +302,41 @@ begin
    XMI_Mapping.Add_Mapping ("Package/*/Comment/Comment.annotatedElement/*/@xmi.idref",
                             FIELD_COMMENT_CLASS_ID);
 
+   --  Tag definition mapping.
+   XMI_Mapping.Add_Mapping ("Package/*/TagDefinition/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("Package/*/TagDefinition/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("Package/*/TagDefinition", FIELD_TAG_DEFINITION);
+   XMI_Mapping.Add_Mapping ("TagDefinition/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("TagDefinition/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("TagDefinition", FIELD_TAG_DEFINITION);
+
+   --  Stereotype mapping.
+   XMI_Mapping.Add_Mapping ("Package/*/Stereotype/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("Package/*/Stereotype/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("Package/*/Stereotype", FIELD_STEREOTYPE);
+   XMI_Mapping.Add_Mapping ("Stereotype/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("Stereotype/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("Stereotype", FIELD_STEREOTYPE);
+
+   --  Enumeration mapping.
+   XMI_Mapping.Add_Mapping ("Package/*/Enumeration/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("Package/*/Enumeration/@name", FIELD_ENUMERATION);
+   XMI_Mapping.Add_Mapping ("Package/*/Enumeration/Enumeration.literal/EnumerationLiteral/@xmi.id",
+                            FIELD_ID);
+   XMI_Mapping.Add_Mapping ("Package/*/Enumeration/Enumeration.literal/EnumerationLiteral/@name",
+                            FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("Enumeration/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("Enumeration/@name", FIELD_ENUMERATION);
+   XMI_Mapping.Add_Mapping ("Enumeration/Enumeration.literal/EnumerationLiteral/@xmi.id",
+                            FIELD_ID);
+   XMI_Mapping.Add_Mapping ("Enumeration/Enumeration.literal/EnumerationLiteral/@name",
+                            FIELD_NAME);
+
+   --  Data type mapping.
+   XMI_Mapping.Add_Mapping ("Package/*/DataType/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("Package/*/DataType/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("Package/*/DataType", FIELD_DATA_TYPE);
+   XMI_Mapping.Add_Mapping ("DataType/@xmi", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("DataType/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("DataType", FIELD_DATA_TYPE);
 end Gen.Artifacts.XMI;

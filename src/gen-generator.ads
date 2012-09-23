@@ -34,6 +34,7 @@ with Gen.Artifacts.Hibernate;
 with Gen.Artifacts.Query;
 with Gen.Artifacts.Mappings;
 with Gen.Artifacts.Distribs;
+with Gen.Artifacts.XMI;
 package Gen.Generator is
 
    --  A fatal error that prevents the generator to proceed has occurred.
@@ -232,6 +233,9 @@ private
 
       --  The distribution artifact.
       Distrib   : Gen.Artifacts.Distribs.Artifact;
+
+      --  Ada generation from UML-XMI models.
+      XMI       : Gen.Artifacts.XMI.Artifact;
 
       --  The list of templates that must be generated.
       Templates : Template_Map.Map;

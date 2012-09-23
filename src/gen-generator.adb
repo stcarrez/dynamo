@@ -630,7 +630,7 @@ package body Gen.Generator is
       Read           : Input_Sources.File.File_Input;
       My_Tree_Reader : DOM.Readers.Tree_Reader;
       Name_Start     : Natural;
-
+      Ext            : constant String := Ada.Directories.Extension (File);
    begin
       --  Before loading a model file, we should know the type mappings.
       --  Load them first if needed.
@@ -639,6 +639,10 @@ package body Gen.Generator is
       end if;
 
       Log.Info ("Reading model file '{0}'", File);
+      if Ext = "xmi" or Ext = "XMI" then
+         H.XMI.Read_Model (File);
+         return;
+      end if;
 
       --  Base file name should be used as the public Id
       Name_Start := File'Last;
@@ -759,6 +763,9 @@ package body Gen.Generator is
       if H.Distrib.Is_Initialized then
          H.Distrib.Prepare (Model => H.Model, Context => H);
       end if;
+      if H.XMI.Is_Initialized then
+         H.XMI.Prepare (Model => H.Model, Context => H);
+      end if;
    end Prepare;
 
    --  ------------------------------
@@ -775,6 +782,9 @@ package body Gen.Generator is
       end if;
       if H.Distrib.Is_Initialized then
          H.Distrib.Finish (Model => H.Model, Project => H.Project, Context => H);
+      end if;
+      if H.XMI.Is_Initialized then
+         H.XMI.Finish (Model => H.Model, Project => H.Project, Context => H);
       end if;
    end Finish;
 

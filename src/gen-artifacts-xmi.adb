@@ -25,7 +25,6 @@ with Gen.Model.Queries;
 with Gen.Model.XMI;
 
 with Util.Log.Loggers;
-with Util.Encoders.HMAC.SHA1;
 
 with Util.Beans;
 with Util.Beans.Objects;
@@ -45,12 +44,21 @@ package body Gen.Artifacts.XMI is
    use type DOM.Core.Node;
    use Util.Log;
 
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.XMIls con");
+   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.XMI");
+
+   use type Gen.Model.XMI.Package_Element_Access;
 
    type XMI_Fields is (FIELD_NAME,
                        FIELD_ID,
+                       FIELD_ID_REF,
+                       FIELD_VALUE,
+
                        FIELD_CLASS_NAME, FIELD_CLASS_ID, FIELD_STEREOTYPE,
                        FIELD_ATTRIBUTE_NAME,
+                       FIELD_ATTRIBUTE_ID,
+                       FIELD_ATTRIBUTE,
+
+                       FIELD_PACKAGE_ID,
                        FIELD_PACKAGE_NAME,
                        FIELD_PACKAGE_END,
                        FIELD_CLASS_VISIBILITY,
@@ -64,41 +72,59 @@ package body Gen.Artifacts.XMI is
                        FIELD_ASSOCIATION_VISIBILITY,
                        FIELD_ASSOCIATION_END_ID,
                        FIELD_OPERATION_NAME,
-                       FIELD_COMMENT_NAME,
-                       FIELD_COMMENT_BODY,
-                       FIELD_COMMENT_CLASS_ID,
+
+                       FIELD_COMMENT,
 
                        FIELD_TAG_DEFINITION,
+                       FIELD_TAGGED_VALUE,
 
                        FIELD_ENUMERATION,
-                       FIELD_ENUMERATION_LITERAL,
-
-                       FIELD_TAGGED_VALUE_TYPE,
-                       FIELD_TAGGED_VALUE_VALUE);
+                       FIELD_ENUMERATION_LITERAL);
 
    type XMI_Info is record
+      Elements           : Gen.Model.XMI.Model_Map_Access;
       Indent : Natural := 1;
       Class_Element    : Gen.Model.XMI.Class_Element_Access;
       Class_Name       : Util.Beans.Objects.Object;
       Class_Visibility : Util.Beans.Objects.Object;
       Class_Id         : Util.Beans.Objects.Object;
 
-      Attr_Name          : Util.Beans.Objects.Object;
+      Package_Element    : Gen.Model.XMI.Package_Element_Access;
+      Package_Id         : Util.Beans.Objects.Object;
+
+      Attr_Id            : Util.Beans.Objects.Object;
+      Attr_Element       : Gen.Model.XMI.Attribute_Element_Access;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
 
       Name               : Util.Beans.Objects.Object;
       Id                 : Util.Beans.Objects.Object;
+      Ref_Id             : Util.Beans.Objects.Object;
+      Value              : Util.Beans.Objects.Object;
 
       Data_Type          : Gen.Model.XMI.Data_Type_Element_Access;
       Enumeration        : Gen.Model.XMI.Enum_Element_Access;
-      Tag_Definition     : Gen.Model.XMI.Tag_Definition_Access;
+      Tag_Definition     : Gen.Model.XMI.Tag_Definition_Element_Access;
+
+      Stereotype         : Gen.Model.XMI.Stereotype_Element_Access;
+      Tagged_Value       : Gen.Model.XMI.Tagged_Value_Access;
+      Comment            : Gen.Model.XMI.Comment_Element_Access;
    end record;
    type XMI_Access is access all XMI_Info;
 
    procedure Set_Member (P     : in out XMI_Info;
                          Field : in XMI_Fields;
                          Value : in Util.Beans.Objects.Object);
+
+   procedure Add_Element (P    : in out XMI_Info;
+                          Item : in Gen.Model.XMI.Model_Element_Access) is
+   begin
+      Item.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
+      Item.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+      P.Elements.Insert (Item.Name, Item);
+      P.Id   := Util.Beans.Objects.Null_Object;
+      P.Name := Util.Beans.Objects.Null_Object;
+   end Add_Element;
 
    procedure Set_Member (P     : in out XMI_Info;
                          Field : in XMI_Fields;
@@ -111,93 +137,138 @@ package body Gen.Artifacts.XMI is
          when FIELD_ID =>
             P.Id := Value;
 
-      when FIELD_CLASS_NAME =>
-         P.Class_Element := new Gen.Model.XMI.Class_Element;
-         P.Class_Name := Value;
+         when FIELD_ID_REF =>
+            P.Ref_Id := Value;
 
-      when FIELD_CLASS_VISIBILITY =>
-         P.Class_Visibility := Value;
+         when FIELD_VALUE =>
+            P.Value := Value;
 
-      when FIELD_CLASS_ID =>
-         P.Class_Id := Value;
+         when FIELD_CLASS_NAME =>
+            P.Class_Element := new Gen.Model.XMI.Class_Element;
+            P.Class_Element.Set_Name (Value);
 
-      when FIELD_CLASS_END =>
-         P.Indent := P.Indent - 2;
+         when FIELD_CLASS_VISIBILITY =>
+            P.Class_Visibility := Value;
 
-      when FIELD_ATTRIBUTE_NAME =>
-         P.Attr_Name := Value;
+         when FIELD_CLASS_ID =>
+            P.Class_Id := Value;
 
-      when FIELD_MULTIPLICITY_LOWER =>
-         P.Multiplicity_Lower := Util.Beans.Objects.To_Integer (Value);
+         when FIELD_CLASS_END =>
+            P.Class_Element.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Class_Id);
+            P.Elements.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
 
-      when FIELD_MULTIPLICITY_UPPER =>
-         P.Multiplicity_Upper := Util.Beans.Objects.To_Integer (Value);
+         when FIELD_ATTRIBUTE_ID =>
+            P.Attr_Id := Value;
 
-      when FIELD_ENUM_DATA_TYPE =>
-         Print (P.Indent, "  enum-type:" & Util.Beans.Objects.To_String (Value));
+         when FIELD_ATTRIBUTE_NAME =>
+            P.Attr_Element := new Gen.Model.XMI.Attribute_Element;
+            P.Attr_Element.Set_Name (Value);
+
+         when FIELD_ATTRIBUTE =>
+            P.Attr_Element.Set_XMI_Id (P.Attr_Id);
+            P.Elements.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
+            P.Attr_Element := null;
+
+         when FIELD_MULTIPLICITY_LOWER =>
+            P.Multiplicity_Lower := Util.Beans.Objects.To_Integer (Value);
+
+         when FIELD_MULTIPLICITY_UPPER =>
+            P.Multiplicity_Upper := Util.Beans.Objects.To_Integer (Value);
+
+         when FIELD_ENUM_DATA_TYPE =>
+            --           Print (P.Indent, "  enum-type:" & Util.Beans.Objects.To_String (Value));
+            null;
 
       when FIELD_OPERATION_NAME =>
-         P.Operation_Name := Value;
+            --              P.Operation_Name := Value;
+            null;
+
 
       when FIELD_ASSOCIATION_NAME =>
-         Print (P.Indent, "association " & Util.Beans.Objects.To_String (Value));
+            --           Print (P.Indent, "association " & Util.Beans.Objects.To_String (Value));
+            null;
 
       when FIELD_ASSOCIATION_VISIBILITY =>
-         Print (P.Indent, "visibility: " & Util.Beans.Objects.To_String (Value));
+            --           Print (P.Indent, "visibility: " & Util.Beans.Objects.To_String (Value));
+            null;
 
       when FIELD_ASSOCIATION_AGGREGATION =>
-         Print (P.Indent, "   aggregate: " & Util.Beans.Objects.To_String (Value));
+            --           Print (P.Indent, "   aggregate: " & Util.Beans.Objects.To_String (Value));
+            null;
 
       when FIELD_ASSOCIATION_END_ID =>
-         Print (P.Indent, "   end-id: " & Util.Beans.Objects.To_String (Value));
+            --           Print (P.Indent, "   end-id: " & Util.Beans.Objects.To_String (Value));
+            null;
 
-      when FIELD_PACKAGE_NAME =>
-         Print (P.Indent, "package " & Util.Beans.Objects.To_String (Value));
-         P.Indent := P.Indent + 2;
+         when FIELD_PACKAGE_ID =>
+            P.Package_Id := Value;
 
-      when FIELD_PACKAGE_END =>
-         P.Indent := P.Indent - 2;
+         when FIELD_PACKAGE_NAME =>
+            if P.Package_Element /= null then
+               P.Package_Element.Set_XMI_Id (P.Package_Id);
+            end if;
+            P.Package_Element := new Gen.Model.XMI.Package_Element;
+            P.Package_Element.Set_Name (Value);
 
-      when FIELD_TAGGED_VALUE_VALUE =>
-         Print (P.Indent, "tag-value: " & Util.Beans.Objects.To_String (Value));
+         when FIELD_PACKAGE_END =>
+            P.Package_Element.Set_XMI_Id (P.Package_Id);
+            P.Elements.Insert (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
+            P.Indent := P.Indent - 2;
 
-      when FIELD_TAGGED_VALUE_TYPE =>
-         Print (P.Indent, "tag-type: " & Util.Beans.Objects.To_String (Value));
-
-      when FIELD_COMMENT_NAME =>
-         Print (P.Indent, "Comment: " & Util.Beans.Objects.To_String (Value));
-
-      when FIELD_COMMENT_BODY =>
-         Print (P.Indent, "   text: " & Util.Beans.Objects.To_String (Value));
-
-      when FIELD_COMMENT_CLASS_ID =>
-         Print (P.Indent, "   for-id: " & Util.Beans.Objects.To_String (Value));
+         when FIELD_TAGGED_VALUE =>
+            P.Tagged_Value := new Gen.Model.XMI.Tagged_Value_Element;
+            P.Tagged_Value.Value  := Util.Beans.Objects.To_Unbounded_String (P.Value);
+            P.Tagged_Value.Ref_Id := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
+            P.Tagged_Value.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            P.Elements.Insert (P.Tagged_Value.XMI_Id, P.Tagged_Value.all'Access);
 
             --  Data type mapping.
          when FIELD_DATA_TYPE =>
             P.Data_Type := new Gen.Model.XMI.Data_Type_Element;
-            P.Data_Type.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
+            P.Data_Type.Set_Name (P.Name);
             P.Data_Type.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            P.Elements.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
 
             --  Enumeration mapping.
          when FIELD_ENUMERATION =>
             P.Enumeration := new Gen.Model.XMI.Enum_Element;
-            P.Enumeration.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+            P.Enumeration.Set_Name (Value);
+            P.Enumeration.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            P.Elements.Insert (P.Enumeration.XMI_Id, P.Enumeration.all'Access);
 
          when FIELD_ENUMERATION_LITERAL =>
             P.Enumeration.Add_Literal (P.Id, P.Name);
 
+            -- Stereotype mapping.
          when FIELD_STEREOTYPE =>
-            P.Stereotype := new Gen.Model.XMI.Stereotype_Element;
-            P.Stereotype.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
-            P.Stereotype.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            if not Util.Beans.Objects.Is_Null (P.Id) then
+               declare
+                  S : constant Gen.Model.XMI.Stereotype_Element_Access := new Gen.Model.XMI.Stereotype_Element;
+               begin
+                  Add_Element (P, S.all'Access);
+               end;
+            end if;
 
+            --  Tag definition mapping.
          when FIELD_TAG_DEFINITION =>
             P.Tag_Definition := new Gen.Model.XMI.Tag_Definition_Element;
-            P.Tag_Definition.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
-            P.Tag_Definition.XMI_ID := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            P.Tag_Definition.Set_Name (P.Name);
+            P.Tag_Definition.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            P.Elements.Insert (P.Tag_Definition.XMI_Id, P.Tag_Definition.all'Access);
+
+            --  Comment mapping.
+         when FIELD_COMMENT =>
+            P.Comment := new Gen.Model.XMI.Comment_Element;
+            P.Comment.Set_Name (P.Name);
+            P.Comment.XMI_Id  := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            P.Comment.Comment := Util.Beans.Objects.To_Unbounded_String (P.Value);
+            P.Comment.Ref_Id  := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
+            P.Elements.Insert (P.Comment.XMI_Id, P.Comment.all'Access);
 
       end case;
+   exception
+      when others =>
+         null;
    end Set_Member;
 
    package XMI_Mapper is
@@ -205,6 +276,8 @@ package body Gen.Artifacts.XMI is
                                                Element_Type_Access => XMI_Access,
                                                Fields              => XMI_Fields,
                                                Set_Member          => Set_Member);
+
+   type Mapper is new XMI_Mapper.Mapper with null record;
 
    XMI_Mapping        : aliased XMI_Mapper.Mapper;
 
@@ -222,7 +295,7 @@ package body Gen.Artifacts.XMI is
       Log.Debug ("Initializing query artifact for the configuration");
 
       Gen.Artifacts.Artifact (Handler).Initialize (Path, Node, Model, Context);
-      Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "query-mapping");
+--        Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "query-mapping");
    end Initialize;
 
    --  ------------------------------
@@ -244,99 +317,110 @@ package body Gen.Artifacts.XMI is
       end if;
    end Prepare;
 
+   --  Read the UML/XMI model file.
+   procedure Read_Model (Handler : in out Artifact;
+                         File    : in String) is
+      Info   : aliased XMI_Info;
+      Reader : Util.Serialize.IO.XML.Parser;
+      Nodes  : aliased Gen.Model.XMI.Model_Map.Map;
+   begin
+      Info.Elements := Nodes'Unchecked_Access;
+      Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
+      Reader.Dump (Log);
+      XMI_Mapper.Set_Context (Reader, Info'Unchecked_Access);
+      Reader.Parse (File);
+      Gen.Model.XMI.Dump (Nodes);
+   end Read_Model;
+
 begin
 
    --  Define the XMI mapping.
-   XMI_Mapping.Add_Mapping ("Package/*/@name",
+   XMI_Mapping.Add_Mapping ("**/Package/@name",
                             FIELD_PACKAGE_NAME);
-   XMI_Mapping.Add_Mapping ("Package",
+   XMI_Mapping.Add_Mapping ("**/Package/@xmi.id",
+                            FIELD_PACKAGE_NAME);
+   XMI_Mapping.Add_Mapping ("**/Package",
                             FIELD_PACKAGE_END);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/@name",
+--
+--     XMI_Mapping.Add_Mapping ("Package/*/Package/@name",
+--                              FIELD_PACKAGE_NAME);
+--     XMI_Mapping.Add_Mapping ("Package/*/Package/@xmi.id",
+--                              FIELD_PACKAGE_NAME);
+--     XMI_Mapping.Add_Mapping ("Package*/Package/",
+--                              FIELD_PACKAGE_END);
+
+
+   XMI_Mapping.Add_Mapping ("**/Class/@name",
                             FIELD_CLASS_NAME);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/@xmi.id",
+   XMI_Mapping.Add_Mapping ("**/Class/@xmi.id",
                             FIELD_CLASS_ID);
-   XMI_Mapping.Add_Mapping ("Package/*/Class",
+   XMI_Mapping.Add_Mapping ("**/Class",
                             FIELD_CLASS_END);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/@visibility",
+   XMI_Mapping.Add_Mapping ("**/Class/@visibility",
                             FIELD_CLASS_VISIBILITY);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Stereotype/@href",
-                            FIELD_STEREOTYPE);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/@name",
+
+   --  Class attribute mapping.
+   XMI_Mapping.Add_Mapping ("**/Attribute/@name",
                             FIELD_ATTRIBUTE_NAME);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/Stereotype/@href",
-                            FIELD_STEREOTYPE);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/TaggedValue.dataValue",
-                            FIELD_TAGGED_VALUE_VALUE);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/TaggedValue.dataValue/*/TagDefinition/@href",
-                            FIELD_TAGGED_VALUE_TYPE);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/DataType/@href",
-                            FIELD_DATA_TYPE);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/Enumeration/@href",
-                            FIELD_ENUM_DATA_TYPE);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/TaggedValue.dataValue",
-                            FIELD_TAGGED_VALUE_VALUE);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/TaggedValue.type/*/TagDefinition/@href",
-                            FIELD_TAGGED_VALUE_TYPE);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@lower",
-                            FIELD_MULTIPLICITY_LOWER);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@upper",
-                            FIELD_MULTIPLICITY_UPPER);
-   XMI_Mapping.Add_Mapping ("Package/*/Class/*/Operation/@name",
-                            FIELD_OPERATION_NAME);
-   XMI_Mapping.Add_Mapping ("Package/*/Association/*/@name",
-                            FIELD_ASSOCIATION_NAME);
-   XMI_Mapping.Add_Mapping ("Package/*/Association/*/@visibility",
-                            FIELD_ASSOCIATION_VISIBILITY);
-   XMI_Mapping.Add_Mapping ("Package/*/Association/*/@aggregation",
-                            FIELD_ASSOCIATION_AGGREGATION);
-   XMI_Mapping.Add_Mapping ("Package/*/Association/*/AssociationEnd.participant/Class/@xmi.idref",
-                            FIELD_ASSOCIATION_END_ID);
-   XMI_Mapping.Add_Mapping ("TagDefinition/@name",
-                            FIELD_TAG_DEFINITION_NAME);
-   XMI_Mapping.Add_Mapping ("TagDefinition/@xm.id",
-                            FIELD_TAG_DEFINITION_ID);
-   XMI_Mapping.Add_Mapping ("Package/*/Comment/@name",
-                            FIELD_COMMENT_NAME);
-   XMI_Mapping.Add_Mapping ("Package/*/Comment/@body",
-                            FIELD_COMMENT_BODY);
-   XMI_Mapping.Add_Mapping ("Package/*/Comment/Comment.annotatedElement/*/@xmi.idref",
-                            FIELD_COMMENT_CLASS_ID);
+   XMI_Mapping.Add_Mapping ("**/Attribute/@xmi.id",
+                            FIELD_ATTRIBUTE_ID);
+   XMI_Mapping.Add_Mapping ("**/Attribute",
+                            FIELD_ATTRIBUTE);
+
+--     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/Stereotype/@href",
+--                              FIELD_STEREOTYPE);
+--     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/DataType/@href",
+--                              FIELD_DATA_TYPE);
+--     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/Enumeration/@href",
+--                              FIELD_ENUM_DATA_TYPE);
+--     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@lower",
+--                              FIELD_MULTIPLICITY_LOWER);
+--     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@upper",
+--                              FIELD_MULTIPLICITY_UPPER);
+--     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Operation/@name",
+--                              FIELD_OPERATION_NAME);
+--     XMI_Mapping.Add_Mapping ("Package/*/Association/*/@name",
+--                              FIELD_ASSOCIATION_NAME);
+--     XMI_Mapping.Add_Mapping ("Package/*/Association/*/@visibility",
+--                              FIELD_ASSOCIATION_VISIBILITY);
+--     XMI_Mapping.Add_Mapping ("Package/*/Association/*/@aggregation",
+--                              FIELD_ASSOCIATION_AGGREGATION);
+--     XMI_Mapping.Add_Mapping ("Package/*/Association/*/AssociationEnd.participant/Class/@xmi.idref",
+--                              FIELD_ASSOCIATION_END_ID);
+
+   --  Comment mapping.
+   XMI_Mapping.Add_Mapping ("**/Comment/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/Comment/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/Comment/@body", FIELD_VALUE);
+   XMI_Mapping.Add_Mapping ("**/Comment/Comment/Class/xmi.idref", FIELD_ID_REF);
+
+   --  Tagged value mapping.
+   XMI_Mapping.Add_Mapping ("**/TaggedValue/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.dataValue", FIELD_VALUE);
+   XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/@xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/TaggedValue", FIELD_TAGGED_VALUE);
 
    --  Tag definition mapping.
-   XMI_Mapping.Add_Mapping ("Package/*/TagDefinition/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("Package/*/TagDefinition/@name", FIELD_NAME);
-   XMI_Mapping.Add_Mapping ("Package/*/TagDefinition", FIELD_TAG_DEFINITION);
-   XMI_Mapping.Add_Mapping ("TagDefinition/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("TagDefinition/@name", FIELD_NAME);
-   XMI_Mapping.Add_Mapping ("TagDefinition", FIELD_TAG_DEFINITION);
+   XMI_Mapping.Add_Mapping ("**/TagDefinition/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/TagDefinition/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/TagDefinition", FIELD_TAG_DEFINITION);
 
    --  Stereotype mapping.
-   XMI_Mapping.Add_Mapping ("Package/*/Stereotype/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("Package/*/Stereotype/@name", FIELD_NAME);
-   XMI_Mapping.Add_Mapping ("Package/*/Stereotype", FIELD_STEREOTYPE);
-   XMI_Mapping.Add_Mapping ("Stereotype/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("Stereotype/@name", FIELD_NAME);
-   XMI_Mapping.Add_Mapping ("Stereotype", FIELD_STEREOTYPE);
+--     XMI_Mapping.Add_Mapping ("Stereotype/@href", FIELD_STEREOTYPE_REF);
+   XMI_Mapping.Add_Mapping ("**/Stereotype/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/Stereotype/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/Stereotype", FIELD_STEREOTYPE);
 
    --  Enumeration mapping.
-   XMI_Mapping.Add_Mapping ("Package/*/Enumeration/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("Package/*/Enumeration/@name", FIELD_ENUMERATION);
-   XMI_Mapping.Add_Mapping ("Package/*/Enumeration/Enumeration.literal/EnumerationLiteral/@xmi.id",
+   XMI_Mapping.Add_Mapping ("**/Enumeration/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/Enumeration/@name", FIELD_ENUMERATION);
+   XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral/@xmi.id",
                             FIELD_ID);
-   XMI_Mapping.Add_Mapping ("Package/*/Enumeration/Enumeration.literal/EnumerationLiteral/@name",
-                            FIELD_NAME);
-   XMI_Mapping.Add_Mapping ("Enumeration/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("Enumeration/@name", FIELD_ENUMERATION);
-   XMI_Mapping.Add_Mapping ("Enumeration/Enumeration.literal/EnumerationLiteral/@xmi.id",
-                            FIELD_ID);
-   XMI_Mapping.Add_Mapping ("Enumeration/Enumeration.literal/EnumerationLiteral/@name",
+   XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral/@name",
                             FIELD_NAME);
 
    --  Data type mapping.
-   XMI_Mapping.Add_Mapping ("Package/*/DataType/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("Package/*/DataType/@name", FIELD_NAME);
-   XMI_Mapping.Add_Mapping ("Package/*/DataType", FIELD_DATA_TYPE);
-   XMI_Mapping.Add_Mapping ("DataType/@xmi", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("DataType/@name", FIELD_NAME);
-   XMI_Mapping.Add_Mapping ("DataType", FIELD_DATA_TYPE);
+   XMI_Mapping.Add_Mapping ("**/DataType/@xmi", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/DataType/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/DataType", FIELD_DATA_TYPE);
 end Gen.Artifacts.XMI;

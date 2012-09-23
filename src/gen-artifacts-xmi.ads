@@ -44,6 +44,10 @@ package Gen.Artifacts.XMI is
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class);
 
+   --  Read the UML/XMI model file.
+   procedure Read_Model (Handler : in out Artifact;
+                         File    : in String);
+
 private
 
    type Artifact is new Gen.Artifacts.Artifact with null record;

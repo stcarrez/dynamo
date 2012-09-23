@@ -33,25 +33,56 @@ package Gen.Model.XMI is
    type Model_Element;
    type Model_Element_Access is access all Model_Element'Class;
 
+   --  Define a list of model elements.
    package Model_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => Model_Element_Access);
 
    subtype Model_Vector is Model_Vectors.Vector;
 
-   type Element_Type is (XMI_STEREOTYPE,
+   --  Define a map to search an element from its XMI ID.
+   package Model_Map is
+     new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+                                     Element_Type    => Model_Element_Access,
+                                     Hash            => Ada.Strings.Unbounded.Hash,
+                                     Equivalent_Keys => "=");
+
+   subtype Model_Map_Cursor is Model_Map.Cursor;
+   type Model_Map_Access is access all Model_Map.Map;
+
+   --  Returns true if the table cursor contains a valid table
+   function Has_Element (Position : in Model_Map_Cursor) return Boolean
+                         renames Model_Map.Has_Element;
+
+   --  Returns the table definition.
+   function Element (Position : in Model_Map_Cursor) return Model_Element_Access
+                     renames Model_Map.Element;
+
+   --  Move the iterator to the next table definition.
+   procedure Next (Position : in out Model_Map_Cursor)
+                   renames Model_Map.Next;
+
+   --  Dump the XMI model elements.
+   procedure Dump (Map : in Model_Map.Map);
+
+   type Element_Type is (
                          XMI_PACKAGE,
                          XMI_CLASS,
+                         XMI_ASSOCIATION,
                          XMI_ATTRIBUTE,
                          XMI_OPERATION,
-                         XMI_TAG_VALUE,
+                         XMI_ENUMERATION,
+                         XMI_ENUMERATION_LITERAL,
+                         XMI_TAGGED_VALUE,
                          XMI_TAG_DEFINITION,
+                         XMI_DATA_TYPE,
+                         XMI_STEREOTYPE,
                          XMI_COMMENT);
 
    --  ------------------------------
    --  Model Element
    --  ------------------------------
-   type Model_Element is new Definition with record
+   type Model_Element is abstract new Definition with record
       --  Element name.
       Name          : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -66,7 +97,15 @@ package Gen.Model.XMI is
    end record;
 
    --  Get the element type.
-   function Get_Type (Node : in Model_Element) return Element_Type;
+   function Get_Type (Node : in Model_Element) return Element_Type is abstract;
+
+   --  Set the model name.
+   procedure Set_Name (Node  : in out Model_Element;
+                       Value : in Util.Beans.Objects.Object);
+
+   --  Set the model XMI unique id.
+   procedure Set_XMI_Id (Node  : in out Model_Element;
+                         Value : in Util.Beans.Objects.Object);
 
    --  ------------------------------
    --  Data type
@@ -103,28 +142,95 @@ package Gen.Model.XMI is
    overriding
    function Get_Type (Node : in Literal_Element) return Element_Type;
 
+   --  ------------------------------
+   --  Stereotype
+   --  ------------------------------
+   type Stereotype_Element is new Model_Element with null record;
+   type Stereotype_Element_Access is access all Stereotype_Element'Class;
+
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Stereotype_Element) return Element_Type;
+
+   --  ------------------------------
+   --  Comment
+   --  ------------------------------
+   type Comment_Element is new Model_Element with record
+      Comment    : Ada.Strings.Unbounded.Unbounded_String;
+      Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
+   end record;
+   type Comment_Element_Access is access all Comment_Element'Class;
+
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Comment_Element) return Element_Type;
+
+   --  ------------------------------
+   --  An operation
+   --  ------------------------------
    type Operation_Element is new Model_Element with record
       Visibility : Natural;
    end record;
    type Operation_Element_Access is access all Operation_Element'Class;
 
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Operation_Element) return Element_Type;
+
+   --  ------------------------------
+   --  An attribute
+   --  ------------------------------
    type Attribute_Element is new Model_Element with record
       Visibility : Natural;
    end record;
    type Attribute_Element_Access is access all Attribute_Element'Class;
 
-   type Tagged_Value is new Model_Element with record
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Attribute_Element) return Element_Type;
+
+   --  ------------------------------
+   --  An association
+   --  ------------------------------
+   type Association_Element is new Model_Element with record
+      Visibility : Natural;
+   end record;
+   type Association_Element_Access is access all Association_Element'Class;
+
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Association_Element) return Element_Type;
+
+   --  ------------------------------
+   --  Tagged value
+   --  ------------------------------
+   type Tagged_Value_Element is new Model_Element with record
       Value      : Ada.Strings.Unbounded.Unbounded_String;
       Value_Type : Ada.Strings.Unbounded.Unbounded_String;
+      Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
    end record;
-   type Tagged_Value_Access is access all Tagged_Value'Class;
+   type Tagged_Value_Access is access all Tagged_Value_Element'Class;
 
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Tagged_Value_Element) return Element_Type;
+
+   --  ------------------------------
+   --  Tag Definition
+   --  ------------------------------
    type Tag_Definition_Element is new Model_Element with record
       Multiplicity_Lower : Natural := 0;
       Multiplicity_Upper : Natural := 0;
    end record;
    type Tag_Definition_Element_Access is access all Tag_Definition_Element'Class;
 
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Tag_Definition_Element) return Element_Type;
+
+   --  ------------------------------
+   --  A class
+   --  ------------------------------
    type Class_Element is new Model_Element with record
       Operations   : Model_Vector;
       Attributes   : Model_Vector;
@@ -132,32 +238,20 @@ package Gen.Model.XMI is
    end record;
    type Class_Element_Access is access all Class_Element'Class;
 
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Class_Element) return Element_Type;
+
+   --  ------------------------------
+   --  A package
+   --  ------------------------------
    type Package_Element is new Model_Element with record
       Classes      : Model_Vector;
    end record;
    type Package_Element_Access is access all Package_Element'Class;
 
-   package Table_Map is
-     new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
-                                     Element_Type    => Model_Element_Access,
-                                     Hash            => Ada.Strings.Unbounded.Hash,
-                                     Equivalent_Keys => "=");
-
-   subtype Table_Cursor is Table_Map.Cursor;
-
-   --  Returns true if the table cursor contains a valid table
-   function Has_Element (Position : Table_Cursor) return Boolean
-                         renames Table_Map.Has_Element;
-
-   --  Returns the table definition.
-   function Element (Position : Table_Cursor) return Model_Element_Access
-                     renames Table_Map.Element;
-
-   --  Move the iterator to the next table definition.
-   procedure Next (Position : in out Table_Cursor)
-                   renames Table_Map.Next;
-
-private
-
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Package_Element) return Element_Type;
 
 end Gen.Model.XMI;

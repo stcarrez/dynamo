@@ -22,6 +22,18 @@ package body Gen.Model.XMI is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.XMI");
 
+   function Find (Model : in Model_Map.Map;
+                  Id    : in Ada.Strings.Unbounded.Unbounded_String) return Model_Element_Access is
+      Pos : constant Model_Map_Cursor := Model.Find (Id);
+   begin
+      if Has_Element (Pos) then
+         return Element (Pos);
+      else
+         Log.Error ("Model element {0} not found", Ada.Strings.Unbounded.To_String (Id));
+         return null;
+      end if;
+   end Find;
+
    --  ------------------------------
    --  Dump the XMI model elements.
    --  ------------------------------
@@ -38,6 +50,13 @@ package body Gen.Model.XMI is
          Next (Iter);
       end loop;
    end Dump;
+
+   --  Reconcile the element by resolving the references to other elements in the model.
+   procedure Reconcile (Node  : in out Model_Element;
+                        Model : in Model_Map.Map) is
+   begin
+      null;
+   end Reconcile;
 
    --  ------------------------------
    --  Set the model name.
@@ -153,6 +172,20 @@ package body Gen.Model.XMI is
    begin
       return XMI_TAGGED_VALUE;
    end Get_Type;
+
+   --  ------------------------------
+   --  Reconcile the element by resolving the references to other elements in the model.
+   --  ------------------------------
+   overriding
+   procedure Reconcile (Node  : in out Tagged_Value_Element;
+                        Model : in Model_Map.Map) is
+      Item : constant Model_Element_Access := Find (Model, Node.Ref_Id);
+   begin
+      if Item = null then
+         return;
+      end if;
+      Node.Name := Item.Name;
+   end Reconcile;
 
    --  ------------------------------
    --  Get the element type.

@@ -99,6 +99,10 @@ package Gen.Model.XMI is
    --  Get the element type.
    function Get_Type (Node : in Model_Element) return Element_Type is abstract;
 
+   --  Reconcile the element by resolving the references to other elements in the model.
+   procedure Reconcile (Node  : in out Model_Element;
+                        Model : in Model_Map.Map);
+
    --  Set the model name.
    procedure Set_Name (Node  : in out Model_Element;
                        Value : in Util.Beans.Objects.Object);
@@ -202,20 +206,6 @@ package Gen.Model.XMI is
    function Get_Type (Node : in Association_Element) return Element_Type;
 
    --  ------------------------------
-   --  Tagged value
-   --  ------------------------------
-   type Tagged_Value_Element is new Model_Element with record
-      Value      : Ada.Strings.Unbounded.Unbounded_String;
-      Value_Type : Ada.Strings.Unbounded.Unbounded_String;
-      Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
-   end record;
-   type Tagged_Value_Access is access all Tagged_Value_Element'Class;
-
-   --  Get the element type.
-   overriding
-   function Get_Type (Node : in Tagged_Value_Element) return Element_Type;
-
-   --  ------------------------------
    --  Tag Definition
    --  ------------------------------
    type Tag_Definition_Element is new Model_Element with record
@@ -227,6 +217,26 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Tag_Definition_Element) return Element_Type;
+
+   --  ------------------------------
+   --  Tagged value
+   --  ------------------------------
+   type Tagged_Value_Element is new Model_Element with record
+      Value      : Ada.Strings.Unbounded.Unbounded_String;
+      Value_Type : Ada.Strings.Unbounded.Unbounded_String;
+      Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
+      Tag_Def    : Tag_Definition_Element_Access;
+   end record;
+   type Tagged_Value_Access is access all Tagged_Value_Element'Class;
+
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Tagged_Value_Element) return Element_Type;
+
+   --  Reconcile the element by resolving the references to other elements in the model.
+   overriding
+   procedure Reconcile (Node  : in out Tagged_Value_Element;
+                        Model : in Model_Map.Map);
 
    --  ------------------------------
    --  A class
@@ -245,10 +255,13 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  A package
    --  ------------------------------
+   type Package_Element;
+   type Package_Element_Access is access all Package_Element'Class;
+
    type Package_Element is new Model_Element with record
       Classes      : Model_Vector;
+      Parent       : Package_Element_Access;
    end record;
-   type Package_Element_Access is access all Package_Element'Class;
 
    --  Get the element type.
    overriding

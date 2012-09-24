@@ -22,6 +22,14 @@ with Ada.Strings.Unbounded;
 
 with Gen.Model.Packages;
 
+with Asis;
+with Asis.Text;
+with Asis.Elements;
+with Asis.Exceptions;
+with Asis.Errors;
+with Asis.Implementation;
+with Asis.Elements;
+with Asis.Declarations;
 --  The <b>Gen.Artifacts.Docs</b> package is an artifact for the generation of
 --  application documentation.  Its purpose is to scan the project source files
 --  and extract some interesting information for a developer's guide.  The artifact

@@ -77,6 +77,48 @@ package body Gen.Model.XMI is
    end Set_XMI_Id;
 
    --  ------------------------------
+   --  Find the tag value element with the given name.
+   --  Returns null if there is no such tag.
+   --  ------------------------------
+   function Find_Tag_Value (Node : in Model_Element;
+                            Name : in String) return Tagged_Value_Element_Access is
+      Pos : Model_Cursor := Node.Tagged_Values.First;
+      Tag : Model_Element_Access;
+   begin
+      while Model_Vectors.Has_Element (Pos) loop
+         Tag := Model_Vectors.Element (Pos);
+         if Tag.Name = Name then
+            return Tagged_Value_Element'Class (Tag.all)'Access;
+         end if;
+         Model_Vectors.Next (Pos);
+      end loop;
+      return null;
+   end Find_Tag_Value;
+
+   --  ------------------------------
+   --  Returns True if the model element has the stereotype with the given name.
+   --  ------------------------------
+   function Has_Stereotype (Node : in Model_Element;
+                            Name : in String) return Boolean is
+   begin
+      return False;
+   end Has_Stereotype;
+
+   --  ------------------------------
+   --  Get the documentation and comment associated with the model element.
+   --  Returns the empty string if there is no comment.
+   --  ------------------------------
+   function Get_Comment (Node : in Model_Element) return String is
+      Doc    : constant Tagged_Value_Element_Access := Node.Find_Tag_Value (TAG_DOCUMENTATION);
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      if Doc /= null then
+         Ada.Strings.Unbounded.Append (Result, Doc.Value);
+      end if;
+      return Ada.Strings.Unbounded.To_String (Result);
+   end Get_Comment;
+
+   --  ------------------------------
    --  Get the element type.
    --  ------------------------------
    overriding
@@ -181,10 +223,10 @@ package body Gen.Model.XMI is
                         Model : in Model_Map.Map) is
       Item : constant Model_Element_Access := Find (Model, Node.Ref_Id);
    begin
-      if Item = null then
-         return;
+      if Item /= null then
+         Node.Name := Item.Name;
+         Node.Tag_Def := Tag_Definition_Element'Class (Item.all)'Access;
       end if;
-      Node.Name := Item.Name;
    end Reconcile;
 
    --  ------------------------------

@@ -202,6 +202,9 @@ package body Gen.Artifacts.XMI is
          when FIELD_ATTRIBUTE =>
             P.Attr_Element.Set_XMI_Id (P.Attr_Id);
             P.Elements.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
+            if P.Class_Element /= null then
+               P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
+            end if;
             P.Attr_Element := null;
 
          when FIELD_MULTIPLICITY_LOWER =>
@@ -290,6 +293,7 @@ package body Gen.Artifacts.XMI is
             end if;
 
          when FIELD_STEREOTYPE_HREF =>
+
             null;
 
             --  Tag definition mapping.
@@ -372,6 +376,7 @@ package body Gen.Artifacts.XMI is
       Reader.Dump (Log);
       XMI_Mapper.Set_Context (Reader, Info'Unchecked_Access);
       Reader.Parse (File);
+      Reader.Parse ("config/uml/default/default-uml14.xmi");
       Gen.Model.XMI.Dump (Nodes);
    end Read_Model;
 

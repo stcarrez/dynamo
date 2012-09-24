@@ -31,7 +31,9 @@ package Gen.Model.XMI is
    use Ada.Strings.Unbounded;
 
    type Model_Element;
+   type Tagged_Value_Element;
    type Model_Element_Access is access all Model_Element'Class;
+   type Tagged_Value_Element_Access is access all Tagged_Value_Element'Class;
 
    --  Define a list of model elements.
    package Model_Vectors is
@@ -39,6 +41,8 @@ package Gen.Model.XMI is
                                   Element_Type => Model_Element_Access);
 
    subtype Model_Vector is Model_Vectors.Vector;
+
+   subtype Model_Cursor is Model_Vectors.Cursor;
 
    --  Define a map to search an element from its XMI ID.
    package Model_Map is
@@ -94,6 +98,9 @@ package Gen.Model.XMI is
 
       --  Elements contained.
       Elements      : Model_Vector;
+
+      --  Stereotypes associated with the element.
+      Stereotypes   : Model_Vector;
    end record;
 
    --  Get the element type.
@@ -110,6 +117,19 @@ package Gen.Model.XMI is
    --  Set the model XMI unique id.
    procedure Set_XMI_Id (Node  : in out Model_Element;
                          Value : in Util.Beans.Objects.Object);
+
+   --  Find the tag value element with the given name.
+   --  Returns null if there is no such tag.
+   function Find_Tag_Value (Node : in Model_Element;
+                            Name : in String) return Tagged_Value_Element_Access;
+
+   --  Returns True if the model element has the stereotype with the given name.
+   function Has_Stereotype (Node : in Model_Element;
+                            Name : in String) return Boolean;
+
+   --  Get the documentation and comment associated with the model element.
+   --  Returns the empty string if there is no comment.
+   function Get_Comment (Node : in Model_Element) return String;
 
    --  ------------------------------
    --  Data type
@@ -208,6 +228,9 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  Tag Definition
    --  ------------------------------
+   TAG_DOCUMENTATION : constant String := "documentation";
+   TAG_AUTHOR        : constant String := "author";
+
    type Tag_Definition_Element is new Model_Element with record
       Multiplicity_Lower : Natural := 0;
       Multiplicity_Upper : Natural := 0;
@@ -227,7 +250,6 @@ package Gen.Model.XMI is
       Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
       Tag_Def    : Tag_Definition_Element_Access;
    end record;
-   type Tagged_Value_Access is access all Tagged_Value_Element'Class;
 
    --  Get the element type.
    overriding

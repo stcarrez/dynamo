@@ -52,8 +52,13 @@ package body Gen.Artifacts.XMI is
                        FIELD_ID,
                        FIELD_ID_REF,
                        FIELD_VALUE,
+                       FIELD_HREF,
 
-                       FIELD_CLASS_NAME, FIELD_CLASS_ID, FIELD_STEREOTYPE,
+                       FIELD_CLASS_NAME, FIELD_CLASS_ID,
+
+                       FIELD_STEREOTYPE,
+                       FIELD_STEREOTYPE_HREF,
+
                        FIELD_ATTRIBUTE_NAME,
                        FIELD_ATTRIBUTE_ID,
                        FIELD_ATTRIBUTE,
@@ -101,6 +106,7 @@ package body Gen.Artifacts.XMI is
       Id                 : Util.Beans.Objects.Object;
       Ref_Id             : Util.Beans.Objects.Object;
       Value              : Util.Beans.Objects.Object;
+      Href               : Util.Beans.Objects.Object;
 
       Data_Type          : Gen.Model.XMI.Data_Type_Element_Access;
       Enumeration        : Gen.Model.XMI.Enum_Element_Access;
@@ -126,6 +132,28 @@ package body Gen.Artifacts.XMI is
       P.Name := Util.Beans.Objects.Null_Object;
    end Add_Element;
 
+   use type Gen.Model.XMI.Attribute_Element_Access;
+   use type Gen.Model.XMI.Class_Element_Access;
+   use type Gen.Model.XMI.Package_Element_Access;
+
+   procedure Add_Tagged_Value (P : in out XMI_Info) is
+      Tagged_Value : constant Model.XMI.Tagged_Value_Access := new Model.XMI.Tagged_Value_Element;
+   begin
+      Tagged_Value.Value  := Util.Beans.Objects.To_Unbounded_String (P.Value);
+      Tagged_Value.Ref_Id := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
+      Tagged_Value.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+      P.Elements.Insert (Tagged_Value.XMI_Id, Tagged_Value.all'Access);
+      if P.Attr_Element /= null then
+         P.Attr_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+      elsif P.Class_Element /= null then
+         P.Class_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+      elsif P.Package_Element /= null then
+         P.Package_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+      else
+         Log.Error ("Tagged value ignored");
+      end if;
+   end Add_Tagged_Value;
+
    procedure Set_Member (P     : in out XMI_Info;
                          Field : in XMI_Fields;
                          Value : in Util.Beans.Objects.Object) is
@@ -143,6 +171,9 @@ package body Gen.Artifacts.XMI is
          when FIELD_VALUE =>
             P.Value := Value;
 
+         when FIELD_HREF =>
+            P.Href := Value;
+
          when FIELD_CLASS_NAME =>
             P.Class_Element := new Gen.Model.XMI.Class_Element;
             P.Class_Element.Set_Name (Value);
@@ -154,8 +185,12 @@ package body Gen.Artifacts.XMI is
             P.Class_Id := Value;
 
          when FIELD_CLASS_END =>
-            P.Class_Element.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Class_Id);
-            P.Elements.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
+            if P.Class_Element /= null then
+               P.Class_Element.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Class_Id);
+               Log.Info ("Adding class {0}", P.Class_Element.XMI_Id);
+               P.Elements.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
+               P.Class_Element := null;
+            end if;
 
          when FIELD_ATTRIBUTE_ID =>
             P.Attr_Id := Value;
@@ -204,23 +239,28 @@ package body Gen.Artifacts.XMI is
             P.Package_Id := Value;
 
          when FIELD_PACKAGE_NAME =>
-            if P.Package_Element /= null then
-               P.Package_Element.Set_XMI_Id (P.Package_Id);
-            end if;
-            P.Package_Element := new Gen.Model.XMI.Package_Element;
-            P.Package_Element.Set_Name (Value);
+            declare
+               Parent : constant Gen.Model.XMI.Package_Element_Access := P.Package_Element;
+            begin
+               if Parent /= null then
+                  Parent.Set_XMI_Id (P.Package_Id);
+               end if;
+               P.Package_Element := new Gen.Model.XMI.Package_Element;
+               P.Package_Element.Set_Name (Value);
+               P.Package_Element.Parent := Parent;
+            end;
 
          when FIELD_PACKAGE_END =>
             P.Package_Element.Set_XMI_Id (P.Package_Id);
-            P.Elements.Insert (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
-            P.Indent := P.Indent - 2;
+            P.Elements.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
+            P.Package_Element := P.Package_Element.Parent;
+            if P.Package_Element /= null then
+               P.Package_Id := Util.Beans.Objects.To_Object (P.Package_Element.XMI_Id);
+            end if;
 
+            --  Tagged value associated with an attribute, operation, class, package.
          when FIELD_TAGGED_VALUE =>
-            P.Tagged_Value := new Gen.Model.XMI.Tagged_Value_Element;
-            P.Tagged_Value.Value  := Util.Beans.Objects.To_Unbounded_String (P.Value);
-            P.Tagged_Value.Ref_Id := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
-            P.Tagged_Value.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
-            P.Elements.Insert (P.Tagged_Value.XMI_Id, P.Tagged_Value.all'Access);
+            Add_Tagged_Value (P);
 
             --  Data type mapping.
          when FIELD_DATA_TYPE =>
@@ -249,6 +289,9 @@ package body Gen.Artifacts.XMI is
                end;
             end if;
 
+         when FIELD_STEREOTYPE_HREF =>
+            null;
+
             --  Tag definition mapping.
          when FIELD_TAG_DEFINITION =>
             P.Tag_Definition := new Gen.Model.XMI.Tag_Definition_Element;
@@ -267,8 +310,8 @@ package body Gen.Artifacts.XMI is
 
       end case;
    exception
-      when others =>
-         null;
+      when E : others =>
+         Log.Error ("Exception on " & XMI_Fields'Image (Field), E);
    end Set_Member;
 
    package XMI_Mapper is
@@ -335,37 +378,19 @@ package body Gen.Artifacts.XMI is
 begin
 
    --  Define the XMI mapping.
-   XMI_Mapping.Add_Mapping ("**/Package/@name",
-                            FIELD_PACKAGE_NAME);
-   XMI_Mapping.Add_Mapping ("**/Package/@xmi.id",
-                            FIELD_PACKAGE_NAME);
-   XMI_Mapping.Add_Mapping ("**/Package",
-                            FIELD_PACKAGE_END);
---
---     XMI_Mapping.Add_Mapping ("Package/*/Package/@name",
---                              FIELD_PACKAGE_NAME);
---     XMI_Mapping.Add_Mapping ("Package/*/Package/@xmi.id",
---                              FIELD_PACKAGE_NAME);
---     XMI_Mapping.Add_Mapping ("Package*/Package/",
---                              FIELD_PACKAGE_END);
+   XMI_Mapping.Add_Mapping ("**/Package/@name", FIELD_PACKAGE_NAME);
+   XMI_Mapping.Add_Mapping ("**/Package/@xmi.id", FIELD_PACKAGE_ID);
+   XMI_Mapping.Add_Mapping ("**/Package", FIELD_PACKAGE_END);
 
-
-   XMI_Mapping.Add_Mapping ("**/Class/@name",
-                            FIELD_CLASS_NAME);
-   XMI_Mapping.Add_Mapping ("**/Class/@xmi.id",
-                            FIELD_CLASS_ID);
-   XMI_Mapping.Add_Mapping ("**/Class",
-                            FIELD_CLASS_END);
-   XMI_Mapping.Add_Mapping ("**/Class/@visibility",
-                            FIELD_CLASS_VISIBILITY);
+   XMI_Mapping.Add_Mapping ("**/Class/@name", FIELD_CLASS_NAME);
+   XMI_Mapping.Add_Mapping ("**/Class/@xmi.id", FIELD_CLASS_ID);
+   XMI_Mapping.Add_Mapping ("**/Class/@visibility", FIELD_CLASS_VISIBILITY);
+   XMI_Mapping.Add_Mapping ("**/Class", FIELD_CLASS_END);
 
    --  Class attribute mapping.
-   XMI_Mapping.Add_Mapping ("**/Attribute/@name",
-                            FIELD_ATTRIBUTE_NAME);
-   XMI_Mapping.Add_Mapping ("**/Attribute/@xmi.id",
-                            FIELD_ATTRIBUTE_ID);
-   XMI_Mapping.Add_Mapping ("**/Attribute",
-                            FIELD_ATTRIBUTE);
+   XMI_Mapping.Add_Mapping ("**/Attribute/@name", FIELD_ATTRIBUTE_NAME);
+   XMI_Mapping.Add_Mapping ("**/Attribute/@xmi.id", FIELD_ATTRIBUTE_ID);
+   XMI_Mapping.Add_Mapping ("**/Attribute", FIELD_ATTRIBUTE);
 
 --     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/Stereotype/@href",
 --                              FIELD_STEREOTYPE);
@@ -392,12 +417,13 @@ begin
    XMI_Mapping.Add_Mapping ("**/Comment/@name", FIELD_NAME);
    XMI_Mapping.Add_Mapping ("**/Comment/@xmi.id", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/Comment/@body", FIELD_VALUE);
-   XMI_Mapping.Add_Mapping ("**/Comment/Comment/Class/xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotated/Class/xmi.idref", FIELD_ID_REF);
 
    --  Tagged value mapping.
    XMI_Mapping.Add_Mapping ("**/TaggedValue/@xmi.id", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.dataValue", FIELD_VALUE);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/@xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/TagDefinition/@href", FIELD_HREF);
    XMI_Mapping.Add_Mapping ("**/TaggedValue", FIELD_TAGGED_VALUE);
 
    --  Tag definition mapping.
@@ -406,7 +432,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/TagDefinition", FIELD_TAG_DEFINITION);
 
    --  Stereotype mapping.
---     XMI_Mapping.Add_Mapping ("Stereotype/@href", FIELD_STEREOTYPE_REF);
+   XMI_Mapping.Add_Mapping ("**/Stereotype/@href", FIELD_STEREOTYPE_HREF);
    XMI_Mapping.Add_Mapping ("**/Stereotype/@xmi.id", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/Stereotype/@name", FIELD_NAME);
    XMI_Mapping.Add_Mapping ("**/Stereotype", FIELD_STEREOTYPE);

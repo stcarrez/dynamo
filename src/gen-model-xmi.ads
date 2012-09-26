@@ -30,6 +30,20 @@ package Gen.Model.XMI is
 
    use Ada.Strings.Unbounded;
 
+   type Element_Type is (
+                         XMI_PACKAGE,
+                         XMI_CLASS,
+                         XMI_ASSOCIATION,
+                         XMI_ATTRIBUTE,
+                         XMI_OPERATION,
+                         XMI_ENUMERATION,
+                         XMI_ENUMERATION_LITERAL,
+                         XMI_TAGGED_VALUE,
+                         XMI_TAG_DEFINITION,
+                         XMI_DATA_TYPE,
+                         XMI_STEREOTYPE,
+                         XMI_COMMENT);
+
    type Model_Element;
    type Tagged_Value_Element;
    type Model_Element_Access is access all Model_Element'Class;
@@ -66,27 +80,37 @@ package Gen.Model.XMI is
    procedure Next (Position : in out Model_Map_Cursor)
                    renames Model_Map.Next;
 
+   --  Map of UML models indexed on the model name.
+   package UML_Model_Map is new
+     Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+                                 Element_Type    => Model_Map.Map,
+                                 Hash            => Ada.Strings.Unbounded.Hash,
+                                 Equivalent_Keys => "=",
+                                 "="             => Model_Map."=");
+   subtype UML_Model is UML_Model_Map.Map;
+
+   --  Find the model element with the given XMI id.
+   --  Returns null if the model element is not found.
+   function Find (Model : in Model_Map.Map;
+                  Id    : in Ada.Strings.Unbounded.Unbounded_String) return Model_Element_Access;
+
+   --  Find the model element within all loaded UML models.
+   --  Returns null if the model element is not found.
+   function Find (Model   : in UML_Model;
+                  Current : in Model_Map.Map;
+                  Id      : in Ada.Strings.Unbounded.Unbounded_String)
+                  return Model_Element_Access;
+
    --  Dump the XMI model elements.
    procedure Dump (Map : in Model_Map.Map);
 
-   type Element_Type is (
-                         XMI_PACKAGE,
-                         XMI_CLASS,
-                         XMI_ASSOCIATION,
-                         XMI_ATTRIBUTE,
-                         XMI_OPERATION,
-                         XMI_ENUMERATION,
-                         XMI_ENUMERATION_LITERAL,
-                         XMI_TAGGED_VALUE,
-                         XMI_TAG_DEFINITION,
-                         XMI_DATA_TYPE,
-                         XMI_STEREOTYPE,
-                         XMI_COMMENT);
+   --  Reconcile all the UML model elements by resolving all the references to UML elements.
+   procedure Reconcile (Model : in out UML_Model);
 
    --  ------------------------------
    --  Model Element
    --  ------------------------------
-   type Model_Element is abstract new Definition with record
+   type Model_Element (Model : Model_Map_Access) is abstract new Definition with record
       --  Element name.
       Name          : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -108,7 +132,7 @@ package Gen.Model.XMI is
 
    --  Reconcile the element by resolving the references to other elements in the model.
    procedure Reconcile (Node  : in out Model_Element;
-                        Model : in Model_Map.Map);
+                        Model : in UML_Model);
 
    --  Set the model name.
    procedure Set_Name (Node  : in out Model_Element;
@@ -205,6 +229,7 @@ package Gen.Model.XMI is
    --  An attribute
    --  ------------------------------
    type Attribute_Element is new Model_Element with record
+      Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
       Visibility : Natural;
    end record;
    type Attribute_Element_Access is access all Attribute_Element'Class;
@@ -258,7 +283,7 @@ package Gen.Model.XMI is
    --  Reconcile the element by resolving the references to other elements in the model.
    overriding
    procedure Reconcile (Node  : in out Tagged_Value_Element;
-                        Model : in Model_Map.Map);
+                        Model : in UML_Model);
 
    --  ------------------------------
    --  A class

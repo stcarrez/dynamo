@@ -16,12 +16,17 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Ada.Tags;
 with Ada.Text_IO;
 with Util.Log.Loggers;
 package body Gen.Model.XMI is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.XMI");
 
+   --  ------------------------------
+   --  Find the model element with the given XMI id.
+   --  Returns null if the model element is not found.
+   --  ------------------------------
    function Find (Model : in Model_Map.Map;
                   Id    : in Ada.Strings.Unbounded.Unbounded_String) return Model_Element_Access is
       Pos : constant Model_Map_Cursor := Model.Find (Id);
@@ -32,6 +37,42 @@ package body Gen.Model.XMI is
          Log.Error ("Model element {0} not found", Ada.Strings.Unbounded.To_String (Id));
          return null;
       end if;
+   end Find;
+
+   --  ------------------------------
+   --  Find the model element within all loaded UML models.
+   --  Returns null if the model element is not found.
+   --  ------------------------------
+   function Find (Model   : in UML_Model;
+                  Current : in Model_Map.Map;
+                  Id      : in Ada.Strings.Unbounded.Unbounded_String)
+                  return Model_Element_Access is
+
+      Pos   : constant Natural := Index (Id, "#");
+      First : Natural;
+   begin
+      if Pos = 0 then
+         return Find (Current, Id);
+      end if;
+      First := Index (Id, "/", Pos, Ada.Strings.Backward);
+      if First = 0 then
+         First := 1;
+      else
+         First := First + 1;
+      end if;
+      declare
+         Len       : constant Natural := Length (Id);
+         Name      : constant Unbounded_String := Unbounded_Slice (Id, First, Pos - 1);
+         Model_Pos : constant UML_Model_Map.Cursor := Model.Find (Name);
+      begin
+         if UML_Model_Map.Has_Element (Model_Pos) then
+            return Find (UML_Model_Map.Element (Model_Pos),
+                         Unbounded_Slice (Id, Pos + 1, Len));
+         else
+            Log.Error ("Model element {0} not found", To_String (Id));
+            return null;
+         end if;
+      end;
    end Find;
 
    --  ------------------------------
@@ -51,9 +92,43 @@ package body Gen.Model.XMI is
       end loop;
    end Dump;
 
+   --  ------------------------------
+   --  Reconcile all the UML model elements by resolving all the references to UML elements.
+   --  ------------------------------
+   procedure Reconcile (Model : in out UML_Model) is
+      procedure Reconcile_Model (Key : in Ada.Strings.Unbounded.Unbounded_String;
+                        Map : in out Model_Map.Map);
+
+      procedure Reconcile_Model (Key : in Ada.Strings.Unbounded.Unbounded_String;
+                                 Map : in out Model_Map.Map) is
+         pragma Unreferenced (Key);
+
+         Iter : Model_Map_Cursor := Map.First;
+      begin
+         while Has_Element (Iter) loop
+            declare
+               Node : constant Model_Element_Access := Element (Iter);
+            begin
+               Node.Reconcile (Model);
+            end;
+            Next (Iter);
+         end loop;
+         Gen.Model.XMI.Dump (Map);
+      end Reconcile_Model;
+
+      Iter : UML_Model_Map.Cursor := Model.First;
+   begin
+      while UML_Model_Map.Has_Element (Iter) loop
+         UML_Model_Map.Update_Element (Model, Iter, Reconcile_Model'Access);
+         UML_Model_Map.Next (Iter);
+      end loop;
+   end Reconcile;
+
+   --  ------------------------------
    --  Reconcile the element by resolving the references to other elements in the model.
+   --  ------------------------------
    procedure Reconcile (Node  : in out Model_Element;
-                        Model : in Model_Map.Map) is
+                        Model : in UML_Model) is
    begin
       null;
    end Reconcile;
@@ -220,12 +295,19 @@ package body Gen.Model.XMI is
    --  ------------------------------
    overriding
    procedure Reconcile (Node  : in out Tagged_Value_Element;
-                        Model : in Model_Map.Map) is
-      Item : constant Model_Element_Access := Find (Model, Node.Ref_Id);
+                        Model : in UML_Model) is
+      Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Ref_Id);
    begin
       if Item /= null then
          Node.Name := Item.Name;
-         Node.Tag_Def := Tag_Definition_Element'Class (Item.all)'Access;
+         if not (Item.all in Tag_Definition_Element'Class) then
+            Log.Error ("Element {0} is not a tag definition.  Tag is {1}, reference is {2}",
+                       Ada.Strings.Unbounded.To_String (Item.Name),
+                       Ada.Tags.Expanded_Name (Item'Tag),
+                       Ada.Strings.Unbounded.To_String (Node.Ref_Id));
+         else
+            Node.Tag_Def := Tag_Definition_Element'Class (Item.all)'Access;
+         end if;
       end if;
    end Reconcile;
 

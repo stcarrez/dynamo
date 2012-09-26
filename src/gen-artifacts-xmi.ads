@@ -18,6 +18,7 @@
 
 with DOM.Core;
 with Gen.Model.Packages;
+with Gen.Model.XMI;
 
 --  The <b>Gen.Artifacts.XMI</b> package is an artifact for the generation of Ada code
 --  from an UML XMI description.
@@ -46,10 +47,20 @@ package Gen.Artifacts.XMI is
 
    --  Read the UML/XMI model file.
    procedure Read_Model (Handler : in out Artifact;
-                         File    : in String);
+                         File    : in String;
+                         Context : in out Generator'Class);
+
+   --  Read the UML configuration files that define the pre-defined types, stereotypes
+   --  and other components used by a model.  These files are XMI files as well.
+   --  All the XMI files in the UML config directory are read.
+   procedure Read_UML_Configuration (Handler : in out Artifact;
+                                     Context : in out Generator'Class);
 
 private
 
-   type Artifact is new Gen.Artifacts.Artifact with null record;
+   type Artifact is new Gen.Artifacts.Artifact with record
+      Nodes      : aliased Gen.Model.XMI.UML_Model;
+      Has_Config : Boolean := False;
+   end record;
 
 end Gen.Artifacts.XMI;

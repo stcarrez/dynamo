@@ -640,7 +640,7 @@ package body Gen.Generator is
 
       Log.Info ("Reading model file '{0}'", File);
       if Ext = "xmi" or Ext = "XMI" then
-         H.XMI.Read_Model (File);
+         H.XMI.Read_Model (File, H);
          return;
       end if;
 

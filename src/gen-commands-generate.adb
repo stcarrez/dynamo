@@ -75,7 +75,7 @@ package body Gen.Commands.Generate is
       Put_Line ("generate: Generate the Ada files for the database model or queries");
       Put_Line ("Usage: generate [MODEL ...]");
       New_Line;
-      Put_Line ("  Read the XML model description (Hibernate mapping, query mapping, ...)");
+      Put_Line ("  Read the XML/XMI model description (Hibernate mapping, query mapping, ...)");
       Put_Line ("  and generate the Ada model files that correspond to the mapping.");
    end Help;
 

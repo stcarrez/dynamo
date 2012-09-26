@@ -57,6 +57,8 @@ package body Gen.Artifacts.XMI is
                        FIELD_CLASS_NAME, FIELD_CLASS_ID,
 
                        FIELD_STEREOTYPE,
+                       FIELD_STEREOTYPE_NAME,
+                       FIELD_STEREOTYPE_ID,
                        FIELD_STEREOTYPE_HREF,
 
                        FIELD_ATTRIBUTE_NAME,
@@ -68,6 +70,7 @@ package body Gen.Artifacts.XMI is
                        FIELD_PACKAGE_END,
                        FIELD_CLASS_VISIBILITY,
                        FIELD_DATA_TYPE,
+                       FIELD_DATA_TYPE_HREF,
                        FIELD_ENUM_DATA_TYPE,
                        FIELD_CLASS_END,
                        FIELD_MULTIPLICITY_LOWER,
@@ -87,7 +90,7 @@ package body Gen.Artifacts.XMI is
                        FIELD_ENUMERATION_LITERAL);
 
    type XMI_Info is record
-      Elements           : Gen.Model.XMI.Model_Map_Access;
+      Model              : Gen.Model.XMI.Model_Map_Access;
       Indent : Natural := 1;
       Class_Element    : Gen.Model.XMI.Class_Element_Access;
       Class_Name       : Util.Beans.Objects.Object;
@@ -108,12 +111,13 @@ package body Gen.Artifacts.XMI is
       Value              : Util.Beans.Objects.Object;
       Href               : Util.Beans.Objects.Object;
 
+      Stereotype_Id      : Util.Beans.Objects.Object;
       Data_Type          : Gen.Model.XMI.Data_Type_Element_Access;
       Enumeration        : Gen.Model.XMI.Enum_Element_Access;
       Tag_Definition     : Gen.Model.XMI.Tag_Definition_Element_Access;
 
       Stereotype         : Gen.Model.XMI.Stereotype_Element_Access;
-      Tagged_Value       : Gen.Model.XMI.Tagged_Value_Access;
+      Tagged_Value       : Gen.Model.XMI.Tagged_Value_Element_Access;
       Comment            : Gen.Model.XMI.Comment_Element_Access;
    end record;
    type XMI_Access is access all XMI_Info;
@@ -127,7 +131,7 @@ package body Gen.Artifacts.XMI is
    begin
       Item.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
       Item.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
-      P.Elements.Insert (Item.Name, Item);
+      P.Model.Insert (Item.XMI_Id, Item);
       P.Id   := Util.Beans.Objects.Null_Object;
       P.Name := Util.Beans.Objects.Null_Object;
    end Add_Element;
@@ -137,12 +141,21 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Package_Element_Access;
 
    procedure Add_Tagged_Value (P : in out XMI_Info) is
-      Tagged_Value : constant Model.XMI.Tagged_Value_Access := new Model.XMI.Tagged_Value_Element;
+      Tagged_Value : constant Model.XMI.Tagged_Value_Element_Access
+        := new Model.XMI.Tagged_Value_Element (P.Model);
    begin
+      Log.Info ("Add tag {0} - {1}",
+                Util.Beans.Objects.To_String (P.Id),
+                Util.Beans.Objects.To_String (P.Ref_Id));
+
       Tagged_Value.Value  := Util.Beans.Objects.To_Unbounded_String (P.Value);
-      Tagged_Value.Ref_Id := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
+      if not Util.Beans.Objects.Is_Null (P.Ref_Id) then
+         Tagged_Value.Ref_Id := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
+      else
+         Tagged_Value.Ref_Id := Util.Beans.Objects.To_Unbounded_String (P.Href);
+      end if;
       Tagged_Value.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
-      P.Elements.Insert (Tagged_Value.XMI_Id, Tagged_Value.all'Access);
+      P.Model.Insert (Tagged_Value.XMI_Id, Tagged_Value.all'Access);
       if P.Attr_Element /= null then
          P.Attr_Element.Tagged_Values.Append (Tagged_Value.all'Access);
       elsif P.Class_Element /= null then
@@ -175,7 +188,7 @@ package body Gen.Artifacts.XMI is
             P.Href := Value;
 
          when FIELD_CLASS_NAME =>
-            P.Class_Element := new Gen.Model.XMI.Class_Element;
+            P.Class_Element := new Gen.Model.XMI.Class_Element (P.Model);
             P.Class_Element.Set_Name (Value);
 
          when FIELD_CLASS_VISIBILITY =>
@@ -188,7 +201,7 @@ package body Gen.Artifacts.XMI is
             if P.Class_Element /= null then
                P.Class_Element.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Class_Id);
                Log.Info ("Adding class {0}", P.Class_Element.XMI_Id);
-               P.Elements.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
+               P.Model.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
                P.Class_Element := null;
             end if;
 
@@ -196,12 +209,12 @@ package body Gen.Artifacts.XMI is
             P.Attr_Id := Value;
 
          when FIELD_ATTRIBUTE_NAME =>
-            P.Attr_Element := new Gen.Model.XMI.Attribute_Element;
+            P.Attr_Element := new Gen.Model.XMI.Attribute_Element (P.Model);
             P.Attr_Element.Set_Name (Value);
 
          when FIELD_ATTRIBUTE =>
             P.Attr_Element.Set_XMI_Id (P.Attr_Id);
-            P.Elements.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
+            P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
             if P.Class_Element /= null then
                P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
             end if;
@@ -248,14 +261,14 @@ package body Gen.Artifacts.XMI is
                if Parent /= null then
                   Parent.Set_XMI_Id (P.Package_Id);
                end if;
-               P.Package_Element := new Gen.Model.XMI.Package_Element;
+               P.Package_Element := new Gen.Model.XMI.Package_Element (P.Model);
                P.Package_Element.Set_Name (Value);
                P.Package_Element.Parent := Parent;
             end;
 
          when FIELD_PACKAGE_END =>
             P.Package_Element.Set_XMI_Id (P.Package_Id);
-            P.Elements.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
+            P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
             P.Package_Element := P.Package_Element.Parent;
             if P.Package_Element /= null then
                P.Package_Id := Util.Beans.Objects.To_Object (P.Package_Element.XMI_Id);
@@ -267,29 +280,40 @@ package body Gen.Artifacts.XMI is
 
             --  Data type mapping.
          when FIELD_DATA_TYPE =>
-            P.Data_Type := new Gen.Model.XMI.Data_Type_Element;
-            P.Data_Type.Set_Name (P.Name);
-            P.Data_Type.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
-            P.Elements.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
+            if P.Attr_Element /= null then
+               P.Data_Type := new Gen.Model.XMI.Data_Type_Element (P.Model);
+               P.Data_Type.Set_Name (P.Name);
+               P.Data_Type.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+               P.Model.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
+            end if;
+
+         when FIELD_DATA_TYPE_HREF =>
+            if P.Attr_Element /= null then
+               P.Attr_Element.Ref_Id := Util.Beans.Objects.To_Unbounded_String (Value);
+            end if;
 
             --  Enumeration mapping.
          when FIELD_ENUMERATION =>
-            P.Enumeration := new Gen.Model.XMI.Enum_Element;
+            P.Enumeration := new Gen.Model.XMI.Enum_Element (P.Model);
             P.Enumeration.Set_Name (Value);
             P.Enumeration.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
-            P.Elements.Insert (P.Enumeration.XMI_Id, P.Enumeration.all'Access);
+            P.Model.Insert (P.Enumeration.XMI_Id, P.Enumeration.all'Access);
 
          when FIELD_ENUMERATION_LITERAL =>
             P.Enumeration.Add_Literal (P.Id, P.Name);
 
-            -- Stereotype mapping.
+         when FIELD_STEREOTYPE_NAME =>
+            P.Stereotype := new Gen.Model.XMI.Stereotype_Element (P.Model);
+            P.Stereotype.Set_Name (Value);
+
+         when FIELD_STEREOTYPE_ID =>
+            P.Stereotype_Id := Value;
+
+            --  Stereotype mapping.
          when FIELD_STEREOTYPE =>
-            if not Util.Beans.Objects.Is_Null (P.Id) then
-               declare
-                  S : constant Gen.Model.XMI.Stereotype_Element_Access := new Gen.Model.XMI.Stereotype_Element;
-               begin
-                  Add_Element (P, S.all'Access);
-               end;
+            if not Util.Beans.Objects.Is_Null (P.Stereotype_Id) then
+               P.Stereotype.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Stereotype_Id);
+               P.Model.Insert (P.Stereotype.XMI_Id, P.Stereotype.all'Access);
             end if;
 
          when FIELD_STEREOTYPE_HREF =>
@@ -298,19 +322,19 @@ package body Gen.Artifacts.XMI is
 
             --  Tag definition mapping.
          when FIELD_TAG_DEFINITION =>
-            P.Tag_Definition := new Gen.Model.XMI.Tag_Definition_Element;
+            P.Tag_Definition := new Gen.Model.XMI.Tag_Definition_Element (P.Model);
             P.Tag_Definition.Set_Name (P.Name);
             P.Tag_Definition.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
-            P.Elements.Insert (P.Tag_Definition.XMI_Id, P.Tag_Definition.all'Access);
+            P.Model.Insert (P.Tag_Definition.XMI_Id, P.Tag_Definition.all'Access);
 
             --  Comment mapping.
          when FIELD_COMMENT =>
-            P.Comment := new Gen.Model.XMI.Comment_Element;
+            P.Comment := new Gen.Model.XMI.Comment_Element (P.Model);
             P.Comment.Set_Name (P.Name);
             P.Comment.XMI_Id  := Util.Beans.Objects.To_Unbounded_String (P.Id);
             P.Comment.Comment := Util.Beans.Objects.To_Unbounded_String (P.Value);
             P.Comment.Ref_Id  := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
-            P.Elements.Insert (P.Comment.XMI_Id, P.Comment.all'Access);
+            P.Model.Insert (P.Comment.XMI_Id, P.Comment.all'Access);
 
       end case;
    exception
@@ -364,20 +388,63 @@ package body Gen.Artifacts.XMI is
       end if;
    end Prepare;
 
+   --  ------------------------------
+   --  Read the UML configuration files that define the pre-defined types, stereotypes
+   --  and other components used by a model.  These files are XMI files as well.
+   --  All the XMI files in the UML config directory are read.
+   --  ------------------------------
+   procedure Read_UML_Configuration (Handler : in out Artifact;
+                                     Context : in out Generator'Class) is
+      use Ada.Directories;
+
+      Path    : constant String := Context.Get_Parameter (Gen.Configs.GEN_UML_DIR);
+      Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
+      Search  : Search_Type;
+      Ent     : Directory_Entry_Type;
+   begin
+      Log.Info ("Reading the UML configuration files from {0}", Path);
+
+      Start_Search (Search, Directory => Path, Pattern => "*.xmi", Filter => Filter);
+
+      --  Collect the files in the vector array.
+      while More_Entries (Search) loop
+         Get_Next_Entry (Search, Ent);
+
+         Handler.Read_Model (Full_Name (Ent), Context);
+      end loop;
+   end Read_UML_Configuration;
+
    --  Read the UML/XMI model file.
    procedure Read_Model (Handler : in out Artifact;
-                         File    : in String) is
-      Info   : aliased XMI_Info;
-      Reader : Util.Serialize.IO.XML.Parser;
-      Nodes  : aliased Gen.Model.XMI.Model_Map.Map;
+                         File    : in String;
+                         Context : in out Generator'Class) is
+
+      procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
+                      Model : in out Gen.Model.XMI.Model_Map.Map) is
+         Info   : aliased XMI_Info;
+         Reader : Util.Serialize.IO.XML.Parser;
+      begin
+         Info.Model := Model'Unchecked_Access;
+         Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
+         Reader.Dump (Log);
+         XMI_Mapper.Set_Context (Reader, Info'Unchecked_Access);
+         Reader.Parse (File);
+      end Read;
+
+      UML  : Gen.Model.XMI.Model_Map.Map;
+      Name : constant Ada.Strings.Unbounded.Unbounded_String
+        := Ada.Strings.Unbounded.To_Unbounded_String (Ada.Directories.Simple_Name (File));
    begin
-      Info.Elements := Nodes'Unchecked_Access;
-      Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
-      Reader.Dump (Log);
-      XMI_Mapper.Set_Context (Reader, Info'Unchecked_Access);
-      Reader.Parse (File);
-      Reader.Parse ("config/uml/default/default-uml14.xmi");
-      Gen.Model.XMI.Dump (Nodes);
+      Log.Info ("Reading XMI {0}", File);
+
+      if not Handler.Has_Config then
+         Handler.Has_Config := True;
+         Handler.Read_UML_Configuration (Context);
+      end if;
+      Handler.Nodes.Include (Name, UML);
+      Handler.Nodes.Update_Element (Handler.Nodes.Find (Name),
+                                    Read'Access);
+      Gen.Model.XMI.Reconcile (Handler.Nodes);
    end Read_Model;
 
 begin
@@ -428,6 +495,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/TaggedValue/@xmi.id", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.dataValue", FIELD_VALUE);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/@xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/TagDefinition/@xmi.idref", FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/TagDefinition/@href", FIELD_HREF);
    XMI_Mapping.Add_Mapping ("**/TaggedValue", FIELD_TAGGED_VALUE);
 
@@ -438,8 +506,8 @@ begin
 
    --  Stereotype mapping.
    XMI_Mapping.Add_Mapping ("**/Stereotype/@href", FIELD_STEREOTYPE_HREF);
-   XMI_Mapping.Add_Mapping ("**/Stereotype/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("**/Stereotype/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/Stereotype/@xmi.id", FIELD_STEREOTYPE_ID);
+   XMI_Mapping.Add_Mapping ("**/Stereotype/@name", FIELD_STEREOTYPE_NAME);
    XMI_Mapping.Add_Mapping ("**/Stereotype", FIELD_STEREOTYPE);
 
    --  Enumeration mapping.
@@ -454,4 +522,6 @@ begin
    XMI_Mapping.Add_Mapping ("**/DataType/@xmi", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/DataType/@name", FIELD_NAME);
    XMI_Mapping.Add_Mapping ("**/DataType", FIELD_DATA_TYPE);
+   XMI_Mapping.Add_Mapping ("**/DataType/@href", FIELD_DATA_TYPE_HREF);
+
 end Gen.Artifacts.XMI;

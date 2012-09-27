@@ -274,6 +274,16 @@ package body Gen.Model.XMI is
    --  Get the element type.
    --  ------------------------------
    overriding
+   function Get_Type (Node : in Association_End_Element) return Element_Type is
+      pragma Unreferenced (Node);
+   begin
+      return XMI_ASSOCIATION_END;
+   end Get_Type;
+
+   --  ------------------------------
+   --  Get the element type.
+   --  ------------------------------
+   overriding
    function Get_Type (Node : in Association_Element) return Element_Type is
       pragma Unreferenced (Node);
    begin

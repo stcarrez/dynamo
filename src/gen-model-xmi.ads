@@ -34,6 +34,7 @@ package Gen.Model.XMI is
                          XMI_PACKAGE,
                          XMI_CLASS,
                          XMI_ASSOCIATION,
+                         XMI_ASSOCIATION_END,
                          XMI_ATTRIBUTE,
                          XMI_OPERATION,
                          XMI_ENUMERATION,
@@ -242,6 +243,18 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Attribute_Element) return Element_Type;
+
+   --  ------------------------------
+   --  An association end
+   --  ------------------------------
+   type Association_End_Element is new Model_Element with record
+      Visibility : Visibility_Type := VISIBILITY_PUBLIC;
+   end record;
+   type Association_End_Element_Access is access all Association_End_Element'Class;
+
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Association_End_Element) return Element_Type;
 
    --  ------------------------------
    --  An association

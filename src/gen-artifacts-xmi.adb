@@ -19,10 +19,6 @@ with Ada.Strings.Unbounded;
 with Ada.Directories;
 
 with Gen.Configs;
-with Gen.Utils;
-with Gen.Model.Tables;
-with Gen.Model.Queries;
-with Gen.Model.XMI;
 
 with Util.Log.Loggers;
 
@@ -37,8 +33,6 @@ package body Gen.Artifacts.XMI is
 
    use Ada.Strings.Unbounded;
    use Gen.Model;
-   use Gen.Model.Tables;
-   use Gen.Model.Queries;
    use Gen.Configs;
 
    use type DOM.Core.Node;
@@ -47,6 +41,9 @@ package body Gen.Artifacts.XMI is
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.XMI");
 
    use type Gen.Model.XMI.Package_Element_Access;
+
+   --  Get the visibility from the XMI visibility value.
+   function Get_Visibility (Value : in Util.Beans.Objects.Object) return Model.XMI.Visibility_Type;
 
    type XMI_Fields is (FIELD_NAME,
                        FIELD_ID,
@@ -63,6 +60,7 @@ package body Gen.Artifacts.XMI is
 
                        FIELD_ATTRIBUTE_NAME,
                        FIELD_ATTRIBUTE_ID,
+                       FIELD_ATTRIBUTE_VISIBILITY,
                        FIELD_ATTRIBUTE,
 
                        FIELD_PACKAGE_ID,
@@ -84,6 +82,9 @@ package body Gen.Artifacts.XMI is
                        FIELD_COMMENT,
 
                        FIELD_TAG_DEFINITION,
+                       FIELD_TAG_DEFINITION_ID,
+                       FIELD_TAG_DEFINITION_NAME,
+
                        FIELD_TAGGED_VALUE,
 
                        FIELD_ENUMERATION,
@@ -94,14 +95,15 @@ package body Gen.Artifacts.XMI is
       Indent : Natural := 1;
       Class_Element    : Gen.Model.XMI.Class_Element_Access;
       Class_Name       : Util.Beans.Objects.Object;
-      Class_Visibility : Util.Beans.Objects.Object;
-      Class_Id         : Util.Beans.Objects.Object;
+      Class_Visibility   : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
+      Class_Id           : Util.Beans.Objects.Object;
 
       Package_Element    : Gen.Model.XMI.Package_Element_Access;
       Package_Id         : Util.Beans.Objects.Object;
 
       Attr_Id            : Util.Beans.Objects.Object;
       Attr_Element       : Gen.Model.XMI.Attribute_Element_Access;
+      Attr_Visibility    : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
 
@@ -110,6 +112,7 @@ package body Gen.Artifacts.XMI is
       Ref_Id             : Util.Beans.Objects.Object;
       Value              : Util.Beans.Objects.Object;
       Href               : Util.Beans.Objects.Object;
+      Tag_Name           : Util.Beans.Objects.Object;
 
       Stereotype_Id      : Util.Beans.Objects.Object;
       Data_Type          : Gen.Model.XMI.Data_Type_Element_Access;
@@ -139,6 +142,29 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Attribute_Element_Access;
    use type Gen.Model.XMI.Class_Element_Access;
    use type Gen.Model.XMI.Package_Element_Access;
+   use type Gen.Model.XMI.Tag_Definition_Element_Access;
+
+   --  Get the visibility from the XMI visibility value.
+   function Get_Visibility (Value : in Util.Beans.Objects.Object)
+                            return Model.XMI.Visibility_Type is
+      S : constant String := Util.Beans.Objects.To_String (Value);
+   begin
+      if S = "public" then
+         return Model.XMI.VISIBILITY_PUBLIC;
+
+      elsif S = "package" then
+         return Model.XMI.VISIBILITY_PACKAGE;
+
+      elsif S = "protected" then
+         return Model.XMI.VISIBILITY_PROTECTED;
+
+      elsif S = "private" then
+         return Model.XMI.VISIBILITY_PRIVATE;
+
+      else
+         return Model.XMI.VISIBILITY_PUBLIC;
+      end if;
+   end Get_Visibility;
 
    procedure Add_Tagged_Value (P : in out XMI_Info) is
       Tagged_Value : constant Model.XMI.Tagged_Value_Element_Access
@@ -162,8 +188,10 @@ package body Gen.Artifacts.XMI is
          P.Class_Element.Tagged_Values.Append (Tagged_Value.all'Access);
       elsif P.Package_Element /= null then
          P.Package_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+      elsif P.Tag_Definition /= null then
+         P.Tag_Definition.Tagged_Values.Append (Tagged_Value.all'Access);
       else
-         Log.Error ("Tagged value ignored");
+         Log.Error ("Tagged value {0} ignored", Util.Beans.Objects.To_String (P.Id));
       end if;
    end Add_Tagged_Value;
 
@@ -192,7 +220,7 @@ package body Gen.Artifacts.XMI is
             P.Class_Element.Set_Name (Value);
 
          when FIELD_CLASS_VISIBILITY =>
-            P.Class_Visibility := Value;
+            P.Class_Visibility := Get_Visibility (Value);
 
          when FIELD_CLASS_ID =>
             P.Class_Id := Value;
@@ -200,13 +228,18 @@ package body Gen.Artifacts.XMI is
          when FIELD_CLASS_END =>
             if P.Class_Element /= null then
                P.Class_Element.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Class_Id);
+               P.Class_Visibility := P.Class_Visibility;
                Log.Info ("Adding class {0}", P.Class_Element.XMI_Id);
                P.Model.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
                P.Class_Element := null;
+               P.Class_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
             end if;
 
          when FIELD_ATTRIBUTE_ID =>
             P.Attr_Id := Value;
+
+         when FIELD_ATTRIBUTE_VISIBILITY =>
+            P.Attr_Visibility := Get_Visibility (Value);
 
          when FIELD_ATTRIBUTE_NAME =>
             P.Attr_Element := new Gen.Model.XMI.Attribute_Element (P.Model);
@@ -214,11 +247,13 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_ATTRIBUTE =>
             P.Attr_Element.Set_XMI_Id (P.Attr_Id);
+            P.Attr_Element.Visibility := P.Attr_Visibility;
             P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
             if P.Class_Element /= null then
                P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
             end if;
             P.Attr_Element := null;
+            P.Attr_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
 
          when FIELD_MULTIPLICITY_LOWER =>
             P.Multiplicity_Lower := Util.Beans.Objects.To_Integer (Value);
@@ -267,11 +302,13 @@ package body Gen.Artifacts.XMI is
             end;
 
          when FIELD_PACKAGE_END =>
-            P.Package_Element.Set_XMI_Id (P.Package_Id);
-            P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
-            P.Package_Element := P.Package_Element.Parent;
             if P.Package_Element /= null then
-               P.Package_Id := Util.Beans.Objects.To_Object (P.Package_Element.XMI_Id);
+               P.Package_Element.Set_XMI_Id (P.Package_Id);
+               P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
+               P.Package_Element := P.Package_Element.Parent;
+               if P.Package_Element /= null then
+                  P.Package_Id := Util.Beans.Objects.To_Object (P.Package_Element.XMI_Id);
+               end if;
             end if;
 
             --  Tagged value associated with an attribute, operation, class, package.
@@ -280,7 +317,7 @@ package body Gen.Artifacts.XMI is
 
             --  Data type mapping.
          when FIELD_DATA_TYPE =>
-            if P.Attr_Element /= null then
+            if P.Attr_Element = null then
                P.Data_Type := new Gen.Model.XMI.Data_Type_Element (P.Model);
                P.Data_Type.Set_Name (P.Name);
                P.Data_Type.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
@@ -321,11 +358,17 @@ package body Gen.Artifacts.XMI is
             null;
 
             --  Tag definition mapping.
-         when FIELD_TAG_DEFINITION =>
+         when FIELD_TAG_DEFINITION_NAME =>
+            P.Tag_Name := Value;
+
+         when FIELD_TAG_DEFINITION_ID =>
             P.Tag_Definition := new Gen.Model.XMI.Tag_Definition_Element (P.Model);
-            P.Tag_Definition.Set_Name (P.Name);
-            P.Tag_Definition.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            P.Tag_Definition.Set_XMI_Id (Value);
             P.Model.Insert (P.Tag_Definition.XMI_Id, P.Tag_Definition.all'Access);
+
+         when FIELD_TAG_DEFINITION =>
+            P.Tag_Definition.Set_Name (P.Tag_Name);
+            P.Tag_Definition := null;
 
             --  Comment mapping.
          when FIELD_COMMENT =>
@@ -339,7 +382,10 @@ package body Gen.Artifacts.XMI is
       end case;
    exception
       when E : others =>
-         Log.Error ("Exception on " & XMI_Fields'Image (Field), E);
+         Log.Error ("Extraction of field {0} with value '{1}' failed",
+                    XMI_Fields'Image (Field), Util.Beans.Objects.To_String (Value));
+         Log.Error ("Cause", E);
+         raise;
    end Set_Member;
 
    package XMI_Mapper is
@@ -462,6 +508,7 @@ begin
    --  Class attribute mapping.
    XMI_Mapping.Add_Mapping ("**/Attribute/@name", FIELD_ATTRIBUTE_NAME);
    XMI_Mapping.Add_Mapping ("**/Attribute/@xmi.id", FIELD_ATTRIBUTE_ID);
+   XMI_Mapping.Add_Mapping ("**/Attribute/@visibility", FIELD_ATTRIBUTE_VISIBILITY);
    XMI_Mapping.Add_Mapping ("**/Attribute", FIELD_ATTRIBUTE);
 
 --     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/Stereotype/@href",
@@ -500,8 +547,8 @@ begin
    XMI_Mapping.Add_Mapping ("**/TaggedValue", FIELD_TAGGED_VALUE);
 
    --  Tag definition mapping.
-   XMI_Mapping.Add_Mapping ("**/TagDefinition/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("**/TagDefinition/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/TagDefinition/@xmi.id", FIELD_TAG_DEFINITION_ID);
+   XMI_Mapping.Add_Mapping ("**/TagDefinition/@name", FIELD_TAG_DEFINITION_NAME);
    XMI_Mapping.Add_Mapping ("**/TagDefinition", FIELD_TAG_DEFINITION);
 
    --  Stereotype mapping.
@@ -519,9 +566,10 @@ begin
                             FIELD_NAME);
 
    --  Data type mapping.
-   XMI_Mapping.Add_Mapping ("**/DataType/@xmi", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/DataType/@xmi.id", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/DataType/@name", FIELD_NAME);
    XMI_Mapping.Add_Mapping ("**/DataType", FIELD_DATA_TYPE);
    XMI_Mapping.Add_Mapping ("**/DataType/@href", FIELD_DATA_TYPE_HREF);
+   XMI_Mapping.Add_Mapping ("**/DataType/@xmi.idref", FIELD_DATA_TYPE_HREF);
 
 end Gen.Artifacts.XMI;

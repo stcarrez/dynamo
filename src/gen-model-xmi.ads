@@ -44,6 +44,11 @@ package Gen.Model.XMI is
                          XMI_STEREOTYPE,
                          XMI_COMMENT);
 
+   type Visibility_Type is (VISIBILITY_PUBLIC,
+                            VISIBILITY_PACKAGE,
+                            VISIBILITY_PROTECTED,
+                            VISIBILITY_PRIVATE);
+
    type Model_Element;
    type Tagged_Value_Element;
    type Model_Element_Access is access all Model_Element'Class;
@@ -217,7 +222,7 @@ package Gen.Model.XMI is
    --  An operation
    --  ------------------------------
    type Operation_Element is new Model_Element with record
-      Visibility : Natural;
+      Visibility : Visibility_Type := VISIBILITY_PUBLIC;
    end record;
    type Operation_Element_Access is access all Operation_Element'Class;
 
@@ -230,7 +235,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    type Attribute_Element is new Model_Element with record
       Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
-      Visibility : Natural;
+      Visibility : Visibility_Type := VISIBILITY_PUBLIC;
    end record;
    type Attribute_Element_Access is access all Attribute_Element'Class;
 
@@ -242,7 +247,7 @@ package Gen.Model.XMI is
    --  An association
    --  ------------------------------
    type Association_Element is new Model_Element with record
-      Visibility : Natural;
+      Visibility : Visibility_Type := VISIBILITY_PUBLIC;
    end record;
    type Association_Element_Access is access all Association_Element'Class;
 
@@ -292,6 +297,7 @@ package Gen.Model.XMI is
       Operations   : Model_Vector;
       Attributes   : Model_Vector;
       Associations : Model_Vector;
+      Visibility   : Visibility_Type := VISIBILITY_PUBLIC;
    end record;
    type Class_Element_Access is access all Class_Element'Class;
 

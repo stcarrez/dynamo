@@ -214,7 +214,13 @@ private
 
       Model  : aliased Gen.Model.Packages.Model_Definition;
       Status : Ada.Command_Line.Exit_Status := 0;
-      File   : access Util.Beans.Objects.Object;
+
+      --  The file that must be saved (the file attribute in <f:view>.
+      File     : access Util.Beans.Objects.Object;
+
+      --  Indicates whether the file must be saved at each generation or only once.
+      --  This is the mode attribute in <f:view>.
+      Mode     : access Util.Beans.Objects.Object;
 
       --  Whether the AdaMappings.xml file was loaded or not.
       Type_Mapping_Loaded : Boolean := False;

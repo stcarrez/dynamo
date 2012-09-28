@@ -369,6 +369,7 @@ package body Gen.Generator is
 
       Register_Funcs (H);
       H.File := new Util.Beans.Objects.Object;
+      H.Mode := new Util.Beans.Objects.Object;
 
       begin
          Gen.Commands.Templates.Read_Commands (H);
@@ -744,6 +745,7 @@ package body Gen.Generator is
       begin
          if Root /= null then
             App.File.all := Root.Get_Attribute (Context, "file");
+            App.Mode.all := Root.Get_Attribute (Context, "mode");
          end if;
       end;
    end Execute_Lifecycle;
@@ -844,12 +846,15 @@ package body Gen.Generator is
       declare
          Dir         : constant String := To_String (H.Output_Dir);
          File        : constant String := Util.Beans.Objects.To_String (H.File.all);
+         Mode        : constant String := Util.Beans.Objects.To_String (H.Mode.all);
          Path        : constant String := Util.Files.Compose (Dir, File);
          Exists      : constant Boolean := Ada.Directories.Exists (Path);
          Content     : Unbounded_String;
          Old_Content : Unbounded_String;
       begin
-         if not H.Force_Save and Exists then
+         if Exists and Mode = "once" then
+            Log.Info ("File {0} exists, generation skipped.", Path);
+         elsif (not H.Force_Save or Mode /= "force") and Exists then
             H.Error ("Cannot generate file: '{0}' exists already.", Path);
          elsif not Util.Beans.Objects.Is_Null (H.File.all) then
             Log.Info ("Generating file '{0}'", Path);

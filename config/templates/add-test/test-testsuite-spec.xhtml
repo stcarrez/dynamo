@@ -3,17 +3,18 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
+	mode="once"
         file="regtests/#{projectName}-testsuite.ads">-----------------------------------------------------------------------
 --  #{projectName}-testsuite -- Testsuite for #{projectName}
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
-with AUnit.Test_Suites; use AUnit.Test_Suites;
+with Util.Tests;
 package #{fn:capitalize(projectName)}.Testsuite is
 #{''}
-   function Suite return Access_Test_Suite;
+   function Suite return Util.Tests.Access_Test_Suite;
 #{''}
-   procedure Initialize
+   procedure Initialize;
 #{''}
 end #{fn:capitalize(projectName)}.Testsuite;
 </f:view>

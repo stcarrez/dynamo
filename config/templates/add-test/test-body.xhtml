@@ -8,15 +8,14 @@
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
-with AUnit.Test_Suites;
 with Util.Tests;
 with Util.Test_Caller;
 
 package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Tests is
 #{''}
-   package Caller is new Util.Test_Caller (Test);
+   package Caller is new Util.Test_Caller (Test, "#{moduleName}");
 #{''}
-   procedure Add_Tests (Suite : in AUnit.Test_Suites.Access_Test_Suite) is
+   procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite) is
    begin
       Caller.Add_Test (Suite, "Test #{projectName}.#{moduleName}.Foo",
                        Test_Foo'Access);

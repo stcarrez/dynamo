@@ -3,6 +3,7 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
+	mode="once"
         file="regtests/#{projectName}-testsuite.adb">-----------------------------------------------------------------------
 --  #{projectName}-testsuite -- Testsuite for #{projectName}
 <ui:include src="../licenses/license-ada.xhtml"/>
@@ -12,8 +13,9 @@ with ASF.Server.Tests;
 with #{fn:capitalize(projectName)}.Applications;
 package body #{fn:capitalize(projectName)}.Testsuite is
 #{''}
-   function Suite return Access_Test_Suite is
-      Ret : constant Access_Test_Suite := new Test_Suite;
+   Tests : aliased Util.Tests.Test_Suite;
+#{''}
+   function Suite return Util.Tests.Access_Test_Suite is
    begin
       return Ret;
    end Suite;

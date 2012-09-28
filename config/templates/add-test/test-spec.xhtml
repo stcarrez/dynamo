@@ -8,11 +8,10 @@
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
-with AUnit.Test_Suites;
 with Util.Tests;
 package #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Tests is
 #{''}
-   procedure Add_Tests (Suite : in AUnit.Test_Suites.Access_Test_Suite);
+   procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite);
 #{''}
    type Test is new Util.Tests.Test with null record;
 #{''}

@@ -3,10 +3,19 @@
       <name>add-test</name>
       <title>Add a new test package to the application</title>
       <usage>add-test MODULE</usage>
-      <help>
-         The test framework consists of a set of test cases that are registered in a testsuite.
-         A test harness allows to execute the tests registered in the testsuite.
-      </help>
+      <help><![CDATA[
+  The test framework consists of a set of test cases that are registered in a testsuite.
+  A test harness allows to execute the tests registered in the testsuite.  This command
+  generates the test harness, testsuite framework and a test case for the module.
+  The following files are created:
+  
+    tests.gpr.in
+    regtests/<project>_harness.adb
+    regtests/<project>-testsuite.ads
+    regtests/<project>-testsuite.adb
+    regtests/<project>-<module>-tests.ads
+    regtests/<project>-<module>-tests.adb
+]]>      </help>
       <param optional='false' name='moduleName' arg='MODULE'/>
       <basedir></basedir>
       <template>add-test/test-spec.xhtml</template>
@@ -14,5 +23,6 @@
       <template>add-test/test-testsuite-spec.xhtml</template>
       <template>add-test/test-testsuite-body.xhtml</template>
       <template>add-test/test-harness.xhtml</template>
+      <template>add-test/tests.gpr.in.xhtml</template>
    </command>
 </commands>

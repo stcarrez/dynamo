@@ -10,11 +10,12 @@
 -----------------------------------------------------------------------
 #{''}
 with Util.Tests;
+with Util.Properties;
 package #{fn:capitalize(projectName)}.Testsuite is
 #{''}
    function Suite return Util.Tests.Access_Test_Suite;
 #{''}
-   procedure Initialize;
+   procedure Initialize (Props : in Util.Properties.Manager);
 #{''}
 end #{fn:capitalize(projectName)}.Testsuite;
 </f:view>

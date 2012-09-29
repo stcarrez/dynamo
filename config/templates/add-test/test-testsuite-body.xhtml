@@ -17,10 +17,10 @@ package body #{fn:capitalize(projectName)}.Testsuite is
 #{''}
    function Suite return Util.Tests.Access_Test_Suite is
    begin
-      return Ret;
+      return Tests'Access;
    end Suite;
 #{''}
-   procedure Initialize is
+   procedure Initialize (Props : in Util.Properties.Manager) is
       App  : constant #{fn:capitalize(projectName)}.Applications.Application_Access := new #{fn:capitalize(projectName)}.Applications.Application;
    begin
       #{fn:capitalize(projectName)}.Applications.Initialize (App);

@@ -1,0 +1,229 @@
+<?xml version = '1.0' encoding = 'UTF-8' ?>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Sep 29 14:04:27 CEST 2012'>
+  <XMI.header>    <XMI.documentation>
+      <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
+      <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
+    </XMI.documentation>
+    <XMI.metamodel xmi.name="UML" xmi.version="1.4"/></XMI.header>
+  <XMI.content>
+    <UML:Model xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D4C'
+      name = 'Dynamo' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+      isAbstract = 'false'>
+      <UML:ModelElement.stereotype>
+        <UML:Stereotype xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D4D'/>
+      </UML:ModelElement.stereotype>
+      <UML:Namespace.ownedElement>
+        <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D4D'
+          name = 'profile' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:Package xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D4E'
+          name = 'ADO' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Namespace.ownedElement>
+            <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D4F'
+              name = 'Table' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+              isLeaf = 'false' isAbstract = 'false'>
+              <UML:Stereotype.baseClass>Class</UML:Stereotype.baseClass>
+              <UML:Stereotype.definedTag>
+                <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D51'
+                  name = '@andromda.hibernate.generator.class' visibility = 'public' isSpecification = 'false'>
+                  <UML:TagDefinition.multiplicity>
+                    <UML:Multiplicity xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D58'>
+                      <UML:Multiplicity.range>
+                        <UML:MultiplicityRange xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D57'
+                          lower = '0' upper = '1'/>
+                      </UML:Multiplicity.range>
+                    </UML:Multiplicity>
+                  </UML:TagDefinition.multiplicity>
+                </UML:TagDefinition>
+                <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D59'
+                  name = '@andromda.persistence.table' visibility = 'public' isSpecification = 'false'>
+                  <UML:TagDefinition.multiplicity>
+                    <UML:Multiplicity xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D5D'>
+                      <UML:Multiplicity.range>
+                        <UML:MultiplicityRange xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D5C'
+                          lower = '0' upper = '1'/>
+                      </UML:Multiplicity.range>
+                    </UML:Multiplicity>
+                  </UML:TagDefinition.multiplicity>
+                </UML:TagDefinition>
+                <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D5E'
+                  name = '@andromda.hibernate.version' visibility = 'public' isSpecification = 'false'>
+                  <UML:TagDefinition.multiplicity>
+                    <UML:Multiplicity xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D62'>
+                      <UML:Multiplicity.range>
+                        <UML:MultiplicityRange xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D61'
+                          lower = '0' upper = '1'/>
+                      </UML:Multiplicity.range>
+                    </UML:Multiplicity>
+                  </UML:TagDefinition.multiplicity>
+                </UML:TagDefinition>
+                <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D63'
+                  name = '@andromda.hibernate.collection.index.type' visibility = 'public'
+                  isSpecification = 'false'>
+                  <UML:TagDefinition.multiplicity>
+                    <UML:Multiplicity xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D67'>
+                      <UML:Multiplicity.range>
+                        <UML:MultiplicityRange xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D66'
+                          lower = '0' upper = '1'/>
+                      </UML:Multiplicity.range>
+                    </UML:Multiplicity>
+                  </UML:TagDefinition.multiplicity>
+                </UML:TagDefinition>
+              </UML:Stereotype.definedTag>
+            </UML:Stereotype>
+            <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D50'
+              name = 'PK' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+              isLeaf = 'false' isAbstract = 'false'>
+              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
+            </UML:Stereotype>
+            <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F70'
+              name = 'FK' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+            </UML:Stereotype>
+            <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F83'
+              name = 'DataModel' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+              isLeaf = 'false' isAbstract = 'false'>
+              <UML:Stereotype.baseClass>Package</UML:Stereotype.baseClass>
+              <UML:Stereotype.definedTag>
+                <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F84'
+                  name = 'dynamo.model.file' isSpecification = 'false'>
+                  <UML:TagDefinition.multiplicity>
+                    <UML:Multiplicity xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F88'>
+                      <UML:Multiplicity.range>
+                        <UML:MultiplicityRange xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F87'
+                          lower = '0' upper = '1'/>
+                      </UML:Multiplicity.range>
+                    </UML:Multiplicity>
+                  </UML:TagDefinition.multiplicity>
+                  <UML:ModelElement.taggedValue>
+                    <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F89'
+                      isSpecification = 'false'>
+                      <UML:TaggedValue.dataValue>Stephane Carrez</UML:TaggedValue.dataValue>
+                      <UML:TaggedValue.type>
+                        <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F73'/>
+                      </UML:TaggedValue.type>
+                    </UML:TaggedValue>
+                    <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F8A'
+                      isSpecification = 'false'>
+                      <UML:TaggedValue.dataValue>1.0</UML:TaggedValue.dataValue>
+                      <UML:TaggedValue.type>
+                        <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F77'/>
+                      </UML:TaggedValue.type>
+                    </UML:TaggedValue>
+                    <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F8B'
+                      isSpecification = 'false'>
+                      <UML:TaggedValue.dataValue>When specified, the tag value represents the XML model file that is generated.
+</UML:TaggedValue.dataValue>
+                      <UML:TaggedValue.type>
+                        <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                      </UML:TaggedValue.type>
+                    </UML:TaggedValue>
+                  </UML:ModelElement.taggedValue>
+                </UML:TagDefinition>
+              </UML:Stereotype.definedTag>
+            </UML:Stereotype>
+          </UML:Namespace.ownedElement>
+        </UML:Package>
+        <UML:Package xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F71'
+          name = 'AWA' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Namespace.ownedElement>
+            <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F72'
+              name = 'Bean' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Stereotype.baseClass>Class</UML:Stereotype.baseClass>
+              <UML:ModelElement.taggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F76'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>Stephane Carrez</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F73'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7A'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>1.0</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F77'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7E'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>The bean stereotype indicates a class that exposes an Ada Bean interface and can be used in EL expressions.</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+              </UML:ModelElement.taggedValue>
+            </UML:Stereotype>
+            <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7F'
+              name = 'Action' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Stereotype.baseClass>Method</UML:Stereotype.baseClass>
+              <UML:ModelElement.taggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F80'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>Indicates an action methods that can be invoked as part of an EL action method.</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F81'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>Stephane Carrez</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F73'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F82'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>1.0</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F77'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+              </UML:ModelElement.taggedValue>
+            </UML:Stereotype>
+          </UML:Namespace.ownedElement>
+        </UML:Package>
+        <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F73'
+          name = 'author' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F75'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F74'
+                  lower = '0' upper = '0'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F77'
+          name = 'version' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F79'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F78'
+                  lower = '0' upper = '0'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'
+          name = 'documentation' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7D'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7C'
+                  lower = '0' upper = '0'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+      </UML:Namespace.ownedElement>
+    </UML:Model>
+  </XMI.content>
+</XMI>

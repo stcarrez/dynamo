@@ -67,7 +67,12 @@ analyze:
 # Clean, then build executables for all mains defined by the project.
 rebuild: clean build
 
-test:	 build
+
+bin/dynamo_harness:  bin/dynamo
+	$(GNATMAKE) -p -Ptests
+
+test:	 build bin/dynamo_harness
+	 bin/dynamo_harness
 	-rm -rf test-app
 	-rm dynamo-junit.xml
 	mkdir test-app

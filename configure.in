@@ -168,4 +168,5 @@ AC_SUBST(mkdir_p)
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT(
 dynamo.gpr
+tests.gpr
 )

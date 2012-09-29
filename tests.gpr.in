@@ -1,0 +1,22 @@
+with "config";
+with "@UTIL_DIR@util";
+with "@UTIL_DIR@testutil";
+with "@EL_DIR@el";
+with "@ASF_DIR@asf";
+with "@ADO_DIR@ado";
+with "dynamo";
+
+project Tests is
+
+   Mains := ("dynamo_harness.adb");
+   for Main use Mains;
+   for Source_Dirs use ("regtests");
+   for Object_Dir use "./" & Config'Object_Dir & "/obj";
+   for Exec_Dir use "./" & Config'Exec_Dir & "/bin";
+
+   package Binder renames Config.Binder;
+   package Builder renames Config.Builder;
+   package Compiler renames Config.Compiler;
+   package Linker renames Config.Linker;
+
+end Tests;

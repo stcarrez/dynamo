@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
---  gen-artifacts-query -- Query artifact for Code Generator
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
+--  Copyright (C) 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,8 +27,6 @@ with Util.Beans.Objects;
 with Util.Serialize.Mappers.Record_Mapper;
 with Util.Serialize.IO.XML;
 
---  The <b>Gen.Artifacts.Query</b> package is an artifact for the generation of
---  data structures returned by queries.
 package body Gen.Artifacts.XMI is
 
    use Ada.Strings.Unbounded;
@@ -39,8 +37,6 @@ package body Gen.Artifacts.XMI is
    use Util.Log;
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.XMI");
-
-   use type Gen.Model.XMI.Package_Element_Access;
 
    --  Get the visibility from the XMI visibility value.
    function Get_Visibility (Value : in Util.Beans.Objects.Object) return Model.XMI.Visibility_Type;
@@ -134,19 +130,11 @@ package body Gen.Artifacts.XMI is
    end record;
    type XMI_Access is access all XMI_Info;
 
+   procedure Add_Tagged_Value (P : in out XMI_Info);
+
    procedure Set_Member (P     : in out XMI_Info;
                          Field : in XMI_Fields;
                          Value : in Util.Beans.Objects.Object);
-
-   procedure Add_Element (P    : in out XMI_Info;
-                          Item : in Gen.Model.XMI.Model_Element_Access) is
-   begin
-      Item.Name   := Util.Beans.Objects.To_Unbounded_String (P.Name);
-      Item.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
-      P.Model.Insert (Item.XMI_Id, Item);
-      P.Id   := Util.Beans.Objects.Null_Object;
-      P.Name := Util.Beans.Objects.Null_Object;
-   end Add_Element;
 
    use type Gen.Model.XMI.Attribute_Element_Access;
    use type Gen.Model.XMI.Class_Element_Access;
@@ -238,7 +226,7 @@ package body Gen.Artifacts.XMI is
          when FIELD_CLASS_END =>
             if P.Class_Element /= null then
                P.Class_Element.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Class_Id);
-               P.Class_Visibility := P.Class_Visibility;
+               P.Class_Element.Visibility := P.Class_Visibility;
                Log.Info ("Adding class {0}", P.Class_Element.XMI_Id);
                P.Model.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
                P.Class_Element := null;
@@ -417,8 +405,6 @@ package body Gen.Artifacts.XMI is
                                                Fields              => XMI_Fields,
                                                Set_Member          => Set_Member);
 
-   type Mapper is new XMI_Mapper.Mapper with null record;
-
    XMI_Mapping        : aliased XMI_Mapper.Mapper;
 
    --  ------------------------------
@@ -484,13 +470,19 @@ package body Gen.Artifacts.XMI is
       end loop;
    end Read_UML_Configuration;
 
+   --  ------------------------------
    --  Read the UML/XMI model file.
+   --  ------------------------------
    procedure Read_Model (Handler : in out Artifact;
                          File    : in String;
                          Context : in out Generator'Class) is
+      procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
+                      Model : in out Gen.Model.XMI.Model_Map.Map);
 
       procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                       Model : in out Gen.Model.XMI.Model_Map.Map) is
+         pragma Unreferenced (Key);
+
          Info   : aliased XMI_Info;
          Reader : Util.Serialize.IO.XML.Parser;
       begin
@@ -547,8 +539,6 @@ begin
 --                              FIELD_ASSOCIATION_VISIBILITY);
 --     XMI_Mapping.Add_Mapping ("Package/*/Association/*/@aggregation",
 --                              FIELD_ASSOCIATION_AGGREGATION);
---     XMI_Mapping.Add_Mapping ("Package/*/Association/*/AssociationEnd.participant/Class/@xmi.idref",
---                              FIELD_ASSOCIATION_END_ID);
 
    --  Association end mapping.
    XMI_Mapping.Add_Mapping ("**/AssociationEnd/@name", FIELD_ASSOCIATION_END_NAME);
@@ -566,7 +556,8 @@ begin
    XMI_Mapping.Add_Mapping ("**/TaggedValue/@xmi.id", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.dataValue", FIELD_VALUE);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/@xmi.idref", FIELD_ID_REF);
-   XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/TagDefinition/@xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/TagDefinition/@xmi.idref",
+                            FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/TagDefinition/@href", FIELD_HREF);
    XMI_Mapping.Add_Mapping ("**/TaggedValue", FIELD_TAGGED_VALUE);
 

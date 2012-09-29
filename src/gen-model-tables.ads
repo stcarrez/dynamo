@@ -70,6 +70,9 @@ package Gen.Model.Tables is
       Is_Updated   : Boolean := True;
 
       Type_Mapping : Gen.Model.Mappings.Mapping_Definition_Access;
+
+      --  The class generator to use for this column.
+      Generator    : Util.Beans.Objects.Object;
    end record;
    type Column_Definition_Access is access all Column_Definition'Class;
 
@@ -112,7 +115,6 @@ package Gen.Model.Tables is
       Members_Bean   : Util.Beans.Objects.Object;
       Parent         : Table_Definition_Access;
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
-      Name           : Unbounded_String;
       Type_Name      : Unbounded_String;
       Pkg_Name       : Unbounded_String;
       Version_Column : Column_Definition_Access;

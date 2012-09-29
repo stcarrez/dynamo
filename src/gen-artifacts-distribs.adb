@@ -99,8 +99,8 @@ package body Gen.Artifacts.Distribs is
 
          use Ada.Strings.Unbounded;
 
-         Dir   : constant String := To_String (Gen.Model.Get_Attribute (Node, "dir"));
-         Mode  : constant String := To_String (Gen.Model.Get_Attribute (Node, "mode"));
+         Dir   : constant String := To_String (Gen.Utils.Get_Attribute (Node, "dir"));
+         Mode  : constant String := To_String (Gen.Utils.Get_Attribute (Node, "mode"));
          Rule  : Distrib_Rule_Access := Create_Rule (Kind => Mode, Node => Node);
          Match : Match_Rule;
 
@@ -109,7 +109,7 @@ package body Gen.Artifacts.Distribs is
          --  ------------------------------
          procedure Collect_Includes (Rule  : in out Distrib_Rule_Access;
                                      Node  : in DOM.Core.Node) is
-            Name : constant String := To_String (Gen.Model.Get_Attribute (Node, "name"));
+            Name : constant String := To_String (Gen.Utils.Get_Attribute (Node, "name"));
          begin
             if Name = "" then
                Context.Error ("Invalid include name {0}", Name);
@@ -128,7 +128,7 @@ package body Gen.Artifacts.Distribs is
          --  ------------------------------
          procedure Collect_Filesets (Rule  : in out Distrib_Rule_Access;
                                      Node  : in DOM.Core.Node) is
-            Dir : constant String := To_String (Gen.Model.Get_Attribute (Node, "dir"));
+            Dir : constant String := To_String (Gen.Utils.Get_Attribute (Node, "dir"));
          begin
             if Dir = "" then
                Context.Error ("Invalid fileset directory {0}", Dir);

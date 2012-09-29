@@ -62,9 +62,9 @@ package body Gen.Artifacts.Mappings is
          procedure Register_Type (O    : in out Gen.Model.Packages.Model_Definition;
                                   Node : in DOM.Core.Node);
 
-         N    : constant DOM.Core.Node := Gen.Model.Get_Child (Node, "to");
+         N    : constant DOM.Core.Node := Gen.Utils.Get_Child (Node, "to");
          To   : constant String := Gen.Utils.Get_Data_Content (N);
-         Kind : constant String := To_String (Gen.Model.Get_Attribute (Node, "type"));
+         Kind : constant String := To_String (Gen.Utils.Get_Attribute (Node, "type"));
 
          Kind_Type     : Gen.Model.Mappings.Basic_Type;
 

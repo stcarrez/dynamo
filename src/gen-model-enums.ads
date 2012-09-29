@@ -55,7 +55,6 @@ package Gen.Model.Enums is
       Values         : aliased Value_List.List_Definition;
       Values_Bean    : Util.Beans.Objects.Object;
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
-      Name           : Unbounded_String;
       Type_Name      : Unbounded_String;
       Pkg_Name       : Unbounded_String;
    end record;

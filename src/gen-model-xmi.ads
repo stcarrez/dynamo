@@ -117,9 +117,6 @@ package Gen.Model.XMI is
    --  Model Element
    --  ------------------------------
    type Model_Element (Model : Model_Map_Access) is abstract new Definition with record
-      --  Element name.
-      Name          : Ada.Strings.Unbounded.Unbounded_String;
-
       --  Element XMI id.
       XMI_Id        : Ada.Strings.Unbounded.Unbounded_String;
 
@@ -210,7 +207,7 @@ package Gen.Model.XMI is
    --  Comment
    --  ------------------------------
    type Comment_Element is new Model_Element with record
-      Comment    : Ada.Strings.Unbounded.Unbounded_String;
+      Text       : Ada.Strings.Unbounded.Unbounded_String;
       Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
    end record;
    type Comment_Element_Access is access all Comment_Element'Class;

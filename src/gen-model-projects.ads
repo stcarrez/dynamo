@@ -47,7 +47,6 @@ package Gen.Model.Projects is
    --  Project Definition
    --  ------------------------------
    type Project_Definition is new Definition with record
-      Name    : Unbounded_String;
       Path    : Unbounded_String;
       Props   : Util.Properties.Manager;
       Modules : Project_Vectors.Vector;

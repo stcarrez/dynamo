@@ -57,7 +57,8 @@ package body Gen.Artifacts.Hibernate is
                                    Column : in DOM.Core.Node);
 
    --  Register all the columns defined in the table
-   procedure Register_Columns (Table : in out Table_Definition);
+   procedure Register_Columns (Table : in out Table_Definition;
+                               Node  : in DOM.Core.Node);
 
    procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
                              Node : in DOM.Core.Node);
@@ -77,38 +78,40 @@ package body Gen.Artifacts.Hibernate is
                               Column : in DOM.Core.Node) is
       Name : constant DOM.Core.DOM_String      := DOM.Core.Nodes.Node_Name (Column);
       C    : constant Column_Definition_Access := new Column_Definition;
-
+      G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
    begin
-
-      C.Node := Column;
+      C.Initialize (Ada.Strings.Unbounded.To_Unbounded_String (Name), Column);
       C.Number := Table.Members.Get_Count;
       Table.Members.Append (C);
 
-      C.Is_Inserted := Get_Attribute (Column, "insert", True);
-      C.Is_Updated  := Get_Attribute (Column, "update", True);
+      C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
+      C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
+      if G /= null then
+         C.Generator := Gen.Utils.Get_Attribute (Column, "class");
+      end if;
 
       --  Get the SQL mapping from an optional <column> element.
       declare
-         N : DOM.Core.Node := Get_Child (Column, "column");
-         T : constant DOM.Core.Node := Get_Child (Column, "type");
+         N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
+         T : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "type");
       begin
          if T /= null then
-            C.Type_Name := To_Unbounded_String (Get_Normalized_Type (T, "name"));
+            C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (T, "name"));
          else
-            C.Type_Name := To_Unbounded_String (Get_Normalized_Type (Column, "type"));
+            C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (Column, "type"));
          end if;
 
          Log.Debug ("Register column {0} of type {1}", Name, To_String (C.Type_Name));
          if N /= null then
-            C.Sql_Name := Get_Attribute (N, "name");
-            C.Sql_Type := Get_Attribute (N, "sql-type");
+            C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
+            C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");
          else
             N := Column;
-            C.Sql_Name := Get_Attribute (N, "column");
+            C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
             C.Sql_Type := C.Type_Name;
          end if;
-         C.Not_Null := Get_Attribute (N, "not-null");
-         C.Unique   := Get_Attribute (N, "unique");
+         C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
+         C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
       end;
       if Name = "version" then
          Table.Version_Column := C;
@@ -133,33 +136,34 @@ package body Gen.Artifacts.Hibernate is
    begin
       Log.Debug ("Register association {0}", Name);
 
-      C.Node := Column;
+      C.Initialize (Ada.Strings.Unbounded.To_Unbounded_String (Name), Column);
       C.Number := Table.Members.Get_Count;
       Table.Members.Append (C.all'Access);
       Table.Has_Associations := True;
 
       --  Get the SQL mapping from an optional <column> element.
       declare
-         N : DOM.Core.Node := Get_Child (Column, "column");
+         N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
       begin
-         C.Type_Name := Get_Attribute (Column, "class");
+         C.Type_Name := Gen.Utils.Get_Attribute (Column, "class");
          if N /= null then
-            C.Sql_Name := Get_Attribute (N, "name");
-            C.Sql_Type := Get_Attribute (N, "sql-type");
+            C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
+            C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");
          else
             N := Column;
-            C.Sql_Name := Get_Attribute (N, "column");
+            C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
             C.Sql_Type := C.Type_Name;
          end if;
-         C.Not_Null := Get_Attribute (N, "not-null");
-         C.Unique   := Get_Attribute (N, "unique");
+         C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
+         C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
       end;
    end Register_Association;
 
    --  ------------------------------
    --  Register all the columns defined in the table
    --  ------------------------------
-   procedure Register_Columns (Table : in out Table_Definition) is
+   procedure Register_Columns (Table : in out Table_Definition;
+                               Node  : in DOM.Core.Node) is
       procedure Iterate is
         new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
                                      Process => Register_Column);
@@ -169,10 +173,10 @@ package body Gen.Artifacts.Hibernate is
    begin
       Log.Debug ("Register columns from table {0}", Table.Name);
 
-      Iterate (Table, Table.Node, "id");
-      Iterate (Table, Table.Node, "version");
-      Iterate (Table, Table.Node, "property");
-      Iterate_Association (Table, Table.Node, "many-to-one");
+      Iterate (Table, Node, "id");
+      Iterate (Table, Node, "version");
+      Iterate (Table, Node, "property");
+      Iterate_Association (Table, Node, "many-to-one");
    end Register_Columns;
 
    --  ------------------------------
@@ -182,8 +186,7 @@ package body Gen.Artifacts.Hibernate is
                              Node : in DOM.Core.Node) is
       Table : constant Table_Definition_Access := new Table_Definition;
    begin
-      Table.Node := Node;
-      Table.Name := Table.Get_Attribute ("name");
+      Table.Initialize (Gen.Utils.Get_Attribute (Node, "name"), Node);
       Log.Debug ("Register class {0}", Table.Name);
 
       declare
@@ -199,7 +202,7 @@ package body Gen.Artifacts.Hibernate is
       end;
 
       O.Register_Table (Table);
-      Register_Columns (Table_Definition (Table.all));
+      Register_Columns (Table_Definition (Table.all), Node);
    end Register_Class;
 
    --  ------------------------------
@@ -212,13 +215,9 @@ package body Gen.Artifacts.Hibernate is
    begin
       Log.Debug ("Register enum value {0}", Name);
 
-      C.Node := Value;
+      C.Initialize (Ada.Strings.Unbounded.To_Unbounded_String (Name), Value);
       C.Number := Enum.Values.Get_Count;
       Enum.Values.Append (C);
-
---        C.Is_Inserted := Get_Attribute (Column, "value", True);
---        C.Is_Updated  := Get_Attribute (Column, "update", True);
-
    end Register_Enum_Value;
 
    --  ------------------------------
@@ -231,9 +230,9 @@ package body Gen.Artifacts.Hibernate is
                                      Process => Register_Enum_Value);
 
       Enum : constant Enum_Definition_Access := new Enum_Definition;
+      Name : constant Ada.Strings.Unbounded.Unbounded_String := Enum.Get_Attribute ("name");
    begin
-      Enum.Node := Node;
-      Enum.Name := Enum.Get_Attribute ("name");
+      Enum.Initialize (Name, Node);
       Log.Debug ("Register enum {0}", Enum.Name);
 
       declare
@@ -252,7 +251,7 @@ package body Gen.Artifacts.Hibernate is
 
       Log.Debug ("Register enum values from enum {0}", Enum.Name);
 
-      Iterate (Enum_Definition (Enum.all), Enum.Node, "value");
+      Iterate (Enum_Definition (Enum.all), Node, "value");
 
    end Register_Enum;
 

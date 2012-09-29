@@ -195,8 +195,6 @@ private
       --  The package Ada name
       Pkg_Name     : Unbounded_String;
 
-      Name         : Unbounded_String;
-
       --  The base name for the package (ex: gen-model-users)
       Base_Name    : Unbounded_String;
 

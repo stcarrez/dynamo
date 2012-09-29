@@ -54,7 +54,8 @@ package body Gen.Artifacts.Query is
       procedure Register_Column (Table  : in out Query_Definition;
                                  Column : in DOM.Core.Node);
 
-      procedure Register_Columns (Table : in out Query_Definition);
+      procedure Register_Columns (Table : in out Query_Definition;
+                                  Node  : in DOM.Core.Node);
 
       procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
                                   Node  : in DOM.Core.Node);
@@ -72,14 +73,14 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Column (Table  : in out Query_Definition;
                                  Column : in DOM.Core.Node) is
-         Name  : constant Unbounded_String := Gen.Model.Get_Attribute (Column, "name");
+         Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
          C     : constant Column_Definition_Access := new Column_Definition;
       begin
-         C.Node := Column;
+         C.Initialize (Name, Column);
          C.Number := Table.Members.Get_Count;
          Table.Members.Append (C);
 
-         C.Type_Name := To_Unbounded_String (Get_Normalized_Type (Column, "type"));
+         C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (Column, "type"));
 
          C.Is_Inserted := False;
          C.Is_Updated  := False;
@@ -96,13 +97,14 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       --  Register all the columns defined in the table
       --  ------------------------------
-      procedure Register_Columns (Table : in out Query_Definition) is
+      procedure Register_Columns (Table : in out Query_Definition;
+                                  Node  : in DOM.Core.Node) is
          procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Query_Definition,
                                                            Process => Register_Column);
       begin
          Log.Debug ("Register columns from query {0}", Table.Name);
 
-         Iterate (Table, Table.Node, "property");
+         Iterate (Table, Node, "property");
       end Register_Columns;
 
       --  ------------------------------
@@ -110,9 +112,9 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
                                   Node  : in DOM.Core.Node) is
-         Name  : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "name");
+         Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
       begin
-         Query.Node := Node;
+         Query.Initialize (Name, Node);
          Query.Set_Table_Name (Query.Get_Attribute ("name"));
 
          if Name /= "" then
@@ -126,7 +128,7 @@ package body Gen.Artifacts.Query is
          Append (Hash, Query.Name);
 
          Log.Debug ("Register query {0} with type {0}", Query.Name, Query.Type_Name);
-         Register_Columns (Query);
+         Register_Columns (Query, Node);
       end Register_Mapping;
 
       --  ------------------------------
@@ -135,8 +137,9 @@ package body Gen.Artifacts.Query is
       procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
                                 Node  : in DOM.Core.Node) is
          C    : constant Column_Definition_Access := new Column_Definition;
+         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
       begin
-         C.Node := Node;
+         Query.Initialize (Name, Node);
          C.Number := Query.Queries.Get_Count;
          Query.Queries.Append (C);
       end Register_Query;
@@ -154,11 +157,12 @@ package body Gen.Artifacts.Query is
                                         Process => Register_Query);
 
          Table : constant Query_Definition_Access := new Query_Definition;
-         Pkg   : constant Unbounded_String := Gen.Model.Get_Attribute (Node, "package");
+         Pkg   : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "package");
+         Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "table");
       begin
+         Table.Initialize (Name, Node);
          Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
          Table.Pkg_Name  := Pkg;
-         Table.Node      := Node;
          Iterate_Mapping (Query_Definition (Table.all), Node, "class");
          Iterate_Query (Query_Definition (Table.all), Node, "query");
          if Length (Table.Pkg_Name) = 0 then

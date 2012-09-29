@@ -18,10 +18,7 @@
 
 with Ada.Strings;
 with Util.Strings;
-with DOM.Core.Elements;
 package body Gen.Model.Tables is
-
-   use type DOM.Core.Node;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -77,15 +74,16 @@ package body Gen.Model.Tables is
          return Util.Beans.Objects.To_Object (From.Is_Basic_Type);
 
       elsif Name = "generator" then
-         declare
-            Node : constant DOM.Core.Node := Get_Child (From.Node, "generator");
-         begin
-            if Node /= null then
-               return Get_Attribute (Node, "class");
-            else
-               return Util.Beans.Objects.Null_Object;
-            end if;
-         end;
+--           declare
+--              Node : constant DOM.Core.Node := Get_Child (From.Node, "generator");
+--           begin
+--              if Node /= null then
+--                 return Get_Attribute (Node, "class");
+--              else
+--                 return Util.Beans.Objects.Null_Object;
+--              end if;
+--           end;
+         return From.Generator;
 
       else
          return Definition (From).Get_Value (Name);
@@ -158,9 +156,8 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    function Get_Name (From : in Table_Definition) return String is
-      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (From.Node, "table");
    begin
-      return V;
+      return From.Get_Attribute ("table");
    end Get_Name;
 
    --  ------------------------------
@@ -168,8 +165,8 @@ package body Gen.Model.Tables is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    overriding
-   function Get_Value (From : Table_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+   function Get_Value (From : in Table_Definition;
+                       Name : in String) return Util.Beans.Objects.Object is
    begin
       if Name = "members" or Name = "columns" then
          return From.Members_Bean;

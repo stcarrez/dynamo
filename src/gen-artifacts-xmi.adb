@@ -386,7 +386,7 @@ package body Gen.Artifacts.XMI is
             P.Comment := new Gen.Model.XMI.Comment_Element (P.Model);
             P.Comment.Set_Name (P.Name);
             P.Comment.XMI_Id  := Util.Beans.Objects.To_Unbounded_String (P.Id);
-            P.Comment.Comment := Util.Beans.Objects.To_Unbounded_String (P.Value);
+            P.Comment.Text    := Util.Beans.Objects.To_Unbounded_String (P.Value);
             P.Comment.Ref_Id  := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
             P.Model.Insert (P.Comment.XMI_Id, P.Comment.all'Access);
 

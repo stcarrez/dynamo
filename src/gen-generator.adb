@@ -854,7 +854,7 @@ package body Gen.Generator is
       begin
          if Exists and Mode = "once" then
             Log.Info ("File {0} exists, generation skipped.", Path);
-         elsif (not H.Force_Save or Mode /= "force") and Exists then
+         elsif Exists and not (H.Force_Save or Mode = "force") then
             H.Error ("Cannot generate file: '{0}' exists already.", Path);
          elsif not Util.Beans.Objects.Is_Null (H.File.all) then
             Log.Info ("Generating file '{0}'", Path);

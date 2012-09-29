@@ -473,6 +473,7 @@ package body Gen.Artifacts.XMI is
    begin
       Log.Info ("Reading the UML configuration files from {0}", Path);
 
+      Handler.Has_Config := True;
       Start_Search (Search, Directory => Path, Pattern => "*.xmi", Filter => Filter);
 
       --  Collect the files in the vector array.

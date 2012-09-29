@@ -15,71 +15,19 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+
 with DOM.Core.Nodes;
-with DOM.Core.Elements;
-with DOM.Core.Character_Datas;
+with Gen.Utils;
 package body Gen.Model is
 
    use Ada.Strings.Unbounded;
 
    --  ------------------------------
-   --  Get the attribute identified by <b>Name</b> on the DOM node
-   --  and return it as an EL object.
-   --  ------------------------------
-   function Get_Attribute (Node : DOM.Core.Node;
-                           Name : String) return Util.Beans.Objects.Object is
-      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
-   begin
-      return Util.Beans.Objects.To_Object (V);
-   end Get_Attribute;
-
-   --  ------------------------------
-   --  Set the DOM node associated with the definition object
-   --  ------------------------------
-   procedure Set_Node (Def   : in out Definition;
-                       Node  : in DOM.Core.Node;
-                       Index : in Natural := 0) is
-      pragma Unreferenced (Index);
-   begin
-      Def.Node := Node;
-   end Set_Node;
-
-   --  --------------------
-   --  Get the comment associated with a node
-   --  --------------------
-   function Get_Comment (Def : in Definition) return String is
-      Children : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Def.Node);
-      Size     : constant Natural := DOM.Core.Nodes.Length (Children);
-      Result   : Unbounded_String;
-   begin
-      for I in 0 .. Size - 1 loop
-         declare
-            N    : constant DOM.Core.Node       := DOM.Core.Nodes.Item (Children, I);
-            Name : constant DOM.Core.DOM_String := DOM.Core.Nodes.Node_Name (N);
-         begin
-            if Name = "comment" then
-               declare
-                  Nodes : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (N);
-                  S     : constant Natural            := DOM.Core.Nodes.Length (Nodes);
-               begin
-                  for J in 0 .. S - 1 loop
-                     Append (Result,
-                             DOM.Core.Character_Datas.Data (DOM.Core.Nodes.Item (Nodes, J)));
-                  end loop;
-               end;
-            end if;
-         end;
-      end loop;
-      return To_String (Result);
-   end Get_Comment;
-
-   --  ------------------------------
    --  Get the object unique name.
    --  ------------------------------
    function Get_Name (From : in Definition) return String is
-      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (From.Node, "name");
    begin
-      return V;
+      return Ada.Strings.Unbounded.To_String (From.Name);
    end Get_Name;
 
    --  ------------------------------
@@ -88,19 +36,17 @@ package body Gen.Model is
    --  ------------------------------
    function Get_Value (From : in Definition;
                        Name : in String) return Util.Beans.Objects.Object is
-      use type DOM.Core.Node;
    begin
-      if From.Node = null then
-         return Util.Beans.Objects.Null_Object;
-
-      elsif Name = "comment" then
-         return Util.Beans.Objects.To_Object (From.Get_Comment);
+      if Name = "comment" then
+         return From.Comment;
 
       elsif Name = "rowIndex" then
          return Util.Beans.Objects.To_Object (From.Row_Index);
 
+      elsif Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
       else
-         return Get_Attribute (From.Node, Name);
+         return From.Attrs.Get_Value (Name);
       end if;
    end Get_Value;
 
@@ -108,91 +54,50 @@ package body Gen.Model is
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
-   function Get_Attribute (From : Definition;
-                           Name : String) return String is
-      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (From.Node, Name);
+   function Get_Attribute (From : in Definition;
+                           Name : in String) return String is
+      V : constant Util.Beans.Objects.Object := From.Get_Value (Name);
    begin
-      return V;
+      return Util.Beans.Objects.To_String (V);
    end Get_Attribute;
 
    --  ------------------------------
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
-   function Get_Attribute (From : Definition;
-                           Name : String) return Ada.Strings.Unbounded.Unbounded_String is
+   function Get_Attribute (From : in Definition;
+                           Name : in String) return Ada.Strings.Unbounded.Unbounded_String is
    begin
       return Ada.Strings.Unbounded.To_Unbounded_String (From.Get_Attribute (Name));
    end Get_Attribute;
 
    --  ------------------------------
-   --  Get a boolean attribute
+   --  Initialize the definition from the DOM node attributes.
    --  ------------------------------
-   function Get_Attribute (Node    : DOM.Core.Node;
-                           Name    : String;
-                           Default : Boolean := False) return Boolean is
-      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
+   procedure Initialize (Def  : in out Definition;
+                         Name : in Ada.Strings.Unbounded.Unbounded_String;
+                         Node : in DOM.Core.Node) is
+      use type DOM.Core.Node;
+
+      Attrs : DOM.Core.Named_Node_Map := DOM.Core.Nodes.Attributes (Node);
    begin
-      if V = "yes" or V = "true" then
-         return True;
-      elsif V = "no" or V = "false" then
-         return False;
-      else
-         return Default;
-      end if;
-   end Get_Attribute;
+      Def.Name := Name;
+      Def.Comment := Util.Beans.Objects.To_Object (Gen.Utils.Get_Comment (Node));
 
-   --  ------------------------------
-   --  Get a string attribute
-   --  ------------------------------
-   function Get_Attribute (Node    : DOM.Core.Node;
-                           Name    : String;
-                           Default : String := "") return Ada.Strings.Unbounded.Unbounded_String is
-      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
-   begin
-      if V = "" then
-         return To_Unbounded_String (Default);
-      else
-         return To_Unbounded_String (V);
-      end if;
-   end Get_Attribute;
-
-   --  ------------------------------
-   --  Get the value identified by the name from the attribute.
-   --  Normalize the result string.
-   --  If the name cannot be found, the method should return the Null object.
-   --  ------------------------------
-   function Get_Normalized_Type (Node : DOM.Core.Node;
-                                 Name : String) return String is
-      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
-   begin
-      if V'Length > 11 and then V (V'First .. V'First + 9) = "java.lang." then
-         return V (V'First + 10 .. V'Last);
-
-      elsif V'Length > 10 and then V (V'First .. V'First + 8) = "java.sql." then
-         return V (V'First + 9 .. V'Last);
-
-      else
-         return V;
-      end if;
-   end Get_Normalized_Type;
-
-   --  ------------------------------
-   --  Get the first DOM child from the given entity tag
-   --  ------------------------------
-   function Get_Child (Node : DOM.Core.Node;
-                       Name : String) return DOM.Core.Node is
-      Nodes : DOM.Core.Node_List :=
-        DOM.Core.Elements.Get_Elements_By_Tag_Name (Node, Name);
-   begin
-      if DOM.Core.Nodes.Length (Nodes) = 0 then
-         DOM.Core.Free (Nodes);
-         return null;
-      else
-         return Result : constant DOM.Core.Node := DOM.Core.Nodes.Item (Nodes, 0) do
-            DOM.Core.Free (Nodes);
-         end return;
-      end if;
-   end Get_Child;
+      for I in 0 .. DOM.Core.Nodes.Length (Attrs) loop
+         declare
+            A : DOM.Core.Node := DOM.Core.Nodes.Item (Attrs, I);
+         begin
+            if A /= null then
+               declare
+                  Name : DOM.Core.DOM_String := DOM.Core.Nodes.Node_Name (A);
+                  Value : DOM.Core.DOM_String := DOM.Core.Nodes.Node_Value (A);
+               begin
+                  Def.Attrs.Include (Name, Util.Beans.Objects.To_Object (Value));
+               end;
+            end if;
+         end;
+      end loop;
+   end Initialize;
 
 end Gen.Model;

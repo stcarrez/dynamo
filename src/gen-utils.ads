@@ -20,6 +20,7 @@ with Ada.Containers.Ordered_Sets;
 
 with DOM.Core;
 with Util.Strings.Vectors;
+with Util.Beans.Objects;
 package Gen.Utils is
 
    --  Generic procedure to iterate over the DOM nodes children of <b>node</b>
@@ -83,5 +84,25 @@ package Gen.Utils is
 
    --  Returns True if the file name must be ignored (.svn, CVS, .git, are ignored).
    function Is_File_Ignored (Name : in String) return Boolean;
+
+   --  Get a string attribute
+   function Get_Attribute (Node    : in DOM.Core.Node;
+                           Name    : in String;
+                           Default : in String := "")
+                           return Ada.Strings.Unbounded.Unbounded_String;
+
+   --  Get the value identified by the name from the attribute.
+   --  Normalize the result string.
+   --  If the name cannot be found, the method should return the Null object.
+   function Get_Normalized_Type (Node : in DOM.Core.Node;
+                                 Name : in String) return String;
+
+   --  Get the attribute identified by <b>Name</b> on the DOM node
+   --  and return it as an EL object.
+   function Get_Attribute (Node : in DOM.Core.Node;
+                           Name : in String) return Util.Beans.Objects.Object;
+
+   --  Get the comment associated with a node
+   function Get_Comment (Node : in DOM.Core.Node) return String;
 
 end Gen.Utils;

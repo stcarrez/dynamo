@@ -267,4 +267,79 @@ package body Gen.Utils is
       end if;
    end Is_File_Ignored;
 
+   --  ------------------------------
+   --  Get the attribute identified by <b>Name</b> on the DOM node
+   --  and return it as an EL object.
+   --  ------------------------------
+   function Get_Attribute (Node : DOM.Core.Node;
+                           Name : String) return Util.Beans.Objects.Object is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
+   begin
+      return Util.Beans.Objects.To_Object (V);
+   end Get_Attribute;
+
+   --  --------------------
+   --  Get the comment associated with a node
+   --  --------------------
+   function Get_Comment (Node : in DOM.Core.Node) return String is
+      Children : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
+      Size     : constant Natural := DOM.Core.Nodes.Length (Children);
+      Result   : Unbounded_String;
+   begin
+      for I in 0 .. Size - 1 loop
+         declare
+            N    : constant DOM.Core.Node       := DOM.Core.Nodes.Item (Children, I);
+            Name : constant DOM.Core.DOM_String := DOM.Core.Nodes.Node_Name (N);
+         begin
+            if Name = "comment" then
+               declare
+                  Nodes : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (N);
+                  S     : constant Natural            := DOM.Core.Nodes.Length (Nodes);
+               begin
+                  for J in 0 .. S - 1 loop
+                     Append (Result,
+                             DOM.Core.Character_Datas.Data (DOM.Core.Nodes.Item (Nodes, J)));
+                  end loop;
+               end;
+            end if;
+         end;
+      end loop;
+      return To_String (Result);
+   end Get_Comment;
+
+   --  ------------------------------
+   --  Get a string attribute
+   --  ------------------------------
+   function Get_Attribute (Node    : DOM.Core.Node;
+                           Name    : String;
+                           Default : String := "") return Ada.Strings.Unbounded.Unbounded_String is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
+   begin
+      if V = "" then
+         return To_Unbounded_String (Default);
+      else
+         return To_Unbounded_String (V);
+      end if;
+   end Get_Attribute;
+
+   --  ------------------------------
+   --  Get the value identified by the name from the attribute.
+   --  Normalize the result string.
+   --  If the name cannot be found, the method should return the Null object.
+   --  ------------------------------
+   function Get_Normalized_Type (Node : DOM.Core.Node;
+                                 Name : String) return String is
+      V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
+   begin
+      if V'Length > 11 and then V (V'First .. V'First + 9) = "java.lang." then
+         return V (V'First + 10 .. V'Last);
+
+      elsif V'Length > 10 and then V (V'First .. V'First + 8) = "java.sql." then
+         return V (V'First + 9 .. V'Last);
+
+      else
+         return V;
+      end if;
+   end Get_Normalized_Type;
+
 end Gen.Utils;

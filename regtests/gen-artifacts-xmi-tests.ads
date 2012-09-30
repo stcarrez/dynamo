@@ -26,4 +26,7 @@ package Gen.Artifacts.XMI.Tests is
    --  Test reading the XMI files defines in the Dynamo UML configuration repository.
    procedure Test_Read_XMI (T : in out Test);
 
+   --  Test searching an XMI element by using a qualified name.
+   procedure Test_Find_Element (T : in out Test);
+
 end Gen.Artifacts.XMI.Tests;

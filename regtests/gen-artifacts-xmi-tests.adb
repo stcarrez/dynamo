@@ -30,6 +30,8 @@ package body Gen.Artifacts.XMI.Tests is
    begin
       Caller.Add_Test (Suite, "Test Gen.XMI.Read_UML_Configuration",
                        Test_Read_XMI'Access);
+      Caller.Add_Test (Suite, "Test Gen.XMI.Find_Element",
+                       Test_Find_Element'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -81,5 +83,32 @@ package body Gen.Artifacts.XMI.Tests is
              "127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F72");
 
    end Test_Read_XMI;
+
+   --  ------------------------------
+   --  Test searching an XMI element by using a qualified name.
+   --  ------------------------------
+   procedure Test_Find_Element (T : in out Test) is
+      A : Artifact;
+      G : Gen.Generator.Handler;
+      C : constant String := Util.Tests.Get_Parameter ("config_dir", "config");
+
+      use type Gen.Model.XMI.Model_Element_Access;
+      use type Gen.Model.XMI.Stereotype_Element_Access;
+
+      function Find_Stereotype is
+        new Gen.Model.XMI.Find_Element (Element_Type        => Model.XMI.Stereotype_Element,
+                                        Element_Type_Access => Model.XMI.Stereotype_Element_Access);
+
+   begin
+      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C));
+      A.Read_UML_Configuration (G);
+
+      declare
+         S : Gen.Model.XMI.Stereotype_Element_Access;
+      begin
+         S := Find_Stereotype (A.Nodes, "Dynamo.xmi", "ADO.Table", Gen.Model.XMI.BY_NAME);
+         T.Assert (S /= null, "Stereotype not found");
+      end;
+   end Test_Find_Element;
 
 end Gen.Artifacts.XMI.Tests;

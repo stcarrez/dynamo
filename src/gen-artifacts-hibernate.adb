@@ -77,12 +77,12 @@ package body Gen.Artifacts.Hibernate is
    procedure Register_Column (Table  : in out Table_Definition;
                               Column : in DOM.Core.Node) is
       Name : constant DOM.Core.DOM_String      := DOM.Core.Nodes.Node_Name (Column);
-      C    : constant Column_Definition_Access := new Column_Definition;
+      N    : constant Unbounded_String := To_Unbounded_String (Name);
       G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
+      C    : Column_Definition_Access;
    begin
-      C.Initialize (Ada.Strings.Unbounded.To_Unbounded_String (Name), Column);
-      C.Number := Table.Members.Get_Count;
-      Table.Members.Append (C);
+      Table.Add_Column (N, C);
+      C.Initialize (N, Column);
 
       C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
       C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
@@ -113,17 +113,6 @@ package body Gen.Artifacts.Hibernate is
          C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
          C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
       end;
-      if Name = "version" then
-         Table.Version_Column := C;
-         C.Is_Version  := True;
-         C.Is_Updated  := False;
-         C.Is_Inserted := False;
-
-      elsif Name = "id" then
-         Table.Id_Column := C;
-         C.Is_Key := True;
-
-      end if;
    end Register_Column;
 
    --  ------------------------------
@@ -184,22 +173,11 @@ package body Gen.Artifacts.Hibernate is
    --  ------------------------------
    procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
                              Node : in DOM.Core.Node) is
-      Table : constant Table_Definition_Access := new Table_Definition;
+      Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+      Table : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
    begin
-      Table.Initialize (Gen.Utils.Get_Attribute (Node, "name"), Node);
+      Table.Initialize (Name, Node);
       Log.Debug ("Register class {0}", Table.Name);
-
-      declare
-         Pos : constant Natural := Index (Table.Name, ".", Ada.Strings.Backward);
-      begin
-         if Pos > 0 then
-            Table.Pkg_Name := Unbounded_Slice (Table.Name, 1, Pos - 1);
-            Table.Type_Name := Unbounded_Slice (Table.Name, Pos + 1, Length (Table.Name));
-         else
-            Table.Pkg_Name := To_Unbounded_String ("ADO");
-            Table.Type_Name := Table.Name;
-         end if;
-      end;
 
       O.Register_Table (Table);
       Register_Columns (Table_Definition (Table.all), Node);

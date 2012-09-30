@@ -459,6 +459,24 @@ package body Gen.Generator is
    end Get_Parameter;
 
    --  ------------------------------
+   --  Get the configuration parameter.
+   --  ------------------------------
+   function Get_Parameter (H       : in Handler;
+                           Name    : in String;
+                           Default : in Boolean := False) return Boolean is
+   begin
+      if not H.Conf.Exists (Name) then
+         return Default;
+      else
+         declare
+            V : constant String := H.Conf.Get (Name);
+         begin
+            return V = "1" or V = "true" or V = "yes";
+         end;
+      end if;
+   end Get_Parameter;
+
+   --  ------------------------------
    --  Set the force-save file mode.  When False, if the generated file exists already,
    --  an error message is reported.
    --  ------------------------------

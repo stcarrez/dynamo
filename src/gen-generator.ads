@@ -151,6 +151,11 @@ package Gen.Generator is
                            Name    : in String;
                            Default : in String := "") return String;
 
+   --  Get the configuration parameter.
+   function Get_Parameter (H       : in Handler;
+                           Name    : in String;
+                           Default : in Boolean := False) return Boolean;
+
    --  Set the force-save file mode.  When False, if the generated file exists already,
    --  an error message is reported.
    procedure Set_Force_Save (H  : in out Handler;

@@ -143,6 +143,51 @@ package body Gen.Model.Tables is
    end Initialize;
 
    --  ------------------------------
+   --  Create a table with the given name.
+   --  ------------------------------
+   function Create_Table (Name : in Unbounded_String) return Table_Definition_Access is
+      Table : constant Table_Definition_Access := new Table_Definition;
+   begin
+      Table.Name := Name;
+      declare
+         Pos : constant Natural := Index (Table.Name, ".", Ada.Strings.Backward);
+      begin
+         if Pos > 0 then
+            Table.Pkg_Name := Unbounded_Slice (Table.Name, 1, Pos - 1);
+            Table.Type_Name := Unbounded_Slice (Table.Name, Pos + 1, Length (Table.Name));
+         else
+            Table.Pkg_Name := To_Unbounded_String ("ADO");
+            Table.Type_Name := Table.Name;
+         end if;
+      end;
+      return Table;
+   end Create_Table;
+
+   --  ------------------------------
+   --  Create a table column with the given name and add it to the table.
+   --  ------------------------------
+   procedure Add_Column (Table  : in out Table_Definition;
+                         Name   : in Unbounded_String;
+                         Column : out Column_Definition_Access) is
+   begin
+      Column := new Column_Definition;
+      Column.Name   := Name;
+      Column.Number := Table.Members.Get_Count;
+      Table.Members.Append (Column);
+      if Name = "version" then
+         Table.Version_Column := Column;
+         Column.Is_Version  := True;
+         Column.Is_Updated  := False;
+         Column.Is_Inserted := False;
+
+      elsif Name = "id" then
+         Table.Id_Column := Column;
+         Column.Is_Key := True;
+
+      end if;
+   end Add_Column;
+
+   --  ------------------------------
    --  Get the table unique name.
    --  ------------------------------
    overriding

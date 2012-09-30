@@ -140,6 +140,14 @@ package Gen.Model.Tables is
    overriding
    procedure Initialize (O : in out Table_Definition);
 
+   --  Create a table with the given name.
+   function Create_Table (Name : in Unbounded_String) return Table_Definition_Access;
+
+   --  Create a table column with the given name and add it to the table.
+   procedure Add_Column (Table  : in out Table_Definition;
+                         Name   : in Unbounded_String;
+                         Column : out Column_Definition_Access);
+
    --  Set the table name and determines the package name.
    procedure Set_Table_Name (Table : in out Table_Definition;
                              Name  : in String);

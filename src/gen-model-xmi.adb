@@ -324,6 +324,18 @@ package body Gen.Model.XMI is
    end Get_Comment;
 
    --  ------------------------------
+   --  Get the full qualified name for the element.
+   --  ------------------------------
+   function Get_Qualified_Name (Node : in Model_Element) return String is
+   begin
+      if Node.Parent /= null then
+         return Node.Parent.Get_Qualified_Name & "." & To_String (Node.Name);
+      else
+         return To_String (Node.Name);
+      end if;
+   end Get_Qualified_Name;
+
+   --  ------------------------------
    --  Get the element type.
    --  ------------------------------
    overriding

@@ -181,6 +181,9 @@ package Gen.Model.XMI is
    --  Returns the empty string if there is no comment.
    function Get_Comment (Node : in Model_Element) return String;
 
+   --  Get the full qualified name for the element.
+   function Get_Qualified_Name (Node : in Model_Element) return String;
+
    --  Find from the model file identified by <tt>Name</tt>, the model element with the
    --  identifier or name represented by <tt>Key</tt>.
    --  Returns null if the model element is not found.

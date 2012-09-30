@@ -32,4 +32,13 @@ package Gen.Integration.Tests is
    --  Test dynamo create-project command.
    procedure Test_Create_Project (T : in out Test);
 
+   --  Test project configure.
+   procedure Test_Configure (T : in out Test);
+
+   --  Test propset command.
+   procedure Test_Change_Property (T : in out Test);
+
+   --  Test add-module command.
+   procedure Test_Add_Module (T : in out Test);
+
 end Gen.Integration.Tests;

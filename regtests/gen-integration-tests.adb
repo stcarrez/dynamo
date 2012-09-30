@@ -32,6 +32,12 @@ package body Gen.Integration.Tests is
    begin
       Caller.Add_Test (Suite, "Create_Project",
                        Test_Create_Project'Access);
+      Caller.Add_Test (Suite, "Configure",
+                       Test_Configure'Access);
+      Caller.Add_Test (Suite, "Propset",
+                       Test_Change_Property'Access);
+      Caller.Add_Test (Suite, "Add Module",
+                       Test_Add_Module'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -59,11 +65,52 @@ package body Gen.Integration.Tests is
    procedure Test_Create_Project (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
+      Ada.Directories.Delete_Tree ("test-app");
+
       T.Execute ("bin/dynamo -o test-app create-project -l apache test", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*test.properties", Result,
                                  "Invalid generation");
       Util.Tests.Assert_Matches (T, ".*Generating file.*src/test.ads", Result,
                                  "Invalid generation");
    end Test_Create_Project;
+
+   --  ------------------------------
+   --  Test project configure.
+   --  ------------------------------
+   procedure Test_Configure (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute ("./configure", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test.properties", Result,
+                                 "Invalid configure");
+   end Test_Configure;
+
+   --  ------------------------------
+   --  Test propset command.
+   --  ------------------------------
+   procedure Test_Change_Property (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute ("bin/dynamo -o test-app propset author Druss", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test.properties", Result,
+                                 "Invalid configure");
+      T.Execute ("bin/dynamo -o test-app propset author_email Druss@drenai.com", Result);
+      T.Execute ("bin/dynamo -o test-app propset license Apache", Result);
+   end Test_Change_Property;
+
+   --  ------------------------------
+   --  Test add-module command.
+   --  ------------------------------
+   procedure Test_Add_Module (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute ("bin/dynamo -o test-app add-module blog", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*model/test-blog-model.ads", Result,
+                                 "Invalid add-module");
+
+      T.Execute ("bin/dynamo -o test-app add-module user", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*model/test-user-model.ads", Result,
+                                 "Invalid add-module");
+   end Test_Add_Module;
 
 end Gen.Integration.Tests;

@@ -61,6 +61,14 @@ private
    type Artifact is new Gen.Artifacts.Artifact with record
       Nodes      : aliased Gen.Model.XMI.UML_Model;
       Has_Config : Boolean := False;
+
+      --  Stereotype which triggers the generation of database table.
+      Table_Stereotype : Gen.Model.XMI.Stereotype_Element_Access;
+      PK_Stereotype    : Gen.Model.XMI.Stereotype_Element_Access;
+      FK_Stereotype    : Gen.Model.XMI.Stereotype_Element_Access;
+
+      --  Stereotype which triggers the generation of AWA bean types.
+      Bean_Stereotype  : Gen.Model.XMI.Stereotype_Element_Access;
    end record;
 
 end Gen.Artifacts.XMI;

@@ -113,7 +113,8 @@ package Gen.Model.XMI is
    --  Find the model element with the given XMI id.
    --  Returns null if the model element is not found.
    function Find (Model : in Model_Map.Map;
-                  Id    : in Ada.Strings.Unbounded.Unbounded_String) return Model_Element_Access;
+                  Key   : in Ada.Strings.Unbounded.Unbounded_String;
+                  By_Id : in Boolean := True) return Model_Element_Access;
 
    --  Find the model element within all loaded UML models.
    --  Returns null if the model element is not found.
@@ -165,13 +166,21 @@ package Gen.Model.XMI is
    function Find_Tag_Value (Node : in Model_Element;
                             Name : in String) return Tagged_Value_Element_Access;
 
-   --  Returns True if the model element has the stereotype with the given name.
-   function Has_Stereotype (Node : in Model_Element;
-                            Name : in String) return Boolean;
-
    --  Get the documentation and comment associated with the model element.
    --  Returns the empty string if there is no comment.
    function Get_Comment (Node : in Model_Element) return String;
+
+   --  Find from the model file identified by <tt>Name</tt>, the model element with the
+   --  identifier or name represented by <tt>Key</tt>.
+   --  Returns null if the model element is not found.
+   generic
+      type Element_Type is new Model_Element with private;
+      type Element_Type_Access is access all Element_Type'Class;
+   function Find_Element (Model   : in UML_Model;
+                          Name    : in Ada.Strings.Unbounded.Unbounded_String;
+                          Key     : in Ada.Strings.Unbounded.Unbounded_String;
+                          By_Id   : in Boolean := True)
+                          return Element_Type_Access;
 
    --  ------------------------------
    --  Data type
@@ -211,12 +220,17 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  Stereotype
    --  ------------------------------
+
    type Stereotype_Element is new Model_Element with null record;
    type Stereotype_Element_Access is access all Stereotype_Element'Class;
 
    --  Get the element type.
    overriding
    function Get_Type (Node : in Stereotype_Element) return Element_Type;
+
+   --  Returns True if the model element has the stereotype with the given name.
+   function Has_Stereotype (Node       : in Model_Element'Class;
+                            Stereotype : in Stereotype_Element_Access) return Boolean;
 
    --  ------------------------------
    --  Comment

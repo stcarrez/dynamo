@@ -62,20 +62,62 @@ package body Gen.Model.XMI is
    end Iterate_Elements;
 
    --  ------------------------------
-   --  Find the model element with the given XMI id.
+   --  Find the model element with the given XMI id or given name.
    --  Returns null if the model element is not found.
    --  ------------------------------
    function Find (Model : in Model_Map.Map;
-                  Id    : in Ada.Strings.Unbounded.Unbounded_String) return Model_Element_Access is
-      Pos : constant Model_Map_Cursor := Model.Find (Id);
+                  Key   : in Ada.Strings.Unbounded.Unbounded_String;
+                  By_Id : in Boolean := True) return Model_Element_Access is
    begin
-      if Has_Element (Pos) then
-         return Element (Pos);
+      if By_Id then
+         declare
+            Pos : constant Model_Map_Cursor := Model.Find (Key);
+         begin
+            if Has_Element (Pos) then
+               return Element (Pos);
+            else
+               Log.Error ("Model element {0} not found", Ada.Strings.Unbounded.To_String (Key));
+               return null;
+            end if;
+         end;
       else
-         Log.Error ("Model element {0} not found", Ada.Strings.Unbounded.To_String (Id));
          return null;
       end if;
    end Find;
+
+   --  ------------------------------
+   --  Find from the model file identified by <tt>Name</tt>, the model element with the
+   --  identifier or name represented by <tt>Key</tt>.
+   --  Returns null if the model element is not found.
+   --  ------------------------------
+   function Find_Element (Model   : in UML_Model;
+                          Name    : in Ada.Strings.Unbounded.Unbounded_String;
+                          Key     : in Ada.Strings.Unbounded.Unbounded_String;
+                          By_Id   : in Boolean := True)
+                          return Element_Type_Access is
+      Model_Pos : constant UML_Model_Map.Cursor := Model.Find (Name);
+   begin
+      if UML_Model_Map.Has_Element (Model_Pos) then
+         declare
+            Item : Model_Element_Access := Find (UML_Model_Map.Element (Model_Pos), Key, By_Id);
+         begin
+            if Item = null then
+               Log.Error ("The model file {0} does not define {1}",
+                          To_String (Name), To_String (Key));
+               return null;
+            end if;
+            if not (Item.all in Element_Type'Class) then
+               Log.Error ("The model file {0} defines the element {1}",
+                          To_String (Name), To_String (Key));
+               return null;
+            end if;
+            return Element_Type'Class (Item.all)'Access;
+         end;
+      else
+         Log.Error ("Model file {0} not found", To_String (Name));
+         return null;
+      end if;
+   end Find_Element;
 
    --  ------------------------------
    --  Find the model element within all loaded UML models.
@@ -209,26 +251,6 @@ package body Gen.Model.XMI is
    end Find_Tag_Value;
 
    --  ------------------------------
-   --  Returns True if the model element has the stereotype with the given name.
-   --  ------------------------------
-   function Has_Stereotype (Node : in Model_Element;
-                            Name : in String) return Boolean is
-      Iter : Model_Cursor := Node.Stereotypes.First;
-   begin
-      while Model_Vectors.Has_Element (Iter) loop
-         declare
-            S : constant Model_Element_Access := Model_Vectors.Element (Iter);
-         begin
-            if S.Name = Name then
-               return True;
-            end if;
-         end;
-         Model_Vectors.Next (Iter);
-      end loop;
-      return False;
-   end Has_Stereotype;
-
-   --  ------------------------------
    --  Get the documentation and comment associated with the model element.
    --  Returns the empty string if there is no comment.
    --  ------------------------------
@@ -288,6 +310,29 @@ package body Gen.Model.XMI is
    begin
       return XMI_STEREOTYPE;
    end Get_Type;
+
+   --  ------------------------------
+   --  Returns True if the model element has the stereotype with the given name.
+   --  ------------------------------
+   function Has_Stereotype (Node       : in Model_Element'Class;
+                            Stereotype : in Stereotype_Element_Access) return Boolean is
+      Iter : Model_Cursor := Node.Stereotypes.First;
+   begin
+      if Stereotype = null then
+         return False;
+      end if;
+      while Model_Vectors.Has_Element (Iter) loop
+         declare
+            S : constant Model_Element_Access := Model_Vectors.Element (Iter);
+         begin
+            if S = Stereotype.all'Access then
+               return True;
+            end if;
+         end;
+         Model_Vectors.Next (Iter);
+      end loop;
+      return False;
+   end Has_Stereotype;
 
    --  ------------------------------
    --  Get the element type.

@@ -756,6 +756,9 @@ package body Gen.Generator is
    procedure Prepare (H : in out Handler) is
    begin
       H.Model.Prepare;
+      if H.XMI.Is_Initialized then
+         H.XMI.Prepare (Model => H.Model, Context => H);
+      end if;
       if H.Hibernate.Is_Initialized then
          H.Hibernate.Prepare (Model => H.Model, Context => H);
       end if;
@@ -764,9 +767,6 @@ package body Gen.Generator is
       end if;
       if H.Distrib.Is_Initialized then
          H.Distrib.Prepare (Model => H.Model, Context => H);
-      end if;
-      if H.XMI.Is_Initialized then
-         H.XMI.Prepare (Model => H.Model, Context => H);
       end if;
    end Prepare;
 

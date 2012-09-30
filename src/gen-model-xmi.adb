@@ -91,30 +91,31 @@ package body Gen.Model.XMI is
    --  Returns null if the model element is not found.
    --  ------------------------------
    function Find_Element (Model   : in UML_Model;
-                          Name    : in Ada.Strings.Unbounded.Unbounded_String;
-                          Key     : in Ada.Strings.Unbounded.Unbounded_String;
+                          Name    : in String;
+                          Key     : in String;
                           By_Id   : in Boolean := True)
                           return Element_Type_Access is
-      Model_Pos : constant UML_Model_Map.Cursor := Model.Find (Name);
+      Model_Pos : constant UML_Model_Map.Cursor := Model.Find (To_Unbounded_String (Name));
    begin
       if UML_Model_Map.Has_Element (Model_Pos) then
          declare
-            Item : Model_Element_Access := Find (UML_Model_Map.Element (Model_Pos), Key, By_Id);
+            Item : constant Model_Element_Access := Find (UML_Model_Map.Element (Model_Pos),
+                                                          To_Unbounded_String (Key), By_Id);
          begin
             if Item = null then
                Log.Error ("The model file {0} does not define {1}",
-                          To_String (Name), To_String (Key));
+                          Name, Key);
                return null;
             end if;
             if not (Item.all in Element_Type'Class) then
                Log.Error ("The model file {0} defines the element {1}",
-                          To_String (Name), To_String (Key));
+                          Name, Key);
                return null;
             end if;
             return Element_Type'Class (Item.all)'Access;
          end;
       else
-         Log.Error ("Model file {0} not found", To_String (Name));
+         Log.Error ("Model file {0} not found", Name);
          return null;
       end if;
    end Find_Element;

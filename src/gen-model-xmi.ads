@@ -177,8 +177,8 @@ package Gen.Model.XMI is
       type Element_Type is new Model_Element with private;
       type Element_Type_Access is access all Element_Type'Class;
    function Find_Element (Model   : in UML_Model;
-                          Name    : in Ada.Strings.Unbounded.Unbounded_String;
-                          Key     : in Ada.Strings.Unbounded.Unbounded_String;
+                          Name    : in String;
+                          Key     : in String;
                           By_Id   : in Boolean := True)
                           return Element_Type_Access;
 

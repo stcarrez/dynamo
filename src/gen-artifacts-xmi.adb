@@ -19,6 +19,10 @@ with Ada.Strings.Unbounded;
 with Ada.Directories;
 
 with Gen.Configs;
+with Gen.Utils;
+with Gen.Model.Tables;
+with Gen.Model.Packages;
+with Gen.Model.Enums;
 
 with Util.Log.Loggers;
 
@@ -40,6 +44,16 @@ package body Gen.Artifacts.XMI is
 
    --  Get the visibility from the XMI visibility value.
    function Get_Visibility (Value : in Util.Beans.Objects.Object) return Model.XMI.Visibility_Type;
+
+   procedure Iterate_For_Table is
+     new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Tables.Table_Definition'Class);
+
+   procedure Iterate_For_Package is
+     new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Packages.Package_Definition'Class);
+
+   function Find_Stereotype is
+     new Gen.Model.XMI.Find_Element (Element_Type        => Model.XMI.Stereotype_Element,
+                                     Element_Type_Access => Model.XMI.Stereotype_Element_Access);
 
    type XMI_Fields is (FIELD_NAME,
                        FIELD_ID,
@@ -433,9 +447,117 @@ package body Gen.Artifacts.XMI is
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
-      pragma Unreferenced (Handler);
+
+      use Gen.Model.XMI;
+      use Gen.Model.Tables;
+
+      procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
+                               Model : in out Gen.Model.XMI.Model_Map.Map);
+      --  ------------------------------
+      --  Register the column definition in the table
+      --  ------------------------------
+      procedure Prepare_Attribute (Table  : in out Gen.Model.Tables.Table_Definition'Class;
+                                   Column : in Model_Element_Access) is
+         C    : Column_Definition_Access;
+--           G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
+      begin
+         Table.Add_Column (Column.Name, C);
+         C.Comment := Util.Beans.Objects.To_Object (Column.Get_Comment);
+--
+--           C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
+--           C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
+--           if G /= null then
+--              C.Generator := Gen.Utils.Get_Attribute (Column, "class");
+--           end if;
+
+         --  Get the SQL mapping from an optional <column> element.
+--           declare
+--              N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
+--              T : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "type");
+--           begin
+--              if T /= null then
+--                 C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (T, "name"));
+--              else
+--                 C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (Column, "type"));
+--              end if;
+--
+--              Log.Debug ("Register column {0} of type {1}", Name, To_String (C.Type_Name));
+--              if N /= null then
+--                 C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
+--                 C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");
+--              else
+--                 N := Column;
+--                 C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
+--                 C.Sql_Type := C.Type_Name;
+--              end if;
+--              C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
+--              C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
+--           end;
+      end Prepare_Attribute;
+
+      --  Prepare a UML/XMI class:
+      --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
+      procedure Prepare_Class (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
+                               Item : in Gen.Model.XMI.Model_Element_Access) is
+         Class : constant Class_Element_Access := Class_Element'Class (Item.all)'Access;
+         Name  : Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Class.Name);
+      begin
+         Log.Info ("Prepare class {0}", Name);
+
+         if Item.Has_Stereotype (Handler.Table_Stereotype) then
+            Log.Debug ("Class {0} recognized as a database table", Name);
+            declare
+               Table : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
+            begin
+               Model.Register_Table (Table);
+               Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
+            end;
+
+         else
+            Log.Debug ("UML class {0} not generated", Name);
+         end if;
+      end Prepare_Class;
+
+      procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
+                                 Item : in Gen.Model.XMI.Model_Element_Access) is
+         Pkg : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
+         P   : Gen.Model.Packages.Package_Definition_Access
+           := new Gen.Model.Packages.Package_Definition;
+      begin
+         Log.Info ("Prepare package {0}", Pkg.Name);
+
+         Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
+      end Prepare_Package;
+
+      procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
+                               Model : in out Gen.Model.XMI.Model_Map.Map) is
+      begin
+         Log.Info ("Preparing model {0}", Key);
+
+         Gen.Model.XMI.Iterate (Model   => Model,
+                                On      => Gen.Model.XMI.XMI_PACKAGE,
+                                Process => Prepare_Package'Access);
+      end Prepare_Model;
+
+      Iter : Gen.Model.XMI.UML_Model_Map.Cursor := Handler.Nodes.First;
    begin
-      Log.Debug ("Preparing the model for query");
+      Log.Debug ("Preparing the XMI model for generation");
+
+      --  Get the Dynamo stereotype definitions.
+      Handler.Table_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                   "Dynamo.xmi",
+                                                   "ADO.Table");
+      Handler.PK_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                   "Dynamo.xmi",
+                                                   "ADO.PK");
+      Handler.FK_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                "Dynamo.xmi",
+                                                "ADO.FK");
+
+      while not Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
+         Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);
+         Gen.Model.XMI.UML_Model_Map.Next (Iter);
+      end loop;
 
       if Model.Has_Packages then
          Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE);

@@ -547,11 +547,13 @@ package body Gen.Artifacts.XMI is
       procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
                                  Item : in Gen.Model.XMI.Model_Element_Access) is
          Pkg : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
+         Name : constant String := Pkg.Get_Qualified_Name;
          P   : Gen.Model.Packages.Package_Definition_Access
            := new Gen.Model.Packages.Package_Definition;
       begin
-         Log.Info ("Prepare package {0}", Pkg.Name);
+         Log.Info ("Prepare package {0}", Name);
 
+         P.Name := To_Unbounded_String (Name);
          Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
       end Prepare_Package;
 

@@ -175,7 +175,18 @@ package body Gen.Model.XMI is
    --  ------------------------------
    function Has_Stereotype (Node : in Model_Element;
                             Name : in String) return Boolean is
+      Iter : Model_Cursor := Node.Stereotypes.First;
    begin
+      while Model_Vectors.Has_Element (Iter) loop
+         declare
+            S : constant Model_Element_Access := Model_Vectors.Element (Iter);
+         begin
+            if S.Name = Name then
+               return True;
+            end if;
+         end;
+         Model_Vectors.Next (Iter);
+      end loop;
       return False;
    end Has_Stereotype;
 

@@ -23,9 +23,6 @@ with Ada.Containers.Vectors;
 
 with Util.Beans.Objects;
 
-with Gen.Model.List;
-with Gen.Model.Packages;
-with Gen.Model.Mappings;
 package Gen.Model.XMI is
 
    use Ada.Strings.Unbounded;

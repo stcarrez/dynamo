@@ -27,6 +27,7 @@ package Gen.Configs is
    GEN_MYSQL_DROP_SQL_FILE  : constant String := "generator.template.drop.sql.mysql";
    GEN_SQLITE_DROP_SQL_FILE : constant String := "generator.template.drop.sql.sqlite";
    GEN_UML_DIR              : constant String := "generator.uml.dir";
+   GEN_DEBUG_ENABLE         : constant String := "generator.debug";
 
    --  Path of the config directory
    CONFIG_DIR       : constant String := $CONFIG_DIR;

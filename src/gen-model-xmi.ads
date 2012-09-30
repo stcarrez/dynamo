@@ -90,6 +90,10 @@ package Gen.Model.XMI is
                       Process : not null access procedure (Id : in Unbounded_String;
                                                            Node : in Model_Element_Access));
 
+   --  Iterate over the model elements of the list.
+   procedure Iterate (List    : in Model_Vector;
+                      Process : not null access procedure (Item : in Model_Element_Access));
+
    --  Map of UML models indexed on the model name.
    package UML_Model_Map is new
      Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,

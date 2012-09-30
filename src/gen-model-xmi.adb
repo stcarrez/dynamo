@@ -24,6 +24,28 @@ package body Gen.Model.XMI is
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.XMI");
 
    --  ------------------------------
+   --  Iterate on the model element of the type <tt>On</tt> and execute the <tt>Process</tt>
+   --  procedure.
+   --  ------------------------------
+   procedure Iterate (Model   : in Model_Map.Map;
+                      On      : in Element_Type;
+                      Process : not null access procedure (Id : in Unbounded_String;
+                                                           Node : in Model_Element_Access)) is
+      Iter : Model_Map_Cursor := Model.First;
+   begin
+      while Has_Element (Iter) loop
+         declare
+            Node : constant Model_Element_Access := Element (Iter);
+         begin
+            if Node.Get_Type = On then
+               Process (Model_Map.Key (Iter), Node);
+            end if;
+         end;
+         Next (Iter);
+      end loop;
+   end Iterate;
+
+   --  ------------------------------
    --  Find the model element with the given XMI id.
    --  Returns null if the model element is not found.
    --  ------------------------------

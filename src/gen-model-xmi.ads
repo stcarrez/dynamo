@@ -83,6 +83,13 @@ package Gen.Model.XMI is
    procedure Next (Position : in out Model_Map_Cursor)
                    renames Model_Map.Next;
 
+   --  Iterate on the model element of the type <tt>On</tt> and execute the <tt>Process</tt>
+   --  procedure.
+   procedure Iterate (Model   : in Model_Map.Map;
+                      On      : in Element_Type;
+                      Process : not null access procedure (Id : in Unbounded_String;
+                                                           Node : in Model_Element_Access));
+
    --  Map of UML models indexed on the model name.
    package UML_Model_Map is new
      Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,

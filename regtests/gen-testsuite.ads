@@ -22,6 +22,9 @@ package Gen.Testsuite is
 
    function Suite return Util.Tests.Access_Test_Suite;
 
+   --  Get the test root directory.
+   function Get_Test_Directory return String;
+
    procedure Initialize (Props : in Util.Properties.Manager);
 
 end Gen.Testsuite;

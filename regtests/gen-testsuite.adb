@@ -16,11 +16,16 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Ada.Directories;
+with Ada.Strings.Unbounded;
+
 with Gen.Artifacts.XMI.Tests;
 with Gen.Integration.Tests;
 package body Gen.Testsuite is
 
    Tests : aliased Util.Tests.Test_Suite;
+
+   Dir   : Ada.Strings.Unbounded.Unbounded_String;
 
    function Suite return Util.Tests.Access_Test_Suite is
       Result : constant Util.Tests.Access_Test_Suite := Tests'Access;
@@ -30,9 +35,17 @@ package body Gen.Testsuite is
       return Result;
    end Suite;
 
+   --  ------------------------------
+   --  Get the test root directory.
+   --  ------------------------------
+   function Get_Test_Directory return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Dir);
+   end Get_Test_Directory;
+
    procedure Initialize (Props : in Util.Properties.Manager) is
    begin
-      null;
+      Dir := Ada.Strings.Unbounded.To_Unbounded_String (Ada.Directories.Current_Directory);
    end Initialize;
 
 end Gen.Testsuite;

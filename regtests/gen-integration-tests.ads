@@ -24,6 +24,12 @@ package Gen.Integration.Tests is
 
    type Test is new Util.Tests.Test with null record;
 
+   overriding
+   procedure Set_Up (T : in out Test);
+
+   overriding
+   procedure Tear_Down (T : in out Test);
+
    --  Execute the command and get the output in a string.
    procedure Execute (T       : in out Test;
                       Command : in String;

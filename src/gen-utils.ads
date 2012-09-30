@@ -105,4 +105,8 @@ package Gen.Utils is
    --  Get the comment associated with a node
    function Get_Comment (Node : in DOM.Core.Node) return String;
 
+   --  Returns a qualified name from a package name and a name.
+   function Qualify_Name (Pkg_Name : in Unbounded_String;
+                          Name     : in Unbounded_String) return Unbounded_String;
+
 end Gen.Utils;

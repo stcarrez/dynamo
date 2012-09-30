@@ -342,4 +342,13 @@ package body Gen.Utils is
       end if;
    end Get_Normalized_Type;
 
+   --  ------------------------------
+   --  Returns a qualified name from a package name and a name.
+   --  ------------------------------
+   function Qualify_Name (Pkg_Name : in Unbounded_String;
+                          Name     : in Unbounded_String) return Unbounded_String is
+   begin
+      return Pkg_Name & "." & Name;
+   end Qualify_Name;
+
 end Gen.Utils;

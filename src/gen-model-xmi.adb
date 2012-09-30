@@ -48,15 +48,18 @@ package body Gen.Model.XMI is
    --  ------------------------------
    --  Iterate over the model elements of the list.
    --  ------------------------------
-   procedure Iterate (List    : in Model_Vector;
-                      Process : not null access procedure (Item : in Model_Element_Access)) is
+   procedure Iterate_Elements (Closure : in out T;
+                               List    : in Model_Vector;
+                               Process : not null access
+                                 procedure (Closure : in out T;
+                                            Node    : in Model_Element_Access)) is
       Iter : Model_Cursor := List.First;
    begin
       while Model_Vectors.Has_Element (Iter) loop
-         Process (Model_Vectors.Element (Iter));
+         Process (Closure, Model_Vectors.Element (Iter));
          Model_Vectors.Next (Iter);
       end loop;
-   end Iterate;
+   end Iterate_Elements;
 
    --  ------------------------------
    --  Find the model element with the given XMI id.

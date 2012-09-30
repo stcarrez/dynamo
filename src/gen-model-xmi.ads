@@ -23,6 +23,7 @@ with Ada.Containers.Vectors;
 
 with Util.Beans.Objects;
 
+with Gen.Model.Tables;
 package Gen.Model.XMI is
 
    use Ada.Strings.Unbounded;
@@ -87,12 +88,18 @@ package Gen.Model.XMI is
    --  procedure.
    procedure Iterate (Model   : in Model_Map.Map;
                       On      : in Element_Type;
-                      Process : not null access procedure (Id : in Unbounded_String;
+                      Process : not null access procedure (Id   : in Unbounded_String;
                                                            Node : in Model_Element_Access));
 
-   --  Iterate over the model elements of the list.
-   procedure Iterate (List    : in Model_Vector;
-                      Process : not null access procedure (Item : in Model_Element_Access));
+   --  Generic procedure to iterate over the XMI elements of a vector
+   --  and having the entity name <b>name</b>.
+   generic
+      type T (<>) is limited private;
+   procedure Iterate_Elements (Closure : in out T;
+                               List    : in Model_Vector;
+                               Process : not null access
+                                 procedure (Closure : in out T;
+                                            Node    : in Model_Element_Access));
 
    --  Map of UML models indexed on the model name.
    package UML_Model_Map is new

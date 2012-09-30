@@ -16,6 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Ada.Directories;
+
 with Util.Log.Loggers;
 with Util.Tests;
 with Util.Test_Caller;

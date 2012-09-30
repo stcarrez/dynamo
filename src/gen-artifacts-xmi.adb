@@ -269,6 +269,7 @@ package body Gen.Artifacts.XMI is
             P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
             if P.Class_Element /= null then
                P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
+               P.Class_Element.Attributes.Append (P.Attr_Element.all'Access);
             end if;
             P.Attr_Element := null;
             P.Attr_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
@@ -487,6 +488,8 @@ package body Gen.Artifacts.XMI is
          C    : Column_Definition_Access;
 --           G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
       begin
+         Log.Info ("Prepare class attribute {0}", Column.Name);
+
          Table.Add_Column (Column.Name, C);
          C.Comment := Util.Beans.Objects.To_Object (Column.Get_Comment);
 --

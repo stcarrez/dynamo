@@ -150,11 +150,13 @@ package body Gen.Artifacts.XMI is
                          Field : in XMI_Fields;
                          Value : in Util.Beans.Objects.Object);
 
+   use type Gen.Model.XMI.Model_Element_Access;
    use type Gen.Model.XMI.Attribute_Element_Access;
    use type Gen.Model.XMI.Class_Element_Access;
    use type Gen.Model.XMI.Package_Element_Access;
    use type Gen.Model.XMI.Tag_Definition_Element_Access;
    use type Gen.Model.XMI.Association_End_Element_Access;
+   use type Gen.Model.XMI.Stereotype_Element_Access;
 
    --  Get the visibility from the XMI visibility value.
    function Get_Visibility (Value : in Util.Beans.Objects.Object)
@@ -243,6 +245,10 @@ package body Gen.Artifacts.XMI is
                P.Class_Element.Visibility := P.Class_Visibility;
                Log.Info ("Adding class {0}", P.Class_Element.XMI_Id);
                P.Model.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
+               if P.Package_Element /= null then
+                  P.Package_Element.Classes.Append (P.Class_Element.all'Access);
+                  P.Package_Element.Elements.Append (P.Class_Element.all'Access);
+               end if;
                P.Class_Element := null;
                P.Class_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
             end if;
@@ -323,14 +329,20 @@ package body Gen.Artifacts.XMI is
                end if;
                P.Package_Element := new Gen.Model.XMI.Package_Element (P.Model);
                P.Package_Element.Set_Name (Value);
-               P.Package_Element.Parent := Parent;
+               if Parent /= null then
+                  P.Package_Element.Parent := Parent.all'Access;
+               else
+                  P.Package_Element.Parent := null;
+               end if;
             end;
 
          when FIELD_PACKAGE_END =>
             if P.Package_Element /= null then
                P.Package_Element.Set_XMI_Id (P.Package_Id);
                P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
-               P.Package_Element := P.Package_Element.Parent;
+               if P.Package_Element.Parent /= null then
+                  P.Package_Element := Gen.Model.XMI.Package_Element (P.Package_Element.Parent.all)'Access;
+               end if;
                if P.Package_Element /= null then
                   P.Package_Id := Util.Beans.Objects.To_Object (P.Package_Element.XMI_Id);
                end if;
@@ -373,14 +385,28 @@ package body Gen.Artifacts.XMI is
 
             --  Stereotype mapping.
          when FIELD_STEREOTYPE =>
-            if not Util.Beans.Objects.Is_Null (P.Stereotype_Id) then
+            if not Util.Beans.Objects.Is_Null (P.Stereotype_Id) and P.Stereotype /= null then
                P.Stereotype.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Stereotype_Id);
                P.Model.Insert (P.Stereotype.XMI_Id, P.Stereotype.all'Access);
+               if P.Class_Element /= null then
+                  P.Class_Element.Elements.Append (P.Stereotype.all'Access);
+               elsif P.Package_Element /= null then
+                  P.Package_Element.Elements.Append (P.Stereotype.all'Access);
+               end if;
+               P.Stereotype := null;
             end if;
 
          when FIELD_STEREOTYPE_HREF =>
-
-            null;
+            declare
+               S : Gen.Model.XMI.Ref_Type_Element_Access := new Gen.Model.XMI.Ref_Type_Element (P.Model);
+            begin
+               S.Href := Util.Beans.Objects.To_Unbounded_String (Value);
+               if P.Class_Element /= null then
+                  P.Class_Element.Stereotypes.Append (S.all'Access);
+               elsif P.Package_Element /= null then
+                  P.Package_Element.Stereotypes.Append (S.all'Access);
+               end if;
+            end;
 
             --  Tag definition mapping.
          when FIELD_TAG_DEFINITION_NAME =>
@@ -504,7 +530,7 @@ package body Gen.Artifacts.XMI is
       begin
          Log.Info ("Prepare class {0}", Name);
 
-         if Item.Has_Stereotype (Handler.Table_Stereotype) then
+         if Item.Has_Stereotype (Handler.Table_Stereotype) or True then
             Log.Debug ("Class {0} recognized as a database table", Name);
             declare
                Table : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
@@ -546,15 +572,18 @@ package body Gen.Artifacts.XMI is
       --  Get the Dynamo stereotype definitions.
       Handler.Table_Stereotype := Find_Stereotype (Handler.Nodes,
                                                    "Dynamo.xmi",
-                                                   "ADO.Table");
+                                                   "ADO.Table",
+                                                   Gen.Model.XMI.BY_NAME);
       Handler.PK_Stereotype := Find_Stereotype (Handler.Nodes,
-                                                   "Dynamo.xmi",
-                                                   "ADO.PK");
+                                                "Dynamo.xmi",
+                                                "ADO.PK",
+                                                Gen.Model.XMI.BY_NAME);
       Handler.FK_Stereotype := Find_Stereotype (Handler.Nodes,
                                                 "Dynamo.xmi",
-                                                "ADO.FK");
+                                                "ADO.FK",
+                                                Gen.Model.XMI.BY_NAME);
 
-      while not Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
+      while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);
          Gen.Model.XMI.UML_Model_Map.Next (Iter);
       end loop;
@@ -581,7 +610,8 @@ package body Gen.Artifacts.XMI is
    begin
       Log.Info ("Reading the UML configuration files from {0}", Path);
 
-      Handler.Has_Config := True;
+      Handler.Has_Config  := True;
+      Handler.Initialized := True;
       Start_Search (Search, Directory => Path, Pattern => "*.xmi", Filter => Filter);
 
       --  Collect the files in the vector array.

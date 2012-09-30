@@ -16,23 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Gen.Artifacts.XMI.Tests;
-with Gen.Integration.Tests;
-package body Gen.Testsuite is
+package Gen.Integration is
 
-   Tests : aliased Util.Tests.Test_Suite;
-
-   function Suite return Util.Tests.Access_Test_Suite is
-      Result : constant Util.Tests.Access_Test_Suite := Tests'Access;
-   begin
-      Gen.Artifacts.XMI.Tests.Add_Tests (Result);
-      Gen.Integration.Tests.Add_Tests (Result);
-      return Result;
-   end Suite;
-
-   procedure Initialize (Props : in Util.Properties.Manager) is
-   begin
-      null;
-   end Initialize;
-
-end Gen.Testsuite;
+end Gen.Integration;

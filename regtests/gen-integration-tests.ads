@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  gen-testsuite -- Testsuite for gen
+--  gen-integration-tests -- Tests for integration
 --  Copyright (C) 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
@@ -16,23 +16,20 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Gen.Artifacts.XMI.Tests;
-with Gen.Integration.Tests;
-package body Gen.Testsuite is
+with Ada.Strings.Unbounded;
+with Util.Tests;
+package Gen.Integration.Tests is
 
-   Tests : aliased Util.Tests.Test_Suite;
+   procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite);
 
-   function Suite return Util.Tests.Access_Test_Suite is
-      Result : constant Util.Tests.Access_Test_Suite := Tests'Access;
-   begin
-      Gen.Artifacts.XMI.Tests.Add_Tests (Result);
-      Gen.Integration.Tests.Add_Tests (Result);
-      return Result;
-   end Suite;
+   type Test is new Util.Tests.Test with null record;
 
-   procedure Initialize (Props : in Util.Properties.Manager) is
-   begin
-      null;
-   end Initialize;
+   --  Execute the command and get the output in a string.
+   procedure Execute (T       : in out Test;
+                      Command : in String;
+                      Result  : out Ada.Strings.Unbounded.Unbounded_String);
 
-end Gen.Testsuite;
+   --  Test dynamo create-project command.
+   procedure Test_Create_Project (T : in out Test);
+
+end Gen.Integration.Tests;

@@ -28,7 +28,7 @@ package Gen.Model.XMI is
 
    use Ada.Strings.Unbounded;
 
-   type Element_Type is (
+   type Element_Type is (XMI_UNKNOWN,
                          XMI_PACKAGE,
                          XMI_CLASS,
                          XMI_ASSOCIATION,
@@ -110,11 +110,13 @@ package Gen.Model.XMI is
                                  "="             => Model_Map."=");
    subtype UML_Model is UML_Model_Map.Map;
 
+   type Search_Type is (BY_NAME, BY_ID);
+
    --  Find the model element with the given XMI id.
    --  Returns null if the model element is not found.
    function Find (Model : in Model_Map.Map;
-                  Key   : in Ada.Strings.Unbounded.Unbounded_String;
-                  By_Id : in Boolean := True) return Model_Element_Access;
+                  Key   : in String;
+                  Mode  : in Search_Type := BY_ID) return Model_Element_Access;
 
    --  Find the model element within all loaded UML models.
    --  Returns null if the model element is not found.
@@ -144,6 +146,9 @@ package Gen.Model.XMI is
 
       --  Stereotypes associated with the element.
       Stereotypes   : Model_Vector;
+
+      --  The parent model element;
+      Parent        : Model_Element_Access;
    end record;
 
    --  Get the element type.
@@ -152,6 +157,12 @@ package Gen.Model.XMI is
    --  Reconcile the element by resolving the references to other elements in the model.
    procedure Reconcile (Node  : in out Model_Element;
                         Model : in UML_Model);
+
+   --  Find the element with the given name.  If the name is a qualified name, navigate
+   --  down the package/class to find the appropriate element.
+   --  Returns null if the element was not found.
+   function Find (Node : in Model_Element;
+                  Name : in String) return Model_Element_Access;
 
    --  Set the model name.
    procedure Set_Name (Node  : in out Model_Element;
@@ -179,8 +190,26 @@ package Gen.Model.XMI is
    function Find_Element (Model   : in UML_Model;
                           Name    : in String;
                           Key     : in String;
-                          By_Id   : in Boolean := True)
+                          Mode    : in Search_Type := BY_ID)
                           return Element_Type_Access;
+
+   --  ------------------------------
+   --  Data type
+   --  ------------------------------
+   type Ref_Type_Element is new Model_Element with record
+      Href : Unbounded_String;
+      Ref  : Model_Element_Access;
+   end record;
+   type Ref_Type_Element_Access is access all Ref_Type_Element'Class;
+
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Ref_Type_Element) return Element_Type;
+
+   --  Reconcile the element by resolving the references to other elements in the model.
+   overriding
+   procedure Reconcile (Node  : in out Ref_Type_Element;
+                        Model : in UML_Model);
 
    --  ------------------------------
    --  Data type
@@ -352,7 +381,6 @@ package Gen.Model.XMI is
 
    type Package_Element is new Model_Element with record
       Classes      : Model_Vector;
-      Parent       : Package_Element_Access;
    end record;
 
    --  Get the element type.

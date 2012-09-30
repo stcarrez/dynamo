@@ -18,6 +18,8 @@
 
 with Ada.Tags;
 with Ada.Text_IO;
+
+with Util.Strings;
 with Util.Log.Loggers;
 package body Gen.Model.XMI is
 
@@ -66,21 +68,47 @@ package body Gen.Model.XMI is
    --  Returns null if the model element is not found.
    --  ------------------------------
    function Find (Model : in Model_Map.Map;
-                  Key   : in Ada.Strings.Unbounded.Unbounded_String;
-                  By_Id : in Boolean := True) return Model_Element_Access is
+                  Key   : in String;
+                  Mode  : in Search_Type := BY_ID) return Model_Element_Access is
    begin
-      if By_Id then
+      if Mode = BY_ID then
          declare
-            Pos : constant Model_Map_Cursor := Model.Find (Key);
+            Pos : constant Model_Map_Cursor := Model.Find (To_Unbounded_String (Key));
          begin
             if Has_Element (Pos) then
                return Element (Pos);
             else
-               Log.Error ("Model element {0} not found", Ada.Strings.Unbounded.To_String (Key));
+               Log.Error ("Model element {0} not found", Key);
                return null;
             end if;
          end;
       else
+         declare
+            Iter : Model_Map_Cursor := Model.First;
+            Pos  : constant Natural := Util.Strings.Index (Key, '.');
+         begin
+            while Has_Element (Iter) loop
+               declare
+                  Node : Model_Element_Access := Element (Iter);
+               begin
+                  --  Find in the package only.  If there is no '.', check the package name only.
+                  if Node.Get_Type = XMI_PACKAGE then
+                     if Pos = 0 and Node.Name = Key then
+                        return Node;
+                     end if;
+
+                     --  Check that the package name matches and look in it.
+                     if Pos > 0 and then Node.Name = Key (Key'First .. Pos - 1) then
+                        Node := Node.Find (Key (Pos + 1 .. Key'Last));
+                        if Node /= null then
+                           return Node;
+                        end if;
+                     end if;
+                  end if;
+               end;
+               Next (Iter);
+            end loop;
+         end;
          return null;
       end if;
    end Find;
@@ -93,14 +121,14 @@ package body Gen.Model.XMI is
    function Find_Element (Model   : in UML_Model;
                           Name    : in String;
                           Key     : in String;
-                          By_Id   : in Boolean := True)
+                          Mode    : in Search_Type := BY_ID)
                           return Element_Type_Access is
       Model_Pos : constant UML_Model_Map.Cursor := Model.Find (To_Unbounded_String (Name));
    begin
       if UML_Model_Map.Has_Element (Model_Pos) then
          declare
             Item : constant Model_Element_Access := Find (UML_Model_Map.Element (Model_Pos),
-                                                          To_Unbounded_String (Key), By_Id);
+                                                          Key, Mode);
          begin
             if Item = null then
                Log.Error ("The model file {0} does not define {1}",
@@ -133,7 +161,7 @@ package body Gen.Model.XMI is
       First : Natural;
    begin
       if Pos = 0 then
-         return Find (Current, Id);
+         return Find (Current, To_String (Id));
       end if;
       First := Index (Id, "/", Pos, Ada.Strings.Backward);
       if First = 0 then
@@ -148,7 +176,7 @@ package body Gen.Model.XMI is
       begin
          if UML_Model_Map.Has_Element (Model_Pos) then
             return Find (UML_Model_Map.Element (Model_Pos),
-                         Unbounded_Slice (Id, Pos + 1, Len));
+                         Slice (Id, Pos + 1, Len));
          else
             Log.Error ("Model element {0} not found", To_String (Id));
             return null;
@@ -215,6 +243,36 @@ package body Gen.Model.XMI is
    end Reconcile;
 
    --  ------------------------------
+   --  Find the element with the given name.  If the name is a qualified name, navigate
+   --  down the package/class to find the appropriate element.
+   --  Returns null if the element was not found.
+   --  ------------------------------
+   function Find (Node : in Model_Element;
+                  Name : in String) return Model_Element_Access is
+      Pos   : constant Natural := Util.Strings.Index (Name, '.');
+      Iter  : Model_Cursor;
+      Item  : Model_Element_Access;
+   begin
+      if Pos = 0 then
+         Iter := Node.Elements.First;
+         while Model_Vectors.Has_Element (Iter) loop
+            Item := Model_Vectors.Element (Iter);
+            if Item.Name = Name then
+               return Item;
+            end if;
+            Model_Vectors.Next (Iter);
+         end loop;
+         return null;
+      else
+         Item := Node.Find (Name (Name'First .. Pos - 1));
+         if Item = null then
+            return null;
+         end if;
+         return Item.Find (Name (Pos + 1 .. Name'Last));
+      end if;
+   end Find;
+
+   --  ------------------------------
    --  Set the model name.
    --  ------------------------------
    procedure Set_Name (Node  : in out Model_Element;
@@ -264,6 +322,33 @@ package body Gen.Model.XMI is
       end if;
       return Ada.Strings.Unbounded.To_String (Result);
    end Get_Comment;
+
+   --  ------------------------------
+   --  Get the element type.
+   --  ------------------------------
+   overriding
+   function Get_Type (Node : in Ref_Type_Element) return Element_Type is
+   begin
+      if Node.Ref /= null then
+         return Node.Ref.Get_Type;
+      else
+         return XMI_UNKNOWN;
+      end if;
+   end Get_Type;
+
+   --  ------------------------------
+   --  Reconcile the element by resolving the references to other elements in the model.
+   --  ------------------------------
+   overriding
+   procedure Reconcile (Node  : in out Ref_Type_Element;
+                        Model : in UML_Model) is
+      Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Href);
+   begin
+      if Item /= null then
+         Node.Name := Item.Name;
+         Node.Ref  := Item;
+      end if;
+   end Reconcile;
 
    --  ------------------------------
    --  Get the element type.

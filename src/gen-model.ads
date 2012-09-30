@@ -36,7 +36,7 @@ package Gen.Model is
      and Util.Beans.Basic.Readonly_Bean with record
       Row_Index  : Natural;
       Name       : Ada.Strings.Unbounded.Unbounded_String;
-      Attrs      : aliased Util.Beans.Objects.Maps.Map_Bean;
+      Attrs      : Util.Beans.Objects.Maps.Map_Bean;
       Comment    : Util.Beans.Objects.Object;
    end record;
    type Definition_Access is access all Definition'Class;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model -- Model for Code Generator
---  Copyright (C) 2009, 2010 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -79,19 +79,19 @@ package body Gen.Model is
                          Node : in DOM.Core.Node) is
       use type DOM.Core.Node;
 
-      Attrs : DOM.Core.Named_Node_Map := DOM.Core.Nodes.Attributes (Node);
+      Attrs : constant DOM.Core.Named_Node_Map := DOM.Core.Nodes.Attributes (Node);
    begin
       Def.Name := Name;
       Def.Comment := Util.Beans.Objects.To_Object (Gen.Utils.Get_Comment (Node));
 
       for I in 0 .. DOM.Core.Nodes.Length (Attrs) loop
          declare
-            A : DOM.Core.Node := DOM.Core.Nodes.Item (Attrs, I);
+            A : constant DOM.Core.Node := DOM.Core.Nodes.Item (Attrs, I);
          begin
             if A /= null then
                declare
-                  Name : DOM.Core.DOM_String := DOM.Core.Nodes.Node_Name (A);
-                  Value : DOM.Core.DOM_String := DOM.Core.Nodes.Node_Value (A);
+                  Name  : constant DOM.Core.DOM_String := DOM.Core.Nodes.Node_Name (A);
+                  Value : constant DOM.Core.DOM_String := DOM.Core.Nodes.Node_Value (A);
                begin
                   Def.Attrs.Include (Name, Util.Beans.Objects.To_Object (Value));
                end;

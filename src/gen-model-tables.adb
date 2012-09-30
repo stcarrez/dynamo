@@ -74,15 +74,6 @@ package body Gen.Model.Tables is
          return Util.Beans.Objects.To_Object (From.Is_Basic_Type);
 
       elsif Name = "generator" then
---           declare
---              Node : constant DOM.Core.Node := Get_Child (From.Node, "generator");
---           begin
---              if Node /= null then
---                 return Get_Attribute (Node, "class");
---              else
---                 return Util.Beans.Objects.Null_Object;
---              end if;
---           end;
          return From.Generator;
 
       else

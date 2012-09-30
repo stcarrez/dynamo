@@ -645,7 +645,9 @@ package body Gen.Artifacts.XMI is
       begin
          Info.Model := Model'Unchecked_Access;
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
-         Reader.Dump (Log);
+         if Context.Get_Parameter (Gen.Configs.GEN_DEBUG_ENABLE) then
+            Reader.Dump (Log);
+         end if;
          XMI_Mapper.Set_Context (Reader, Info'Unchecked_Access);
          Reader.Parse (File);
       end Read;

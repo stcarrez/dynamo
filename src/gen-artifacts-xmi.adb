@@ -408,6 +408,8 @@ package body Gen.Artifacts.XMI is
          when FIELD_DATA_TYPE_HREF =>
             if P.Attr_Element /= null then
                P.Attr_Element.Ref_Id := Util.Beans.Objects.To_Unbounded_String (Value);
+               Log.Debug ("Attribute {0} has type {1}",
+                          P.Attr_Element.Name, P.Attr_Element.Ref_Id);
             end if;
 
             --  Enumeration mapping.

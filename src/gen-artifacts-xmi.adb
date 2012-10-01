@@ -45,6 +45,10 @@ package body Gen.Artifacts.XMI is
    --  Get the visibility from the XMI visibility value.
    function Get_Visibility (Value : in Util.Beans.Objects.Object) return Model.XMI.Visibility_Type;
 
+   --  Get the changeability from the XMI visibility value.
+   function Get_Changeability (Value : in Util.Beans.Objects.Object)
+                               return Model.XMI.Changeability_Type;
+
    procedure Iterate_For_Table is
      new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Tables.Table_Definition'Class);
 
@@ -71,7 +75,11 @@ package body Gen.Artifacts.XMI is
                        FIELD_ATTRIBUTE_NAME,
                        FIELD_ATTRIBUTE_ID,
                        FIELD_ATTRIBUTE_VISIBILITY,
+                       FIELD_ATTRIBUTE_CHANGEABILITY,
                        FIELD_ATTRIBUTE,
+
+                       FIELD_MULTIPLICITY_UPPER,
+                       FIELD_MULTIPLICITY_LOWER,
 
                        FIELD_PACKAGE_ID,
                        FIELD_PACKAGE_NAME,
@@ -119,6 +127,7 @@ package body Gen.Artifacts.XMI is
       Attr_Id            : Util.Beans.Objects.Object;
       Attr_Element       : Gen.Model.XMI.Attribute_Element_Access;
       Attr_Visibility    : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
+      Attr_Changeability : Gen.Model.XMI.Changeability_Type := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
 
@@ -158,7 +167,9 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Association_End_Element_Access;
    use type Gen.Model.XMI.Stereotype_Element_Access;
 
+   --  ------------------------------
    --  Get the visibility from the XMI visibility value.
+   --  ------------------------------
    function Get_Visibility (Value : in Util.Beans.Objects.Object)
                             return Model.XMI.Visibility_Type is
       S : constant String := Util.Beans.Objects.To_String (Value);
@@ -179,6 +190,27 @@ package body Gen.Artifacts.XMI is
          return Model.XMI.VISIBILITY_PUBLIC;
       end if;
    end Get_Visibility;
+
+   --  ------------------------------
+   --  Get the changeability from the XMI visibility value.
+   --  ------------------------------
+   function Get_Changeability (Value : in Util.Beans.Objects.Object)
+                            return Model.XMI.Changeability_Type is
+      S : constant String := Util.Beans.Objects.To_String (Value);
+   begin
+      if S = "frozen" then
+         return Model.XMI.CHANGEABILITY_FROZEN;
+
+      elsif S = "changeable" then
+         return Model.XMI.CHANGEABILITY_CHANGEABLE;
+
+      elsif S = "addOnly" then
+         return Model.XMI.CHANGEABILITY_INSERT;
+
+      else
+         return Model.XMI.CHANGEABILITY_CHANGEABLE;
+      end if;
+   end Get_Changeability;
 
    procedure Add_Tagged_Value (P : in out XMI_Info) is
       Tagged_Value : constant Model.XMI.Tagged_Value_Element_Access
@@ -229,6 +261,12 @@ package body Gen.Artifacts.XMI is
          when FIELD_HREF =>
             P.Href := Value;
 
+         when FIELD_MULTIPLICITY_LOWER =>
+            P.Multiplicity_Lower := Util.Beans.Objects.To_Integer (Value);
+
+         when FIELD_MULTIPLICITY_UPPER =>
+            P.Multiplicity_Upper := Util.Beans.Objects.To_Integer (Value);
+
          when FIELD_CLASS_NAME =>
             P.Class_Element := new Gen.Model.XMI.Class_Element (P.Model);
             P.Class_Element.Set_Name (Value);
@@ -259,20 +297,27 @@ package body Gen.Artifacts.XMI is
          when FIELD_ATTRIBUTE_VISIBILITY =>
             P.Attr_Visibility := Get_Visibility (Value);
 
+         when FIELD_ATTRIBUTE_CHANGEABILITY =>
+            P.Attr_Changeability := Get_Changeability (Value);
+
          when FIELD_ATTRIBUTE_NAME =>
             P.Attr_Element := new Gen.Model.XMI.Attribute_Element (P.Model);
             P.Attr_Element.Set_Name (Value);
 
          when FIELD_ATTRIBUTE =>
             P.Attr_Element.Set_XMI_Id (P.Attr_Id);
-            P.Attr_Element.Visibility := P.Attr_Visibility;
+            P.Attr_Element.Visibility    := P.Attr_Visibility;
+            P.Attr_Element.Changeability := P.Attr_Changeability;
+            P.Attr_Element.Multiplicity_Lower := P.Multiplicity_Lower;
+            P.Attr_Element.Multiplicity_Upper := P.Multiplicity_Upper;
             P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
             if P.Class_Element /= null then
                P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
                P.Class_Element.Attributes.Append (P.Attr_Element.all'Access);
             end if;
-            P.Attr_Element := null;
-            P.Attr_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
+            P.Attr_Element       := null;
+            P.Attr_Visibility    := Gen.Model.XMI.VISIBILITY_PUBLIC;
+            P.Attr_Changeability := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
 
          when FIELD_MULTIPLICITY_LOWER =>
             P.Multiplicity_Lower := Util.Beans.Objects.To_Integer (Value);
@@ -492,6 +537,8 @@ package body Gen.Artifacts.XMI is
 
          Table.Add_Column (Column.Name, C);
          C.Comment := Util.Beans.Objects.To_Object (Column.Get_Comment);
+         C.Type_Name := Column.Get_Type_Name;
+
 --
 --           C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
 --           C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
@@ -687,7 +734,12 @@ begin
    XMI_Mapping.Add_Mapping ("**/Attribute/@name", FIELD_ATTRIBUTE_NAME);
    XMI_Mapping.Add_Mapping ("**/Attribute/@xmi.id", FIELD_ATTRIBUTE_ID);
    XMI_Mapping.Add_Mapping ("**/Attribute/@visibility", FIELD_ATTRIBUTE_VISIBILITY);
+   XMI_Mapping.Add_Mapping ("**/Attribute/@changeability", FIELD_ATTRIBUTE_CHANGEABILITY);
    XMI_Mapping.Add_Mapping ("**/Attribute", FIELD_ATTRIBUTE);
+
+   --  Field multiplicity.
+   XMI_Mapping.Add_Mapping ("**/MultiplicityRange/@lower", FIELD_MULTIPLICITY_LOWER);
+   XMI_Mapping.Add_Mapping ("**/MultiplicityRange/@upper", FIELD_MULTIPLICITY_UPPER);
 
 --     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@lower",
 --                              FIELD_MULTIPLICITY_LOWER);

@@ -48,6 +48,9 @@ package Gen.Model.XMI is
                             VISIBILITY_PROTECTED,
                             VISIBILITY_PRIVATE);
 
+   type Changeability_Type is (CHANGEABILITY_INSERT,
+                               CHANGEABILITY_CHANGEABLE,
+                               CHANGEABILITY_FROZEN);
    type Model_Element;
    type Tagged_Value_Element;
    type Model_Element_Access is access all Model_Element'Class;
@@ -293,8 +296,11 @@ package Gen.Model.XMI is
    --  An attribute
    --  ------------------------------
    type Attribute_Element is new Model_Element with record
-      Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
-      Visibility : Visibility_Type := VISIBILITY_PUBLIC;
+      Ref_Id             : Ada.Strings.Unbounded.Unbounded_String;
+      Visibility         : Visibility_Type := VISIBILITY_PUBLIC;
+      Changeability      : Changeability_Type := CHANGEABILITY_CHANGEABLE;
+      Multiplicity_Lower : Integer := 0;
+      Multiplicity_Upper : Integer := 1;
    end record;
    type Attribute_Element_Access is access all Attribute_Element'Class;
 

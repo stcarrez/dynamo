@@ -233,7 +233,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  Enum
    --  ------------------------------
-   type Enum_Element is new Model_Element with null record;
+   type Enum_Element is new Data_Type_Element with null record;
    type Enum_Element_Access is access all Enum_Element'Class;
 
    --  Get the element type.

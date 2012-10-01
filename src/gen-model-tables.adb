@@ -171,8 +171,9 @@ package body Gen.Model.Tables is
                          Column : out Column_Definition_Access) is
    begin
       Column := new Column_Definition;
-      Column.Name   := Name;
-      Column.Number := Table.Members.Get_Count;
+      Column.Name     := Name;
+      Column.Sql_Name := Name;
+      Column.Number   := Table.Members.Get_Count;
       Table.Members.Append (Column);
       if Name = "version" then
          Table.Version_Column := Column;

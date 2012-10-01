@@ -78,7 +78,7 @@ package body Gen.Model.XMI is
             if Has_Element (Pos) then
                return Element (Pos);
             else
-               Log.Error ("Model element {0} not found", Key);
+               Log.Error ("Model element id '{0}' not found", Key);
                return null;
             end if;
          end;

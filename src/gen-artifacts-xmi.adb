@@ -110,7 +110,8 @@ package body Gen.Artifacts.XMI is
                        FIELD_TAGGED_VALUE,
 
                        FIELD_ENUMERATION,
-                       FIELD_ENUMERATION_LITERAL);
+                       FIELD_ENUMERATION_LITERAL,
+                       FIELD_ENUMERATION_HREF);
 
    type XMI_Info is record
       Model              : Gen.Model.XMI.Model_Map_Access;
@@ -405,7 +406,7 @@ package body Gen.Artifacts.XMI is
                P.Model.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
             end if;
 
-         when FIELD_DATA_TYPE_HREF =>
+         when FIELD_DATA_TYPE_HREF | FIELD_ENUMERATION_HREF =>
             if P.Attr_Element /= null then
                P.Attr_Element.Ref_Id := Util.Beans.Objects.To_Unbounded_String (Value);
                Log.Debug ("Attribute {0} has type {1}",
@@ -806,6 +807,7 @@ begin
                             FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral/@name",
                             FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/Enumeration/@href", FIELD_ENUMERATION_HREF);
 
    --  Data type mapping.
    XMI_Mapping.Add_Mapping ("**/DataType/@xmi.id", FIELD_ID);

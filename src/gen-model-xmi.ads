@@ -300,6 +300,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    type Attribute_Element is new Model_Element with record
       Ref_Id             : Ada.Strings.Unbounded.Unbounded_String;
+      Data_Type          : Data_Type_Element_Access;
       Visibility         : Visibility_Type := VISIBILITY_PUBLIC;
       Changeability      : Changeability_Type := CHANGEABILITY_CHANGEABLE;
       Initial_Value      : Util.Beans.Objects.Object;
@@ -311,6 +312,11 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Attribute_Element) return Element_Type;
+
+   --  Reconcile the element by resolving the references to other elements in the model.
+   overriding
+   procedure Reconcile (Node  : in out Attribute_Element;
+                        Model : in UML_Model);
 
    --  ------------------------------
    --  An association end

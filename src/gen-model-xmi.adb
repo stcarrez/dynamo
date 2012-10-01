@@ -463,6 +463,24 @@ package body Gen.Model.XMI is
    end Get_Type;
 
    --  ------------------------------
+   --  Reconcile the element by resolving the references to other elements in the model.
+   --  ------------------------------
+   overriding
+   procedure Reconcile (Node  : in out Attribute_Element;
+                        Model : in UML_Model) is
+      Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Ref_Id);
+   begin
+      if Item = null then
+         return;
+      end if;
+      if Item.Get_Type /= XMI_DATA_TYPE then
+         Log.Error ("Invalid data type {0}", To_String (Node.Ref_Id));
+         return;
+      end if;
+      Node.Data_Type := Data_Type_Element'Class (Item.all)'Access;
+   end Reconcile;
+
+   --  ------------------------------
    --  Get the element type.
    --  ------------------------------
    overriding

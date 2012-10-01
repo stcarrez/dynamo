@@ -323,12 +323,6 @@ package body Gen.Artifacts.XMI is
             P.Attr_Visibility    := Gen.Model.XMI.VISIBILITY_PUBLIC;
             P.Attr_Changeability := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
 
-         when FIELD_MULTIPLICITY_LOWER =>
-            P.Multiplicity_Lower := Util.Beans.Objects.To_Integer (Value);
-
-         when FIELD_MULTIPLICITY_UPPER =>
-            P.Multiplicity_Upper := Util.Beans.Objects.To_Integer (Value);
-
          when FIELD_ENUM_DATA_TYPE =>
             --           Print (P.Indent, "  enum-type:" & Util.Beans.Objects.To_String (Value));
             null;
@@ -541,7 +535,16 @@ package body Gen.Artifacts.XMI is
 
          Table.Add_Column (Column.Name, C);
          C.Comment := Util.Beans.Objects.To_Object (Column.Get_Comment);
-         C.Type_Name := Column.Get_Type_Name;
+         if Column.all in Attribute_Element'Class then
+            declare
+               Attr : Attribute_Element_Access := Attribute_Element'Class (Column.all)'Access;
+            begin
+               if Attr.Data_Type /= null then
+                  C.Type_Name := Attr.Data_Type.Name;
+               end if;
+               C.Not_Null := Attr.Multiplicity_Lower > 0;
+            end;
+         end if;
 
 --
 --           C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
@@ -808,5 +811,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/DataType", FIELD_DATA_TYPE);
    XMI_Mapping.Add_Mapping ("**/DataType/@href", FIELD_DATA_TYPE_HREF);
    XMI_Mapping.Add_Mapping ("**/DataType/@xmi.idref", FIELD_DATA_TYPE_HREF);
+--     XMI_Mapping.Add_Mapping ("**/StructuralFeature.type/DataType/@xmi.idref",
+--                              FIELD_DATA_TYPE_HREF);
 
 end Gen.Artifacts.XMI;

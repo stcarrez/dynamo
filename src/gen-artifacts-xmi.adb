@@ -545,6 +545,9 @@ package body Gen.Artifacts.XMI is
          else
             Log.Debug ("UML class {0} not generated", Name);
          end if;
+      exception
+         when E: others =>
+            Log.Error ("Exception", E);
       end Prepare_Class;
 
       procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;

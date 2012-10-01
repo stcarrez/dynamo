@@ -299,6 +299,7 @@ package Gen.Model.XMI is
       Ref_Id             : Ada.Strings.Unbounded.Unbounded_String;
       Visibility         : Visibility_Type := VISIBILITY_PUBLIC;
       Changeability      : Changeability_Type := CHANGEABILITY_CHANGEABLE;
+      Initial_Value      : Util.Beans.Objects.Object;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 1;
    end record;

@@ -76,6 +76,7 @@ package body Gen.Artifacts.XMI is
                        FIELD_ATTRIBUTE_ID,
                        FIELD_ATTRIBUTE_VISIBILITY,
                        FIELD_ATTRIBUTE_CHANGEABILITY,
+                       FIELD_ATTRIBUTE_INITIAL_VALUE,
                        FIELD_ATTRIBUTE,
 
                        FIELD_MULTIPLICITY_UPPER,
@@ -89,8 +90,6 @@ package body Gen.Artifacts.XMI is
                        FIELD_DATA_TYPE_HREF,
                        FIELD_ENUM_DATA_TYPE,
                        FIELD_CLASS_END,
-                       FIELD_MULTIPLICITY_LOWER,
-                       FIELD_MULTIPLICITY_UPPER,
                        FIELD_ASSOCIATION_AGGREGATION,
                        FIELD_ASSOCIATION_NAME,
                        FIELD_ASSOCIATION_VISIBILITY,
@@ -128,6 +127,7 @@ package body Gen.Artifacts.XMI is
       Attr_Element       : Gen.Model.XMI.Attribute_Element_Access;
       Attr_Visibility    : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
       Attr_Changeability : Gen.Model.XMI.Changeability_Type := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
+      Attr_Value         : Util.Beans.Objects.Object;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
 
@@ -304,12 +304,16 @@ package body Gen.Artifacts.XMI is
             P.Attr_Element := new Gen.Model.XMI.Attribute_Element (P.Model);
             P.Attr_Element.Set_Name (Value);
 
+         when FIELD_ATTRIBUTE_INITIAL_VALUE =>
+            P.Attr_Value := Value;
+
          when FIELD_ATTRIBUTE =>
             P.Attr_Element.Set_XMI_Id (P.Attr_Id);
             P.Attr_Element.Visibility    := P.Attr_Visibility;
             P.Attr_Element.Changeability := P.Attr_Changeability;
             P.Attr_Element.Multiplicity_Lower := P.Multiplicity_Lower;
             P.Attr_Element.Multiplicity_Upper := P.Multiplicity_Upper;
+            P.Attr_Element.Initial_Value      := P.Attr_Value;
             P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
             if P.Class_Element /= null then
                P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
@@ -735,11 +739,15 @@ begin
    XMI_Mapping.Add_Mapping ("**/Attribute/@xmi.id", FIELD_ATTRIBUTE_ID);
    XMI_Mapping.Add_Mapping ("**/Attribute/@visibility", FIELD_ATTRIBUTE_VISIBILITY);
    XMI_Mapping.Add_Mapping ("**/Attribute/@changeability", FIELD_ATTRIBUTE_CHANGEABILITY);
+   XMI_Mapping.Add_Mapping ("**/Attribute.initialValue/Expression/@body",
+                            FIELD_ATTRIBUTE_INITIAL_VALUE);
    XMI_Mapping.Add_Mapping ("**/Attribute", FIELD_ATTRIBUTE);
 
    --  Field multiplicity.
    XMI_Mapping.Add_Mapping ("**/MultiplicityRange/@lower", FIELD_MULTIPLICITY_LOWER);
    XMI_Mapping.Add_Mapping ("**/MultiplicityRange/@upper", FIELD_MULTIPLICITY_UPPER);
+
+
 
 --     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@lower",
 --                              FIELD_MULTIPLICITY_LOWER);

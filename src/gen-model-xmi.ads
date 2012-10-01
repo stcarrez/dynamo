@@ -43,14 +43,17 @@ package Gen.Model.XMI is
                          XMI_STEREOTYPE,
                          XMI_COMMENT);
 
+   --  Defines the visibility of an element (a package, class, attribute, operation).
    type Visibility_Type is (VISIBILITY_PUBLIC,
                             VISIBILITY_PACKAGE,
                             VISIBILITY_PROTECTED,
                             VISIBILITY_PRIVATE);
 
+   --  Defines whether an attribute or association changes.
    type Changeability_Type is (CHANGEABILITY_INSERT,
                                CHANGEABILITY_CHANGEABLE,
                                CHANGEABILITY_FROZEN);
+
    type Model_Element;
    type Tagged_Value_Element;
    type Model_Element_Access is access all Model_Element'Class;

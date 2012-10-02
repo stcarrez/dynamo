@@ -319,6 +319,11 @@ package body Gen.Artifacts.XMI is
             if P.Class_Element /= null then
                P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
                P.Class_Element.Attributes.Append (P.Attr_Element.all'Access);
+               if P.Attr_Element.Ref_Id = "" then
+                  Log.Error ("Class {0}: attribute {1} has no type",
+                             To_String (P.Class_Element.Name),
+                             To_String (P.Attr_Element.Name));
+               end if;
             end if;
             P.Attr_Element       := null;
             P.Attr_Visibility    := Gen.Model.XMI.VISIBILITY_PUBLIC;

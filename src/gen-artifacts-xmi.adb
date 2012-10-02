@@ -394,6 +394,8 @@ package body Gen.Artifacts.XMI is
                P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
                if P.Package_Element.Parent /= null then
                   P.Package_Element := Gen.Model.XMI.Package_Element (P.Package_Element.Parent.all)'Access;
+               else
+                  P.Package_Element := null;
                end if;
                if P.Package_Element /= null then
                   P.Package_Id := Util.Beans.Objects.To_Object (P.Package_Element.XMI_Id);

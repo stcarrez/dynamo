@@ -643,6 +643,9 @@ package body Gen.Artifacts.XMI is
    begin
       Log.Debug ("Preparing the XMI model for generation");
 
+      Gen.Model.XMI.Reconcile (Handler.Nodes,
+                               Context.Get_Parameter (Gen.Configs.GEN_DEBUG_ENABLE));
+
       --  Get the Dynamo stereotype definitions.
       Handler.Table_Stereotype := Find_Stereotype (Handler.Nodes,
                                                    "Dynamo.xmi",
@@ -734,7 +737,6 @@ package body Gen.Artifacts.XMI is
       Handler.Nodes.Include (Name, UML);
       Handler.Nodes.Update_Element (Handler.Nodes.Find (Name),
                                     Read'Access);
-      Gen.Model.XMI.Reconcile (Handler.Nodes);
    end Read_Model;
 
 begin
@@ -819,6 +821,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/Enumeration/@href", FIELD_ENUMERATION_HREF);
 
    XMI_Mapping.Add_Mapping ("**/Classifier/@xmi.idref", FIELD_CLASSIFIER_HREF);
+   XMI_Mapping.Add_Mapping ("**/Classifier/@href", FIELD_CLASSIFIER_HREF);
 
    --  Data type mapping.
    XMI_Mapping.Add_Mapping ("**/DataType/@xmi.id", FIELD_ID);

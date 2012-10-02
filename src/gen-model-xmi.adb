@@ -473,7 +473,7 @@ package body Gen.Model.XMI is
       if Item = null then
          return;
       end if;
-      if Item.Get_Type /= XMI_DATA_TYPE then
+      if not (Item.all in Data_Type_Element'Class) then
          Log.Error ("Invalid data type {0}", To_String (Node.Ref_Id));
          return;
       end if;

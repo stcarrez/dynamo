@@ -380,7 +380,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  A class
    --  ------------------------------
-   type Class_Element is new Model_Element with record
+   type Class_Element is new Data_Type_Element with record
       Operations   : Model_Vector;
       Attributes   : Model_Vector;
       Associations : Model_Vector;

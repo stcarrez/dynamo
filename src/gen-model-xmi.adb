@@ -204,7 +204,8 @@ package body Gen.Model.XMI is
    --  ------------------------------
    --  Reconcile all the UML model elements by resolving all the references to UML elements.
    --  ------------------------------
-   procedure Reconcile (Model : in out UML_Model) is
+   procedure Reconcile (Model : in out UML_Model;
+                        Debug : in Boolean := False) is
       procedure Reconcile_Model (Key : in Ada.Strings.Unbounded.Unbounded_String;
                         Map : in out Model_Map.Map);
 
@@ -222,7 +223,9 @@ package body Gen.Model.XMI is
             end;
             Next (Iter);
          end loop;
-         Gen.Model.XMI.Dump (Map);
+         if Debug then
+            Gen.Model.XMI.Dump (Map);
+         end if;
       end Reconcile_Model;
 
       Iter : UML_Model_Map.Cursor := Model.First;

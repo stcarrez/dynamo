@@ -135,7 +135,8 @@ package Gen.Model.XMI is
    procedure Dump (Map : in Model_Map.Map);
 
    --  Reconcile all the UML model elements by resolving all the references to UML elements.
-   procedure Reconcile (Model : in out UML_Model);
+   procedure Reconcile (Model : in out UML_Model;
+                        Debug : in Boolean := False);
 
    --  ------------------------------
    --  Model Element

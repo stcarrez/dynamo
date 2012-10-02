@@ -38,6 +38,7 @@ with EL.Utils;
 with EL.Contexts.Default;
 
 with Gen.Utils;
+with Gen.Configs;
 with Gen.Model;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
@@ -334,7 +335,8 @@ package body Gen.Generator is
    --  Initialize the generator
    --  ------------------------------
    procedure Initialize (H : in out Handler;
-                         Config_Dir : in Ada.Strings.Unbounded.Unbounded_String) is
+                         Config_Dir : in Ada.Strings.Unbounded.Unbounded_String;
+                         Debug : in Boolean) is
       use Ada.Directories;
 
       procedure Register_Funcs is
@@ -360,6 +362,9 @@ package body Gen.Generator is
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_EMPTY_LINES, "true");
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
       H.Conf.Set ("ado.queries.paths", Compose (Dir, "db"));
+      if Debug then
+         H.Conf.Set (Gen.Configs.GEN_DEBUG_ENABLE, "1");
+      end if;
       Props.Set ("generator_config_dir", Dir);
       EL.Utils.Expand (Source => Props, Into => H.Conf, Context => Context);
       H.Initialize (H.Conf, Factory);

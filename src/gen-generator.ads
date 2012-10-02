@@ -51,7 +51,8 @@ package Gen.Generator is
 
    --  Initialize the generator
    procedure Initialize (H : in out Handler;
-                         Config_Dir : in Ada.Strings.Unbounded.Unbounded_String);
+                         Config_Dir : in Ada.Strings.Unbounded.Unbounded_String;
+                         Debug : in Boolean);
 
    --  Get the configuration properties.
    function Get_Properties (H : in Handler) return Util.Properties.Manager;

@@ -45,6 +45,7 @@ procedure Dynamo is
    Config_Dir   : Unbounded_String;
    Template_Dir : Unbounded_String;
    Status       : Exit_Status := Success;
+   Debug        : Boolean := False;
 
    --  ------------------------------
    --  Verify and set the configuration path
@@ -76,7 +77,7 @@ begin
    Initialize_Option_Scan (Stop_At_First_Non_Switch => True, Section_Delimiters => "targs");
    --  Parse the command line
    loop
-      case Getopt ("* o: t: c:") is
+      case Getopt ("* d o: t: c:") is
          when ASCII.NUL => exit;
 
          when 'o' =>
@@ -87,6 +88,9 @@ begin
 
          when 'c' =>
             Set_Config_Directory (Parameter);
+
+         when 'd' =>
+            Debug := True;
 
          when '*' =>
             exit;
@@ -131,7 +135,7 @@ begin
          Gen.Generator.Set_Template_Directory (Generator, Template_Dir);
       end if;
 
-      Gen.Generator.Initialize (Generator, Config_Dir);
+      Gen.Generator.Initialize (Generator, Config_Dir, Debug);
       Cmd := Gen.Commands.Find_Command (Cmd_Name);
 
       --  Check that the command exists.

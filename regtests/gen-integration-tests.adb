@@ -57,6 +57,8 @@ package body Gen.Integration.Tests is
                        Test_Generate'Access);
       Caller.Add_Test (Suite, "Help",
                        Test_Help'Access);
+      Caller.Add_Test (Suite, "Dist",
+                       Test_Dist'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -266,5 +268,22 @@ package body Gen.Integration.Tests is
                                  Result,
                                  "Invalid help");
    end Test_Help;
+
+   --  ------------------------------
+   --  Test dist command.
+   --  ------------------------------
+   procedure Test_Dist (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " dist ../test-dist", Result);
+      Util.Tests.Assert_Matches (T,
+                                 ".*Installing.*files with copy.*",
+                                 Result,
+                                 "Invalid dist");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Installing.*compressor.*",
+                                 Result,
+                                 "Invalid dist");
+   end Test_Dist;
 
 end Gen.Integration.Tests;

@@ -67,4 +67,7 @@ package Gen.Integration.Tests is
    --  Test help command.
    procedure Test_Help (T : in out Test);
 
+   --  Test dist command.
+   procedure Test_Dist (T : in out Test);
+
 end Gen.Integration.Tests;

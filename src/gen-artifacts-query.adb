@@ -22,6 +22,7 @@ with Gen.Configs;
 with Gen.Utils;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
+with Gen.Model.Mappings;
 
 with Util.Log.Loggers;
 with Util.Encoders.HMAC.SHA1;
@@ -200,8 +201,10 @@ package body Gen.Artifacts.Query is
       Log.Debug ("Preparing the model for query");
 
       if Model.Has_Packages then
-         Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE);
-         Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE);
+         Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE,
+                                 Mapping => Gen.Model.Mappings.ADA_MAPPING);
+         Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE,
+                                 Mapping => Gen.Model.Mappings.ADA_MAPPING);
       end if;
    end Prepare;
 

@@ -113,7 +113,10 @@ package body Gen.Artifacts.Mappings is
          procedure Iterate is
            new Gen.Utils.Iterate_Nodes (T => Gen.Model.Packages.Model_Definition,
                                         Process => Register_Mapping);
+
+         Name : constant String := Gen.Utils.Get_Attribute (Node, "name");
       begin
+         Gen.Model.Mappings.Set_Mapping_Name (Name);
          Iterate (Model, Node, "mapping");
       end Register_Mappings;
 

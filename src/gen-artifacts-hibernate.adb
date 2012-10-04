@@ -27,6 +27,7 @@ with Gen.Utils;
 with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Projects;
+with Gen.Model.Mappings;
 
 with Util.Files;
 with Util.Log.Loggers;
@@ -292,12 +293,18 @@ package body Gen.Artifacts.Hibernate is
       Log.Debug ("Preparing the model for hibernate");
 
       if Model.Has_Packages then
-         Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE);
-         Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE);
-         Context.Add_Generation (Name => GEN_MYSQL_SQL_FILE, Mode => ITERATION_TABLE);
-         Context.Add_Generation (Name => GEN_MYSQL_DROP_SQL_FILE, Mode => ITERATION_TABLE);
-         Context.Add_Generation (Name => GEN_SQLITE_SQL_FILE, Mode => ITERATION_TABLE);
-         Context.Add_Generation (Name => GEN_SQLITE_DROP_SQL_FILE, Mode => ITERATION_TABLE);
+         Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE,
+                                 Mapping => Gen.Model.Mappings.ADA_MAPPING);
+         Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE,
+                                 Mapping => Gen.Model.Mappings.ADA_MAPPING);
+         Context.Add_Generation (Name => GEN_MYSQL_SQL_FILE, Mode => ITERATION_TABLE,
+                                 Mapping => Gen.Model.Mappings.MySQL_MAPPING);
+         Context.Add_Generation (Name => GEN_MYSQL_DROP_SQL_FILE, Mode => ITERATION_TABLE,
+                                 Mapping => Gen.Model.Mappings.MySQL_MAPPING);
+         Context.Add_Generation (Name => GEN_SQLITE_SQL_FILE, Mode => ITERATION_TABLE,
+                                 Mapping => Gen.Model.Mappings.SQLite_MAPPING);
+         Context.Add_Generation (Name => GEN_SQLITE_DROP_SQL_FILE, Mode => ITERATION_TABLE,
+                                 Mapping => Gen.Model.Mappings.SQLite_MAPPING);
       end if;
    end Prepare;
 

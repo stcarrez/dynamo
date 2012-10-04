@@ -23,6 +23,7 @@ with Gen.Utils;
 with Gen.Model.Tables;
 with Gen.Model.Packages;
 with Gen.Model.Enums;
+with Gen.Model.Mappings;
 
 with Util.Log.Loggers;
 
@@ -666,8 +667,10 @@ package body Gen.Artifacts.XMI is
       end loop;
 
       if Model.Has_Packages then
-         Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE);
-         Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE);
+         Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE,
+                                 Mapping => Gen.Model.Mappings.ADA_MAPPING);
+         Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE,
+                                 Mapping => Gen.Model.Mappings.ADA_MAPPING);
       end if;
    end Prepare;
 

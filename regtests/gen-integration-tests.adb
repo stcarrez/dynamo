@@ -59,6 +59,8 @@ package body Gen.Integration.Tests is
                        Test_Help'Access);
       Caller.Add_Test (Suite, "Dist",
                        Test_Dist'Access);
+      Caller.Add_Test (Suite, "Info",
+                       Test_Info'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -285,5 +287,22 @@ package body Gen.Integration.Tests is
                                  Result,
                                  "Invalid dist");
    end Test_Dist;
+
+   --  ------------------------------
+   --  Test dist command.
+   --  ------------------------------
+   procedure Test_Info (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " info", Result);
+      Util.Tests.Assert_Matches (T,
+                                 ".*GNAT project files.*",
+                                 Result,
+                                 "Invalid info");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Dynamo project files.*",
+                                 Result,
+                                 "Invalid info");
+   end Test_Info;
 
 end Gen.Integration.Tests;

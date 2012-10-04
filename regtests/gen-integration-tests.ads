@@ -70,4 +70,7 @@ package Gen.Integration.Tests is
    --  Test dist command.
    procedure Test_Dist (T : in out Test);
 
+   --  Test dist command.
+   procedure Test_Info (T : in out Test);
+
 end Gen.Integration.Tests;

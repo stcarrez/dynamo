@@ -72,25 +72,9 @@ bin/dynamo_harness:  bin/dynamo
 	$(GNATMAKE) -p -Ptests
 
 test:	 build bin/dynamo_harness
-	 bin/dynamo_harness
 	-rm -rf test-app
 	-rm dynamo-junit.xml
-	mkdir test-app
-	regtests/run.sh 'Dynamo create project' ../bin/dynamo create-project -l apache test
-	regtests/run.sh 'Dynamo configure project' ./configure
-	regtests/run.sh 'Dynamo propset author' ../bin/dynamo propset author 'Druss'
-	regtests/run.sh 'Dynamo propset email' ../bin/dynamo propset author_email 'Druss@drenai.com'
-	regtests/run.sh 'Dynamo propset license' ../bin/dynamo propset license 'Apache'
-	regtests/run.sh 'Dynamo add module blog' ../bin/dynamo add-module blog
-	regtests/run.sh 'Dynamo add module user' ../bin/dynamo add-module user
-	regtests/run.sh 'Dynamo add model user' ../bin/dynamo add-model user test_user
-	regtests/run.sh 'Dynamo add model blog' ../bin/dynamo add-model blog test_blog
-	regtests/run.sh 'Dynamo add service blog' ../bin/dynamo add-service user user_service
-	regtests/run.sh 'Dynamo add query' ../bin/dynamo add-query user user_query
-	regtests/run.sh 'Dynamo generate db' ../bin/dynamo generate db
-	regtests/run.sh 'Dynamo add-page ' ../bin/dynamo add-page main_page
-	regtests/run.sh 'Dynamo add-ajax-form ' ../bin/dynamo add-ajax-form user create-user
-	regtests/run.sh 'Dynamo dist' ../bin/dynamo dist ../test-dist
+	bin/dynamo_harness
 
 GENERATOR=dynamo
 
@@ -98,7 +82,7 @@ generate:
 	$(GENERATOR) generate config/db
 
 # Files to package in source distribution
-DISTFILES=README LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess configure config.sub \
+DISTFILES=README NEWS LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess configure config.sub \
 configure.in Makefile.in install-sh ChangeLog \
 dynamo.gpr.in config.gpr \
 src \

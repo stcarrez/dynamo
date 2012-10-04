@@ -47,6 +47,12 @@ package body Gen.Integration.Tests is
                        Test_Add_Module'Access);
       Caller.Add_Test (Suite, "Add Service",
                        Test_Add_Service'Access);
+      Caller.Add_Test (Suite, "Add Query",
+                       Test_Add_Query'Access);
+      Caller.Add_Test (Suite, "Add Page",
+                       Test_Add_Page'Access);
+      Caller.Add_Test (Suite, "Add Ajax Form",
+                       Test_Add_Ajax_Form'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -179,5 +185,44 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Matches (T, ".*Generating file.*test-user-services.ads.*", Result,
                                  "Invalid add-module");
    end Test_Add_Service;
+
+   --  ------------------------------
+   --  Test add-query command.
+   --  ------------------------------
+   procedure Test_Add_Query (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " add-query user user_query", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*db/user-user_query.xml*", Result,
+                                 "Invalid add-query");
+
+      T.Execute (Dynamo & " add-query blog blog_query", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*db/blog-blog_query.xml.*", Result,
+                                 "Invalid add-query");
+   end Test_Add_Query;
+
+   --  ------------------------------
+   --  Test add-page command.
+   --  ------------------------------
+   procedure Test_Add_Page (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " add-page main_page", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*web/main_page.xhtml.*", Result,
+                                 "Invalid add-page");
+   end Test_Add_Page;
+
+   --  ------------------------------
+   --  Test add-ajax-form command.
+   --  ------------------------------
+   procedure Test_Add_Ajax_Form (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " add-ajax-form user create-user", Result);
+      Util.Tests.Assert_Matches (T,
+                                 ".*Generating file.*web/user/forms/create-user-response.xhtml.*",
+                                 Result,
+                                 "Invalid add-ajax-form");
+   end Test_Add_Ajax_Form;
 
 end Gen.Integration.Tests;

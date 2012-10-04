@@ -52,4 +52,13 @@ package Gen.Integration.Tests is
    --  Test add-service command.
    procedure Test_Add_Service (T : in out Test);
 
+   --  Test add-query command.
+   procedure Test_Add_Query (T : in out Test);
+
+   --  Test add-page command.
+   procedure Test_Add_Page (T : in out Test);
+
+   --  Test add-ajax-form command.
+   procedure Test_Add_Ajax_Form (T : in out Test);
+
 end Gen.Integration.Tests;

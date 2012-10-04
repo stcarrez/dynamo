@@ -821,7 +821,8 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Add_Generation (H    : in out Handler;
                              Name : in String;
-                             Mode : in Gen.Artifacts.Iteration_Mode) is
+                             Mode : in Gen.Artifacts.Iteration_Mode;
+                             Mapping : in String) is
       Value : constant String := H.Conf.Get (Name, "");
    begin
       Log.Debug ("Adding template {0} to the generation", Name);
@@ -829,7 +830,8 @@ package body Gen.Generator is
       if Value'Length = 0 then
          H.Error ("Template '{0}' is not defined.", Name);
       else
-         H.Templates.Include (To_Unbounded_String (Value), Mode);
+         H.Templates.Include (To_Unbounded_String (Value),
+                              Template_Context '(Mode, To_Unbounded_String (Mapping)));
       end if;
    end Add_Generation;
 
@@ -933,8 +935,13 @@ package body Gen.Generator is
                 Ada.Containers.Count_Type'Image (H.Templates.Length));
 
       while Template_Map.Has_Element (Iter) loop
-         H.Generate (File => To_String (Template_Map.Key (Iter)),
-                     Mode => Template_Map.Element (Iter));
+         declare
+            T : constant Template_Context := Template_Map.Element (Iter);
+         begin
+            Gen.Model.Mappings.Set_Mapping_Name (To_String (T.Mapping));
+            H.Generate (File => To_String (Template_Map.Key (Iter)),
+                        Mode => T.Mode);
+         end;
          Template_Map.Next (Iter);
       end loop;
    end Generate_All;

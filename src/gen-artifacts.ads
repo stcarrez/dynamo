@@ -58,7 +58,8 @@ package Gen.Artifacts is
    --  of a given template.  The template is generated only once.
    procedure Add_Generation (Handler : in out Generator;
                              Name    : in String;
-                             Mode    : in Iteration_Mode) is abstract;
+                             Mode    : in Iteration_Mode;
+                             Mapping : in String) is abstract;
 
    --  Scan the dynamo directories and execute the <b>Process</b> procedure with the
    --  directory path.

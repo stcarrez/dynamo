@@ -98,7 +98,8 @@ package Gen.Generator is
    --  of a given template.  The template is generated only once.
    procedure Add_Generation (H    : in out Handler;
                              Name : in String;
-                             Mode : in Gen.Artifacts.Iteration_Mode);
+                             Mode : in Gen.Artifacts.Iteration_Mode;
+                             Mapping : in String);
 
    --  Generate the code using the template file
    procedure Generate (H     : in out Handler;
@@ -203,9 +204,14 @@ private
    use Ada.Strings.Unbounded;
    use Gen.Artifacts;
 
+   type Template_Context is record
+      Mode    : Gen.Artifacts.Iteration_Mode;
+      Mapping : Unbounded_String;
+   end record;
+
    package Template_Map is
      new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
-                                     Element_Type    => Gen.Artifacts.Iteration_Mode,
+                                     Element_Type    => Template_Context,
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Keys => "=");
 

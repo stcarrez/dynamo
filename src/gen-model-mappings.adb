@@ -37,6 +37,8 @@ package body Gen.Model.Mappings is
 
    Types : Mapping_Maps.Map;
 
+   Mapping_Name : Unbounded_String;
+
    --  ------------------------------
    --  Mapping Definition
 
@@ -74,12 +76,13 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    function Find_Type (Name : in Ada.Strings.Unbounded.Unbounded_String)
                        return Mapping_Definition_Access is
-      Pos : constant Mapping_Maps.Cursor := Types.Find (Name);
+      Pos : constant Mapping_Maps.Cursor := Types.Find (Mapping_Name & Name);
    begin
       if Mapping_Maps.Has_Element (Pos) then
          return Mapping_Maps.Element (Pos);
       else
-         Log.Info ("Type {0} not found in mapping table", Name);
+         Log.Info ("Type '{0}' not found in mapping table '{1}'",
+                   To_String (Name), To_String (Mapping_Name));
          return null;
       end if;
    end Find_Type;
@@ -87,7 +90,7 @@ package body Gen.Model.Mappings is
    procedure Register_Type (Name    : in String;
                             Mapping : in Mapping_Definition_Access;
                             Kind    : in Basic_Type) is
-      N    : constant Unbounded_String := To_Unbounded_String (Name);
+      N    : constant Unbounded_String := Mapping_Name & To_Unbounded_String (Name);
       Pos  : constant Mapping_Maps.Cursor := Types.Find (N);
    begin
       Log.Debug ("Register type '{0}'", Name);
@@ -104,7 +107,7 @@ package body Gen.Model.Mappings is
    procedure Register_Type (Target : in String;
                             From   : in String;
                             Kind   : in Basic_Type) is
-      Name    : constant Unbounded_String := To_Unbounded_String (From);
+      Name    : constant Unbounded_String := Mapping_Name & To_Unbounded_String (From);
       Pos     : constant Mapping_Maps.Cursor := Types.Find (Name);
       Mapping : Mapping_Definition_Access;
    begin
@@ -120,5 +123,13 @@ package body Gen.Model.Mappings is
       Mapping.Target := To_Unbounded_String (Target);
       Mapping.Kind   := Kind;
    end Register_Type;
+
+   --  ------------------------------
+   --  Setup the type mapping for the language identified by the given name.
+   --  ------------------------------
+   procedure Set_Mapping_Name (Name : in String) is
+   begin
+      Mapping_Name := To_Unbounded_String (Name & ".");
+   end Set_Mapping_Name;
 
 end Gen.Model.Mappings;

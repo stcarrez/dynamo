@@ -23,6 +23,12 @@ with Util.Beans.Objects;
 --  type into the Ada type.
 package Gen.Model.Mappings is
 
+   ADA_MAPPING    : constant String := "Ada05";
+
+   MySQL_MAPPING  : constant String := "MySQL";
+
+   SQLite_MAPPING : constant String := "SQLite";
+
    type Basic_Type is (T_BOOLEAN, T_INTEGER, T_DATE, T_ENUM, T_IDENTIFIER, T_STRING, T_BLOB);
 
    --  ------------------------------
@@ -52,5 +58,8 @@ package Gen.Model.Mappings is
    procedure Register_Type (Target        : in String;
                             From          : in String;
                             Kind          : in Basic_Type);
+
+   --  Setup the type mapping for the language identified by the given name.
+   procedure Set_Mapping_Name (Name : in String);
 
 end Gen.Model.Mappings;

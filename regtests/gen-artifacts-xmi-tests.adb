@@ -49,14 +49,16 @@ package body Gen.Artifacts.XMI.Tests is
                        Id        : in String) is
          Empty  : Gen.Model.XMI.Model_Map.Map;
          XMI_Id : constant Unbounded_String := To_Unbounded_String (Namespace & "#" & Id);
-         N      : Gen.Model.XMI.Model_Element_Access := Gen.Model.XMI.Find (A.Nodes, Empty, XMI_Id);
+         N      : constant Gen.Model.XMI.Model_Element_Access := Gen.Model.XMI.Find (A.Nodes,
+                                                                                     Empty,
+                                                                                     XMI_Id);
       begin
          T.Assert (N /= null, "Cannot find UML element " & To_String (XMI_Id));
          Util.Tests.Assert_Equals (T, Name, To_String (N.Name), "Invalid element name");
       end Check;
 
    begin
-      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C));
+      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
       A.Read_UML_Configuration (G);
 
       --  ArgoUML Integer DataType
@@ -67,7 +69,7 @@ package body Gen.Artifacts.XMI.Tests is
              "-84-17--56-5-43645a83:11466542d86:-8000:000000000000087E");
       --  ArgoUML documentation TagDefinition
       Check ("default-uml14.xmi", "documentation",
-             ".:000000000000087B");
+             ".:000000000000087C");
       --  ArgoUML type Stereotype
       Check ("default-uml14.xmi", "type",
              ".:0000000000000842");
@@ -100,7 +102,7 @@ package body Gen.Artifacts.XMI.Tests is
                                         Element_Type_Access => Model.XMI.Stereotype_Element_Access);
 
    begin
-      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C));
+      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
       A.Read_UML_Configuration (G);
 
       declare

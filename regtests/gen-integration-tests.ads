@@ -24,9 +24,11 @@ package Gen.Integration.Tests is
 
    type Test is new Util.Tests.Test with null record;
 
+   --  Change the working directory before running dynamo.
    overriding
    procedure Set_Up (T : in out Test);
 
+   --  Restore the working directory after running dynamo.
    overriding
    procedure Tear_Down (T : in out Test);
 
@@ -46,5 +48,8 @@ package Gen.Integration.Tests is
 
    --  Test add-module command.
    procedure Test_Add_Module (T : in out Test);
+
+   --  Test add-service command.
+   procedure Test_Add_Service (T : in out Test);
 
 end Gen.Integration.Tests;

@@ -45,6 +45,8 @@ package body Gen.Integration.Tests is
                        Test_Change_Property'Access);
       Caller.Add_Test (Suite, "Add Module",
                        Test_Add_Module'Access);
+      Caller.Add_Test (Suite, "Add Service",
+                       Test_Add_Service'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -162,5 +164,20 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Matches (T, ".*Generating file.*test-user-beans.ads.*", Result,
                                  "Invalid add-module");
    end Test_Add_Module;
+
+   --  ------------------------------
+   --  Test add-service command.
+   --  ------------------------------
+   procedure Test_Add_Service (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " add-service blog blogging", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test-blog-services.ads.*", Result,
+                                 "Invalid add-module");
+
+      T.Execute (Dynamo & " add-service user admin", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test-user-services.ads.*", Result,
+                                 "Invalid add-module");
+   end Test_Add_Service;
 
 end Gen.Integration.Tests;

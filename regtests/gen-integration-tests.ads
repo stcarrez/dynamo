@@ -61,4 +61,10 @@ package Gen.Integration.Tests is
    --  Test add-ajax-form command.
    procedure Test_Add_Ajax_Form (T : in out Test);
 
+   --  Test generate command.
+   procedure Test_Generate (T : in out Test);
+
+   --  Test help command.
+   procedure Test_Help (T : in out Test);
+
 end Gen.Integration.Tests;

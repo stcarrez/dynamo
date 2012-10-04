@@ -53,6 +53,10 @@ package body Gen.Integration.Tests is
                        Test_Add_Page'Access);
       Caller.Add_Test (Suite, "Add Ajax Form",
                        Test_Add_Ajax_Form'Access);
+      Caller.Add_Test (Suite, "Generate",
+                       Test_Generate'Access);
+      Caller.Add_Test (Suite, "Help",
+                       Test_Help'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -224,5 +228,43 @@ package body Gen.Integration.Tests is
                                  Result,
                                  "Invalid add-ajax-form");
    end Test_Add_Ajax_Form;
+
+   --  ------------------------------
+   --  Test generate command.
+   --  ------------------------------
+   procedure Test_Generate (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate db", Result);
+      Util.Tests.Assert_Matches (T,
+                                 ".*Reading model file stored in .db.*",
+                                 Result,
+                                 "Invalid generate");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Generating file.*src/model/test-user-models.*",
+                                 Result,
+                                 "Invalid generate");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Generating mysql.*db/mysql/create-test-mysql.sql.*",
+                                 Result,
+                                 "Invalid generate");
+   end Test_Generate;
+
+   --  ------------------------------
+   --  Test help command.
+   --  ------------------------------
+   procedure Test_Help (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " help", Result);
+      Util.Tests.Assert_Matches (T,
+                                 ".*Usage.*dynamo.*",
+                                 Result,
+                                 "Invalid help");
+      Util.Tests.Assert_Matches (T,
+                                 ".*add.*module.*",
+                                 Result,
+                                 "Invalid help");
+   end Test_Help;
 
 end Gen.Integration.Tests;

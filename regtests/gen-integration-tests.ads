@@ -73,4 +73,7 @@ package Gen.Integration.Tests is
    --  Test dist command.
    procedure Test_Info (T : in out Test);
 
+   --  Test build-doc command.
+   procedure Test_Build_Doc (T : in out Test);
+
 end Gen.Integration.Tests;

@@ -61,6 +61,8 @@ package body Gen.Integration.Tests is
                        Test_Dist'Access);
       Caller.Add_Test (Suite, "Info",
                        Test_Info'Access);
+      Caller.Add_Test (Suite, "Build Doc",
+                       Test_Build_Doc'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -304,5 +306,18 @@ package body Gen.Integration.Tests is
                                  Result,
                                  "Invalid info");
    end Test_Info;
+
+   --  ------------------------------
+   --  Test build-doc command.
+   --  ------------------------------
+   procedure Test_Build_Doc (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " build-doc wiki", Result);
+      Util.Tests.Assert_Equals (T, "", Result, "Invalid build-doc command");
+
+      Util.Tests.Assert_Exists (T, "wiki/blog.wiki");
+      Util.Tests.Assert_Exists (T, "wiki/user-user_query.wiki");
+   end Test_Build_Doc;
 
 end Gen.Integration.Tests;

@@ -637,13 +637,24 @@ package body Gen.Generator is
    --  Read the model mapping types and initialize the hibernate artifact.
    --  ------------------------------
    procedure Read_Mappings (H    : in out Handler) is
-      Mapping : constant String := H.Get_Parameter ("generator.mapping",
-                                                    "AdaMappings.xml");
+      procedure Read_Mapping (Name    : in String;
+                              Default : in String);
+
       Dir     : constant String := H.Get_Config_Directory;
+
+      procedure Read_Mapping (Name    : in String;
+                              Default : in String) is
+         Mapping : constant String := H.Get_Parameter (Name, Default);
+      begin
+         H.Read_Model (File => Ada.Directories.Compose (Dir, Mapping));
+      end Read_Mapping;
+
    begin
-      --  Read the type mappings
+      --  Read the type mappings for Ada, MySQL and SQLite.
       H.Type_Mapping_Loaded := True;
-      H.Read_Model (File => Ada.Directories.Compose (Dir, Mapping));
+      Read_Mapping ("generator.mapping.ada", "AdaMappings.xml");
+      Read_Mapping ("generator.mapping.mysql", "MySQLMappings.xml");
+      Read_Mapping ("generator.mapping.sqlite", "SQLiteMappings.xml");
    end Read_Mappings;
 
    --  ------------------------------

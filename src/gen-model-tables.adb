@@ -119,6 +119,9 @@ package body Gen.Model.Tables is
    procedure Prepare (O : in out Column_Definition) is
    begin
       O.Type_Mapping := Gen.Model.Mappings.Find_Type (O.Type_Name);
+      if Length (O.Sql_Type) = 0 then
+
+      end if;
    end Prepare;
 
    --  ------------------------------
@@ -189,15 +192,6 @@ package body Gen.Model.Tables is
    end Add_Column;
 
    --  ------------------------------
-   --  Get the table unique name.
-   --  ------------------------------
-   overriding
-   function Get_Name (From : in Table_Definition) return String is
-   begin
-      return From.Get_Attribute ("table");
-   end Get_Name;
-
-   --  ------------------------------
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
@@ -229,7 +223,7 @@ package body Gen.Model.Tables is
       elsif Name = "type" then
          return Util.Beans.Objects.To_Object (From.Type_Name);
 
-      elsif Name = "name" then
+      elsif Name = "table" then
          return Util.Beans.Objects.To_Object (From.Name);
 
       else

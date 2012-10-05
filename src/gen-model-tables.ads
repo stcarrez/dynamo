@@ -122,10 +122,6 @@ package Gen.Model.Tables is
       Has_Associations : Boolean := False;
    end record;
 
-   --  Get the table unique name.
-   overriding
-   function Get_Name (From : in Table_Definition) return String;
-
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    overriding

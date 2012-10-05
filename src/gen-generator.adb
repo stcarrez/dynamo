@@ -646,7 +646,7 @@ package body Gen.Generator is
                               Default : in String) is
          Mapping : constant String := H.Get_Parameter (Name, Default);
       begin
-         H.Read_Model (File => Ada.Directories.Compose (Dir, Mapping));
+         H.Read_Model (File => Util.Files.Compose (Dir, Mapping));
       end Read_Mapping;
 
    begin

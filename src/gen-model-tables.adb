@@ -119,9 +119,6 @@ package body Gen.Model.Tables is
    procedure Prepare (O : in out Column_Definition) is
    begin
       O.Type_Mapping := Gen.Model.Mappings.Find_Type (O.Type_Name);
-      if Length (O.Sql_Type) = 0 then
-
-      end if;
    end Prepare;
 
    --  ------------------------------

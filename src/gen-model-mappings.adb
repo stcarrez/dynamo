@@ -129,6 +129,8 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    procedure Set_Mapping_Name (Name : in String) is
    begin
+      Log.Info ("Using type mapping {0}", Name);
+
       Mapping_Name := To_Unbounded_String (Name & ".");
    end Set_Mapping_Name;
 

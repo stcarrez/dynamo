@@ -263,6 +263,7 @@ package body Gen.Model.Packages is
       O.Enums_Bean   := Util.Beans.Objects.To_Object (O.Enums'Unchecked_Access, STATIC);
       O.Tables_Bean  := Util.Beans.Objects.To_Object (O.Tables'Unchecked_Access, STATIC);
       O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access, STATIC);
+      O.Beans_Bean   := Util.Beans.Objects.To_Object (O.Beans'Unchecked_Access, STATIC);
       O.Used         := Util.Beans.Objects.To_Object (O.Used_Types'Unchecked_Access, STATIC);
    end Initialize;
 

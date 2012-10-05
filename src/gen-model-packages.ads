@@ -27,6 +27,7 @@ with Gen.Model.List;
 limited with Gen.Model.Enums;
 limited with Gen.Model.Tables;
 limited with Gen.Model.Queries;
+limited with Gen.Model.Beans;
 package Gen.Model.Packages is
 
    use Ada.Strings.Unbounded;
@@ -188,6 +189,10 @@ private
       Queries      : aliased Table_List_Definition;
       Queries_Bean : Util.Beans.Objects.Object;
 
+      --  Ada Beans
+      Beans        : aliased Table_List_Definition;
+      Beans_Bean   : Util.Beans.Objects.Object;
+
       --  A list of external packages which are used (used for with clause generation).
       Used_Types   : aliased List_Object;
       Used         : Util.Beans.Objects.Object;
@@ -208,21 +213,25 @@ private
       Enums_Bean   : Util.Beans.Objects.Object;
 
       --  List of all tables.
-      Tables      : aliased Table_List_Definition;
-      Tables_Bean : Util.Beans.Objects.Object;
+      Tables       : aliased Table_List_Definition;
+      Tables_Bean  : Util.Beans.Objects.Object;
 
       --  List of all queries.
       Queries      : aliased Table_List_Definition;
       Queries_Bean : Util.Beans.Objects.Object;
 
+      --  Ada Beans
+      Beans        : aliased Table_List_Definition;
+      Beans_Bean   : Util.Beans.Objects.Object;
+
       --  Map of all packages.
-      Packages    : Package_Map.Map;
+      Packages     : Package_Map.Map;
 
       --  Directory associated with the model ('src', 'samples', 'regtests', ...).
-      Dir_Name    : Unbounded_String;
+      Dir_Name     : Unbounded_String;
 
       --  Directory that contains the SQL and model files.
-      DB_Name     : Unbounded_String;
+      DB_Name      : Unbounded_String;
    end record;
 
 end Gen.Model.Packages;

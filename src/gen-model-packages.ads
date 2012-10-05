@@ -94,6 +94,10 @@ package Gen.Model.Packages is
    procedure Register_Query (O     : in out Model_Definition;
                              Table : access Gen.Model.Queries.Query_Definition'Class);
 
+   --  Register the declaration of the given bean in the model.
+   procedure Register_Bean (O     : in out Model_Definition;
+                            Bean  : access Gen.Model.Beans.Bean_Definition'Class);
+
    --  Register a type mapping.  The <b>From</b> type describes a type in the XML
    --  configuration files (hibernate, query, ...) and the <b>To</b> represents the
    --  corresponding Ada type.

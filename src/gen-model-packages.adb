@@ -24,6 +24,7 @@ with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
 with Gen.Model.Mappings;
+with Gen.Model.Beans;
 
 with Util.Strings;
 with Util.Strings.Transforms;
@@ -115,6 +116,17 @@ package body Gen.Model.Packages is
       Table.Package_Def.Queries.Append (Table.all'Access);
       O.Queries.Append (Table.all'Access);
    end Register_Query;
+
+   --  ------------------------------
+   --  Register the declaration of the given bean in the model.
+   --  ------------------------------
+   procedure Register_Bean (O     : in out Model_Definition;
+                            Bean  : access Gen.Model.Beans.Bean_Definition'Class) is
+   begin
+      O.Register_Package (Bean.Pkg_Name, Bean.Package_Def);
+      Bean.Package_Def.Beans.Append (Bean.all'Access);
+      O.Queries.Append (Bean.all'Access);
+   end Register_Bean;
 
    --  ------------------------------
    --  Register or find the package knowing its name

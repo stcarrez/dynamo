@@ -63,6 +63,8 @@ package body Gen.Integration.Tests is
                        Test_Info'Access);
       Caller.Add_Test (Suite, "Build Doc",
                        Test_Build_Doc'Access);
+      Caller.Add_Test (Suite, "Generate XMI Enum",
+                       Test_Generate_XMI_Enum'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -319,5 +321,18 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "wiki/blog.wiki");
       Util.Tests.Assert_Exists (T, "wiki/user-user_query.wiki");
    end Test_Build_Doc;
+
+   --  ------------------------------
+   --  Test generate command (XMI enum).
+   --  ------------------------------
+   procedure Test_Generate_XMI_Enum (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-enum.xmi", Result);
+
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-enums.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-enums.adb");
+
+   end Test_Generate_XMI_Enum;
 
 end Gen.Integration.Tests;

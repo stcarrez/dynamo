@@ -76,4 +76,7 @@ package Gen.Integration.Tests is
    --  Test build-doc command.
    procedure Test_Build_Doc (T : in out Test);
 
+   --  Test generate command (XMI enum).
+   procedure Test_Generate_XMI_Enum (T : in out Test);
+
 end Gen.Integration.Tests;

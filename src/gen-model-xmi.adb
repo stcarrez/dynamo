@@ -429,6 +429,9 @@ package body Gen.Model.XMI is
             if S = Stereotype.all'Access then
                return True;
             end if;
+            if S.XMI_Id = Stereotype.XMI_Id then
+               return True;
+            end if;
          end;
          Model_Vectors.Next (Iter);
       end loop;

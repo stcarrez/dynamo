@@ -83,6 +83,8 @@ package body Gen.Artifacts.XMI is
                        FIELD_MULTIPLICITY_UPPER,
                        FIELD_MULTIPLICITY_LOWER,
 
+                       FIELD_NAMESPACE,
+
                        FIELD_PACKAGE_ID,
                        FIELD_PACKAGE_NAME,
                        FIELD_PACKAGE_END,
@@ -126,6 +128,7 @@ package body Gen.Artifacts.XMI is
 
       Package_Element    : Gen.Model.XMI.Package_Element_Access;
       Package_Id         : Util.Beans.Objects.Object;
+      Need_Register_Package : Boolean := False;
 
       Attr_Id            : Util.Beans.Objects.Object;
       Attr_Element       : Gen.Model.XMI.Attribute_Element_Access;
@@ -370,27 +373,8 @@ package body Gen.Artifacts.XMI is
                P.Assos_End_Element.Visibility := P.Assos_End_Visibility;
             end if;
 
-         when FIELD_PACKAGE_ID =>
-            P.Package_Id := Value;
-
-         when FIELD_PACKAGE_NAME =>
-            declare
-               Parent : constant Gen.Model.XMI.Package_Element_Access := P.Package_Element;
-            begin
-               if Parent /= null then
-                  Parent.Set_XMI_Id (P.Package_Id);
-               end if;
-               P.Package_Element := new Gen.Model.XMI.Package_Element (P.Model);
-               P.Package_Element.Set_Name (Value);
-               if Parent /= null then
-                  P.Package_Element.Parent := Parent.all'Access;
-               else
-                  P.Package_Element.Parent := null;
-               end if;
-            end;
-
-         when FIELD_PACKAGE_END =>
-            if P.Package_Element /= null then
+         when FIELD_NAMESPACE =>
+            if P.Need_Register_Package and P.Package_Element /= null then
                P.Package_Element.Set_XMI_Id (P.Package_Id);
                P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
                if P.Package_Element.Parent /= null then
@@ -400,6 +384,36 @@ package body Gen.Artifacts.XMI is
                end if;
                if P.Package_Element /= null then
                   P.Package_Id := Util.Beans.Objects.To_Object (P.Package_Element.XMI_Id);
+               end if;
+               P.Need_Register_Package := False;
+            end if;
+
+         when FIELD_PACKAGE_ID =>
+            P.Package_Id := Value;
+
+         when FIELD_PACKAGE_NAME =>
+            declare
+               Parent : constant Gen.Model.XMI.Package_Element_Access := P.Package_Element;
+            begin
+--                 if Parent /= null then
+--                    Parent.Set_XMI_Id (P.Package_Id);
+--                 end if;
+               P.Package_Element := new Gen.Model.XMI.Package_Element (P.Model);
+               P.Package_Element.Set_Name (Value);
+               if Parent /= null then
+                  P.Package_Element.Parent := Parent.all'Access;
+               else
+                  P.Package_Element.Parent := null;
+               end if;
+               P.Need_Register_Package := True;
+            end;
+
+         when FIELD_PACKAGE_END =>
+            if P.Package_Element /= null then
+               if P.Package_Element.Parent /= null then
+                  P.Package_Element := Gen.Model.XMI.Package_Element (P.Package_Element.Parent.all)'Access;
+               else
+                  P.Package_Element := null;
                end if;
             end if;
 
@@ -429,6 +443,10 @@ package body Gen.Artifacts.XMI is
             P.Enumeration.Set_Name (Value);
             P.Enumeration.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
             P.Model.Insert (P.Enumeration.XMI_Id, P.Enumeration.all'Access);
+            Log.Info ("Adding enumeration {0}", P.Enumeration.Name);
+            if P.Package_Element /= null then
+               P.Package_Element.Elements.Append (P.Enumeration.all'Access);
+            end if;
 
          when FIELD_ENUMERATION_LITERAL =>
             P.Enumeration.Add_Literal (P.Id, P.Name);
@@ -613,7 +631,7 @@ package body Gen.Artifacts.XMI is
             Log.Debug ("UML class {0} not generated", Name);
          end if;
       exception
-         when E: others =>
+         when E : others =>
             Log.Error ("Exception", E);
       end Prepare_Class;
 
@@ -625,6 +643,10 @@ package body Gen.Artifacts.XMI is
            := new Gen.Model.Packages.Package_Definition;
       begin
          Log.Info ("Prepare package {0}", Name);
+
+         if Item.Has_Stereotype (Handler.Data_Model_Stereotype) then
+            Log.Info ("Package {0} has the <<DataModel>> stereotyp", Name);
+         end if;
 
          P.Name := To_Unbounded_String (Name);
          Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
@@ -660,6 +682,10 @@ package body Gen.Artifacts.XMI is
                                                 "Dynamo.xmi",
                                                 "ADO.FK",
                                                 Gen.Model.XMI.BY_NAME);
+      Handler.Data_Model_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                        "Dynamo.xmi",
+                                                        "ADO.DataModel",
+                                                        Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);
@@ -748,6 +774,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/Package/@name", FIELD_PACKAGE_NAME);
    XMI_Mapping.Add_Mapping ("**/Package/@xmi.id", FIELD_PACKAGE_ID);
    XMI_Mapping.Add_Mapping ("**/Package", FIELD_PACKAGE_END);
+   XMI_Mapping.Add_Mapping ("**/Namespace.ownedElement", FIELD_NAMESPACE);
 
    XMI_Mapping.Add_Mapping ("**/Class/@name", FIELD_CLASS_NAME);
    XMI_Mapping.Add_Mapping ("**/Class/@xmi.id", FIELD_CLASS_ID);

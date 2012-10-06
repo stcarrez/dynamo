@@ -72,6 +72,15 @@ package body Gen.Model is
    end Get_Attribute;
 
    --  ------------------------------
+   --  Set the comment associated with the element.
+   --  ------------------------------
+   procedure Set_Comment (Def     : in out Definition;
+                          Comment : in String) is
+   begin
+      Def.Comment := Util.Beans.Objects.To_Object (Comment);
+   end Set_Comment;
+
+   --  ------------------------------
    --  Initialize the definition from the DOM node attributes.
    --  ------------------------------
    procedure Initialize (Def  : in out Definition;

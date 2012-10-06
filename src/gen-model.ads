@@ -62,6 +62,10 @@ package Gen.Model is
    function Get_Attribute (From : in Definition;
                            Name : in String) return Ada.Strings.Unbounded.Unbounded_String;
 
+   --  Set the comment associated with the element.
+   procedure Set_Comment (Def     : in out Definition;
+                          Comment : in String);
+
    --  Initialize the definition from the DOM node attributes.
    procedure Initialize (Def  : in out Definition;
                          Name : in Ada.Strings.Unbounded.Unbounded_String;

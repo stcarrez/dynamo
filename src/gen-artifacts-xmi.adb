@@ -670,6 +670,7 @@ package body Gen.Artifacts.XMI is
             declare
                Table : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
             begin
+               Table.Set_Comment (Item.Get_Comment);
                Model.Register_Table (Table);
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
             end;
@@ -680,6 +681,7 @@ package body Gen.Artifacts.XMI is
                Bean : constant Bean_Definition_Access := Gen.Model.Beans.Create_Bean (Name);
             begin
                Model.Register_Bean (Bean);
+               Bean.Set_Comment (Item.Get_Comment);
                Iterate_For_Bean (Bean.all, Class.Attributes, Prepare_Attribute'Access);
             end;
 
@@ -722,6 +724,8 @@ package body Gen.Artifacts.XMI is
 
       procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
                                  Item : in Gen.Model.XMI.Model_Element_Access) is
+         pragma Unreferenced (Id);
+
          Pkg : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
          Name : constant String := Pkg.Get_Qualified_Name;
          P   : Gen.Model.Packages.Package_Definition_Access
@@ -733,6 +737,7 @@ package body Gen.Artifacts.XMI is
          if Item.Has_Stereotype (Handler.Data_Model_Stereotype) then
             Log.Info ("Package {0} has the <<DataModel>> stereotype", Name);
 
+            P.Set_Comment (Pkg.Get_Comment);
             Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
          else
             Log.Info ("Package {0} does not have the <<DataModel>> stereotype.", Name);

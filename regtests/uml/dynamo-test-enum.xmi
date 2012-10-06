@@ -1,0 +1,117 @@
+<?xml version = '1.0' encoding = 'UTF-8' ?>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Oct 06 19:04:36 CEST 2012'>
+  <XMI.header>    <XMI.documentation>
+      <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
+      <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
+    </XMI.documentation>
+    <XMI.metamodel xmi.name="UML" xmi.version="1.4"/></XMI.header>
+  <XMI.content>
+    <UML:Model xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C8'
+      name = 'DynamoTest' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+      isAbstract = 'false'>
+      <UML:ModelElement.stereotype>
+        <UML:Stereotype xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C9'/>
+      </UML:ModelElement.stereotype>
+      <UML:Namespace.ownedElement>
+        <UML:Stereotype xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C9'
+          name = 'profile' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:Package xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024E6'
+          name = 'Gen' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Namespace.ownedElement>
+            <UML:Package xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024E7'
+              name = 'Tests' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Namespace.ownedElement>
+                <UML:Package xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024F3'
+                  name = 'Enums' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F83'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Namespace.ownedElement>
+                    <UML:Enumeration xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024E8'
+                      name = 'Test_Enum' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                      isAbstract = 'false'>
+                      <UML:ModelElement.comment>
+                        <UML:Comment xmi.idref = '127-0-1-1-30027d73:13a36cb0cd4:-8000:0000000000001E7F'/>
+                      </UML:ModelElement.comment>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024F2'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>The test enumeration type.
+</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
+                      <UML:Enumeration.literal>
+                        <UML:EnumerationLiteral xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024E9'
+                          name = 'RED' isSpecification = 'false'>
+                          <UML:ModelElement.taggedValue>
+                            <UML:TaggedValue xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EF'
+                              isSpecification = 'false'>
+                              <UML:TaggedValue.dataValue>The red color.</UML:TaggedValue.dataValue>
+                              <UML:TaggedValue.type>
+                                <UML:TagDefinition xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'/>
+                              </UML:TaggedValue.type>
+                            </UML:TaggedValue>
+                          </UML:ModelElement.taggedValue>
+                        </UML:EnumerationLiteral>
+                        <UML:EnumerationLiteral xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EA'
+                          name = 'BLUE' isSpecification = 'false'>
+                          <UML:ModelElement.taggedValue>
+                            <UML:TaggedValue xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024F0'
+                              isSpecification = 'false'>
+                              <UML:TaggedValue.dataValue>Blue color</UML:TaggedValue.dataValue>
+                              <UML:TaggedValue.type>
+                                <UML:TagDefinition xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'/>
+                              </UML:TaggedValue.type>
+                            </UML:TaggedValue>
+                          </UML:ModelElement.taggedValue>
+                        </UML:EnumerationLiteral>
+                        <UML:EnumerationLiteral xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EB'
+                          name = 'GREEN' isSpecification = 'false'>
+                          <UML:ModelElement.taggedValue>
+                            <UML:TaggedValue xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024F1'
+                              isSpecification = 'false'>
+                              <UML:TaggedValue.dataValue>Green color</UML:TaggedValue.dataValue>
+                              <UML:TaggedValue.type>
+                                <UML:TagDefinition xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'/>
+                              </UML:TaggedValue.type>
+                            </UML:TaggedValue>
+                          </UML:ModelElement.taggedValue>
+                        </UML:EnumerationLiteral>
+                      </UML:Enumeration.literal>
+                    </UML:Enumeration>
+                    <UML:Comment xmi.id = '127-0-1-1-30027d73:13a36cb0cd4:-8000:0000000000001E7E'
+                      isSpecification = 'false' body = 'Title: Test for UML with an enum&#10;Date: 2012-10-06'/>
+                    <UML:Comment xmi.id = '127-0-1-1-30027d73:13a36cb0cd4:-8000:0000000000001E7F'
+                      isSpecification = 'false' body = 'A note associated with the enum type.&#10;(=&gt; comment)'>
+                      <UML:Comment.annotatedElement>
+                        <UML:Enumeration xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024E8'/>
+                      </UML:Comment.annotatedElement>
+                    </UML:Comment>
+                  </UML:Namespace.ownedElement>
+                </UML:Package>
+              </UML:Namespace.ownedElement>
+            </UML:Package>
+          </UML:Namespace.ownedElement>
+        </UML:Package>
+        <UML:TagDefinition xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'
+          name = 'documentation' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EE'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024ED'
+                  lower = '0' upper = '0'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+      </UML:Namespace.ownedElement>
+    </UML:Model>
+  </XMI.content>
+</XMI>

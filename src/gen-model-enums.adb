@@ -70,6 +70,19 @@ package body Gen.Model.Enums is
    end Initialize;
 
    --  ------------------------------
+   --  Add an enum value to this enum definition and return the new value.
+   --  ------------------------------
+   procedure Add_Value (Enum  : in out Enum_Definition;
+                        Name  : in String;
+                        Value : out Value_Definition_Access) is
+   begin
+      Value := new Value_Definition;
+      Value.Name   := To_Unbounded_String (Name);
+      Value.Number := Enum.Values.Get_Count;
+      Enum.Values.Append (Value);
+   end Add_Value;
+
+   --  ------------------------------
    --  Create an enum with the given name.
    --  ------------------------------
    function Create_Enum (Name : in Unbounded_String) return Enum_Definition_Access is

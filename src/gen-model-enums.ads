@@ -73,6 +73,11 @@ package Gen.Model.Enums is
    overriding
    procedure Initialize (O : in out Enum_Definition);
 
+   --  Add an enum value to this enum definition and return the new value.
+   procedure Add_Value (Enum  : in out Enum_Definition;
+                        Name  : in String;
+                        Value : out Value_Definition_Access);
+
    --  Create an enum with the given name.
    function Create_Enum (Name : in Unbounded_String) return Enum_Definition_Access;
 

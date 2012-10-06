@@ -1,0 +1,40 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core">
+
+<h:list value="#{package.beans}" var="bean">
+ <h:panelGroup rendered="#{not empty bean.comment}">
+   --  --------------------
+   --  #{g:comment(bean.comment)}
+   --  --------------------
+ </h:panelGroup>
+   type #{bean.type} is abstract new #{bean.parentType}
+     and Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with null record;
+#{''}
+   --  This bean provides some methods that can be used in a Method_Expression.
+   overriding
+   function Get_Method_Bindings (From : in #{bean.type})
+                                 return Util.Beans.Methods.Method_Binding_Array_Access;
+#{''}
+   --  Get the value identified by the name.
+   overriding
+   function Get_Value (From : in #{bean.type};
+                       Name : in String) return Util.Beans.Objects.Object;
+#{''}
+   --  Set the value identified by the name.
+   overriding
+   procedure Set_Value (From  : in out #{bean.type};
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+<h:list value="#{bean.operations}" var="operation">
+#{''}
+   procedure #{fn:capitalize(operation.name)} (Bean : in out #{bean.type};
+              #{g:indent(operation.name)}Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
+</h:list>
+#{''}
+</h:list>
+#{''}
+
+</ui:composition>

@@ -401,6 +401,7 @@ package Gen.Model.XMI is
 
    type Package_Element is new Model_Element with record
       Classes      : Model_Vector;
+      Enums        : Model_Vector;
    end record;
 
    --  Get the element type.

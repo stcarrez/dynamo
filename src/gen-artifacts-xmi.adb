@@ -395,9 +395,6 @@ package body Gen.Artifacts.XMI is
             declare
                Parent : constant Gen.Model.XMI.Package_Element_Access := P.Package_Element;
             begin
---                 if Parent /= null then
---                    Parent.Set_XMI_Id (P.Package_Id);
---                 end if;
                P.Package_Element := new Gen.Model.XMI.Package_Element (P.Model);
                P.Package_Element.Set_Name (Value);
                if Parent /= null then
@@ -445,7 +442,7 @@ package body Gen.Artifacts.XMI is
             P.Model.Insert (P.Enumeration.XMI_Id, P.Enumeration.all'Access);
             Log.Info ("Adding enumeration {0}", P.Enumeration.Name);
             if P.Package_Element /= null then
-               P.Package_Element.Elements.Append (P.Enumeration.all'Access);
+               P.Package_Element.Enums.Append (P.Enumeration.all'Access);
             end if;
 
          when FIELD_ENUMERATION_LITERAL =>
@@ -635,6 +632,23 @@ package body Gen.Artifacts.XMI is
             Log.Error ("Exception", E);
       end Prepare_Class;
 
+      --  Prepare a UML/XMI class:
+      --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
+      procedure Prepare_Enum (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
+                              Item : in Gen.Model.XMI.Model_Element_Access) is
+         Data  : constant Enum_Element_Access := Enum_Element'Class (Item.all)'Access;
+         Name  : Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Data.Name);
+         Enum  : Gen.Model.Enums.Enum_Definition_Access := Gen.Model.Enums.Create_Enum (Name);
+      begin
+         Log.Info ("Prepare enum {0}", Name);
+
+         Model.Register_Enum (Enum);
+
+      exception
+         when E : others =>
+            Log.Error ("Exception", E);
+      end Prepare_Enum;
+
       procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
                                  Item : in Gen.Model.XMI.Model_Element_Access) is
          Pkg : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
@@ -645,7 +659,9 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare package {0}", Name);
 
          if Item.Has_Stereotype (Handler.Data_Model_Stereotype) then
-            Log.Info ("Package {0} has the <<DataModel>> stereotyp", Name);
+            Log.Info ("Package {0} has the <<DataModel>> stereotype", Name);
+
+            Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
          end if;
 
          P.Name := To_Unbounded_String (Name);

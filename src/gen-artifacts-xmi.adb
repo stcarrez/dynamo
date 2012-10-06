@@ -110,6 +110,7 @@ package body Gen.Artifacts.XMI is
                        FIELD_OPERATION_NAME,
 
                        FIELD_COMMENT,
+                       FIELD_COMMENT_ID,
 
                        FIELD_TAG_DEFINITION,
                        FIELD_TAG_DEFINITION_ID,
@@ -177,6 +178,7 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Association_End_Element_Access;
    use type Gen.Model.XMI.Stereotype_Element_Access;
    use type Gen.Model.XMI.Enum_Element_Access;
+   use type Gen.Model.XMI.Comment_Element_Access;
 
    --  ------------------------------
    --  Get the visibility from the XMI visibility value.
@@ -501,14 +503,19 @@ package body Gen.Artifacts.XMI is
             P.Tag_Definition.Set_Name (P.Tag_Name);
             P.Tag_Definition := null;
 
+         when FIELD_COMMENT_ID =>
+            P.Comment := new Gen.Model.XMI.Comment_Element (P.Model);
+            P.Comment.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Value);
+            P.Ref_Id := Util.Beans.Objects.Null_Object;
+
             --  Comment mapping.
          when FIELD_COMMENT =>
-            P.Comment := new Gen.Model.XMI.Comment_Element (P.Model);
-            P.Comment.Set_Name (P.Name);
-            P.Comment.XMI_Id  := Util.Beans.Objects.To_Unbounded_String (P.Id);
-            P.Comment.Text    := Util.Beans.Objects.To_Unbounded_String (P.Value);
-            P.Comment.Ref_Id  := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
-            P.Model.Insert (P.Comment.XMI_Id, P.Comment.all'Access);
+            if P.Comment /= null then
+               P.Comment.Text    := Util.Beans.Objects.To_Unbounded_String (P.Value);
+               P.Comment.Ref_Id  := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
+               P.Model.Insert (P.Comment.XMI_Id, P.Comment.all'Access);
+            end if;
+            P.Comment := null;
 
       end case;
    exception
@@ -860,10 +867,12 @@ begin
    XMI_Mapping.Add_Mapping ("**/AssociationEnd", FIELD_ASSOCIATION_END);
 
    --  Comment mapping.
-   XMI_Mapping.Add_Mapping ("**/Comment/@name", FIELD_NAME);
-   XMI_Mapping.Add_Mapping ("**/Comment/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/Comment/@xmi.id", FIELD_COMMENT_ID);
    XMI_Mapping.Add_Mapping ("**/Comment/@body", FIELD_VALUE);
-   XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotated/Class/xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Class/@xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Enumeration/@xmi.idref",
+                            FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/Comment", FIELD_COMMENT);
 
    --  Tagged value mapping.
    XMI_Mapping.Add_Mapping ("**/TaggedValue/@xmi.id", FIELD_ID);

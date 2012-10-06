@@ -208,30 +208,17 @@ package body Gen.Artifacts.Hibernate is
         new Gen.Utils.Iterate_Nodes (T       => Enum_Definition,
                                      Process => Register_Enum_Value);
 
-      Enum : constant Enum_Definition_Access := new Enum_Definition;
-      Name : constant Ada.Strings.Unbounded.Unbounded_String := Enum.Get_Attribute ("name");
+      Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+      Enum  : constant Enum_Definition_Access := Gen.Model.Enums.Create_Enum (Name);
    begin
       Enum.Initialize (Name, Node);
       Log.Debug ("Register enum {0}", Enum.Name);
-
-      declare
-         Pos : constant Natural := Index (Enum.Name, ".", Ada.Strings.Backward);
-      begin
-         if Pos > 0 then
-            Enum.Pkg_Name := Unbounded_Slice (Enum.Name, 1, Pos - 1);
-            Enum.Type_Name := Unbounded_Slice (Enum.Name, Pos + 1, Length (Enum.Name));
-         else
-            Enum.Pkg_Name := To_Unbounded_String ("ADO");
-            Enum.Type_Name := Enum.Name;
-         end if;
-      end;
 
       O.Register_Enum (Enum);
 
       Log.Debug ("Register enum values from enum {0}", Enum.Name);
 
       Iterate (Enum_Definition (Enum.all), Node, "value");
-
    end Register_Enum;
 
    --  ------------------------------

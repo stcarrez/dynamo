@@ -642,7 +642,7 @@ package body Gen.Artifacts.XMI is
       begin
          Log.Info ("Prepare class attribute {0}", Column.Name);
 
---           Bean.Add_Column (Column.Name, C);
+         Bean.Add_Attribute (Column.Name, C);
          C.Set_Comment (Column.Get_Comment);
          if Column.all in Attribute_Element'Class then
             declare

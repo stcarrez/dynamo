@@ -61,6 +61,20 @@ package body Gen.Model.Beans is
    end Initialize;
 
    --  ------------------------------
+   --  Create an attribute with the given name and add it to the bean.
+   --  ------------------------------
+   procedure Add_Attribute (Bean   : in out Bean_Definition;
+                            Name   : in Unbounded_String;
+                            Column : out Gen.Model.Tables.Column_Definition_Access) is
+   begin
+      Column := new Gen.Model.Tables.Column_Definition;
+      Column.Name     := Name;
+      Column.Sql_Name := Name;
+      Column.Number   := Bean.Members.Get_Count;
+      Bean.Members.Append (Column);
+   end Add_Attribute;
+
+   --  ------------------------------
    --  Create a table with the given name.
    --  ------------------------------
    function Create_Bean (Name : in Unbounded_String) return Bean_Definition_Access is

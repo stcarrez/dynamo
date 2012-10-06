@@ -52,6 +52,11 @@ package Gen.Model.Beans is
    overriding
    procedure Initialize (O : in out Bean_Definition);
 
+   --  Create an attribute with the given name and add it to the bean.
+   procedure Add_Attribute (Bean   : in out Bean_Definition;
+                            Name   : in Unbounded_String;
+                            Column : out Gen.Model.Tables.Column_Definition_Access);
+
    --  Create a bean with the given name.
    function Create_Bean (Name : in Unbounded_String) return Bean_Definition_Access;
 

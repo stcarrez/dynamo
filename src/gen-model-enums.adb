@@ -69,4 +69,25 @@ package body Gen.Model.Enums is
                                                      Util.Beans.Objects.STATIC);
    end Initialize;
 
+   --  ------------------------------
+   --  Create an enum with the given name.
+   --  ------------------------------
+   function Create_Enum (Name : in Unbounded_String) return Enum_Definition_Access is
+      Enum : constant Enum_Definition_Access := new Enum_Definition;
+   begin
+      Enum.Name := Name;
+      declare
+         Pos : constant Natural := Index (Enum.Name, ".", Ada.Strings.Backward);
+      begin
+         if Pos > 0 then
+            Enum.Pkg_Name := Unbounded_Slice (Enum.Name, 1, Pos - 1);
+            Enum.Type_Name := Unbounded_Slice (Enum.Name, Pos + 1, Length (Enum.Name));
+         else
+            Enum.Pkg_Name := To_Unbounded_String ("ADO");
+            Enum.Type_Name := Enum.Name;
+         end if;
+      end;
+      return Enum;
+   end Create_Enum;
+
 end Gen.Model.Enums;

@@ -73,4 +73,7 @@ package Gen.Model.Enums is
    overriding
    procedure Initialize (O : in out Enum_Definition);
 
+   --  Create an enum with the given name.
+   function Create_Enum (Name : in Unbounded_String) return Enum_Definition_Access;
+
 end Gen.Model.Enums;

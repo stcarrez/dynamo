@@ -176,6 +176,7 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Tag_Definition_Element_Access;
    use type Gen.Model.XMI.Association_End_Element_Access;
    use type Gen.Model.XMI.Stereotype_Element_Access;
+   use type Gen.Model.XMI.Enum_Element_Access;
 
    --  ------------------------------
    --  Get the visibility from the XMI visibility value.
@@ -242,6 +243,10 @@ package body Gen.Artifacts.XMI is
          P.Attr_Element.Tagged_Values.Append (Tagged_Value.all'Access);
       elsif P.Class_Element /= null then
          P.Class_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+
+      elsif P.Enumeration /= null then
+         P.Enumeration.Tagged_Values.Append (Tagged_Value.all'Access);
+
       elsif P.Package_Element /= null then
          P.Package_Element.Tagged_Values.Append (Tagged_Value.all'Access);
       elsif P.Tag_Definition /= null then
@@ -565,7 +570,7 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare class attribute {0}", Column.Name);
 
          Table.Add_Column (Column.Name, C);
-         C.Comment := Util.Beans.Objects.To_Object (Column.Get_Comment);
+         C.Set_Comment (Column.Get_Comment);
          if Column.all in Attribute_Element'Class then
             declare
                Attr : Attribute_Element_Access := Attribute_Element'Class (Column.all)'Access;
@@ -655,6 +660,7 @@ package body Gen.Artifacts.XMI is
       begin
          Log.Info ("Prepare enum {0}", Name);
 
+         Enum.Set_Comment (Item.Get_Comment);
          Model.Register_Enum (Enum);
 
          Iterate_For_Enum (Enum.all, Item.Elements, Prepare_Enum_Literal'Access);

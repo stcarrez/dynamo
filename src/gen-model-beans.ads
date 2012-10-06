@@ -36,6 +36,7 @@ package Gen.Model.Beans is
       Type_Name      : Unbounded_String;
       Pkg_Name       : Unbounded_String;
    end record;
+   type Bean_Definition_Access is access all Bean_Definition'Class;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
@@ -50,5 +51,8 @@ package Gen.Model.Beans is
    --  Initialize the table definition instance.
    overriding
    procedure Initialize (O : in out Bean_Definition);
+
+   --  Create a bean with the given name.
+   function Create_Bean (Name : in Unbounded_String) return Bean_Definition_Access;
 
 end Gen.Model.Beans;

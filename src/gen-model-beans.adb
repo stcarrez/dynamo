@@ -60,4 +60,25 @@ package body Gen.Model.Beans is
                                                       Util.Beans.Objects.STATIC);
    end Initialize;
 
+   --  ------------------------------
+   --  Create a table with the given name.
+   --  ------------------------------
+   function Create_Bean (Name : in Unbounded_String) return Bean_Definition_Access is
+      Bean : constant Bean_Definition_Access := new Bean_Definition;
+   begin
+      Bean.Name := Name;
+      declare
+         Pos : constant Natural := Index (Bean.Name, ".", Ada.Strings.Backward);
+      begin
+         if Pos > 0 then
+            Bean.Pkg_Name := Unbounded_Slice (Bean.Name, 1, Pos - 1);
+            Bean.Type_Name := Unbounded_Slice (Bean.Name, Pos + 1, Length (Bean.Name));
+         else
+            Bean.Pkg_Name := To_Unbounded_String ("ADO");
+            Bean.Type_Name := Bean.Name;
+         end if;
+      end;
+      return Bean;
+   end Create_Bean;
+
 end Gen.Model.Beans;

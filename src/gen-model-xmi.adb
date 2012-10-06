@@ -323,7 +323,18 @@ package body Gen.Model.XMI is
    function Get_Comment (Node : in Model_Element) return String is
       Doc    : constant Tagged_Value_Element_Access := Node.Find_Tag_Value (TAG_DOCUMENTATION);
       Result : Ada.Strings.Unbounded.Unbounded_String;
+
+      procedure Collect_Comment (Id   : in Unbounded_String;
+                                 Item : in Model_Element_Access) is
+         Comment : constant Comment_Element_Access := Comment_Element'Class (Item.all)'Access;
+      begin
+         if Comment.Ref_Id = Node.XMI_Id then
+            Ada.Strings.Unbounded.Append (Result, Comment.Text);
+         end if;
+      end Collect_Comment;
+
    begin
+      Iterate (Node.Model.all, XMI_COMMENT, Collect_Comment'Access);
       if Doc /= null then
          Ada.Strings.Unbounded.Append (Result, Doc.Value);
       end if;

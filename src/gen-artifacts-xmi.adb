@@ -56,6 +56,9 @@ package body Gen.Artifacts.XMI is
    procedure Iterate_For_Package is
      new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Packages.Package_Definition'Class);
 
+   procedure Iterate_For_Enum is
+     new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Enums.Enum_Definition'Class);
+
    function Find_Stereotype is
      new Gen.Model.XMI.Find_Element (Element_Type        => Model.XMI.Stereotype_Element,
                                      Element_Type_Access => Model.XMI.Stereotype_Element_Access);
@@ -634,16 +637,27 @@ package body Gen.Artifacts.XMI is
 
       --  Prepare a UML/XMI class:
       --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
+      procedure Prepare_Enum_Literal (Enum : in out Gen.Model.Enums.Enum_Definition'Class;
+                                      Item : in Gen.Model.XMI.Model_Element_Access) is
+         Value : Gen.Model.Enums.Value_Definition_Access;
+      begin
+         Log.Info ("Prepare enum literal {0}", Item.Name);
+
+         Enum.Add_Value (To_String (Item.Name), Value);
+      end Prepare_Enum_Literal;
+
+      --  Prepare a UML/XMI class:
+      --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
       procedure Prepare_Enum (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
                               Item : in Gen.Model.XMI.Model_Element_Access) is
-         Data  : constant Enum_Element_Access := Enum_Element'Class (Item.all)'Access;
-         Name  : Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Data.Name);
+         Name  : Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Item.Name);
          Enum  : Gen.Model.Enums.Enum_Definition_Access := Gen.Model.Enums.Create_Enum (Name);
       begin
          Log.Info ("Prepare enum {0}", Name);
 
          Model.Register_Enum (Enum);
 
+         Iterate_For_Enum (Enum.all, Item.Elements, Prepare_Enum_Literal'Access);
       exception
          when E : others =>
             Log.Error ("Exception", E);
@@ -657,6 +671,7 @@ package body Gen.Artifacts.XMI is
            := new Gen.Model.Packages.Package_Definition;
       begin
          Log.Info ("Prepare package {0}", Name);
+         P.Name := To_Unbounded_String (Name);
 
          if Item.Has_Stereotype (Handler.Data_Model_Stereotype) then
             Log.Info ("Package {0} has the <<DataModel>> stereotype", Name);
@@ -664,7 +679,6 @@ package body Gen.Artifacts.XMI is
             Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
          end if;
 
-         P.Name := To_Unbounded_String (Name);
          Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
       end Prepare_Package;
 
@@ -864,6 +878,8 @@ begin
                             FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral/@name",
                             FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral",
+                            FIELD_ENUMERATION_LITERAL);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@href", FIELD_ENUMERATION_HREF);
 
    XMI_Mapping.Add_Mapping ("**/Classifier/@xmi.idref", FIELD_CLASSIFIER_HREF);

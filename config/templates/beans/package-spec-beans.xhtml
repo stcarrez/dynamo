@@ -10,8 +10,13 @@
    --  #{g:comment(bean.comment)}
    --  --------------------
  </h:panelGroup>
-   type #{bean.type} is abstract new #{bean.parentType}
-     and Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with null record;
+   type #{bean.type} is abstract#{not empty bean.parentType ? ' new' : ''}#{bean.parentType}
+     #{empty bean.parentType ? 'new ' : 'and '}Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with record
+   <h:list value="#{bean.members}" var="attribute">
+      #{fn:capitalize(attribute.name)} : #{g:adaType(attribute,0)};
+   </h:list>
+   end record;
+
 #{''}
    --  This bean provides some methods that can be used in a Method_Expression.
    overriding

@@ -554,6 +554,14 @@ package body Gen.Artifacts.XMI is
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
 
+      --  Collect the enum literal for the enum definition.
+      procedure Prepare_Enum_Literal (Enum : in out Gen.Model.Enums.Enum_Definition'Class;
+                                      Item : in Gen.Model.XMI.Model_Element_Access);
+
+      --  Register the enum in the model for the generation.
+      procedure Prepare_Enum (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
+                              Item : in Gen.Model.XMI.Model_Element_Access);
+
       use Gen.Model.XMI;
       use Gen.Model.Tables;
 
@@ -640,8 +648,9 @@ package body Gen.Artifacts.XMI is
             Log.Error ("Exception", E);
       end Prepare_Class;
 
-      --  Prepare a UML/XMI class:
-      --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
+      --  ------------------------------
+      --  Collect the enum literal for the enum definition.
+      --  ------------------------------
       procedure Prepare_Enum_Literal (Enum : in out Gen.Model.Enums.Enum_Definition'Class;
                                       Item : in Gen.Model.XMI.Model_Element_Access) is
          Value : Gen.Model.Enums.Value_Definition_Access;
@@ -651,22 +660,21 @@ package body Gen.Artifacts.XMI is
          Enum.Add_Value (To_String (Item.Name), Value);
       end Prepare_Enum_Literal;
 
-      --  Prepare a UML/XMI class:
-      --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
+      --  ------------------------------
+      --  Register the enum in the model for the generation.
+      --  ------------------------------
       procedure Prepare_Enum (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
                               Item : in Gen.Model.XMI.Model_Element_Access) is
-         Name  : Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Item.Name);
-         Enum  : Gen.Model.Enums.Enum_Definition_Access := Gen.Model.Enums.Create_Enum (Name);
+         Name  : constant Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Item.Name);
+         Enum  : Gen.Model.Enums.Enum_Definition_Access;
       begin
          Log.Info ("Prepare enum {0}", Name);
 
+         Enum := Gen.Model.Enums.Create_Enum (Name);
          Enum.Set_Comment (Item.Get_Comment);
          Model.Register_Enum (Enum);
 
          Iterate_For_Enum (Enum.all, Item.Elements, Prepare_Enum_Literal'Access);
-      exception
-         when E : others =>
-            Log.Error ("Exception", E);
       end Prepare_Enum;
 
       procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;

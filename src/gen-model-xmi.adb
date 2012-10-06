@@ -241,8 +241,12 @@ package body Gen.Model.XMI is
    --  ------------------------------
    procedure Reconcile (Node  : in out Model_Element;
                         Model : in UML_Model) is
+      Iter : Model_Cursor := Node.Stereotypes.First;
    begin
-      null;
+      while Model_Vectors.Has_Element (Iter) loop
+         Model_Vectors.Element (Iter).Reconcile (Model);
+         Model_Vectors.Next (Iter);
+      end loop;
    end Reconcile;
 
    --  ------------------------------
@@ -362,7 +366,9 @@ package body Gen.Model.XMI is
       if Item /= null then
          Node.Name := Item.Name;
          Node.Ref  := Item;
+         Node.XMI_Id := Item.XMI_Id;
       end if;
+      Model_Element (Node).Reconcile (Model);
    end Reconcile;
 
    --  ------------------------------
@@ -476,6 +482,7 @@ package body Gen.Model.XMI is
                         Model : in UML_Model) is
       Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Ref_Id);
    begin
+      Model_Element (Node).Reconcile (Model);
       if Item = null then
          return;
       end if;
@@ -524,6 +531,7 @@ package body Gen.Model.XMI is
                         Model : in UML_Model) is
       Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Ref_Id);
    begin
+      Model_Element (Node).Reconcile (Model);
       if Item /= null then
          Node.Name := Item.Name;
          if not (Item.all in Tag_Definition_Element'Class) then

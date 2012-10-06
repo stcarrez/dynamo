@@ -24,6 +24,7 @@ with Gen.Model.Tables;
 with Gen.Model.Packages;
 with Gen.Model.Enums;
 with Gen.Model.Mappings;
+with Gen.Model.Beans;
 
 with Util.Log.Loggers;
 
@@ -52,6 +53,9 @@ package body Gen.Artifacts.XMI is
 
    procedure Iterate_For_Table is
      new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Tables.Table_Definition'Class);
+
+   procedure Iterate_For_Bean is
+     new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Beans.Bean_Definition'Class);
 
    procedure Iterate_For_Package is
      new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Packages.Package_Definition'Class);
@@ -571,6 +575,7 @@ package body Gen.Artifacts.XMI is
 
       use Gen.Model.XMI;
       use Gen.Model.Tables;
+      use Gen.Model.Beans;
 
       procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                                Model : in out Gen.Model.XMI.Model_Map.Map);
@@ -628,6 +633,28 @@ package body Gen.Artifacts.XMI is
 --              C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
 --           end;
       end Prepare_Attribute;
+      --  ------------------------------
+      --  Register the column definition in the table
+      --  ------------------------------
+      procedure Prepare_Attribute (Bean   : in out Gen.Model.Beans.Bean_Definition'Class;
+                                   Column : in Model_Element_Access) is
+         C    : Column_Definition_Access;
+      begin
+         Log.Info ("Prepare class attribute {0}", Column.Name);
+
+--           Bean.Add_Column (Column.Name, C);
+         C.Set_Comment (Column.Get_Comment);
+         if Column.all in Attribute_Element'Class then
+            declare
+               Attr : Attribute_Element_Access := Attribute_Element'Class (Column.all)'Access;
+            begin
+               if Attr.Data_Type /= null then
+                  C.Type_Name := Attr.Data_Type.Name;
+               end if;
+               C.Not_Null := Attr.Multiplicity_Lower > 0;
+            end;
+         end if;
+      end Prepare_Attribute;
 
       --  Prepare a UML/XMI class:
       --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
@@ -638,13 +665,22 @@ package body Gen.Artifacts.XMI is
       begin
          Log.Info ("Prepare class {0}", Name);
 
-         if Item.Has_Stereotype (Handler.Table_Stereotype) or True then
+         if Item.Has_Stereotype (Handler.Table_Stereotype) then
             Log.Debug ("Class {0} recognized as a database table", Name);
             declare
                Table : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
             begin
                Model.Register_Table (Table);
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
+            end;
+
+         elsif Item.Has_Stereotype (Handler.Bean_Stereotype) then
+            Log.Debug ("Class {0} recognized as a bean", Name);
+            declare
+               Bean : constant Bean_Definition_Access := Gen.Model.Beans.Create_Bean (Name);
+            begin
+               Model.Register_Bean (Bean);
+               Iterate_For_Bean (Bean.all, Class.Attributes, Prepare_Attribute'Access);
             end;
 
          else
@@ -698,6 +734,8 @@ package body Gen.Artifacts.XMI is
             Log.Info ("Package {0} has the <<DataModel>> stereotype", Name);
 
             Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
+         else
+            Log.Info ("Package {0} does not have the <<DataModel>> stereotype.", Name);
          end if;
 
          Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
@@ -737,6 +775,10 @@ package body Gen.Artifacts.XMI is
                                                         "Dynamo.xmi",
                                                         "ADO.DataModel",
                                                         Gen.Model.XMI.BY_NAME);
+      Handler.Bean_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                  "Dynamo.xmi",
+                                                  "AWA.Bean",
+                                                  Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);

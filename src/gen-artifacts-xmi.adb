@@ -22,7 +22,6 @@ with Ada.Strings.Fixed;
 with Gen.Configs;
 with Gen.Utils;
 with Gen.Model.Tables;
-with Gen.Model.Packages;
 with Gen.Model.Enums;
 with Gen.Model.Mappings;
 with Gen.Model.Beans;
@@ -259,7 +258,7 @@ package body Gen.Artifacts.XMI is
       elsif P.Tag_Definition /= null then
          P.Tag_Definition.Tagged_Values.Append (Tagged_Value.all'Access);
       else
-         Log.Error ("Tagged value {0} ignored", Util.Beans.Objects.To_String (P.Id));
+         Log.Info ("Tagged value {0} ignored", Util.Beans.Objects.To_String (P.Id));
       end if;
    end Add_Tagged_Value;
 
@@ -979,6 +978,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral",
                             FIELD_ENUMERATION_LITERAL);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@href", FIELD_ENUMERATION_HREF);
+   XMI_Mapping.Add_Mapping ("**/Enumeration/@xmi.idref", FIELD_ENUMERATION_HREF);
 
    XMI_Mapping.Add_Mapping ("**/Classifier/@xmi.idref", FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Classifier/@href", FIELD_CLASSIFIER_HREF);

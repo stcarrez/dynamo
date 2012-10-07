@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
 with Ada.Directories;
+with Ada.Strings.Fixed;
 
 with Gen.Configs;
 with Gen.Utils;
@@ -835,12 +836,39 @@ package body Gen.Artifacts.XMI is
       procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                       Model : in out Gen.Model.XMI.Model_Map.Map);
 
+      type Parser is new Util.Serialize.IO.XML.Parser with null record;
+
+      --  Report an error while parsing the input stream.  The error message will be reported
+      --  on the logger associated with the parser.  The parser will be set as in error so that
+      --  the <b>Has_Error</b> function will return True after parsing the whole file.
+      overriding
+      procedure Error (Handler : in out Parser;
+                       Message : in String);
+
+      --  ------------------------------
+      --  Report an error while parsing the input stream.  The error message will be reported
+      --  on the logger associated with the parser.  The parser will be set as in error so that
+      --  the <b>Has_Error</b> function will return True after parsing the whole file.
+      --  ------------------------------
+      overriding
+      procedure Error (Handler : in out Parser;
+                       Message : in String) is
+      begin
+         if Ada.Strings.Fixed.Index (Message, "Invalid absolute IRI") > 0
+           and then Ada.Strings.Fixed.Index (Message, "org.omg.xmi.namespace.UML") > 0 then
+            return;
+         end if;
+         Context.Error ("{0}: {1}",
+                        Parser'Class (Handler).Get_Location,
+                        Message);
+      end Error;
+
       procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                       Model : in out Gen.Model.XMI.Model_Map.Map) is
          pragma Unreferenced (Key);
 
          Info   : aliased XMI_Info;
-         Reader : Util.Serialize.IO.XML.Parser;
+         Reader : Parser;
       begin
          Info.Model := Model'Unchecked_Access;
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);

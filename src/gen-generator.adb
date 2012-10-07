@@ -739,7 +739,7 @@ package body Gen.Generator is
          else
             H.Model.Set_Dirname ("src", Path);
          end if;
-         Start_Search (Search, Directory => Path, Pattern => "*.xml", Filter => Filter);
+         Start_Search (Search, Directory => Path, Pattern => "*.xm[il]", Filter => Filter);
 
          --  Collect the files in the vector array.
          while More_Entries (Search) loop

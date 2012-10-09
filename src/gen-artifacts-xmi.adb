@@ -710,12 +710,12 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       procedure Prepare_Enum (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
                               Item : in Gen.Model.XMI.Model_Element_Access) is
-         Name  : constant Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Item.Name);
+         Name  : constant String := Item.Get_Qualified_Name;
          Enum  : Gen.Model.Enums.Enum_Definition_Access;
       begin
          Log.Info ("Prepare enum {0}", Name);
 
-         Enum := Gen.Model.Enums.Create_Enum (Name);
+         Enum := Gen.Model.Enums.Create_Enum (To_Unbounded_String (Name));
          Enum.Set_Comment (Item.Get_Comment);
          Model.Register_Enum (Enum);
 

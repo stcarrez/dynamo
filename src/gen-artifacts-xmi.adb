@@ -453,6 +453,9 @@ package body Gen.Artifacts.XMI is
             P.Enumeration := new Gen.Model.XMI.Enum_Element (P.Model);
             P.Enumeration.Set_Name (Value);
             P.Enumeration.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            if P.Package_Element /= null then
+               P.Enumeration.Parent := P.Package_Element.all'Access;
+            end if;
             P.Model.Insert (P.Enumeration.XMI_Id, P.Enumeration.all'Access);
             Log.Info ("Adding enumeration {0}", P.Enumeration.Name);
             if P.Package_Element /= null then

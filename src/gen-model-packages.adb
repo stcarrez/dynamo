@@ -241,6 +241,7 @@ package body Gen.Model.Packages is
       Prepare_Tables (O.Enums);
       Prepare_Tables (O.Tables);
       Prepare_Tables (O.Queries);
+      Prepare_Tables (O.Beans);
       declare
          P : Gen.Utils.String_Set.Cursor := Used_Types.First;
       begin

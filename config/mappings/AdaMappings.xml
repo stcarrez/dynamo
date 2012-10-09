@@ -15,7 +15,7 @@
         <from>Nullable_Timestamp</from>
         <to>ADO.Nullable_Time</to>
     </mapping>
-    <mapping>
+    <mapping type="date">
         <from>Time</from>
         <from>Date</from>
         <from>DateTime</from>
@@ -30,14 +30,14 @@
         <from>datatype::Timestamp</from>
         <to>Ada.Calendar.Time</to>
     </mapping>
-    <mapping>
+    <mapping type="integer">
         <from>int</from>
         <from>Integer</from>
         <from>PrimitiveTypes::Integer</from>
         <from>datatype::Integer</from>
         <to>Integer</to>
     </mapping>
-    <mapping>
+    <mapping type="integer">
         <from>long</from>
         <from>Long</from>
         <from>PrimitiveTypes::Long</from>
@@ -48,7 +48,7 @@
         <from>Natural</from>
         <to>Natural</to>
     </mapping>
-    <mapping>
+    <mapping type="integer">
         <from>ADO.Identifier</from>
         <from>Identifier</from>
         <from>identifier</from>
@@ -75,7 +75,7 @@
         <from>java.sql.Blob</from>
         <to>ADO.Blob_Ref</to>
     </mapping>
-    <mapping>
+    <mapping type="string">
         <from>String</from>
         <to>Ada.Strings.Unbounded.Unbounded_String</to>
     </mapping>

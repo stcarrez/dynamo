@@ -789,10 +789,10 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Prepare (H : in out Handler) is
    begin
-      H.Model.Prepare;
       if H.XMI.Is_Initialized then
          H.XMI.Prepare (Model => H.Model, Context => H);
       end if;
+      H.Model.Prepare;
       if H.Hibernate.Is_Initialized then
          H.Hibernate.Prepare (Model => H.Model, Context => H);
       end if;

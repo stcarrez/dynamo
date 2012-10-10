@@ -24,6 +24,7 @@ with Util.Beans.Objects;
 with Util.Beans.Objects.Vectors;
 
 with Gen.Model.List;
+with Gen.Model.Mappings;
 limited with Gen.Model.Enums;
 limited with Gen.Model.Tables;
 limited with Gen.Model.Queries;
@@ -200,6 +201,9 @@ private
       --  A list of external packages which are used (used for with clause generation).
       Used_Types   : aliased List_Object;
       Used         : Util.Beans.Objects.Object;
+
+      --  A map of all types defined in this package.
+      Types        : Gen.Model.Mappings.Mapping_Maps.Map;
 
       --  The package Ada name
       Pkg_Name     : Unbounded_String;

@@ -20,6 +20,7 @@ with Ada.Strings.Unbounded;
 
 with Util.Beans.Objects;
 
+with Gen.Model.Mappings;
 with Gen.Model.Packages;
 with Gen.Model.Tables;
 package Gen.Model.Beans is
@@ -29,7 +30,7 @@ package Gen.Model.Beans is
    --  ------------------------------
    --  Bean Definition
    --  ------------------------------
-   type Bean_Definition is new Definition with record
+   type Bean_Definition is new Mappings.Mapping_Definition with record
       Members        : aliased Gen.Model.Tables.Column_List.List_Definition;
       Members_Bean   : Util.Beans.Objects.Object;
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;

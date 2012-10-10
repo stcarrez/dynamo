@@ -16,6 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
+with Ada.Containers.Hashed_Maps;
+with Ada.Strings.Unbounded.Hash;
 
 with Util.Beans.Objects;
 
@@ -61,5 +63,11 @@ package Gen.Model.Mappings is
 
    --  Setup the type mapping for the language identified by the given name.
    procedure Set_Mapping_Name (Name : in String);
+
+   package Mapping_Maps is
+     new Ada.Containers.Hashed_Maps (Key_Type        => Ada.Strings.Unbounded.Unbounded_String,
+                                     Element_Type    => Mapping_Definition_Access,
+                                     Hash            => Ada.Strings.Unbounded.Hash,
+                                     Equivalent_Keys => Ada.Strings.Unbounded."=");
 
 end Gen.Model.Mappings;

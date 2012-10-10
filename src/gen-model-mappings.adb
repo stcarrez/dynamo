@@ -15,8 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Containers.Hashed_Maps;
-with Ada.Strings.Unbounded.Hash;
 
 with Util.Log.Loggers;
 
@@ -28,12 +26,6 @@ package body Gen.Model.Mappings is
    use Util.Log;
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Model.Mappings");
-
-   package Mapping_Maps is
-     new Ada.Containers.Hashed_Maps (Key_Type        => Ada.Strings.Unbounded.Unbounded_String,
-                                     Element_Type    => Mapping_Definition_Access,
-                                     Hash            => Ada.Strings.Unbounded.Hash,
-                                     Equivalent_Keys => Ada.Strings.Unbounded."=");
 
    Types : Mapping_Maps.Map;
 

@@ -110,7 +110,7 @@ package Gen.Model.Tables is
    --  ------------------------------
    --  Table Definition
    --  ------------------------------
-   type Table_Definition is new Definition with record
+   type Table_Definition is new Mappings.Mapping_Definition with record
       Members        : aliased Column_List.List_Definition;
       Members_Bean   : Util.Beans.Objects.Object;
       Parent         : Table_Definition_Access;

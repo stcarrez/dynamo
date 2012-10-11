@@ -87,6 +87,7 @@ package body Gen.Model.Packages is
          raise Name_Exist with "Enum '" & Name & "' already defined";
       end if;
       Enum.Package_Def.Enums.Append (Enum.all'Access);
+      Enum.Package_Def.Types.Include (Enum.Name, Enum.all'Access);
       O.Enums.Append (Enum.all'Access);
       Gen.Model.Mappings.Register_Type (To_String (Enum.Name), Enum.all'Access,
                                         Gen.Model.Mappings.T_ENUM);
@@ -106,6 +107,7 @@ package body Gen.Model.Packages is
          raise Name_Exist with "Table '" & Name & "' already defined";
       end if;
       Table.Package_Def.Tables.Append (Table.all'Access);
+      Table.Package_Def.Types.Include (Table.Name, Table.all'Access);
       O.Tables.Append (Table.all'Access);
    end Register_Table;
 
@@ -128,6 +130,7 @@ package body Gen.Model.Packages is
    begin
       O.Register_Package (Bean.Pkg_Name, Bean.Package_Def);
       Bean.Package_Def.Beans.Append (Bean.all'Access);
+      Bean.Package_Def.Types.Include (Bean.Name, Bean.all'Access);
       O.Queries.Append (Bean.all'Access);
    end Register_Bean;
 

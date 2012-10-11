@@ -57,6 +57,10 @@ package Gen.Model.Packages is
    overriding
    procedure Initialize (O : in out Package_Definition);
 
+   --  Find the type identified by the name.
+   function Find_Type (From : in Package_Definition;
+                       Name : in String) return Gen.Model.Mappings.Mapping_Definition_Access;
+
    --  ------------------------------
    --  Model Definition
    --  ------------------------------

@@ -74,6 +74,20 @@ package body Gen.Model.Packages is
    end Get_Value;
 
    --  ------------------------------
+   --  Find the type identified by the name.
+   --  ------------------------------
+   function Find_Type (From : in Package_Definition;
+                       Name : in String) return Gen.Model.Mappings.Mapping_Definition_Access is
+      Pos : constant Mappings.Cursor := From.Types.Find (To_Unbounded_String (Name));
+   begin
+      if Mappings.Mapping_Maps.Has_Element (Pos) then
+         return Mappings.Mapping_Maps.Element (Pos);
+      else
+         return null;
+      end if;
+   end Find_Type;
+
+   --  ------------------------------
    --  Register the declaration of the given enum in the model.
    --  ------------------------------
    procedure Register_Enum (O      : in out Model_Definition;

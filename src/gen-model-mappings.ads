@@ -70,4 +70,8 @@ package Gen.Model.Mappings is
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Keys => Ada.Strings.Unbounded."=");
 
+   subtype Map is Mapping_Maps.Map;
+
+   subtype Cursor is Mapping_Maps.Cursor;
+
 end Gen.Model.Mappings;

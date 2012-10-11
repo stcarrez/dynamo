@@ -77,8 +77,9 @@ package body Gen.Model.Packages is
    --  Find the type identified by the name.
    --  ------------------------------
    function Find_Type (From : in Package_Definition;
-                       Name : in String) return Gen.Model.Mappings.Mapping_Definition_Access is
-      Pos : constant Mappings.Cursor := From.Types.Find (To_Unbounded_String (Name));
+                       Name : in Unbounded_String)
+                       return Gen.Model.Mappings.Mapping_Definition_Access is
+      Pos : constant Mappings.Cursor := From.Types.Find (Name);
    begin
       if Mappings.Mapping_Maps.Has_Element (Pos) then
          return Mappings.Mapping_Maps.Element (Pos);

@@ -117,8 +117,12 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    procedure Prepare (O : in out Column_Definition) is
+      use type Mappings.Mapping_Definition_Access;
    begin
       O.Type_Mapping := Gen.Model.Mappings.Find_Type (O.Type_Name);
+      if O.Type_Mapping = null then
+         O.Type_Mapping := O.Table.Package_Def.Find_Type (O.Type_Name);
+      end if;
    end Prepare;
 
    --  ------------------------------

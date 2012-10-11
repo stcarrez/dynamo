@@ -59,7 +59,8 @@ package Gen.Model.Packages is
 
    --  Find the type identified by the name.
    function Find_Type (From : in Package_Definition;
-                       Name : in String) return Gen.Model.Mappings.Mapping_Definition_Access;
+                       Name : in Unbounded_String)
+                       return Gen.Model.Mappings.Mapping_Definition_Access;
 
    --  ------------------------------
    --  Model Definition

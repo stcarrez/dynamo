@@ -178,6 +178,7 @@ package body Gen.Model.Tables is
       Column.Name     := Name;
       Column.Sql_Name := Name;
       Column.Number   := Table.Members.Get_Count;
+      Column.Table    := Table'Unchecked_Access;
       Table.Members.Append (Column);
       if Name = "version" then
          Table.Version_Column := Column;

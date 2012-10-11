@@ -71,6 +71,7 @@ package body Gen.Model.Beans is
       Column.Name     := Name;
       Column.Sql_Name := Name;
       Column.Number   := Bean.Members.Get_Count;
+      Column.Table    := Bean'Unchecked_Access;
       Bean.Members.Append (Column);
    end Add_Attribute;
 

@@ -30,13 +30,7 @@ package Gen.Model.Beans is
    --  ------------------------------
    --  Bean Definition
    --  ------------------------------
-   type Bean_Definition is new Mappings.Mapping_Definition with record
-      Members        : aliased Gen.Model.Tables.Column_List.List_Definition;
-      Members_Bean   : Util.Beans.Objects.Object;
-      Package_Def    : Gen.Model.Packages.Package_Definition_Access;
-      Type_Name      : Unbounded_String;
-      Pkg_Name       : Unbounded_String;
-   end record;
+   type Bean_Definition is new Tables.Table_Definition with null record;
    type Bean_Definition_Access is access all Bean_Definition'Class;
 
    --  Get the value identified by the name.

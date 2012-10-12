@@ -122,6 +122,7 @@ package body Gen.Generator is
 
       Ptr : constant access Util.Beans.Basic.Readonly_Bean'Class
         := Util.Beans.Objects.To_Bean (Value);
+      Type_Mapping : Gen.Model.Mappings.Mapping_Definition_Access;
    begin
       if Ptr /= null and then Ptr.all in Column_Definition'Class then
          Column := Column_Definition'Class (Ptr.all)'Unchecked_Access;
@@ -129,11 +130,12 @@ package body Gen.Generator is
          Column := null;
       end if;
       if Column /= null then
-         if Column.Type_Mapping /= null then
-            if Column.Type_Mapping.Kind = T_DATE and Util.Beans.Objects.To_Integer (Param) = 2 then
+         Type_Mapping := Column.Get_Type_Mapping;
+         if Type_Mapping /= null then
+            if Type_Mapping.Kind = T_DATE and Util.Beans.Objects.To_Integer (Param) = 2 then
                return Util.Beans.Objects.To_Object (String '("Time"));
             else
-               return Util.Beans.Objects.To_Object (Column.Type_Mapping.Target);
+               return Util.Beans.Objects.To_Object (Type_Mapping.Target);
             end if;
          elsif Column.Is_Basic_Type then
             return To_Ada_Type (Column.Get_Type);

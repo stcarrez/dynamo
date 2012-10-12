@@ -47,6 +47,11 @@ package Gen.Model.Queries is
    overriding
    procedure Prepare (O : in out Query_Definition);
 
+   --  Add a new query to the definition.
+   procedure Add_Query (Into   : in out Query_Definition;
+                        Name   : in Unbounded_String;
+                        Query  : out Gen.Model.Tables.Column_Definition_Access);
+
 private
 
    --  Initialize the table definition instance.

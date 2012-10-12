@@ -50,6 +50,19 @@ package body Gen.Model.Queries is
    end Prepare;
 
    --  ------------------------------
+   --  Add a new query to the definition.
+   --  ------------------------------
+   procedure Add_Query (Into   : in out Query_Definition;
+                        Name   : in Unbounded_String;
+                        Query  : out Gen.Model.Tables.Column_Definition_Access) is
+   begin
+      Query := new Gen.Model.Tables.Column_Definition;
+      Query.Name := Name;
+      Into.Queries.Append (Query);
+      Query.Number := Into.Queries.Get_Count;
+   end Add_Query;
+
+   --  ------------------------------
    --  Initialize the table definition instance.
    --  ------------------------------
    overriding

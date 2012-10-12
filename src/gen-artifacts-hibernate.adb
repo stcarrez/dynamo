@@ -77,13 +77,12 @@ package body Gen.Artifacts.Hibernate is
    --  ------------------------------
    procedure Register_Column (Table  : in out Table_Definition;
                               Column : in DOM.Core.Node) is
-      Name : constant DOM.Core.DOM_String      := DOM.Core.Nodes.Node_Name (Column);
-      N    : constant Unbounded_String := To_Unbounded_String (Name);
+      Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
       G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
       C    : Column_Definition_Access;
    begin
-      Table.Add_Column (N, C);
-      C.Initialize (N, Column);
+      Table.Add_Column (Name, C);
+      C.Initialize (Name, Column);
 
       C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
       C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
@@ -121,12 +120,12 @@ package body Gen.Artifacts.Hibernate is
    --  ------------------------------
    procedure Register_Association (Table  : in out Table_Definition;
                                    Column : in DOM.Core.Node) is
-      Name : constant DOM.Core.DOM_String      := DOM.Core.Nodes.Node_Name (Column);
+      Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
       C    : constant Association_Definition_Access := new Association_Definition;
    begin
       Log.Debug ("Register association {0}", Name);
 
-      C.Initialize (Ada.Strings.Unbounded.To_Unbounded_String (Name), Column);
+      C.Initialize (Name, Column);
       C.Number := Table.Members.Get_Count;
       Table.Members.Append (C.all'Access);
       Table.Has_Associations := True;
@@ -189,14 +188,12 @@ package body Gen.Artifacts.Hibernate is
    --  ------------------------------
    procedure Register_Enum_Value (Enum  : in out Enum_Definition;
                                   Value : in DOM.Core.Node) is
-      Name : constant DOM.Core.DOM_String      := DOM.Core.Nodes.Node_Name (Value);
-      C    : constant Value_Definition_Access := new Value_Definition;
+      Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Value, "name");
+      V    : Value_Definition_Access;
    begin
       Log.Debug ("Register enum value {0}", Name);
 
-      C.Initialize (Ada.Strings.Unbounded.To_Unbounded_String (Name), Value);
-      C.Number := Enum.Values.Get_Count;
-      Enum.Values.Append (C);
+      Enum.Add_Value (To_String (Name), V);
    end Register_Enum_Value;
 
    --  ------------------------------

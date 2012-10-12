@@ -116,7 +116,7 @@ package body Gen.Artifacts.Query is
          Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
       begin
          Query.Initialize (Name, Node);
-         Query.Set_Table_Name (Query.Get_Attribute ("name"));
+         Query.Set_Table_Name (To_String (Name));
 
          if Name /= "" then
             Query.Name := Name;
@@ -128,7 +128,7 @@ package body Gen.Artifacts.Query is
          Append (Hash, "class=");
          Append (Hash, Query.Name);
 
-         Log.Debug ("Register query {0} with type {0}", Query.Name, Query.Type_Name);
+         Log.Debug ("Register query {0} with type {1}", Query.Name, Query.Type_Name);
          Register_Columns (Query, Node);
       end Register_Mapping;
 
@@ -137,12 +137,10 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
                                 Node  : in DOM.Core.Node) is
-         C    : constant Column_Definition_Access := new Column_Definition;
          Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         C    : Column_Definition_Access;
       begin
-         Query.Initialize (Name, Node);
-         C.Number := Query.Queries.Get_Count;
-         Query.Queries.Append (C);
+         Query.Add_Query (Name, C);
       end Register_Query;
 
       --  ------------------------------

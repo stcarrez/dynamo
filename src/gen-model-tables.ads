@@ -69,8 +69,6 @@ package Gen.Model.Tables is
       --  True if the column is included in the update statement
       Is_Updated   : Boolean := True;
 
-      Type_Mapping : Gen.Model.Mappings.Mapping_Definition_Access;
-
       --  The class generator to use for this column.
       Generator    : Util.Beans.Objects.Object;
    end record;
@@ -91,6 +89,10 @@ package Gen.Model.Tables is
 
    --  Returns the column type.
    function Get_Type (From : Column_Definition) return String;
+
+   --  Returns the column type mapping.
+   function Get_Type_Mapping (From : in Column_Definition)
+                              return Gen.Model.Mappings.Mapping_Definition_Access;
 
    package Column_List is new Gen.Model.List (T         => Column_Definition,
                                               T_Access  => Column_Definition_Access);

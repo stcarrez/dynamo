@@ -30,11 +30,14 @@ package body Gen.Model.Tables is
       use type Gen.Model.Mappings.Mapping_Definition_Access;
    begin
 
-      if Name = "type" and From.Type_Mapping /= null then
+      if Name = "type" then
          declare
-            Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Type_Mapping.all'Access;
+            T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
          begin
-            return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
+            if T = null then
+               return Util.Beans.Objects.Null_Object;
+            end if;
+            return Util.Beans.Objects.To_Object (T.all'Access, Util.Beans.Objects.STATIC);
          end;
 
       elsif Name = "type" then
@@ -84,14 +87,15 @@ package body Gen.Model.Tables is
    --  ------------------------------
    --  Returns true if the column type is a basic type.
    --  ------------------------------
-   function Is_Basic_Type (From : Column_Definition) return Boolean is
+   function Is_Basic_Type (From : in Column_Definition) return Boolean is
       use type Gen.Model.Mappings.Mapping_Definition_Access;
       use type Gen.Model.Mappings.Basic_Type;
 
+      T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
       Name : constant String := To_String (From.Type_Name);
    begin
-      if From.Type_Mapping /= null then
-         return From.Type_Mapping.Kind /= Gen.Model.Mappings.T_BLOB;
+      if T /= null then
+         return T.Kind /= Gen.Model.Mappings.T_BLOB;
       end if;
       return Name = "int" or Name = "String"
         or Name = "ADO.Identifier" or Name = "Timestamp"
@@ -102,15 +106,32 @@ package body Gen.Model.Tables is
    --  ------------------------------
    --  Returns the column type.
    --  ------------------------------
-   function Get_Type (From : Column_Definition) return String is
+   function Get_Type (From : in Column_Definition) return String is
       use type Gen.Model.Mappings.Mapping_Definition_Access;
+      T : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
    begin
-      if From.Type_Mapping /= null then
-         return To_String (From.Type_Mapping.Target);
+      if T /= null then
+         return To_String (T.Target);
       else
          return To_String (From.Type_Name);
       end if;
    end Get_Type;
+
+   --  ------------------------------
+   --  Returns the column type mapping.
+   --  ------------------------------
+   function Get_Type_Mapping (From : in Column_Definition)
+                              return Gen.Model.Mappings.Mapping_Definition_Access is
+      use type Mappings.Mapping_Definition_Access;
+
+      Result : Gen.Model.Mappings.Mapping_Definition_Access;
+   begin
+      Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
+      if Result = null then
+         Result := From.Table.Package_Def.Find_Type (From.Type_Name);
+      end if;
+      return Result;
+   end Get_Type_Mapping;
 
    --  ------------------------------
    --  Prepare the generation of the model.
@@ -119,10 +140,11 @@ package body Gen.Model.Tables is
    procedure Prepare (O : in out Column_Definition) is
       use type Mappings.Mapping_Definition_Access;
    begin
-      O.Type_Mapping := Gen.Model.Mappings.Find_Type (O.Type_Name);
-      if O.Type_Mapping = null then
-         O.Type_Mapping := O.Table.Package_Def.Find_Type (O.Type_Name);
-      end if;
+--        O.Type_Mapping := Gen.Model.Mappings.Find_Type (O.Type_Name);
+--        if O.Type_Mapping = null then
+--           O.Type_Mapping := O.Table.Package_Def.Find_Type (O.Type_Name);
+--        end if;
+      null;
    end Prepare;
 
    --  ------------------------------

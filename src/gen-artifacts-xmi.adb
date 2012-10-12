@@ -689,7 +689,8 @@ package body Gen.Artifacts.XMI is
             end;
 
          else
-            Log.Debug ("UML class {0} not generated", Name);
+            Log.Warn ("UML class {0} not generated: no <<Bean>> and no <<Table>> stereotype",
+                       To_String (Name));
          end if;
       exception
          when E : others =>

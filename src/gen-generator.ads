@@ -71,8 +71,9 @@ package Gen.Generator is
    procedure Read_Mappings (H    : in out Handler);
 
    --  Read the XML model file
-   procedure Read_Model (H    : in out Handler;
-                         File : in String);
+   procedure Read_Model (H      : in out Handler;
+                         File   : in String;
+                         Silent : in Boolean);
 
    --  Read the model and query files stored in the application directory <b>db</b>.
    procedure Read_Models (H : in out Handler;

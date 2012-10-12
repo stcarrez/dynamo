@@ -48,7 +48,7 @@ package body Gen.Commands.Generate is
               and then Ada.Directories.Kind (Model_File) = Ada.Directories.Directory then
                Gen.Generator.Read_Models (Generator, Model_File);
             else
-               Gen.Generator.Read_Model (Generator, Model_File);
+               Gen.Generator.Read_Model (Generator, Model_File, False);
             end if;
          end;
       end loop;

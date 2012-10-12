@@ -649,7 +649,7 @@ package body Gen.Generator is
                               Default : in String) is
          Mapping : constant String := H.Get_Parameter (Name, Default);
       begin
-         H.Read_Model (File => Util.Files.Compose (Dir, Mapping));
+         H.Read_Model (File => Util.Files.Compose (Dir, Mapping), Silent => True);
       end Read_Mapping;
 
    begin
@@ -663,8 +663,9 @@ package body Gen.Generator is
    --  ------------------------------
    --  Read the XML model file
    --  ------------------------------
-   procedure Read_Model (H    : in out Handler;
-                         File : in String) is
+   procedure Read_Model (H      : in out Handler;
+                         File   : in String;
+                         Silent : in Boolean) is
       Read           : Input_Sources.File.File_Input;
       My_Tree_Reader : DOM.Readers.Tree_Reader;
       Name_Start     : Natural;
@@ -676,7 +677,11 @@ package body Gen.Generator is
          H.Read_Mappings;
       end if;
 
-      Log.Info ("Reading model file '{0}'", File);
+      if Silent then
+         Log.Debug ("Reading model file '{0}'", File);
+      else
+         Log.Info ("Reading model file '{0}'", File);
+      end if;
       if Ext = "xmi" or Ext = "XMI" then
          H.XMI.Read_Model (File, H);
          return;
@@ -759,7 +764,8 @@ package body Gen.Generator is
             Iter : Util.Strings.Vectors.Cursor := Files.First;
          begin
             while Util.Strings.Vectors.Has_Element (Iter) loop
-               H.Read_Model (Util.Strings.Vectors.Element (Iter));
+               H.Read_Model (File   => Util.Strings.Vectors.Element (Iter),
+                             Silent => False);
                Util.Strings.Vectors.Next (Iter);
             end loop;
          end;

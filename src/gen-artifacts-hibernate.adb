@@ -173,12 +173,16 @@ package body Gen.Artifacts.Hibernate is
    --  ------------------------------
    procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
                              Node : in DOM.Core.Node) is
-      Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
-      Table : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
+      Name       : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+      Table_Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "table");
+      Table      : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
    begin
       Table.Initialize (Name, Node);
       Log.Debug ("Register class {0}", Table.Name);
 
+      if Length (Table_Name) > 0 then
+         Table.Table_Name := Table_Name;
+      end if;
       O.Register_Table (Table);
       Register_Columns (Table_Definition (Table.all), Node);
    end Register_Class;

@@ -7,7 +7,7 @@
 <h:list value="#{package.beans}" var="bean">
  <h:panelGroup rendered="#{not empty bean.comment}">
    --  --------------------
-   --  #{g:comment(bean.comment)}
+   --  <h:outputText value="#{g:comment(table.comment)}" escape="false"/>
    --  --------------------
  </h:panelGroup>
    type #{bean.type} is abstract#{not empty bean.parentType ? ' new' : ''}#{bean.parentType}

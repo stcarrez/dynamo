@@ -7,7 +7,7 @@
 <h:list value="#{package.tables}" var="table">
  <h:panelGroup rendered="#{not empty table.comment}">
    --  --------------------
-   --  #{g:comment(table.comment)}
+   --  <h:outputText value="#{g:comment(table.comment)}" escape="false"/>
    --  --------------------
  </h:panelGroup>
    --  Create an object key for #{table.type}.

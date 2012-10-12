@@ -185,6 +185,7 @@ package body Gen.Model.Tables is
             Table.Pkg_Name := To_Unbounded_String ("ADO");
             Table.Type_Name := Table.Name;
          end if;
+         Table.Table_Name := Table.Type_Name;
       end;
       return Table;
    end Create_Table;
@@ -248,7 +249,7 @@ package body Gen.Model.Tables is
          return Util.Beans.Objects.To_Object (From.Type_Name);
 
       elsif Name = "table" then
-         return Util.Beans.Objects.To_Object (From.Name);
+         return Util.Beans.Objects.To_Object (From.Table_Name);
 
       else
          return Definition (From).Get_Value (Name);

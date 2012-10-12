@@ -119,6 +119,7 @@ package Gen.Model.Tables is
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
       Type_Name      : Unbounded_String;
       Pkg_Name       : Unbounded_String;
+      Table_Name     : Unbounded_String;
       Version_Column : Column_Definition_Access;
       Id_Column      : Column_Definition_Access;
       Has_Associations : Boolean := False;

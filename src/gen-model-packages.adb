@@ -79,8 +79,13 @@ package body Gen.Model.Packages is
    function Find_Type (From : in Package_Definition;
                        Name : in Unbounded_String)
                        return Gen.Model.Mappings.Mapping_Definition_Access is
-      Pos : constant Mappings.Cursor := From.Types.Find (Name);
+      Pos : Mappings.Cursor;
    begin
+      if Index (Name, ".") > 0 then
+         Pos := From.Types.Find (Name);
+      else
+         Pos := From.Types.Find (From.Pkg_Name & "." & Name);
+      end if;
       if Mappings.Mapping_Maps.Has_Element (Pos) then
          return Mappings.Mapping_Maps.Element (Pos);
       else

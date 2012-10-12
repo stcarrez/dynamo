@@ -296,6 +296,7 @@ package body Gen.Generator is
             Pos := Pos + 1;
          end if;
       end loop;
+      Append (Result, ASCII.LF);
       return Util.Beans.Objects.To_Object (Result);
    end Comment;
 

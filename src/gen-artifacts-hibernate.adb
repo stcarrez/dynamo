@@ -20,8 +20,6 @@ with Ada.Directories;
 with Ada.Exceptions;
 with Ada.Containers;
 
-with DOM.Core.Nodes;
-
 with Gen.Configs;
 with Gen.Utils;
 with Gen.Model.Enums;

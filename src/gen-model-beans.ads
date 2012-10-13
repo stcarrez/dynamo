@@ -20,8 +20,6 @@ with Ada.Strings.Unbounded;
 
 with Util.Beans.Objects;
 
-with Gen.Model.Mappings;
-with Gen.Model.Packages;
 with Gen.Model.Tables;
 package Gen.Model.Beans is
 

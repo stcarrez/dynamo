@@ -21,6 +21,7 @@ with Ada.Strings.Unbounded;
 with Util.Beans.Objects;
 
 with Gen.Model.Tables;
+with Gen.Model.Operations;
 package Gen.Model.Beans is
 
    use Ada.Strings.Unbounded;

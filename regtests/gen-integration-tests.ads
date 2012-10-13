@@ -82,4 +82,7 @@ package Gen.Integration.Tests is
    --  Test generate command (XMI Ada Bean).
    procedure Test_Generate_XMI_Bean (T : in out Test);
 
+   --  Test generate command (XMI Ada Table).
+   procedure Test_Generate_XMI_Table (T : in out Test);
+
 end Gen.Integration.Tests;

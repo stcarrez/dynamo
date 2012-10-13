@@ -125,10 +125,11 @@ install:	  install_dirs
 	$(INSTALL) bin/dynamo $(prefix)/bin/dynamo
 	$(INSTALL) doc/dynamo.1 $(prefix)/share/man/man1/dynamo.1
 	$(CP) config/*.properties $(prefix)/share/dynamo/base
-	$(CP) config/*.xml $(prefix)/share/dynamo/base
 	$(CP) config/*.xsl $(prefix)/share/dynamo/base
 	-rm -rf $(prefix)/share/dynamo/base/templates
 	-rm -rf $(prefix)/share/dynamo/base/commands
+	$(CP) -r config/uml $(prefix)/share/dynamo/base
+	$(CP) -r config/mappings $(prefix)/share/dynamo/base
 	$(CP) -r config/templates $(prefix)/share/dynamo/base
 	$(CP) -r config/commands $(prefix)/share/dynamo/base
 	$(CP) config/db/*.xml $(prefix)/share/dynamo/base/db

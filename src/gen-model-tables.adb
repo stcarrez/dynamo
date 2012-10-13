@@ -59,7 +59,17 @@ package body Gen.Model.Tables is
          return Util.Beans.Objects.To_Object (From.Is_Updated);
 
       elsif Name = "sqlType" then
-         return Util.Beans.Objects.To_Object (From.Sql_Type);
+         if Length (From.Sql_Type) > 0 then
+            return Util.Beans.Objects.To_Object (From.Sql_Type);
+         end if;
+         declare
+            T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
+         begin
+            if T = null then
+               return Util.Beans.Objects.Null_Object;
+            end if;
+            return T.Get_Value ("name");
+         end;
 
       elsif Name = "sqlName" then
          return Util.Beans.Objects.To_Object (From.Sql_Name);

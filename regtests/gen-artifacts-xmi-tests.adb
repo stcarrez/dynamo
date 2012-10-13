@@ -38,6 +38,10 @@ package body Gen.Artifacts.XMI.Tests is
    --  Test reading the XMI files defines in the Dynamo UML configuration repository.
    --  ------------------------------
    procedure Test_Read_XMI (T : in out Test) is
+      procedure Check (Namespace : in String;
+                       Name      : in String;
+                       Id        : in String);
+
       A : Artifact;
       G : Gen.Generator.Handler;
       C : constant String := Util.Tests.Get_Parameter ("config_dir", "config");
@@ -94,12 +98,11 @@ package body Gen.Artifacts.XMI.Tests is
       G : Gen.Generator.Handler;
       C : constant String := Util.Tests.Get_Parameter ("config_dir", "config");
 
-      use type Gen.Model.XMI.Model_Element_Access;
-      use type Gen.Model.XMI.Stereotype_Element_Access;
+      use Gen.Model.XMI;
 
       function Find_Stereotype is
-        new Gen.Model.XMI.Find_Element (Element_Type        => Model.XMI.Stereotype_Element,
-                                        Element_Type_Access => Model.XMI.Stereotype_Element_Access);
+        new Gen.Model.XMI.Find_Element (Element_Type        => Stereotype_Element,
+                                        Element_Type_Access => Stereotype_Element_Access);
 
    begin
       Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);

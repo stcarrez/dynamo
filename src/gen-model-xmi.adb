@@ -321,11 +321,16 @@ package body Gen.Model.XMI is
    --  Returns the empty string if there is no comment.
    --  ------------------------------
    function Get_Comment (Node : in Model_Element) return String is
+      procedure Collect_Comment (Id   : in Unbounded_String;
+                                 Item : in Model_Element_Access);
+
       Doc    : constant Tagged_Value_Element_Access := Node.Find_Tag_Value (TAG_DOCUMENTATION);
       Result : Ada.Strings.Unbounded.Unbounded_String;
 
       procedure Collect_Comment (Id   : in Unbounded_String;
                                  Item : in Model_Element_Access) is
+         pragma Unreferenced (Id);
+
          Comment : constant Comment_Element_Access := Comment_Element'Class (Item.all)'Access;
       begin
          if Comment.Ref_Id = Node.XMI_Id then
@@ -405,7 +410,7 @@ package body Gen.Model.XMI is
    procedure Add_Literal (Node : in out Enum_Element;
                           Id   : in Util.Beans.Objects.Object;
                           Name : in Util.Beans.Objects.Object) is
-      Literal : Literal_Element_Access := new Literal_Element (Node.Model);
+      Literal : constant Literal_Element_Access := new Literal_Element (Node.Model);
    begin
       Literal.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Id);
       Literal.Name   := Util.Beans.Objects.To_Unbounded_String (Name);

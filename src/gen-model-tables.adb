@@ -176,6 +176,8 @@ package body Gen.Model.Tables is
    begin
       O.Members_Bean := Util.Beans.Objects.To_Object (O.Members'Unchecked_Access,
                                                       Util.Beans.Objects.STATIC);
+      O.Operations_Bean := Util.Beans.Objects.To_Object (O.Operations'Unchecked_Access,
+                                                         Util.Beans.Objects.STATIC);
    end Initialize;
 
    --  ------------------------------
@@ -236,6 +238,9 @@ package body Gen.Model.Tables is
    begin
       if Name = "members" or Name = "columns" then
          return From.Members_Bean;
+
+      elsif Name = "operations" then
+         return From.Operations_Bean;
 
       elsif Name = "id" and From.Id_Column /= null then
          declare

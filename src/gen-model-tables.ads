@@ -25,6 +25,7 @@ with Util.Beans.Objects;
 with Gen.Model.List;
 with Gen.Model.Packages;
 with Gen.Model.Mappings;
+with Gen.Model.Operations;
 package Gen.Model.Tables is
 
    use Ada.Strings.Unbounded;
@@ -109,12 +110,18 @@ package Gen.Model.Tables is
    function Get_Value (From : Association_Definition;
                        Name : String) return Util.Beans.Objects.Object;
 
+   package Operation_List is
+     new Gen.Model.List (T         => Gen.Model.Operations.Operation_Definition,
+                         T_Access  => Gen.Model.Operations.Operation_Definition_Access);
+
    --  ------------------------------
    --  Table Definition
    --  ------------------------------
    type Table_Definition is new Mappings.Mapping_Definition with record
       Members        : aliased Column_List.List_Definition;
       Members_Bean   : Util.Beans.Objects.Object;
+      Operations     : aliased Operation_List.List_Definition;
+      Operations_Bean : Util.Beans.Objects.Object;
       Parent         : Table_Definition_Access;
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
       Type_Name      : Unbounded_String;

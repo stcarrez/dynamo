@@ -18,7 +18,10 @@
 
 with Ada.Strings;
 with Util.Strings;
+with Util.Log.Loggers;
 package body Gen.Model.Tables is
+
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Tables");
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -134,9 +137,15 @@ package body Gen.Model.Tables is
                               return Gen.Model.Mappings.Mapping_Definition_Access is
       use type Mappings.Mapping_Definition_Access;
 
-      Result : Gen.Model.Mappings.Mapping_Definition_Access;
+      Result : Gen.Model.Mappings.Mapping_Definition_Access := null;
+      Pos    : constant Natural := Ada.Strings.Unbounded.Index (From.Type_Name, ".");
    begin
-      Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
+      if Pos = 0 then
+         Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
+      end if;
+      if From.Type_Name = "Gen.Tests.Tables.Test_Enum" then
+         Log.Debug ("Found enum");
+      end if;
       if Result = null then
          Result := From.Table.Package_Def.Find_Type (From.Type_Name);
       end if;

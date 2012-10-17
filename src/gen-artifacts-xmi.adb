@@ -112,6 +112,8 @@ package body Gen.Artifacts.XMI is
                        FIELD_ASSOCIATION_END,
 
                        FIELD_OPERATION_NAME,
+                       FIELD_OPERATION_END,
+                       FIELD_PARAMETER_NAME,
 
                        FIELD_COMMENT,
                        FIELD_COMMENT_ID,
@@ -150,6 +152,9 @@ package body Gen.Artifacts.XMI is
       Assos_End_Name       : Util.Beans.Objects.Object;
       Assos_End_Visibility : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
 
+      Operation            : Gen.Model.XMI.Operation_Element_Access;
+      Parameter            : Gen.Model.XMI.Parameter_Element_Access;
+
       Name               : Util.Beans.Objects.Object;
       Id                 : Util.Beans.Objects.Object;
       Ref_Id             : Util.Beans.Objects.Object;
@@ -183,6 +188,7 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Stereotype_Element_Access;
    use type Gen.Model.XMI.Enum_Element_Access;
    use type Gen.Model.XMI.Comment_Element_Access;
+   use type Gen.Model.XMI.Operation_Element_Access;
 
    --  ------------------------------
    --  Get the visibility from the XMI visibility value.
@@ -353,10 +359,16 @@ package body Gen.Artifacts.XMI is
             --           Print (P.Indent, "  enum-type:" & Util.Beans.Objects.To_String (Value));
             null;
 
-      when FIELD_OPERATION_NAME =>
-            --              P.Operation_Name := Value;
-            null;
+         when FIELD_OPERATION_NAME =>
+            P.Operation := new Gen.Model.XMI.Operation_Element (P.Model);
+            P.Operation.Set_Name (Value);
 
+         when FIELD_PARAMETER_NAME =>
+            P.Attr_Element := new Gen.Model.XMI.Attribute_Element (P.Model);
+            P.Attr_Element.Set_Name (Value);
+
+         when FIELD_OPERATION_END =>
+            P.Operation := null;
 
       when FIELD_ASSOCIATION_NAME =>
             --           Print (P.Indent, "association " & Util.Beans.Objects.To_String (Value));
@@ -434,7 +446,7 @@ package body Gen.Artifacts.XMI is
 
             --  Data type mapping.
          when FIELD_DATA_TYPE =>
-            if P.Attr_Element = null then
+            if P.Attr_Element = null and P.Operation = null then
                P.Data_Type := new Gen.Model.XMI.Data_Type_Element (P.Model);
                P.Data_Type.Set_Name (P.Name);
                P.Data_Type.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
@@ -923,7 +935,11 @@ begin
    XMI_Mapping.Add_Mapping ("**/MultiplicityRange/@lower", FIELD_MULTIPLICITY_LOWER);
    XMI_Mapping.Add_Mapping ("**/MultiplicityRange/@upper", FIELD_MULTIPLICITY_UPPER);
 
-
+   --  Operation mapping.
+   XMI_Mapping.Add_Mapping ("**/Operation/@name", FIELD_OPERATION_NAME);
+   XMI_Mapping.Add_Mapping ("**/Operation/@xmi.id", FIELD_ATTRIBUTE_ID);
+   XMI_Mapping.Add_Mapping ("**/Operation", FIELD_OPERATION_END);
+   XMI_Mapping.Add_Mapping ("**/Parameter/@xname", FIELD_PARAMETER_NAME);
 
 --     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@lower",
 --                              FIELD_MULTIPLICITY_LOWER);

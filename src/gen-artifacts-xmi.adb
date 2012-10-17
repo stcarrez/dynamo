@@ -599,7 +599,7 @@ package body Gen.Artifacts.XMI is
                Attr : Attribute_Element_Access := Attribute_Element'Class (Column.all)'Access;
             begin
                if Attr.Data_Type /= null then
-                  C.Type_Name := Attr.Data_Type.Name;
+                  C.Type_Name := To_Unbounded_String (Attr.Data_Type.Get_Qualified_Name);
                end if;
                C.Not_Null := Attr.Multiplicity_Lower > 0;
             end;
@@ -741,12 +741,12 @@ package body Gen.Artifacts.XMI is
          if Item.Has_Stereotype (Handler.Data_Model_Stereotype) then
             Log.Info ("Package {0} has the <<DataModel>> stereotype", Name);
 
-            P.Set_Comment (Pkg.Get_Comment);
-            Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
          else
             Log.Info ("Package {0} does not have the <<DataModel>> stereotype.", Name);
          end if;
 
+         P.Set_Comment (Pkg.Get_Comment);
+         Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
          Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
       end Prepare_Package;
 

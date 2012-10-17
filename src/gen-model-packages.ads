@@ -111,6 +111,11 @@ package Gen.Model.Packages is
                             From : in String;
                             To   : in String);
 
+   --  Find the type identified by the name.
+   function Find_Type (From : in Model_Definition;
+                       Name : in Unbounded_String)
+                       return Gen.Model.Mappings.Mapping_Definition_Access;
+
    --  Set the directory name associated with the model. This directory name allows to
    --  save and build a model in separate directories for the application, the unit tests
    --  and others.
@@ -218,6 +223,9 @@ private
 
       --  True if the package uses Ada.Calendar.Time
       Uses_Calendar_Time : Boolean := False;
+
+      --  The global model (used to resolve types from other packages).
+      Model              : Model_Definition_Access;
    end record;
 
    type Model_Definition is new Definition with record

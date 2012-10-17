@@ -23,7 +23,6 @@ with Gen.Utils;
 with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
-with Gen.Model.Mappings;
 with Gen.Model.Beans;
 
 with Util.Strings;
@@ -83,6 +82,9 @@ package body Gen.Model.Packages is
    begin
       if Index (Name, ".") > 0 then
          Pos := From.Types.Find (Name);
+         if not Mappings.Mapping_Maps.Has_Element (Pos) then
+            return From.Model.Find_Type (Name);
+         end if;
       else
          Pos := From.Types.Find (From.Pkg_Name & "." & Name);
       end if;
@@ -174,6 +176,7 @@ package body Gen.Model.Packages is
 
             Result := new Package_Definition;
             Result.Pkg_Name := Name;
+            Result.Model := O'Unchecked_Access;
             Result.Tables_Bean := Util.Beans.Objects.To_Object (Result.Tables'Access,
                                                                 Util.Beans.Objects.STATIC);
             Util.Strings.Transforms.To_Lower_Case (To_String (Base_Name),
@@ -432,5 +435,28 @@ package body Gen.Model.Packages is
    begin
       null;
    end Register_Type;
+
+   --  ------------------------------
+   --  Find the type identified by the name.
+   --  ------------------------------
+   function Find_Type (From : in Model_Definition;
+                       Name : in Unbounded_String)
+                       return Gen.Model.Mappings.Mapping_Definition_Access is
+      N : constant Natural := Ada.Strings.Unbounded.Index (Name, ".", Ada.Strings.Backward);
+   begin
+      if N = 0 then
+         return null;
+      end if;
+      declare
+         Pkg_Name : constant String := Ada.Strings.Unbounded.Slice (Name, 1, N - 1);
+         Key      : constant String := Util.Strings.Transforms.To_Upper_Case (Pkg_Name);
+         Pos      : constant Package_Map.Cursor := From.Packages.Find (To_Unbounded_String (Key));
+      begin
+         if Package_Map.Has_Element (Pos) then
+            return Package_Map.Element (Pos).Find_Type (Name);
+         end if;
+         return null;
+      end;
+   end Find_Type;
 
 end Gen.Model.Packages;

@@ -34,6 +34,7 @@ package Gen.Model.XMI is
                          XMI_ASSOCIATION_END,
                          XMI_ATTRIBUTE,
                          XMI_OPERATION,
+                         XMI_PARAMETER,
                          XMI_ENUMERATION,
                          XMI_ENUMERATION_LITERAL,
                          XMI_TAGGED_VALUE,
@@ -317,6 +318,17 @@ package Gen.Model.XMI is
    overriding
    procedure Reconcile (Node  : in out Attribute_Element;
                         Model : in UML_Model);
+
+
+   --  ------------------------------
+   --  A parameter
+   --  ------------------------------
+   type Parameter_Element is new Attribute_Element with null record;
+   type Parameter_Element_Access is access all Parameter_Element'Class;
+
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Parameter_Element) return Element_Type;
 
    --  ------------------------------
    --  An association end

@@ -334,7 +334,10 @@ package Gen.Model.XMI is
    --  An association end
    --  ------------------------------
    type Association_End_Element is new Model_Element with record
-      Visibility : Visibility_Type := VISIBILITY_PUBLIC;
+      Visibility         : Visibility_Type := VISIBILITY_PUBLIC;
+      Multiplicity_Lower : Integer := 0;
+      Multiplicity_Upper : Integer := 0;
+      Target             : Unbounded_String;
    end record;
    type Association_End_Element_Access is access all Association_End_Element'Class;
 
@@ -347,6 +350,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    type Association_Element is new Model_Element with record
       Visibility : Visibility_Type := VISIBILITY_PUBLIC;
+      Connections : Model_Vector;
    end record;
    type Association_Element_Access is access all Association_Element'Class;
 
@@ -413,6 +417,7 @@ package Gen.Model.XMI is
    type Package_Element is new Model_Element with record
       Classes      : Model_Vector;
       Enums        : Model_Vector;
+      Associations : Model_Vector;
    end record;
 
    --  Get the element type.

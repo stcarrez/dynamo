@@ -238,6 +238,21 @@ package body Gen.Model.Tables is
    end Add_Column;
 
    --  ------------------------------
+   --  Create a table association with the given name and add it to the table.
+   --  ------------------------------
+   procedure Add_Association (Table  : in out Table_Definition;
+                              Name   : in Unbounded_String;
+                              Assoc  : out Association_Definition_Access) is
+   begin
+      Assoc := new Association_Definition;
+      Assoc.Name   := Name;
+      Assoc.Number := Table.Members.Get_Count;
+      Assoc.Table  := Table'Unchecked_Access;
+      Table.Members.Append (Assoc.all'Access);
+      Table.Has_Associations := True;
+   end Add_Association;
+
+   --  ------------------------------
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------

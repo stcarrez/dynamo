@@ -154,6 +154,11 @@ package Gen.Model.Tables is
                          Name   : in Unbounded_String;
                          Column : out Column_Definition_Access);
 
+   --  Create a table association with the given name and add it to the table.
+   procedure Add_Association (Table  : in out Table_Definition;
+                              Name   : in Unbounded_String;
+                              Assoc  : out Association_Definition_Access);
+
    --  Set the table name and determines the package name.
    procedure Set_Table_Name (Table : in out Table_Definition;
                              Name  : in String);

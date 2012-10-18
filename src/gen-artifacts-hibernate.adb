@@ -119,14 +119,13 @@ package body Gen.Artifacts.Hibernate is
    procedure Register_Association (Table  : in out Table_Definition;
                                    Column : in DOM.Core.Node) is
       Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
-      C    : constant Association_Definition_Access := new Association_Definition;
+      C    : Association_Definition_Access;
    begin
       Log.Debug ("Register association {0}", Name);
 
+      Table.Add_Association (Name, C);
+
       C.Initialize (Name, Column);
-      C.Number := Table.Members.Get_Count;
-      Table.Members.Append (C.all'Access);
-      Table.Has_Associations := True;
 
       --  Get the SQL mapping from an optional <column> element.
       declare

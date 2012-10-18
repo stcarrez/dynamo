@@ -103,6 +103,9 @@ package body Gen.Artifacts.XMI is
                        FIELD_ASSOCIATION_AGGREGATION,
                        FIELD_ASSOCIATION_NAME,
                        FIELD_ASSOCIATION_VISIBILITY,
+                       FIELD_ASSOCIATION_ID,
+                       FIELD_ASSOCIATION,
+                       FIELD_ASSOCIATION_CLASS_ID,
 
                        FIELD_CLASSIFIER_HREF,
 
@@ -148,6 +151,7 @@ package body Gen.Artifacts.XMI is
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
 
+      Association          : Gen.Model.XMI.Association_Element_Access;
       Assos_End_Element    : Gen.Model.XMI.Association_End_Element_Access;
       Assos_End_Name       : Util.Beans.Objects.Object;
       Assos_End_Visibility : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
@@ -162,6 +166,7 @@ package body Gen.Artifacts.XMI is
       Href               : Util.Beans.Objects.Object;
       Tag_Name           : Util.Beans.Objects.Object;
 
+      Association_Id     : Util.Beans.Objects.Object;
       Stereotype_Id      : Util.Beans.Objects.Object;
       Data_Type          : Gen.Model.XMI.Data_Type_Element_Access;
       Enumeration        : Gen.Model.XMI.Enum_Element_Access;
@@ -189,6 +194,7 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Enum_Element_Access;
    use type Gen.Model.XMI.Comment_Element_Access;
    use type Gen.Model.XMI.Operation_Element_Access;
+   use type Gen.Model.XMI.Association_Element_Access;
 
    --  ------------------------------
    --  Get the visibility from the XMI visibility value.
@@ -354,6 +360,8 @@ package body Gen.Artifacts.XMI is
             P.Attr_Element       := null;
             P.Attr_Visibility    := Gen.Model.XMI.VISIBILITY_PUBLIC;
             P.Attr_Changeability := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
+            P.Multiplicity_Lower := 0;
+            P.Multiplicity_Upper := 0;
 
          when FIELD_ENUM_DATA_TYPE =>
             --           Print (P.Indent, "  enum-type:" & Util.Beans.Objects.To_String (Value));
@@ -370,15 +378,19 @@ package body Gen.Artifacts.XMI is
          when FIELD_OPERATION_END =>
             P.Operation := null;
 
-      when FIELD_ASSOCIATION_NAME =>
-            --           Print (P.Indent, "association " & Util.Beans.Objects.To_String (Value));
-            null;
+            --  Extract an association.
+         when FIELD_ASSOCIATION_ID =>
+            P.Association_Id := Value;
 
-      when FIELD_ASSOCIATION_VISIBILITY =>
+         when FIELD_ASSOCIATION_NAME =>
+            P.Association := new Gen.Model.XMI.Association_Element (P.Model);
+            P.Association.Set_Name (Value);
+
+         when FIELD_ASSOCIATION_VISIBILITY =>
             --           Print (P.Indent, "visibility: " & Util.Beans.Objects.To_String (Value));
             null;
 
-      when FIELD_ASSOCIATION_AGGREGATION =>
+         when FIELD_ASSOCIATION_AGGREGATION =>
             --           Print (P.Indent, "   aggregate: " & Util.Beans.Objects.To_String (Value));
             null;
 
@@ -392,12 +404,34 @@ package body Gen.Artifacts.XMI is
             P.Assos_End_Element := new Gen.Model.XMI.Association_End_Element (P.Model);
             P.Assos_End_Element.Set_XMI_Id (Value);
             P.Model.Include (P.Assos_End_Element.XMI_Id, P.Assos_End_Element.all'Access);
+            if P.Association /= null then
+               P.Association.Connections.Append (P.Assos_End_Element.all'Access);
+            end if;
+
+         when FIELD_ASSOCIATION_CLASS_ID =>
+            if P.Assos_End_Element /= null then
+               P.Assos_End_Element.Target := Util.Beans.Objects.To_Unbounded_String (Value);
+            end if;
 
          when FIELD_ASSOCIATION_END =>
             if P.Assos_End_Element /= null then
                P.Assos_End_Element.Set_Name (P.Assos_End_Name);
                P.Assos_End_Element.Visibility := P.Assos_End_Visibility;
+               P.Assos_End_Element.Multiplicity_Lower := P.Multiplicity_Lower;
+               P.Assos_End_Element.Multiplicity_Upper := P.Multiplicity_Upper;
             end if;
+            P.Multiplicity_Lower := 0;
+            P.Multiplicity_Upper := 0;
+
+         when FIELD_ASSOCIATION =>
+            if P.Association /= null then
+               P.Association.Set_XMI_Id (P.Association_Id);
+               P.Model.Include (P.Association.XMI_Id, P.Association.all'Access);
+               if P.Package_Element /= null then
+                  P.Package_Element.Associations.Append (P.Association.all'Access);
+               end if;
+            end if;
+            P.Association := null;
 
          when FIELD_NAMESPACE =>
             if P.Need_Register_Package and P.Package_Element /= null then
@@ -954,16 +988,24 @@ begin
 --     XMI_Mapping.Add_Mapping ("Package/*/Association/*/@aggregation",
 --                              FIELD_ASSOCIATION_AGGREGATION);
 
+   --  Association mapping.
+   XMI_Mapping.Add_Mapping ("**/Association/@name", FIELD_ASSOCIATION_NAME);
+   XMI_Mapping.Add_Mapping ("**/Association/@xmi.id", FIELD_ASSOCIATION_ID);
+   XMI_Mapping.Add_Mapping ("**/Association", FIELD_ASSOCIATION);
+
    --  Association end mapping.
    XMI_Mapping.Add_Mapping ("**/AssociationEnd/@name", FIELD_ASSOCIATION_END_NAME);
    XMI_Mapping.Add_Mapping ("**/AssociationEnd/@xmi.id", FIELD_ASSOCIATION_END_ID);
    XMI_Mapping.Add_Mapping ("**/AssociationEnd/@visibility", FIELD_ASSOCIATION_END_VISIBILITY);
    XMI_Mapping.Add_Mapping ("**/AssociationEnd", FIELD_ASSOCIATION_END);
+   XMI_Mapping.Add_Mapping ("**/AssociationEnd.participant/Class/@xmi.idref",
+                            FIELD_ASSOCIATION_CLASS_ID);
 
    --  Comment mapping.
    XMI_Mapping.Add_Mapping ("**/Comment/@xmi.id", FIELD_COMMENT_ID);
    XMI_Mapping.Add_Mapping ("**/Comment/@body", FIELD_VALUE);
    XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Class/@xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Attribute/@xmi.idref", FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Enumeration/@xmi.idref",
                             FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/Comment", FIELD_COMMENT);

@@ -628,6 +628,7 @@ package body Gen.Artifacts.XMI is
 
       procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                                Model : in out Gen.Model.XMI.Model_Map.Map);
+
       --  ------------------------------
       --  Register the column definition in the table
       --  ------------------------------
@@ -682,6 +683,7 @@ package body Gen.Artifacts.XMI is
 --              C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
 --           end;
       end Prepare_Attribute;
+
       --  ------------------------------
       --  Register the column definition in the table
       --  ------------------------------
@@ -705,6 +707,18 @@ package body Gen.Artifacts.XMI is
          end if;
       end Prepare_Attribute;
 
+      --  ------------------------------
+      --  Register the column definition in the table
+      --  ------------------------------
+      procedure Prepare_Association (Table  : in out Gen.Model.Tables.Table_Definition'Class;
+                                     Assoc  : in Model_Element_Access) is
+         A    : Association_Definition_Access;
+      begin
+         Log.Info ("Prepare class association {0}", Assoc.Name);
+
+         Table.Add_Association (Assoc.Name, A);
+      end Prepare_Association;
+
       --  Prepare a UML/XMI class:
       --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
       procedure Prepare_Class (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
@@ -722,6 +736,7 @@ package body Gen.Artifacts.XMI is
                Table.Set_Comment (Item.Get_Comment);
                Model.Register_Table (Table);
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
+               Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);
             end;
 
          elsif Item.Has_Stereotype (Handler.Bean_Stereotype) then

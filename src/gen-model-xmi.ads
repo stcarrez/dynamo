@@ -338,6 +338,7 @@ package Gen.Model.XMI is
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
       Target             : Unbounded_String;
+      Target_Element     : Model_Element_Access;
    end record;
    type Association_End_Element_Access is access all Association_End_Element'Class;
 
@@ -349,7 +350,7 @@ package Gen.Model.XMI is
    --  An association
    --  ------------------------------
    type Association_Element is new Model_Element with record
-      Visibility : Visibility_Type := VISIBILITY_PUBLIC;
+      Visibility  : Visibility_Type := VISIBILITY_PUBLIC;
       Connections : Model_Vector;
    end record;
    type Association_Element_Access is access all Association_Element'Class;
@@ -423,5 +424,11 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Package_Element) return Element_Type;
+
+   --  Reconcile the associations between classes in the package.  For each association,
+   --  find the class ends and register the association end in the class.
+   overriding
+   procedure Reconcile (Node  : in out Package_Element;
+                        Model : in UML_Model);
 
 end Gen.Model.XMI;

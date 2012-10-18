@@ -604,4 +604,52 @@ package body Gen.Model.XMI is
       return XMI_PACKAGE;
    end Get_Type;
 
+   --  ------------------------------
+   --  Reconcile the associations between classes in the package.  For each association,
+   --  find the class ends and register the association end in the class.
+   --  ------------------------------
+   overriding
+   procedure Reconcile (Node  : in out Package_Element;
+                        Model : in UML_Model) is
+      use type Ada.Containers.Count_Type;
+
+      Iter  : Model_Cursor := Node.Associations.First;
+      Assoc : Association_Element_Access;
+   begin
+      while Model_Vectors.Has_Element (Iter) loop
+         Assoc := Association_Element'Class (Model_Vectors.Element (Iter).all)'Access;
+         if Assoc.Connections.Length >= 2 then
+            declare
+               First, Second : Association_End_Element_Access;
+               C1, C2 : Model_Element_Access;
+            begin
+               First  := Association_End_Element'Class (Assoc.Connections.Element (1).all)'Access;
+               Second := Association_End_Element'Class (Assoc.Connections.Element (2).all)'Access;
+
+               Log.Info ("Reconcile association {0} - {1}",
+                         To_String (First.Name), To_String (Second.Name));
+
+               C1 := Find (Model, Node.Model.all, First.Target);
+               C2 := Find (Model, Node.Model.all, Second.Target);
+               if C1 /= null then
+                  Class_Element'Class (C1.all).Associations.Append (First.all'Access);
+                  First.Target_Element := C1.all'Access;
+               else
+                  Log.Error ("Association end {0} not found", To_String (First.Name));
+               end if;
+               if C2 /= null then
+                  Class_Element'Class (C2.all).Associations.Append (Second.all'Access);
+                  Second.Target_Element := C2.all'Access;
+               else
+                  Log.Error ("Association end {0} not found", To_String (Second.Name));
+               end if;
+            end;
+         else
+            Log.Error ("Association {0} needs 2 association ends",
+                       To_String (Assoc.Name));
+         end if;
+         Model_Vectors.Next (Iter);
+      end loop;
+   end Reconcile;
+
 end Gen.Model.XMI;

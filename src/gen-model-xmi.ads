@@ -339,12 +339,19 @@ package Gen.Model.XMI is
       Multiplicity_Upper : Integer := 0;
       Target             : Unbounded_String;
       Target_Element     : Model_Element_Access;
+      Source_Element     : Model_Element_Access;
+      Navigable          : Boolean := True;
    end record;
    type Association_End_Element_Access is access all Association_End_Element'Class;
 
    --  Get the element type.
    overriding
    function Get_Type (Node : in Association_End_Element) return Element_Type;
+
+   --  Make the association between the two ends.
+   procedure Make_Association (From  : in out Association_End_Element;
+                               To    : in out Association_End_Element'Class;
+                               Model : in UML_Model);
 
    --  ------------------------------
    --  An association
@@ -358,6 +365,12 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Association_Element) return Element_Type;
+
+   --  Reconcile the association between classes in the package.  Find the association
+   --  ends and add the necessary links to the corresponding class elements.
+   overriding
+   procedure Reconcile (Node  : in out Association_Element;
+                        Model : in UML_Model);
 
    --  ------------------------------
    --  Tag Definition
@@ -424,11 +437,5 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Package_Element) return Element_Type;
-
-   --  Reconcile the associations between classes in the package.  For each association,
-   --  find the class ends and register the association end in the class.
-   overriding
-   procedure Reconcile (Node  : in out Package_Element;
-                        Model : in UML_Model);
 
 end Gen.Model.XMI;

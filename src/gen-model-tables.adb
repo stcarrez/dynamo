@@ -248,6 +248,7 @@ package body Gen.Model.Tables is
       Assoc.Name   := Name;
       Assoc.Number := Table.Members.Get_Count;
       Assoc.Table  := Table'Unchecked_Access;
+      Assoc.Sql_Name := Name;
       Table.Members.Append (Assoc.all'Access);
       Table.Has_Associations := True;
    end Add_Association;

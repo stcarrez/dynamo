@@ -746,6 +746,7 @@ package body Gen.Artifacts.XMI is
             begin
                Table.Set_Comment (Item.Get_Comment);
                Model.Register_Table (Table);
+               Table.Target := Name;
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);
             end;
@@ -757,6 +758,7 @@ package body Gen.Artifacts.XMI is
             begin
                Model.Register_Bean (Bean);
                Bean.Set_Comment (Item.Get_Comment);
+               Bean.Target := Name;
                Iterate_For_Bean (Bean.all, Class.Attributes, Prepare_Attribute'Access);
             end;
 

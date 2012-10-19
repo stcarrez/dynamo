@@ -112,6 +112,7 @@ package body Gen.Artifacts.XMI is
                        FIELD_ASSOCIATION_END_ID,
                        FIELD_ASSOCIATION_END_NAME,
                        FIELD_ASSOCIATION_END_VISIBILITY,
+                       FIELD_ASSOCIATION_END_NAVIGABLE,
                        FIELD_ASSOCIATION_END,
 
                        FIELD_OPERATION_NAME,
@@ -155,6 +156,7 @@ package body Gen.Artifacts.XMI is
       Assos_End_Element    : Gen.Model.XMI.Association_End_Element_Access;
       Assos_End_Name       : Util.Beans.Objects.Object;
       Assos_End_Visibility : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
+      Assos_End_Navigable  : Boolean := False;
 
       Operation            : Gen.Model.XMI.Operation_Element_Access;
       Parameter            : Gen.Model.XMI.Parameter_Element_Access;
@@ -319,6 +321,7 @@ package body Gen.Artifacts.XMI is
                if P.Package_Element /= null then
                   P.Package_Element.Classes.Append (P.Class_Element.all'Access);
                   P.Package_Element.Elements.Append (P.Class_Element.all'Access);
+                  P.Class_Element.Parent := P.Package_Element.all'Access;
                end if;
                P.Class_Element := null;
                P.Class_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
@@ -400,6 +403,9 @@ package body Gen.Artifacts.XMI is
          when FIELD_ASSOCIATION_END_VISIBILITY =>
             P.Assos_End_Visibility := Get_Visibility (Value);
 
+         when FIELD_ASSOCIATION_END_NAVIGABLE =>
+            P.Assos_End_Navigable := Util.Beans.Objects.To_Boolean (Value);
+
          when FIELD_ASSOCIATION_END_ID =>
             P.Assos_End_Element := new Gen.Model.XMI.Association_End_Element (P.Model);
             P.Assos_End_Element.Set_XMI_Id (Value);
@@ -417,11 +423,13 @@ package body Gen.Artifacts.XMI is
             if P.Assos_End_Element /= null then
                P.Assos_End_Element.Set_Name (P.Assos_End_Name);
                P.Assos_End_Element.Visibility := P.Assos_End_Visibility;
+               P.Assos_End_Element.Navigable := P.Assos_End_Navigable;
                P.Assos_End_Element.Multiplicity_Lower := P.Multiplicity_Lower;
                P.Assos_End_Element.Multiplicity_Upper := P.Multiplicity_Upper;
             end if;
             P.Multiplicity_Lower := 0;
             P.Multiplicity_Upper := 0;
+            P.Assos_End_Navigable := False;
 
          when FIELD_ASSOCIATION =>
             if P.Association /= null then
@@ -711,12 +719,15 @@ package body Gen.Artifacts.XMI is
       --  Register the column definition in the table
       --  ------------------------------
       procedure Prepare_Association (Table  : in out Gen.Model.Tables.Table_Definition'Class;
-                                     Assoc  : in Model_Element_Access) is
+                                     Node   : in Model_Element_Access) is
          A    : Association_Definition_Access;
+         Assoc : Association_End_Element_Access := Association_End_Element'Class (Node.all)'Access;
       begin
          Log.Info ("Prepare class association {0}", Assoc.Name);
 
          Table.Add_Association (Assoc.Name, A);
+         A.Set_Comment (Assoc.Get_Comment);
+         A.Type_Name := To_Unbounded_String (Assoc.Source_Element.Get_Qualified_Name);
       end Prepare_Association;
 
       --  Prepare a UML/XMI class:
@@ -1012,6 +1023,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/AssociationEnd/@name", FIELD_ASSOCIATION_END_NAME);
    XMI_Mapping.Add_Mapping ("**/AssociationEnd/@xmi.id", FIELD_ASSOCIATION_END_ID);
    XMI_Mapping.Add_Mapping ("**/AssociationEnd/@visibility", FIELD_ASSOCIATION_END_VISIBILITY);
+   XMI_Mapping.Add_Mapping ("**/AssociationEnd/@isNavigable", FIELD_ASSOCIATION_END_NAVIGABLE);
    XMI_Mapping.Add_Mapping ("**/AssociationEnd", FIELD_ASSOCIATION_END);
    XMI_Mapping.Add_Mapping ("**/AssociationEnd.participant/Class/@xmi.idref",
                             FIELD_ASSOCIATION_CLASS_ID);

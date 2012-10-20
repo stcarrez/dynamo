@@ -259,8 +259,17 @@ package body Gen.Artifacts.XMI is
       end if;
       Tagged_Value.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
       P.Model.Insert (Tagged_Value.XMI_Id, Tagged_Value.all'Access);
-      if P.Attr_Element /= null then
+
+      --  Insert the tag value into the current element.
+      if P.Assos_End_Element /= null then
+         P.Assos_End_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+
+      elsif P.Association /= null then
+         P.Association.Tagged_Values.Append (Tagged_Value.all'Access);
+
+      elsif P.Attr_Element /= null then
          P.Attr_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+
       elsif P.Class_Element /= null then
          P.Class_Element.Tagged_Values.Append (Tagged_Value.all'Access);
 
@@ -269,8 +278,10 @@ package body Gen.Artifacts.XMI is
 
       elsif P.Package_Element /= null then
          P.Package_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+
       elsif P.Tag_Definition /= null then
          P.Tag_Definition.Tagged_Values.Append (Tagged_Value.all'Access);
+
       else
          Log.Info ("Tagged value {0} ignored", Util.Beans.Objects.To_String (P.Id));
       end if;
@@ -426,6 +437,7 @@ package body Gen.Artifacts.XMI is
                P.Assos_End_Element.Navigable := P.Assos_End_Navigable;
                P.Assos_End_Element.Multiplicity_Lower := P.Multiplicity_Lower;
                P.Assos_End_Element.Multiplicity_Upper := P.Multiplicity_Upper;
+               P.Assos_End_Element.Parent := P.Association.all'Access;
             end if;
             P.Multiplicity_Lower := 0;
             P.Multiplicity_Upper := 0;

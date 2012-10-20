@@ -285,7 +285,9 @@ package body Gen.Model.XMI is
    procedure Set_Name (Node  : in out Model_Element;
                        Value : in Util.Beans.Objects.Object) is
    begin
-      Node.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      if not Util.Beans.Objects.Is_Null (Value) then
+         Node.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+      end if;
    end Set_Name;
 
    --  ------------------------------

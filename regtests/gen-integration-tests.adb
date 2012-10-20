@@ -69,6 +69,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_XMI_Bean'Access);
       Caller.Add_Test (Suite, "Generate XMI Table",
                        Test_Generate_XMI_Table'Access);
+      Caller.Add_Test (Suite, "Generate XMI Association",
+                       Test_Generate_XMI_Association'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -361,5 +363,17 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-tables.ads");
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-tables.adb");
    end Test_Generate_XMI_Table;
+
+   --  ------------------------------
+   --  Test generate command (XMI Associations between Tables).
+   --  ------------------------------
+   procedure Test_Generate_XMI_Association (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-associations.xmi", Result);
+
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.adb");
+   end Test_Generate_XMI_Association;
 
 end Gen.Integration.Tests;

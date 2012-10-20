@@ -196,6 +196,7 @@ package body Gen.Model.Tables is
       Table : constant Table_Definition_Access := new Table_Definition;
    begin
       Table.Name := Name;
+      Table.Kind := Gen.Model.Mappings.T_TABLE;
       declare
          Pos : constant Natural := Index (Table.Name, ".", Ada.Strings.Backward);
       begin

@@ -18,6 +18,7 @@
 with Ada.Strings.Unbounded;
 with Ada.Directories;
 with Ada.Strings.Fixed;
+with Ada.Directories;
 
 with Gen.Configs;
 with Gen.Utils;
@@ -27,11 +28,14 @@ with Gen.Model.Mappings;
 with Gen.Model.Beans;
 
 with Util.Log.Loggers;
-
+with Util.Strings;
 with Util.Beans;
 with Util.Beans.Objects;
 with Util.Serialize.Mappers.Record_Mapper;
 with Util.Serialize.IO.XML;
+with Util.Processes;
+with Util.Streams.Pipes;
+with Util.Streams.Buffered;
 
 package body Gen.Artifacts.XMI is
 
@@ -959,6 +963,7 @@ package body Gen.Artifacts.XMI is
 
          Info   : aliased XMI_Info;
          Reader : Parser;
+         N      : constant Natural := Util.Strings.Rindex (File, '.');
       begin
          Info.Model := Model'Unchecked_Access;
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
@@ -966,7 +971,22 @@ package body Gen.Artifacts.XMI is
             Reader.Dump (Log);
          end if;
          XMI_Mapper.Set_Context (Reader, Info'Unchecked_Access);
-         Reader.Parse (File);
+
+         if N > 0 and then File (N .. File'Last) = ".zargo" then
+            declare
+               Name   : constant String := Ada.Directories.Base_Name (File);
+               Pipe   : aliased Util.Streams.Pipes.Pipe_Stream;
+               Buffer : Util.Streams.Buffered.Buffered_Stream;
+            begin
+               Pipe.Open ("unzip -cq " & File & " " & Name & ".xmi",
+                          Util.Processes.READ);
+               Buffer.Initialize (null, Pipe'Unchecked_Access, 4096);
+               Reader.Parse (Buffer);
+               Pipe.Close;
+            end;
+         else
+            Reader.Parse (File);
+         end if;
       end Read;
 
       UML  : Gen.Model.XMI.Model_Map.Map;

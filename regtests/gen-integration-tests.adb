@@ -24,6 +24,7 @@ with Util.Streams.Pipes;
 with Util.Streams.Buffered;
 with Util.Processes;
 with Util.Files;
+with Util.Systems.Os;
 
 with Gen.Testsuite;
 package body Gen.Integration.Tests is
@@ -71,6 +72,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_XMI_Table'Access);
       Caller.Add_Test (Suite, "Generate XMI Association",
                        Test_Generate_XMI_Association'Access);
+      Caller.Add_Test (Suite, "Build generated project",
+                       Test_Build'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -375,5 +378,20 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.ads");
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.adb");
    end Test_Generate_XMI_Association;
+
+   --  ------------------------------
+   --  Test GNAT compilation of the final project.
+   --  ------------------------------
+   procedure Test_Build (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute ("make", Result);
+
+      if Util.Systems.Os.Directory_Separator = '\' then
+         Util.Tests.Assert_Exists (T, "bin/test-server.exe");
+      else
+         Util.Tests.Assert_Exists (T, "bin/test-server");
+      end if;
+   end Test_Build;
 
 end Gen.Integration.Tests;

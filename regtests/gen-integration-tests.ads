@@ -88,4 +88,7 @@ package Gen.Integration.Tests is
    --  Test generate command (XMI Associations between Tables).
    procedure Test_Generate_XMI_Association (T : in out Test);
 
+   --  Test GNAT compilation of the final project.
+   procedure Test_Build (T : in out Test);
+
 end Gen.Integration.Tests;

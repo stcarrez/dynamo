@@ -429,6 +429,7 @@ package body Gen.Artifacts.XMI is
             end if;
             P.Multiplicity_Lower := 0;
             P.Multiplicity_Upper := 0;
+            P.Assos_End_Name := Util.Beans.Objects.Null_Object;
             P.Assos_End_Navigable := False;
 
          when FIELD_ASSOCIATION =>

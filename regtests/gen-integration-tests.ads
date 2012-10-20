@@ -88,6 +88,9 @@ package Gen.Integration.Tests is
    --  Test generate command (XMI Associations between Tables).
    procedure Test_Generate_XMI_Association (T : in out Test);
 
+   --  Test generate command using the ArgoUML file directly (runs unzip -cq and parse the output).
+   procedure Test_Generate_Zargo_Association (T : in out Test);
+
    --  Test GNAT compilation of the final project.
    procedure Test_Build (T : in out Test);
 

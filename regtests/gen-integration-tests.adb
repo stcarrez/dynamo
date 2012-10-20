@@ -72,6 +72,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_XMI_Table'Access);
       Caller.Add_Test (Suite, "Generate XMI Association",
                        Test_Generate_XMI_Association'Access);
+      Caller.Add_Test (Suite, "Generate ArgoUML Association",
+                       Test_Generate_Zargo_Association'Access);
       Caller.Add_Test (Suite, "Build generated project",
                        Test_Build'Access);
 
@@ -380,18 +382,34 @@ package body Gen.Integration.Tests is
    end Test_Generate_XMI_Association;
 
    --  ------------------------------
+   --  Test generate command using the ArgoUML file directly (runs unzip -cq and parse the output).
+   --  ------------------------------
+   procedure Test_Generate_Zargo_Association (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-associations.zargo", Result);
+
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.adb");
+   end Test_Generate_Zargo_Association;
+
+   --  ------------------------------
    --  Test GNAT compilation of the final project.
    --  ------------------------------
    procedure Test_Build (T : in out Test) is
+
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
       T.Execute ("make", Result);
 
+      pragma Warnings (Off, "condition is always False");
       if Util.Systems.Os.Directory_Separator = '\' then
          Util.Tests.Assert_Exists (T, "bin/test-server.exe");
       else
          Util.Tests.Assert_Exists (T, "bin/test-server");
       end if;
+      pragma Warnings (On, "condition is always False");
+
    end Test_Build;
 
 end Gen.Integration.Tests;

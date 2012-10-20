@@ -684,7 +684,7 @@ package body Gen.Generator is
       else
          Log.Info ("Reading model file '{0}'", File);
       end if;
-      if Ext = "xmi" or Ext = "XMI" then
+      if Ext = "xmi" or Ext = "XMI" or Ext = "zargo" then
          H.XMI.Read_Model (File, H);
          return;
       end if;
@@ -750,6 +750,14 @@ package body Gen.Generator is
             H.Model.Set_Dirname ("src", Path);
          end if;
          Start_Search (Search, Directory => Path, Pattern => "*.xm[il]", Filter => Filter);
+
+         --  Collect the files in the vector array.
+         while More_Entries (Search) loop
+            Get_Next_Entry (Search, Ent);
+            Files.Append (Full_Name (Ent));
+         end loop;
+
+         Start_Search (Search, Directory => Path, Pattern => "*.zargo", Filter => Filter);
 
          --  Collect the files in the vector array.
          while More_Entries (Search) loop

@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "May 17, 2012" "Ada Web Application"
+.TH DYNAMO 1 "Oct 20, 2012" "Ada Web Application"
 .SH NAME
 dynamo - Ada Web Application Generator
 .SH SYNOPSIS
@@ -34,7 +34,7 @@ describes how to map a database table into an Ada record type for the
 .B ADO
 framework.  The
 .B generate
-command is then used to build the Ada model files from the database mapping files.
+command is then used to build the Ada model files from the database mapping files or from a UML model.
 At the same time, it generates the SQL database creation schemas for MySQL and SQLite databases.
 .PP
 The
@@ -285,13 +285,13 @@ Give an help description about a command.
 dynamo \fBgenerate [\fImodel ... \fR]\fR
 .RE
 .PP
-Generate the Ada model implementation from the XML model mappings.
+Generate the Ada model implementation from the XML model mappings or from a UML model.
 The Ada model files are generated in the
 .B src/model
 directory.  Developers should not modify those files by themselves.
 When no file is specified, the
 .B generate
-command will read all the XML files stored in the
+command will read all the XML and XMI files stored in the
 .B db
 directory.  It will generate all the models found in those files.
 .PP
@@ -299,6 +299,18 @@ At the same time, the command generates the SQL files to create the
 database tables for the supported drivers (MySQL and SQLite).
 For each project, it generates a set of SQL files that can be used
 to create or delete the database tables.
+.PP
+The
+.B generate
+command is able to read XMI 1.2 model files (UML 1.4).  The UML model must use the
+.I Dynamo
+UML profile and assign the
+.I Table
+,
+.I PK
+and
+.I Bean
+stereotypes to the model element for the generation to be activated.
 .\"
 .SS The propset command
 .RS 0
@@ -354,11 +366,13 @@ This configuration file is read by
 .I dynamo
 to configure various installation parameters necessary for the generation.
 .\"
-.SS /usr/share/dynamo/base/AdaMappings.xml
-This XML file defines the type mapping used in the
+.SS /usr/share/dynamo/base/mappings/AdaMappings.xml
+.SS /usr/share/dynamo/base/mappings/MySQLMappings.xml
+.SS /usr/share/dynamo/base/mappings/SQLiteMappings.xml
+These XML files define the type mapping used in the
 .I dynamo
-model files.  This mapping indicates for each basic type used in the
-XML model files, what is the target Ada type name.
+model files.  These mapping indicate for each basic type used in the
+XML model files, what is the target Ada, MySQL or SQLite type name.
 .\"
 .SS /usr/share/dynamo/base/commands
 This directory contains XML files that describe additional template commands.
@@ -367,6 +381,11 @@ This directory contains XML files that describe additional template commands.
 This directory contains the template files associated with
 .I dynamo
 commands.
+.\"
+.SS /usr/share/dynamo/base/uml
+This directory contains the UML profiles that
+.I dynamo
+reads to obtain global definitions.
 .\"
 .SH SEE ALSO
 \fIgnatmake(1)\fR, \fIgcc(1)\fR, \fIyui-compressor(1)\fR, \fIpngcrush(1)\fR, \fIjpegtran(1)\fR

@@ -31,7 +31,7 @@
 <h:panelGroup rendered="#{column.isInserted or column.isUpdated}">
 
 #{''}
-   --  Set #{column.comment}
+   --  Set <h:outputText value="#{g:comment(column.comment)}" escape="false"/>
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
                   #{g:indent(column.name)} Value  : in #{g:adaType(column,1)});
 <h:panelGroup rendered="#{column.type.isString}">
@@ -41,7 +41,7 @@
 #{''}
 </h:panelGroup>
 
-   --  Get #{column.comment}
+   --  Get <h:outputText value="#{g:comment(column.comment)}" escape="false"/>
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
                  return #{g:adaType(column,1)};
 <h:panelGroup rendered="#{column.type.isString}">

@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Oct 20 00:06:19 CEST 2012'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Oct 20 16:22:55 CEST 2012'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
@@ -356,8 +356,8 @@
                           </UML:AssociationEnd.participant>
                         </UML:AssociationEnd>
                         <UML:AssociationEnd xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001E98'
-                          visibility = 'public' isSpecification = 'false' isNavigable = 'true' ordering = 'unordered'
-                          aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                          name = 'reference' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                          ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                           <UML:AssociationEnd.multiplicity>
                             <UML:Multiplicity xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001E9A'>
                               <UML:Multiplicity.range>
@@ -400,7 +400,7 @@
                       </UML:Classifier.feature>
                     </UML:Class>
                     <UML:Association xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001E9C'
-                      name = 'is-owned-by' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                      name = 'is-described-by' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
                       isAbstract = 'false'>
                       <UML:Association.connection>
                         <UML:AssociationEnd xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001E9D'
@@ -420,8 +420,8 @@
                           </UML:AssociationEnd.participant>
                         </UML:AssociationEnd>
                         <UML:AssociationEnd xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001E9E'
-                          visibility = 'public' isSpecification = 'false' isNavigable = 'true' ordering = 'unordered'
-                          aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
+                          name = 'properties' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                          ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                           <UML:AssociationEnd.multiplicity>
                             <UML:Multiplicity xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001EA5'>
                               <UML:Multiplicity.range>

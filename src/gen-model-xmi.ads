@@ -348,6 +348,12 @@ package Gen.Model.XMI is
    overriding
    function Get_Type (Node : in Association_End_Element) return Element_Type;
 
+   --  Get the documentation and comment associated with the model element.
+   --  Integrates the comment from the association itself as well as this association end.
+   --  Returns the empty string if there is no comment.
+   overriding
+   function Get_Comment (Node : in Association_End_Element) return String;
+
    --  Make the association between the two ends.
    procedure Make_Association (From  : in out Association_End_Element;
                                To    : in out Association_End_Element'Class;

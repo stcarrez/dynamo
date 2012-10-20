@@ -535,6 +535,25 @@ package body Gen.Model.XMI is
    end Get_Type;
 
    --  ------------------------------
+   --  Get the documentation and comment associated with the model element.
+   --  Integrates the comment from the association itself as well as this association end.
+   --  Returns the empty string if there is no comment.
+   --  ------------------------------
+   overriding
+   function Get_Comment (Node : in Association_End_Element) return String is
+      Comment             : constant String := Model_Element (Node).Get_Comment;
+      Association_Comment : constant String := Node.Parent.Get_Comment;
+   begin
+      if Association_Comment'Length = 0 then
+         return Comment;
+      elsif Comment'Length = 0 then
+         return Association_Comment;
+      else
+         return Association_Comment & ASCII.LF & Comment;
+      end if;
+   end Get_Comment;
+
+   --  ------------------------------
    --  Make the association between the two ends.
    --  ------------------------------
    procedure Make_Association (From  : in out Association_End_Element;

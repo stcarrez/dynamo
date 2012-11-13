@@ -470,6 +470,10 @@ package body Gen.Artifacts.Docs is
          elsif Line'Length <= 1 then
             Doc_Block := False;
 
+         elsif Line (Line'Last) = ASCII.CR then
+            Result.Line_Number := Result.Line_Number - 1;
+	    Process (Line (Line'First .. Line'Last - 1));
+
          elsif Line (Line'First) = '-' and Line (Line'First + 1) = '-' then
             if Doc_Block then
                if Line'Length < 4 then

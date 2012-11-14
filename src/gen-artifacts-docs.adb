@@ -158,8 +158,14 @@ package body Gen.Artifacts.Docs is
          procedure Write (Line : in Line_Type) is
          begin
             if Line.Kind = L_LIST then
+               Ada.Text_IO.New_Line (File);
                Ada.Text_IO.Put (File, Line.Content);
                Need_Newline := True;
+
+            elsif Line.Kind = L_LIST_ITEM then
+               Ada.Text_IO.Put (File, Line.Content);
+               Need_Newline := True;
+
             else
                if Need_Newline then
                   Ada.Text_IO.New_Line (File);
@@ -308,7 +314,7 @@ package body Gen.Artifacts.Docs is
                           Line : in String) is
    begin
       if Doc.State = IN_LIST then
-         Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_LIST, Content => Line));
+         Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_LIST_ITEM, Content => Line));
       else
          Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_TEXT, Content => Line));
       end if;
@@ -366,6 +372,7 @@ package body Gen.Artifacts.Docs is
             elsif Is_List (Line) then
                Doc.State := IN_LIST;
             end if;
+            Append_Line (Doc, Line);
 
          when IN_SEPARATOR =>
             if Is_List (Line) then
@@ -375,12 +382,14 @@ package body Gen.Artifacts.Docs is
                Doc.State := IN_CODE;
                Append_Line (Doc, "{{{");
             end if;
+            Append_Line (Doc, Line);
 
          when IN_CODE =>
             if Line'Length = 0 then
                Doc.State := IN_CODE_SEPARATOR;
                return;
             end if;
+            Append_Line (Doc, Line);
 
          when IN_CODE_SEPARATOR =>
             if Line'Length > 0 and
@@ -390,15 +399,22 @@ package body Gen.Artifacts.Docs is
                Append_Line (Doc, "");
                Doc.State := IN_PARA;
             end if;
+            Append_Line (Doc, Line);
 
          when IN_LIST =>
             if Is_List (Line) then
-               Append_Line (Doc, "");
+               Doc.Lines.Append (Line_Type '(Len => Line'Length,
+                                             Kind => L_LIST, Content => Line));
+
             elsif Line'Length = 0 then
                Doc.State := IN_SEPARATOR;
+               Append_Line (Doc, Line);
+
+            else
+               Append_Line (Doc, " " & Ada.Strings.Fixed.Trim (Line, Ada.Strings.Left));
             end if;
+
       end case;
-      Append_Line (Doc, Line);
    end Append;
 
    --  ------------------------------
@@ -472,7 +488,7 @@ package body Gen.Artifacts.Docs is
 
          elsif Line (Line'Last) = ASCII.CR then
             Result.Line_Number := Result.Line_Number - 1;
-	    Process (Line (Line'First .. Line'Last - 1));
+            Process (Line (Line'First .. Line'Last - 1));
 
          elsif Line (Line'First) = '-' and Line (Line'First + 1) = '-' then
             if Doc_Block then

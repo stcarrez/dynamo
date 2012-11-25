@@ -764,7 +764,9 @@ package body Gen.Artifacts.XMI is
             Log.Debug ("Class {0} recognized as a database table", Name);
             declare
                Table : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
+               Has_List : constant String := Item.Find_Tag_Value (Handler.Has_List_Tag, "true");
             begin
+               Log.Info ("Has list: {0}", Has_List);
                Table.Set_Comment (Item.Get_Comment);
                Model.Register_Table (Table);
                Table.Target := Name;
@@ -885,7 +887,7 @@ package body Gen.Artifacts.XMI is
                                                   Gen.Model.XMI.BY_NAME);
       Handler.Has_List_Tag := Find_Tag_Definition (Handler.Nodes,
                                                    "Dynamo.xmi",
-                                                   "dynamo.table.hasList",
+                                                   "@dynamo.table.hasList",
                                                    Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop

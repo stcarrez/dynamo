@@ -319,6 +319,28 @@ package body Gen.Model.XMI is
    end Find_Tag_Value;
 
    --  ------------------------------
+   --  Find the tag value associated with the given tag definition.
+   --  Returns the tag value if it was found, otherwise returns the default
+   --  ------------------------------
+   function Find_Tag_Value (Node       : in Model_Element;
+                            Definition : in Tag_Definition_Element_Access;
+                            Default    : in String := "") return String is
+      Pos : Model_Cursor := Node.Tagged_Values.First;
+      Tag : Model_Element_Access;
+   begin
+      while Model_Vectors.Has_Element (Pos) loop
+         Tag := Model_Vectors.Element (Pos);
+         if Tag.all in Tagged_Value_Element'Class and then
+           Tagged_Value_Element'Class (Tag.all).Tag_Def = Definition then
+            return Ada.Strings.Unbounded.To_String (Tagged_Value_Element'Class (Tag.all).Value);
+         end if;
+         Model_Vectors.Next (Pos);
+      end loop;
+      return Default;
+   end Find_Tag_Value;
+
+
+   --  ------------------------------
    --  Get the documentation and comment associated with the model element.
    --  Returns the empty string if there is no comment.
    --  ------------------------------

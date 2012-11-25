@@ -71,6 +71,10 @@ package body Gen.Artifacts.XMI is
      new Gen.Model.XMI.Find_Element (Element_Type        => Model.XMI.Stereotype_Element,
                                      Element_Type_Access => Model.XMI.Stereotype_Element_Access);
 
+   function Find_Tag_Definition is
+     new Gen.Model.XMI.Find_Element (Element_Type        => Model.XMI.Tag_Definition_Element,
+                                     Element_Type_Access => Model.XMI.Tag_Definition_Element_Access);
+
    type XMI_Fields is (FIELD_NAME,
                        FIELD_ID,
                        FIELD_ID_REF,
@@ -879,6 +883,10 @@ package body Gen.Artifacts.XMI is
                                                   "Dynamo.xmi",
                                                   "AWA.Bean",
                                                   Gen.Model.XMI.BY_NAME);
+      Handler.Has_List_Tag := Find_Tag_Definition (Handler.Nodes,
+                                                   "Dynamo.xmi",
+                                                   "dynamo.table.hasList",
+                                                   Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);

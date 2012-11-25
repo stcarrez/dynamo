@@ -1113,7 +1113,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/DataType", FIELD_DATA_TYPE);
    XMI_Mapping.Add_Mapping ("**/DataType/@href", FIELD_DATA_TYPE_HREF);
    XMI_Mapping.Add_Mapping ("**/DataType/@xmi.idref", FIELD_DATA_TYPE_HREF);
-   --     XMI_Mapping.Add_Mapping ("**/StructuralFeature.type/DataType/@xmi.idref",
---                              FIELD_DATA_TYPE_HREF);
+   XMI_Mapping.Add_Mapping ("**/StructuralFeature.type/Class/@xmi.idref",
+                            FIELD_DATA_TYPE_HREF);
 
 end Gen.Artifacts.XMI;

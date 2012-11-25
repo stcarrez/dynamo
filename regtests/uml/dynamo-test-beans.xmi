@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Oct 06 22:22:37 CEST 2012'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Oct 14 23:33:31 CEST 2012'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
@@ -9,9 +9,6 @@
     <UML:Model xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C8'
       name = 'DynamoTest' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
       isAbstract = 'false'>
-      <UML:ModelElement.stereotype>
-        <UML:Stereotype xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C9'/>
-      </UML:ModelElement.stereotype>
       <UML:Namespace.ownedElement>
         <UML:Stereotype xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C9'
           name = 'profile' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
@@ -209,6 +206,36 @@
                             <UML:Enumeration xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024E8'/>
                           </UML:StructuralFeature.type>
                         </UML:Attribute>
+                        <UML:Operation xmi.id = '127-0-1-1-99d947:13a56f02657:-8000:00000000000010F7'
+                          name = 'Save' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                          isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false'>
+                          <UML:BehavioralFeature.parameter>
+                            <UML:Parameter xmi.id = '127-0-1-1-99d947:13a56f02657:-8000:00000000000010F8'
+                              name = 'return' isSpecification = 'false' kind = 'return'/>
+                            <UML:Parameter xmi.id = '127-0-1-1-99d947:13a56f02657:-8000:00000000000010F9'
+                              name = 'outcome' isSpecification = 'false' kind = 'inout'>
+                              <UML:Parameter.type>
+                                <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087E'/>
+                              </UML:Parameter.type>
+                            </UML:Parameter>
+                          </UML:BehavioralFeature.parameter>
+                        </UML:Operation>
+                        <UML:Operation xmi.id = '127-0-1-1-99d947:13a56f02657:-8000:00000000000010FA'
+                          name = 'Update' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                          isQuery = 'false' concurrency = 'sequential' isRoot = 'false' isLeaf = 'false'
+                          isAbstract = 'false'>
+                          <UML:BehavioralFeature.parameter>
+                            <UML:Parameter xmi.id = '127-0-1-1-99d947:13a56f02657:-8000:00000000000010FB'
+                              name = 'return' isSpecification = 'false' kind = 'return'/>
+                            <UML:Parameter xmi.id = '127-0-1-1-99d947:13a56f02657:-8000:00000000000010FC'
+                              name = 'Outcome' isSpecification = 'false' kind = 'inout'>
+                              <UML:Parameter.type>
+                                <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087E'/>
+                              </UML:Parameter.type>
+                            </UML:Parameter>
+                          </UML:BehavioralFeature.parameter>
+                        </UML:Operation>
                       </UML:Classifier.feature>
                     </UML:Class>
                     <UML:Comment xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001126'

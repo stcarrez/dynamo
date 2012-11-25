@@ -56,8 +56,10 @@ package Gen.Model.XMI is
 
    type Model_Element;
    type Tagged_Value_Element;
+   type Tag_Definition_Element;
    type Model_Element_Access is access all Model_Element'Class;
    type Tagged_Value_Element_Access is access all Tagged_Value_Element'Class;
+   type Tag_Definition_Element_Access is access all Tag_Definition_Element'Class;
 
    --  Define a list of model elements.
    package Model_Vectors is
@@ -183,6 +185,12 @@ package Gen.Model.XMI is
    --  Returns null if there is no such tag.
    function Find_Tag_Value (Node : in Model_Element;
                             Name : in String) return Tagged_Value_Element_Access;
+
+   --  Find the tag value associated with the given tag definition.
+   --  Returns the tag value if it was found, otherwise returns the default
+   function Find_Tag_Value (Node       : in Model_Element;
+                            Definition : in Tag_Definition_Element_Access;
+                            Default    : in String := "") return String;
 
    --  Get the documentation and comment associated with the model element.
    --  Returns the empty string if there is no comment.
@@ -388,7 +396,6 @@ package Gen.Model.XMI is
       Multiplicity_Lower : Natural := 0;
       Multiplicity_Upper : Natural := 0;
    end record;
-   type Tag_Definition_Element_Access is access all Tag_Definition_Element'Class;
 
    --  Get the element type.
    overriding

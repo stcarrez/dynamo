@@ -18,7 +18,6 @@
 with Ada.Strings.Unbounded;
 with Ada.Directories;
 with Ada.Strings.Fixed;
-with Ada.Directories;
 
 with Gen.Configs;
 with Gen.Utils;
@@ -633,7 +632,6 @@ package body Gen.Artifacts.XMI is
       Log.Debug ("Initializing query artifact for the configuration");
 
       Gen.Artifacts.Artifact (Handler).Initialize (Path, Node, Model, Context);
---        Iterate (Gen.Model.Packages.Model_Definition (Model), Node, "query-mapping");
    end Initialize;
 
    --  ------------------------------
@@ -667,7 +665,6 @@ package body Gen.Artifacts.XMI is
       procedure Prepare_Attribute (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                    Column : in Model_Element_Access) is
          C    : Column_Definition_Access;
---           G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
       begin
          Log.Info ("Prepare class attribute {0}", Column.Name);
 
@@ -1050,19 +1047,6 @@ begin
    XMI_Mapping.Add_Mapping ("**/Operation", FIELD_OPERATION_END);
    XMI_Mapping.Add_Mapping ("**/Parameter/@xname", FIELD_PARAMETER_NAME);
 
---     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@lower",
---                              FIELD_MULTIPLICITY_LOWER);
---     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Attribute/*/MultiplicityRange/@upper",
---                              FIELD_MULTIPLICITY_UPPER);
---     XMI_Mapping.Add_Mapping ("Package/*/Class/*/Operation/@name",
---                              FIELD_OPERATION_NAME);
---     XMI_Mapping.Add_Mapping ("Package/*/Association/*/@name",
---                              FIELD_ASSOCIATION_NAME);
---     XMI_Mapping.Add_Mapping ("Package/*/Association/*/@visibility",
---                              FIELD_ASSOCIATION_VISIBILITY);
---     XMI_Mapping.Add_Mapping ("Package/*/Association/*/@aggregation",
---                              FIELD_ASSOCIATION_AGGREGATION);
-
    --  Association mapping.
    XMI_Mapping.Add_Mapping ("**/Association/@name", FIELD_ASSOCIATION_NAME);
    XMI_Mapping.Add_Mapping ("**/Association/@xmi.id", FIELD_ASSOCIATION_ID);
@@ -1081,7 +1065,8 @@ begin
    XMI_Mapping.Add_Mapping ("**/Comment/@xmi.id", FIELD_COMMENT_ID);
    XMI_Mapping.Add_Mapping ("**/Comment/@body", FIELD_VALUE);
    XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Class/@xmi.idref", FIELD_ID_REF);
-   XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Attribute/@xmi.idref", FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Attribute/@xmi.idref",
+                            FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Enumeration/@xmi.idref",
                             FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/Comment", FIELD_COMMENT);

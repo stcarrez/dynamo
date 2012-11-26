@@ -32,6 +32,8 @@ package body Gen.Artifacts.XMI.Tests is
                        Test_Read_XMI'Access);
       Caller.Add_Test (Suite, "Test Gen.XMI.Find_Element",
                        Test_Find_Element'Access);
+      Caller.Add_Test (Suite, "Test Gen.XMI.Find_Element",
+                       Test_Find_Tag_Definition'Access);
    end Add_Tests;
 
    --  ------------------------------
@@ -127,5 +129,30 @@ package body Gen.Artifacts.XMI.Tests is
          T.Assert (S /= null, "Stereotype not found");
       end;
    end Test_Find_Element;
+
+   --  Test searching an XMI Tag definition element by using its name.
+   procedure Test_Find_Tag_Definition (T : in out Test) is
+      A : Artifact;
+      G : Gen.Generator.Handler;
+      C : constant String := Util.Tests.Get_Parameter ("config_dir", "config");
+
+      use Gen.Model.XMI;
+
+      function Find_Tag_Definition is
+        new Gen.Model.XMI.Find_Element (Element_Type        => Tag_Definition_Element,
+                                        Element_Type_Access => Tag_Definition_Element_Access);
+
+   begin
+      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
+      A.Read_UML_Configuration (G);
+
+      declare
+         Tag : Tag_Definition_Element_Access;
+      begin
+         Tag := Find_Tag_Definition (A.Nodes, "Dynamo.xmi", "ADO.Table.@dynamo.table.hasList",
+                                     Gen.Model.XMI.BY_NAME);
+         T.Assert (Tag /= null, "Tag definition not found");
+      end;
+   end Test_Find_Tag_Definition;
 
 end Gen.Artifacts.XMI.Tests;

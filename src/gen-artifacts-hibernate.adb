@@ -180,6 +180,7 @@ package body Gen.Artifacts.Hibernate is
       if Length (Table_Name) > 0 then
          Table.Table_Name := Table_Name;
       end if;
+      Table.Has_List := Gen.Utils.Get_Attribute (Node, "list");
       O.Register_Table (Table);
       Register_Columns (Table_Definition (Table.all), Node);
    end Register_Class;

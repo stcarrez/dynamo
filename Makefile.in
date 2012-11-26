@@ -71,7 +71,7 @@ rebuild: clean build
 bin/dynamo_harness:  bin/dynamo
 	$(GNATMAKE) -p -Ptests
 
-test:	 build bin/dynamo_harness
+check test:	 build bin/dynamo_harness
 	-rm -rf test-app
 	-rm -f dynamo-junit.xml
 	bin/dynamo_harness

@@ -772,6 +772,7 @@ package body Gen.Artifacts.XMI is
                Log.Info ("Has list: {0}", Has_List);
                Table.Set_Comment (Item.Get_Comment);
                Model.Register_Table (Table);
+               Table.Has_List := Has_List = "true";
                Table.Target := Name;
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);

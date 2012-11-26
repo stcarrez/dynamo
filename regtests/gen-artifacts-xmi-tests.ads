@@ -29,4 +29,7 @@ package Gen.Artifacts.XMI.Tests is
    --  Test searching an XMI element by using a qualified name.
    procedure Test_Find_Element (T : in out Test);
 
+   --  Test searching an XMI Tag definition element by using its name.
+   procedure Test_Find_Tag_Definition (T : in out Test);
+
 end Gen.Artifacts.XMI.Tests;

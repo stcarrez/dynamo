@@ -113,6 +113,18 @@ package body Gen.Artifacts.XMI.Tests is
       begin
          S := Find_Stereotype (A.Nodes, "Dynamo.xmi", "ADO.Table", Gen.Model.XMI.BY_NAME);
          T.Assert (S /= null, "Stereotype not found");
+
+         S := Find_Stereotype (A.Nodes, "Dynamo.xmi", "ADO.PK", Gen.Model.XMI.BY_NAME);
+         T.Assert (S /= null, "Stereotype not found");
+
+         S := Find_Stereotype (A.Nodes, "Dynamo.xmi", "ADO.FK", Gen.Model.XMI.BY_NAME);
+         T.Assert (S /= null, "Stereotype not found");
+
+         S := Find_Stereotype (A.Nodes, "Dynamo.xmi", "ADO.DataModel", Gen.Model.XMI.BY_NAME);
+         T.Assert (S /= null, "Stereotype not found");
+
+         S := Find_Stereotype (A.Nodes, "Dynamo.xmi", "AWA.Bean", Gen.Model.XMI.BY_NAME);
+         T.Assert (S /= null, "Stereotype not found");
       end;
    end Test_Find_Element;
 

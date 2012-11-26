@@ -583,6 +583,9 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_TAG_DEFINITION =>
             P.Tag_Definition.Set_Name (P.Tag_Name);
+            if P.Stereotype /= null then
+               P.Stereotype.Elements.Append (P.Tag_Definition.all'Access);
+            end if;
             P.Tag_Definition := null;
 
          when FIELD_COMMENT_ID =>
@@ -887,7 +890,7 @@ package body Gen.Artifacts.XMI is
                                                   Gen.Model.XMI.BY_NAME);
       Handler.Has_List_Tag := Find_Tag_Definition (Handler.Nodes,
                                                    "Dynamo.xmi",
-                                                   "@dynamo.table.hasList",
+                                                   "ADO.Table.@dynamo.table.hasList",
                                                    Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop

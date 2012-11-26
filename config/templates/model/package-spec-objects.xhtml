@@ -112,7 +112,7 @@
    procedure Copy (Object : in #{fn:capitalize(table.type)}_Ref;
                    Into   : in out #{fn:capitalize(table.type)}_Ref);
 #{''}
-<h:panelGroup rendered="#{empty table.list or table.list}">
+<h:panelGroup rendered="#{table.hasList}">
    package #{fn:capitalize(table.type)}_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Natural,
                                   Element_Type => #{fn:capitalize(table.type)}_Ref,

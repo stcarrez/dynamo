@@ -515,7 +515,7 @@
    end Set_Value;
 #{''}
 </h:panelGroup>
-<h:panelGroup rendered="#{empty table.list or table.list}">
+<h:panelGroup rendered="#{table.hasList}">
 #{''}
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;

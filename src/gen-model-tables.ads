@@ -130,6 +130,10 @@ package Gen.Model.Tables is
       Version_Column : Column_Definition_Access;
       Id_Column      : Column_Definition_Access;
       Has_Associations : Boolean := False;
+
+      --  Controls whether the <tt>Vector</tt> type and the <tt>List</tt> procedure must
+      --  be generated.
+      Has_List         : Boolean := True;
    end record;
 
    --  Get the value identified by the name.

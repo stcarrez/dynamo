@@ -286,6 +286,9 @@ package body Gen.Model.Tables is
       elsif Name = "hasAssociations" then
          return Util.Beans.Objects.To_Object (From.Has_Associations);
 
+      elsif Name = "hasList" then
+         return Util.Beans.Objects.To_Object (From.Has_List);
+
       elsif Name = "type" then
          return Util.Beans.Objects.To_Object (From.Type_Name);
 

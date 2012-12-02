@@ -199,6 +199,9 @@ package Gen.Model.XMI is
    --  Get the full qualified name for the element.
    function Get_Qualified_Name (Node : in Model_Element) return String;
 
+   --  Dump the node to get some debugging description about it.
+   procedure Dump (Node : in Model_Element);
+
    --  Find from the model file identified by <tt>Name</tt>, the model element with the
    --  identifier or name represented by <tt>Key</tt>.
    --  Returns null if the model element is not found.

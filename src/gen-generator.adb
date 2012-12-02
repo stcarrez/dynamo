@@ -382,8 +382,9 @@ package body Gen.Generator is
       H.Output_Dir := To_Unbounded_String (H.Conf.Get (RESULT_DIR, "./"));
 
       Register_Funcs (H);
-      H.File := new Util.Beans.Objects.Object;
-      H.Mode := new Util.Beans.Objects.Object;
+      H.File   := new Util.Beans.Objects.Object;
+      H.Mode   := new Util.Beans.Objects.Object;
+      H.Ignore := new Util.Beans.Objects.Object;
 
       begin
          Gen.Commands.Templates.Read_Commands (H);
@@ -801,8 +802,9 @@ package body Gen.Generator is
            := Components.Root.Get_Root (View);
       begin
          if Root /= null then
-            App.File.all := Root.Get_Attribute (Context, "file");
-            App.Mode.all := Root.Get_Attribute (Context, "mode");
+            App.File.all   := Root.Get_Attribute (Context, "file");
+            App.Mode.all   := Root.Get_Attribute (Context, "mode");
+            App.Ignore.all := Root.Get_Attribute (Context, "ignore");
          end if;
       end;
    end Execute_Lifecycle;
@@ -915,7 +917,8 @@ package body Gen.Generator is
             Log.Info ("File {0} exists, generation skipped.", Path);
          elsif Exists and not (H.Force_Save or Mode = "force") then
             H.Error ("Cannot generate file: '{0}' exists already.", Path);
-         elsif not Util.Beans.Objects.Is_Null (H.File.all) then
+         elsif not Util.Beans.Objects.Is_Null (H.File.all) and then
+            not Util.Beans.Objects.To_Boolean (H.Ignore.all) then
             Log.Info ("Generating file '{0}'", Path);
             Reply.Read_Content (Content);
 

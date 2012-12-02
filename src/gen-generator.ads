@@ -235,6 +235,11 @@ private
       --  This is the mode attribute in <f:view>.
       Mode     : access Util.Beans.Objects.Object;
 
+      --  Indicates whether the file must be ignored after the generation.
+      --  This is the ignore attribute in <f:view>.  It is intended to be used for the package
+      --  body generation to skip that in some cases when it turns out there is no operation.
+      Ignore   : access Util.Beans.Objects.Object;
+
       --  Whether the AdaMappings.xml file was loaded or not.
       Type_Mapping_Loaded : Boolean := False;
 

@@ -85,8 +85,13 @@ package body Gen.Model.XMI is
       else
          declare
             Iter : Model_Map_Cursor := Model.First;
-            Pos  : constant Natural := Util.Strings.Index (Key, '.');
+            Pos  : Natural;
          begin
+            if Key (Key'First) /= '@' then
+               Pos := Util.Strings.Index (Key, '.');
+            else
+               Pos := 0;
+            end if;
             while Has_Element (Iter) loop
                declare
                   Node : Model_Element_Access := Element (Iter);
@@ -124,24 +129,38 @@ package body Gen.Model.XMI is
                           Mode    : in Search_Type := BY_ID)
                           return Element_Type_Access is
       Model_Pos : constant UML_Model_Map.Cursor := Model.Find (To_Unbounded_String (Name));
+      Item      : Model_Element_Access;
    begin
       if UML_Model_Map.Has_Element (Model_Pos) then
-         declare
-            Item : constant Model_Element_Access := Find (UML_Model_Map.Element (Model_Pos),
-                                                          Key, Mode);
-         begin
-            if Item = null then
-               Log.Error ("The model file {0} does not define {1}",
-                          Name, Key);
-               return null;
-            end if;
-            if not (Item.all in Element_Type'Class) then
-               Log.Error ("The model file {0} defines the element {1}",
-                          Name, Key);
-               return null;
-            end if;
-            return Element_Type'Class (Item.all)'Access;
-         end;
+         if Mode = BY_ID or Mode = BY_NAME then
+            Item := Find (UML_Model_Map.Element (Model_Pos), Key, Mode);
+         else
+            declare
+               Iter : Model_Map_Cursor := UML_Model_Map.Element (Model_Pos).First;
+            begin
+               while Has_Element (Iter) loop
+                  declare
+                     Node : constant Model_Element_Access := Element (Iter);
+                  begin
+                     if Node.all in Element_Type'Class and then Node.Name = Key then
+                        return Element_Type'Class (Node.all)'Access;
+                     end if;
+                  end;
+                  Next (Iter);
+               end loop;
+            end;
+         end if;
+         if Item = null then
+            Log.Error ("The model file {0} does not define {1}",
+                       Name, Key);
+            return null;
+         end if;
+         if not (Item.all in Element_Type'Class) then
+            Log.Error ("The model file {0} defines the element {1}",
+                       Name, Key);
+            return null;
+         end if;
+         return Element_Type'Class (Item.all)'Access;
       else
          Log.Error ("Model file {0} not found", Name);
          return null;
@@ -191,12 +210,7 @@ package body Gen.Model.XMI is
       Iter : Model_Map_Cursor := Map.First;
    begin
       while Has_Element (Iter) loop
-         declare
-            Node : constant Model_Element_Access := Element (Iter);
-         begin
-            Ada.Text_IO.Put_Line ("XMI " & Element_Type'Image (Node.Get_Type) & ":"
-                                  & To_String (Node.XMI_Id) & " - " & To_String (Node.Name));
-         end;
+         Element (Iter).Dump;
          Next (Iter);
       end loop;
    end Dump;
@@ -260,7 +274,7 @@ package body Gen.Model.XMI is
       Iter  : Model_Cursor;
       Item  : Model_Element_Access;
    begin
-      if Pos = 0 then
+      if Pos = 0 or Name (Name'First) = '@' then
          Iter := Node.Elements.First;
          while Model_Vectors.Has_Element (Iter) loop
             Item := Model_Vectors.Element (Iter);
@@ -298,6 +312,47 @@ package body Gen.Model.XMI is
    begin
       Node.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Value);
    end Set_XMI_Id;
+
+   --  ------------------------------
+   --  Dump the node to get some debugging description about it.
+   --  ------------------------------
+   procedure Dump (Node : in Model_Element) is
+   begin
+      Log.Info ("XMI {0} - {2}: {1}",
+                Element_Type'Image (Model_Element'Class (Node).Get_Type),
+                To_String (Node.XMI_Id), To_String (Node.Name));
+      if Node.Parent /= null then
+         Log.Info ("  Parent: {0} ({1})", To_String (Node.Parent.Name),
+                   Element_Type'Image (Node.Parent.Get_Type));
+      end if;
+      declare
+         Iter : Model_Cursor := Node.Tagged_Values.First;
+         Tag  : Tagged_Value_Element_Access;
+      begin
+         while Model_Vectors.Has_Element (Iter) loop
+            Tag := Tagged_Value_Element'Class (Model_Vectors.Element (Iter).all)'Access;
+            if Tag.Tag_Def /= null then
+               Log.Info ("  Tag: {0} = {1}",
+                         To_String (Tag.Tag_Def.Name),
+                         To_String (Tag.Value));
+            else
+               Log.Info ("  Undef tag: {0} = {1}",
+                         To_String (Tag.XMI_Id), To_String (Tag.Value));
+            end if;
+            Model_Vectors.Next (Iter);
+         end loop;
+      end;
+      declare
+         Stereotype : Model_Cursor := Node.Stereotypes.First;
+      begin
+         while Model_Vectors.Has_Element (Stereotype) loop
+            Log.Info ("  Stereotype: <<{0}>>: {1}",
+                      To_String (Model_Vectors.Element (Stereotype).Name),
+                      To_String (Model_Vectors.Element (Stereotype).XMI_Id));
+            Model_Vectors.Next (Stereotype);
+         end loop;
+      end;
+   end Dump;
 
    --  ------------------------------
    --  Find the tag value element with the given name.

@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Nov 28 21:46:14 CET 2012'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Dec 02 15:45:28 CET 2012'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
@@ -160,6 +160,12 @@ with the table and the generation of the List procedure.
                 </UML:Multiplicity>
               </UML:TagDefinition.multiplicity>
             </UML:TagDefinition>
+            <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B43'
+              name = 'Nullable' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'/>
+            <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B44'
+              name = 'Not Null' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'/>
           </UML:Namespace.ownedElement>
         </UML:Package>
         <UML:Package xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F71'

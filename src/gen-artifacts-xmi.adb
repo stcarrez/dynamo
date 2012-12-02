@@ -772,11 +772,16 @@ package body Gen.Artifacts.XMI is
             declare
                Table : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
                Has_List : constant String := Item.Find_Tag_Value (Handler.Has_List_Tag, "true");
+               T_Name   : constant String := Item.Find_Tag_Value (Handler.Table_Name_Tag, "");
             begin
                Log.Info ("Has list: {0}", Has_List);
                Table.Set_Comment (Item.Get_Comment);
                Model.Register_Table (Table);
                Table.Has_List := Has_List = "true";
+               if T_Name'Length /= 0 then
+                  Log.Info ("Using table name {0}", Name);
+                  Table.Table_Name := To_Unbounded_String (T_Name);
+               end if;
                Table.Target := Name;
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);
@@ -897,6 +902,10 @@ package body Gen.Artifacts.XMI is
                                                    "Dynamo.xmi",
                                                    "ADO.Table.@dynamo.table.hasList",
                                                    Gen.Model.XMI.BY_NAME);
+      Handler.Table_Name_Tag := Find_Tag_Definition (Handler.Nodes,
+                                                     "Dynamo.xmi",
+                                                     "ADO.Table.@dynamo.table.name",
+                                                     Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);

@@ -453,6 +453,7 @@ package body Gen.Artifacts.XMI is
             if P.Association = null then
                raise Util.Serialize.Mappers.Field_Error with "invalid association";
             end if;
+            P.Assos_End_Element := null;
 
          when FIELD_ASSOCIATION =>
             if P.Association /= null then

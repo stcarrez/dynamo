@@ -138,7 +138,12 @@
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.name eq table.id.name}">
+<h:panelGroup rendered="#{table.id.type.isString or table.id.type.isIdentifier}">
       ADO.Objects.Set_Field_Key_Value (Impl.all, #{column.index + 1}, Value);
+</h:panelGroup>
+<h:panelGroup rendered="#{not table.id.type.isString and not table.id.type.isIdentifier}">
+      ADO.Objects.Set_Field_Key_Value (Impl.all, #{column.index + 1}, ADO.Identifier (Value));
+</h:panelGroup>
     </h:panelGroup>
    end Set_#{fn:capitalize(column.name)};
   </h:panelGroup>
@@ -163,7 +168,12 @@
     <h:panelGroup rendered="#{column.name eq table.id.name}">
       Impl : constant #{fn:capitalize(table.type)}_Access := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
    begin
+<h:panelGroup rendered="#{table.id.type.isString or table.id.type.isIdentifier}">
       return Impl.Get_Key_Value;
+</h:panelGroup>
+<h:panelGroup rendered="#{not table.id.type.isString and not table.id.type.isIdentifier}">
+      return #{g:adaType(column,1)} (ADO.Identifier '(Impl.Get_Key_Value));
+</h:panelGroup>
     </h:panelGroup>
    end Get_#{fn:capitalize(column.name)};
 #{''}
@@ -317,7 +327,12 @@
                    Session : in out ADO.Sessions.Session'Class) is
       Found : Boolean;
       Query : ADO.SQL.Query;
+<h:panelGroup rendered="#{table.id.type.isString or table.id.type.isIdentifier}">
       Id    : constant #{g:adaType(table.id,0)} := Object.Get_Key_Value;
+</h:panelGroup>
+<h:panelGroup rendered="#{not table.id.type.isString and not table.id.type.isIdentifier}">
+      Id    : constant #{g:adaType(table.id,0)} := #{g:adaType(table.id,0)} (ADO.Identifier '(Object.Get_Key_Value));
+</h:panelGroup>
    begin
       Query.Bind_Param (Position => 1, Value => Id);
       Query.Set_Filter ("#{table.id.name} = ?");

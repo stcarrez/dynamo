@@ -1,0 +1,33 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core">
+
+<h:list value="#{package.beans}" var="bean">
+#{''}
+   --  This bean provides some methods that can be used in a Method_Expression.
+   overriding
+   function Get_Method_Bindings (From : in #{bean.type})
+                                 return Util.Beans.Methods.Method_Binding_Array_Access is
+   begin
+      return null;
+   end Get_Method_Bindings;
+#{''}
+   <ui:include src="../beans/package-bean-operations.xhtml">
+     <ui:param name="bean" value="#{table}"/>
+   </ui:include>
+#{''}
+   --  Set the value identified by the name.
+   overriding
+   procedure Set_Value (From  : in out #{bean.type};
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object) is
+   begin
+      null;
+   end Set_Value;
+#{''}
+</h:list>
+#{''}
+
+</ui:composition>

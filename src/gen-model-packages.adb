@@ -451,9 +451,10 @@ package body Gen.Model.Packages is
          Pkg_Name : constant String := Ada.Strings.Unbounded.Slice (Name, 1, N - 1);
          Key      : constant String := Util.Strings.Transforms.To_Upper_Case (Pkg_Name);
          Pos      : constant Package_Map.Cursor := From.Packages.Find (To_Unbounded_String (Key));
+         L        : constant Natural := Ada.Strings.Unbounded.Length (Name);
       begin
          if Package_Map.Has_Element (Pos) then
-            return Package_Map.Element (Pos).Find_Type (Name);
+            return Package_Map.Element (Pos).Find_Type (Ada.Strings.Unbounded.Unbounded_Slice (Name, N, L));
          end if;
          return null;
       end;

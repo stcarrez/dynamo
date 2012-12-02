@@ -570,7 +570,9 @@ package body Gen.Artifacts.XMI is
                S : Gen.Model.XMI.Ref_Type_Element_Access := new Gen.Model.XMI.Ref_Type_Element (P.Model);
             begin
                S.Href := Util.Beans.Objects.To_Unbounded_String (Value);
-               if P.Class_Element /= null then
+               if P.Attr_Element /= null then
+                  P.Attr_Element.Stereotypes.Append (S.all'Access);
+               elsif P.Class_Element /= null then
                   P.Class_Element.Stereotypes.Append (S.all'Access);
                elsif P.Package_Element /= null then
                   P.Package_Element.Stereotypes.Append (S.all'Access);

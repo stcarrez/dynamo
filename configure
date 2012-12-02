@@ -3034,7 +3034,7 @@ $as_echo "${ADO_DIR}" >&6; }
 
 ac_config_files="$ac_config_files Makefile"
 
-ac_config_files="$ac_config_files dynamo.gpr tests.gpr"
+ac_config_files="$ac_config_files dynamo.gpr tests.gpr regtests/check_build/check_build.gpr"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3757,6 +3757,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "dynamo.gpr") CONFIG_FILES="$CONFIG_FILES dynamo.gpr" ;;
     "tests.gpr") CONFIG_FILES="$CONFIG_FILES tests.gpr" ;;
+    "regtests/check_build/check_build.gpr") CONFIG_FILES="$CONFIG_FILES regtests/check_build/check_build.gpr" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

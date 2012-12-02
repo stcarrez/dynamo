@@ -438,7 +438,7 @@ package body Gen.Artifacts.XMI is
             end if;
 
          when FIELD_ASSOCIATION_END =>
-            if P.Assos_End_Element /= null then
+            if P.Assos_End_Element /= null and P.Association /= null then
                P.Assos_End_Element.Set_Name (P.Assos_End_Name);
                P.Assos_End_Element.Visibility := P.Assos_End_Visibility;
                P.Assos_End_Element.Navigable := P.Assos_End_Navigable;
@@ -450,6 +450,9 @@ package body Gen.Artifacts.XMI is
             P.Multiplicity_Upper := 0;
             P.Assos_End_Name := Util.Beans.Objects.Null_Object;
             P.Assos_End_Navigable := False;
+            if P.Association = null then
+               raise Util.Serialize.Mappers.Field_Error with "invalid association";
+            end if;
 
          when FIELD_ASSOCIATION =>
             if P.Association /= null then
@@ -964,7 +967,7 @@ package body Gen.Artifacts.XMI is
             return;
          end if;
          Context.Error ("{0}: {1}",
-                        Parser'Class (Handler).Get_Location,
+                        File & Parser'Class (Handler).Get_Location,
                         Message);
       end Error;
 
@@ -1068,6 +1071,8 @@ begin
    XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Attribute/@xmi.idref",
                             FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/Enumeration/@xmi.idref",
+                            FIELD_ID_REF);
+   XMI_Mapping.Add_Mapping ("**/Comment/Comment.annotatedElement/AssociationEnd/@xmi.idref",
                             FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/Comment", FIELD_COMMENT);
 

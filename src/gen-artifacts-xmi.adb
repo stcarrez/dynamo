@@ -762,9 +762,13 @@ package body Gen.Artifacts.XMI is
       begin
          Log.Info ("Prepare class association {0}", Assoc.Name);
 
-         Table.Add_Association (Assoc.Name, A);
-         A.Set_Comment (Assoc.Get_Comment);
-         A.Type_Name := To_Unbounded_String (Assoc.Source_Element.Get_Qualified_Name);
+         if Assoc.Multiplicity_Upper /= 1 then
+            Log.Warn ("Multiple association are not yet supported.");
+         else
+            Table.Add_Association (Assoc.Name, A);
+            A.Set_Comment (Assoc.Get_Comment);
+            A.Type_Name := To_Unbounded_String (Assoc.Source_Element.Get_Qualified_Name);
+         end if;
       end Prepare_Association;
 
       --  Prepare a UML/XMI class:

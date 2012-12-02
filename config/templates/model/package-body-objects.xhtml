@@ -450,86 +450,10 @@
    end Delete;
 #{''}
 
-   function Get_Value (Item : in #{fn:capitalize(table.type)}_Ref;
-                       Name : in String) return Util.Beans.Objects.Object is
-      Obj  : constant ADO.Objects.Object_Record_Access := Item.Get_Load_Object;
-      Impl : access #{fn:capitalize(table.type)}_Impl;
-   begin
-      if Obj = null then
-         return Util.Beans.Objects.Null_Object;
-      end if;
-      Impl := #{fn:capitalize(table.type)}_Impl (Obj.all)'Access;
-<h:list value="#{table.members}" var="column">
-  <h:panelGroup rendered="#{not column.isVersion and (column.type.isPrimitiveType or column.type.isEnum)}">
-      if Name = "#{column.name}" then
-    <h:panelGroup rendered="#{column.name eq table.id.name}">
-         return ADO.Objects.To_Object (Impl.Get_Key);
-    </h:panelGroup>
-    <h:panelGroup rendered="#{column.type.isEnum}">
-         return #{column.type.name}_Objects.To_Object (Impl.#{fn:capitalize(column.name)});
-    </h:panelGroup>
-    <h:panelGroup rendered="#{column.name ne table.id.name}">
-      <h:panelGroup rendered="#{column.type.isInteger or column.type.isIdentifier}">
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
-         return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)});
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-         if Impl.#{fn:capitalize(column.name)}.Is_Null then
-            return Util.Beans.Objects.Null_Object;
-         else
-            return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)}.Value);
-         end if;
-      </h:panelGroup>
-    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate}">
-         return Util.Beans.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
-  </h:panelGroup>
-</h:panelGroup>
-      end if;
-</h:panelGroup></h:list>
-      return Util.Beans.Objects.Null_Object;
-   end Get_Value;
-   
-<h:panelGroup rendered="#{table.bean eq 'yes'}">
-#{''}
-   --  Set the value identified by the name
-   overriding 
-   procedure Set_Value (Item  : in out #{fn:capitalize(table.type)}_Ref;
-                        Name  : in String;
-                        Value : in Util.Beans.Objects.Object) is
-   begin
-<h:list value="#{table.members}" var="column">
-  <h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType and column.isUpdated and column.name ne table.id.name }">
-      if Name = "#{column.name}" then
-      <h:panelGroup rendered="#{column.type.isIdentifier}">
-         Item.Set_#{fn:capitalize(column.name)} (ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value)));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isInteger}">
-         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.To_Integer (Value));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
-         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.Time.To_Time (Value));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-         if Util.Beans.Objects.Is_Null (Value) then
-            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => True, others => &lt;&gt;));
-         else
-            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => False,
-								        Value   => Util.Beans.Objects.Time.To_Time (Value)));
-         end if;
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isEnum}">
-         Item.Set_#{fn:capitalize(column.name)} (#{fn:capitalize(column.type.name)}_Objects.To_Value (Value));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate}">
-         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.To_String (Value));
-      </h:panelGroup>
-      end if;
-</h:panelGroup></h:list>
-   end Set_Value;
-#{''}
-</h:panelGroup>
+   <ui:include src="../beans/package-bean-operations.xhtml">
+     <ui:param name="bean" value="#{table}"/>
+   </ui:include>
+
 <h:panelGroup rendered="#{table.hasList}">
 #{''}
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;

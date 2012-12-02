@@ -135,7 +135,11 @@ package body Gen.Generator is
             if Type_Mapping.Kind = T_DATE and Util.Beans.Objects.To_Integer (Param) = 2 then
                return Util.Beans.Objects.To_Object (String '("Time"));
             elsif Type_Mapping.Kind = T_TABLE then
-               return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref");
+               if Util.Beans.Objects.To_Integer (Param) = 1 then
+                  return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
+               else
+                  return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref");
+               end if;
             else
                return Util.Beans.Objects.To_Object (Type_Mapping.Target);
             end if;

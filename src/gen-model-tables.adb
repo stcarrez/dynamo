@@ -174,6 +174,9 @@ package body Gen.Model.Tables is
    function Get_Value (From : Association_Definition;
                        Name : String) return Util.Beans.Objects.Object is
    begin
+      if Name = "type" then
+         Log.Debug ("Association type");
+      end if;
       return Column_Definition (From).Get_Value (Name);
    end Get_Value;
 
@@ -294,6 +297,11 @@ package body Gen.Model.Tables is
 
       elsif Name = "table" then
          return Util.Beans.Objects.To_Object (From.Table_Name);
+
+      elsif Name = "isVersion" or Name = "isReadable" or Name = "isPrimaryKey"
+        or Name = "isPrimitiveType" or Name = "isEnum" or Name = "isIdentifier"
+        or Name = "isBoolean" or Name = "isBlob" or Name = "isDate" or Name = "isString" then
+         return Util.Beans.Objects.To_Object (False);
 
       else
          return Definition (From).Get_Value (Name);

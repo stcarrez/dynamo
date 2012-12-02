@@ -46,13 +46,13 @@
   <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isIdentifier}">
       Impl.#{fn:capitalize(column.name)} := ADO.NO_IDENTIFIER;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isBoolean}">
+  <h:panelGroup rendered="#{column.type.isBoolean and not column.isPrimaryKey}">
       Impl.#{fn:capitalize(column.name)} := False;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isInteger}">
+  <h:panelGroup rendered="#{column.type.isInteger and not column.isPrimaryKey}">
       Impl.#{fn:capitalize(column.name)} := 0;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isEnum}">
+  <h:panelGroup rendered="#{column.type.isEnum and not column.isPrimaryKey}">
       Impl.#{fn:capitalize(column.name)} := #{column.type.name}'First;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
@@ -560,10 +560,6 @@
   </h:panelGroup>
 
 <h:panelGroup rendered="#{column.name ne table.id.name and column.name ne table.version.name}">
-  <h:panelGroup rendered="#{column.type.isEnum}">
-      Object.#{fn:capitalize(column.name)} := #{column.type.name}'Val (Stmt.Get_Identifier (#{column.index}));
-  </h:panelGroup>
-
   <h:panelGroup rendered="#{not column.isPrimitiveType and not column.type.isBoolean and not column.type.isEnum and not column.type.isBlob}">
       if not Stmt.Is_Null (#{column.index}) then
          Object.#{fn:capitalize(column.name)}.Set_Key_Value (Stmt.Get_Identifier (#{column.index}), Session);

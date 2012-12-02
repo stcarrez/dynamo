@@ -169,4 +169,5 @@ AC_CONFIG_FILES([Makefile])
 AC_OUTPUT(
 dynamo.gpr
 tests.gpr
+regtests/check_build/check_build.gpr
 )

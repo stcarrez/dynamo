@@ -76,6 +76,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_Zargo_Association'Access);
       Caller.Add_Test (Suite, "Build generated project",
                        Test_Build'Access);
+      Caller.Add_Test (Suite, "Build generated model files (UML)",
+                       Test_Build_Model'Access);
 
       --  Delete the previous test application if it exists.
       if Ada.Directories.Exists ("test-app") then
@@ -342,7 +344,6 @@ package body Gen.Integration.Tests is
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-enum.xmi", Result);
 
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-enums.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-enums.adb");
    end Test_Generate_XMI_Enum;
 
    --  ------------------------------
@@ -354,7 +355,6 @@ package body Gen.Integration.Tests is
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-beans.xmi", Result);
 
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-beans.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-beans.adb");
    end Test_Generate_XMI_Bean;
 
    --  ------------------------------
@@ -411,5 +411,27 @@ package body Gen.Integration.Tests is
       pragma Warnings (On, "condition is always False");
 
    end Test_Build;
+
+   --  ------------------------------
+   --  Test GNAT compilation of the generated model files.
+   --  ------------------------------
+   procedure Test_Build_Model (T : in out Test) is
+
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      Ada.Directories.Copy_File (Source_Name => "../regtests/check_build/check_build.gpr",
+                                 Target_Name => "check_build.gpr");
+
+      T.Execute ("gnatmake -p -Pcheck_build", Result);
+
+      pragma Warnings (Off, "condition is always False");
+      if Util.Systems.Os.Directory_Separator = '\' then
+         Util.Tests.Assert_Exists (T, "bin/test-server.exe");
+      else
+         Util.Tests.Assert_Exists (T, "bin/test-server");
+      end if;
+      pragma Warnings (On, "condition is always False");
+
+   end Test_Build_Model;
 
 end Gen.Integration.Tests;

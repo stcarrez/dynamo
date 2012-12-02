@@ -685,6 +685,13 @@ package body Gen.Artifacts.XMI is
                   C.Type_Name := To_Unbounded_String (Attr.Data_Type.Get_Qualified_Name);
                end if;
                C.Not_Null := Attr.Multiplicity_Lower > 0;
+               C.Is_Key   := Column.Has_Stereotype (Handler.PK_Stereotype);
+               if Column.Has_Stereotype (Handler.Not_Null_Stereotype) then
+                  C.Not_Null := True;
+               end if;
+               if Column.Has_Stereotype (Handler.Nullable_Stereotype) then
+                  C.Not_Null := False;
+               end if;
             end;
          end if;
 
@@ -890,6 +897,14 @@ package body Gen.Artifacts.XMI is
                                                 "Dynamo.xmi",
                                                 "ADO.FK",
                                                 Gen.Model.XMI.BY_NAME);
+      Handler.Nullable_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                      "Dynamo.xmi",
+                                                      "ADO.Nullable",
+                                                      Gen.Model.XMI.BY_NAME);
+      Handler.Not_Null_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                      "Dynamo.xmi",
+                                                      "ADO.Not Null",
+                                                      Gen.Model.XMI.BY_NAME);
       Handler.Data_Model_Stereotype := Find_Stereotype (Handler.Nodes,
                                                         "Dynamo.xmi",
                                                         "ADO.DataModel",

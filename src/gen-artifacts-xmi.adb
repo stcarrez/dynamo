@@ -303,7 +303,9 @@ package body Gen.Artifacts.XMI is
             P.Name := Value;
 
          when FIELD_ID =>
-            P.Id := Value;
+            P.Id     := Value;
+            P.Ref_Id := Util.Beans.Objects.Null_Object;
+            P.Href   := Util.Beans.Objects.Null_Object;
 
          when FIELD_ID_REF =>
             P.Ref_Id := Value;
@@ -586,6 +588,7 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_TAG_DEFINITION =>
             P.Tag_Definition.Set_Name (P.Tag_Name);
+            Log.Info ("Adding tag definition {0}", P.Tag_Definition.Name);
             if P.Stereotype /= null then
                P.Stereotype.Elements.Append (P.Tag_Definition.all'Access);
             end if;

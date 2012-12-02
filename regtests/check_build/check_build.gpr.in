@@ -1,4 +1,4 @@
-with "config";
+with "../config";
 with "@UTIL_DIR@util";
 with "@UTIL_DIR@testutil";
 with "@EL_DIR@el";
@@ -9,10 +9,9 @@ project Check_Build is
 
    Version := "0.1.0";
    Library_Dir := "lib";
-   Library_Type : Config.Library_Type_Type := external ("LIBRARY_TYPE", "static");
 
    for Library_Name use "ada-tst";
-   for Library_Kind use Library_Type;
+   for Library_Kind use "static";
 
    for Source_Dirs use ("src/model", "../regtests/check_build");
    
@@ -23,6 +22,5 @@ project Check_Build is
    package Binder renames Config.Binder;
    package Builder renames Config.Builder;
    package Compiler renames Config.Compiler;
-   package Ide      renames Config.Ide;
 
 end Check_Build;

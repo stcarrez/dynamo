@@ -306,9 +306,17 @@ package body Gen.Model.Tables is
    overriding
    procedure Prepare (O : in out Table_Definition) is
       Iter : Column_List.Cursor := O.Members.First;
+      C    : Column_Definition_Access;
    begin
+      Log.Info ("Prepare table {0}", O.Name);
+
       while Column_List.Has_Element (Iter) loop
-         Column_List.Element (Iter).Prepare;
+         C := Column_List.Element (Iter);
+         C.Prepare;
+         if C.Is_Key then
+            Log.Info ("Found key {0}", C.Name);
+            O.Id_Column := C;
+         end if;
          Column_List.Next (Iter);
       end loop;
    end Prepare;

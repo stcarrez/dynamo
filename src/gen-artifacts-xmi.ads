@@ -70,6 +70,7 @@ private
 
       --  Tag definitions which control the generation.
       Has_List_Tag          : Gen.Model.XMI.Tag_Definition_Element_Access;
+      Table_Name_Tag        : Gen.Model.XMI.Tag_Definition_Element_Access;
 
       --  Stereotype which triggers the generation of AWA bean types.
       Bean_Stereotype  : Gen.Model.XMI.Stereotype_Element_Access;

@@ -94,4 +94,7 @@ package Gen.Integration.Tests is
    --  Test GNAT compilation of the final project.
    procedure Test_Build (T : in out Test);
 
+   --  Test GNAT compilation of the generated model files.
+   procedure Test_Build_Model (T : in out Test);
+
 end Gen.Integration.Tests;

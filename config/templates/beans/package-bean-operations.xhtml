@@ -2,47 +2,11 @@
 		xmlns:ui="http://java.sun.com/jsf/facelets"
 		xmlns:fn="http://java.sun.com/jsp/jstl/functions"
 		xmlns:g="http://code.google.com/p/ada-ado/generator"
+                xmlns:u="http://code.google.com/p/ada-asf/util"
 		xmlns:f="http://java.sun.com/jsf/core">
-   function Get_Value (Item : in #{fn:capitalize(bean.type)}_Ref; -- #{bean.type}
-                       Name : in String) return Util.Beans.Objects.Object is
-      Obj  : constant ADO.Objects.Object_Record_Access := Item.Get_Load_Object;
-      Impl : access #{fn:capitalize(bean.type)}_Impl;
-   begin
-      if Obj = null then
-         return Util.Beans.Objects.Null_Object;
-      end if;
-      Impl := #{fn:capitalize(bean.type)}_Impl (Obj.all)'Access;
-<h:list value="#{bean.members}" var="column">
-  <h:panelGroup rendered="#{not column.isVersion and (column.type.isPrimitiveType or column.type.isEnum)}">
-      if Name = "#{column.name}" then
-    <h:panelGroup rendered="#{column.name eq bean.id.name}">
-         return ADO.Objects.To_Object (Impl.Get_Key);
-    </h:panelGroup>
-    <h:panelGroup rendered="#{column.type.isEnum}">
-         return #{column.type.name}_Objects.To_Object (Impl.#{fn:capitalize(column.name)});
-    </h:panelGroup>
-    <h:panelGroup rendered="#{column.name ne bean.id.name}">
-      <h:panelGroup rendered="#{column.type.isInteger or column.type.isIdentifier}">
-         return Util.Beans.Objects.To_Object (Long_Long_Integer (Impl.#{fn:capitalize(column.name)}));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
-         return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)});
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-         if Impl.#{fn:capitalize(column.name)}.Is_Null then
-            return Util.Beans.Objects.Null_Object;
-         else
-            return Util.Beans.Objects.Time.To_Object (Impl.#{fn:capitalize(column.name)}.Value);
-         end if;
-      </h:panelGroup>
-    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate}">
-         return Util.Beans.Objects.To_Object (Impl.#{fn:capitalize(column.name)});
-  </h:panelGroup>
-</h:panelGroup>
-      end if;
-</h:panelGroup></h:list>
-      return Util.Beans.Objects.Null_Object;
-   end Get_Value;
+<ui:include src="package-bean-get_impl.xhtml">
+   <ui:param name="impl" value="#{bean.isBean ? 'From' : 'Impl'}"/>
+</ui:include>
    
 <h:panelGroup rendered="#{bean.bean eq 'yes'}">
 #{''}

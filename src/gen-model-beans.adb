@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Gen.Model.Mappings;
 package body Gen.Model.Beans is
 
    --  ------------------------------
@@ -32,8 +33,11 @@ package body Gen.Model.Beans is
       elsif Name = "type" then
          return Util.Beans.Objects.To_Object (From.Type_Name);
 
+      elsif Name = "isBean" then
+         return Util.Beans.Objects.To_Object (True);
+
       else
-         return Definition (From).Get_Value (Name);
+         return Tables.Table_Definition (From).Get_Value (Name);
       end if;
    end Get_Value;
 
@@ -81,6 +85,7 @@ package body Gen.Model.Beans is
    function Create_Bean (Name : in Unbounded_String) return Bean_Definition_Access is
       Bean : constant Bean_Definition_Access := new Bean_Definition;
    begin
+      Bean.Kind := Mappings.T_BEAN;
       Bean.Name := Name;
       declare
          Pos : constant Natural := Index (Bean.Name, ".", Ada.Strings.Backward);

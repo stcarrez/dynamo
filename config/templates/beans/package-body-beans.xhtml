@@ -5,17 +5,34 @@
         xmlns:f="http://java.sun.com/jsf/core">
 
 <h:list value="#{package.beans}" var="bean">
+   <h:list value="#{bean.operations}" var="operation">
+   package #{fn:capitalize(operation)}_Binding is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => #{bean.type},
+                                                      Method => #{fn:capitalize(operation)},
+                                                      Name   => "#{operation}");
+   </h:list>
+#{''}
+<h:panelGroup rendered="#{not empty bean.operations}">
+   Binding_#{bean.type}_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
+     := (<h:list value="#{bean.operations}" var="operation">#{fn:capitalize(operation)}_Binding'Access
+</h:list>);
+</h:panelGroup>
+
 #{''}
    --  This bean provides some methods that can be used in a Method_Expression.
    overriding
    function Get_Method_Bindings (From : in #{bean.type})
                                  return Util.Beans.Methods.Method_Binding_Array_Access is
    begin
+<h:panelGroup rendered="#{not empty bean.operations}">
+      return Binding_#{bean.type}_Array'Access;
+</h:panelGroup>
+<h:panelGroup rendered="#{empty bean.operations}">
       return null;
+</h:panelGroup>
    end Get_Method_Bindings;
 #{''}
    <ui:include src="../beans/package-bean-operations.xhtml">
-     <ui:param name="bean" value="#{table}"/>
    </ui:include>
 #{''}
    --  Set the value identified by the name.

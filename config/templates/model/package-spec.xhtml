@@ -38,6 +38,9 @@ with Util.Beans.Basic.Lists;
 <h:list value="#{package.usedTypes}" var="type">
 with #{type};
 </h:list>
+<h:panelGroup rendered="#{not empty package.beans}">
+with Util.Beans.Methods;
+</h:panelGroup>
 pragma Warnings (On, "unit * is not referenced");
 package #{package.name} is
 

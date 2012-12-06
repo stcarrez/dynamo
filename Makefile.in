@@ -118,7 +118,7 @@ version:
 		  src/gen.gpb src/gen.ads
 
 src/gen-configs.ads:   Makefile src/gen-configs.gpb
-	gnatprep -DCONFIG_DIR='"$(config_dir)/base"' \
+	gnatprep -DCONFIG_DIR='"$(config_dir)/base"' -DVERSION='"@GEN_VERSION@"' \
 		  src/gen-configs.gpb src/gen-configs.ads
 
 install:	  install_dirs

@@ -24,6 +24,7 @@ with Ada.Text_IO;
 with Ada.Strings.Fixed;
 with Ada.IO_Exceptions;
 with Ada.Directories;
+with Ada.Exceptions;
 
 with Util.Strings;
 with Util.Files;
@@ -135,6 +136,7 @@ package body Gen.Commands.Database is
       Stmt := DB.Create_Statement (Query);
       Stmt.Bind_Param ("name", ADO.Parameters.Token (Name));
       Stmt.Execute;
+
    end Create_Database;
 
    --  ------------------------------
@@ -348,6 +350,10 @@ package body Gen.Commands.Database is
             --  Remember the database connection string.
             Generator.Set_Project_Property ("database", Database);
             Generator.Save_Project;
+
+         exception
+            when E : others =>
+               Generator.Error (Ada.Exceptions.Exception_Message (E));
          end;
       end Create_Database;
 

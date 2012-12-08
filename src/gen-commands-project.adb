@@ -58,6 +58,9 @@ package body Gen.Commands.Project is
       pragma Unreferenced (Cmd);
       use GNAT.Command_Line;
 
+      Web_Flag  : aliased Boolean := False;
+      Tool_Flag : aliased Boolean := False;
+      Ado_Flag  : aliased Boolean := False;
    begin
       --  If a dynamo.xml file exists, read it.
       if Ada.Directories.Exists ("dynamo.xml") then
@@ -69,8 +72,17 @@ package body Gen.Commands.Project is
       end if;
       --  Parse the command line
       loop
-         case Getopt ("l:") is
+         case Getopt ("l: -web -tool -ado") is
          when ASCII.NUL => exit;
+
+         when '-' =>
+            if Full_Switch = "-web" then
+               Web_Flag := True;
+            elsif Full_Switch = "-tool" then
+               Tool_Flag := True;
+            elsif Full_Switch = "-ado" then
+               Ado_Flag := True;
+            end if;
 
          when 'l' =>
             declare
@@ -95,6 +107,9 @@ package body Gen.Commands.Project is
             null;
          end case;
       end loop;
+      if not Web_Flag and not Ado_Flag and not Tool_Flag then
+         Web_Flag := True;
+      end if;
       declare
          Name  : constant String := Get_Argument;
          Arg2  : constant String := Get_Argument;
@@ -162,13 +177,18 @@ package body Gen.Commands.Project is
       use Ada.Text_IO;
    begin
       Put_Line ("create-project: Create a new Ada Web Application project");
-      Put_Line ("Usage: create-project [-l apache|gpl|proprietary] NAME [AUTHOR] [EMAIL]");
+      Put_Line ("Usage: create-project [-l apache|gpl|proprietary] [-web] [-tool] [-ado] "
+                & "NAME [AUTHOR] [EMAIL]");
       New_Line;
       Put_Line ("  Creates a new AWA application with the name passed in NAME.");
       Put_Line ("  The application license is controlled with the -l option. ");
       Put_Line ("  License headers can use either the Apache, the GNU license or");
       Put_Line ("  a proprietary license. The author's name and email addresses");
       Put_Line ("  are also reported in generated files.");
+      New_Line;
+      Put_Line ("  -web   Generate a Web application");
+      Put_Line ("  -tool  Generate a command line tool");
+      Put_Line ("  -ado   Generate a database tool operation for ADO");
    end Help;
 
 end Gen.Commands.Project;

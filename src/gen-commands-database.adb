@@ -317,7 +317,7 @@ package body Gen.Commands.Database is
             Append (Root_Connection, Password);
          end if;
 
-         Log.Info ("Connecting to {0}", Root_Connection);
+         Log.Info ("Connecting to {0} for database setup", Root_Connection);
 
          --  Initialize the session factory to connect to the
          --  database defined by root connection (which should allow the database creation).

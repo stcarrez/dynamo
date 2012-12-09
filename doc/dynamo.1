@@ -82,7 +82,7 @@ templates provided by \fIdynamo\fR.
 .\"
 .SS The create-project command
 .RS 0
-dynamo \fBcreate-project\fR [-l \fI{apache|gpl|proprietary}\fR] \fIname\fR \fIauthor\fR \fIemail\fR
+dynamo \fBcreate-project\fR [-l \fI{apache|gpl|proprietary}\fR] [--web] [--tool] [--ado] \fIname\fR \fIauthor\fR \fIemail\fR
 .RE
 .PP
 Create a new project in the current working directory or in the
@@ -98,6 +98,22 @@ to run.  The
 option allows to choose the license headers.  The tool supports the generation
 of Apache, the GNU license or a proprietary license.  The author's name and email address
 can be specified in the command line so that the license headers integrates them correctly.
+.\"
+.PP
+The project type is controlled by one of the
+.B --web
+,
+.B --tool
+or
+.B --ado
+option.  When
+.B --ado
+is specified, a command line project using Ada Database Objects is generated.  This type of
+project does not use Ada Server Faces nor Ada Web Application.  When
+.B --web
+option is specified, a full web application based on ASF and AWA is created.  The
+.B --web
+is the default if no other option is specified.
 .\"
 .SS The dist command
 .RS 0

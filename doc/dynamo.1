@@ -168,6 +168,7 @@ Example of connection string for MySQL database:
 .\"
 .RS 0
 mysql://localhost:3306/my_db?user=joe&password=admin
+.RE
 .\"
 .PP
 The MySQL server is running on localhost and TCP/IP port 3306.  The database name is
@@ -189,7 +190,7 @@ dynamo \fBcreate-plugin \fIname\fR [ada | web]\fR
 .RE
 .PP
 Create a new plugin for the current project.  The plugin sources are created in the
-.B plugins/\fIname\fR
+\fBplugins/\fR\fIname\fR
 directory.  The optional last argument controls whether the new plugin contains
 Ada sources or is a Web plugin.  The plugin can be seen as a separate small
 .I Dynamo

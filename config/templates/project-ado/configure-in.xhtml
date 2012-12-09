@@ -1,0 +1,104 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="configure.in">dnl Autoconf configure script for #{projectName}
+
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(src/#{projectName}.ads)
+
+AC_CANONICAL_SYSTEM
+dnl AM_MAINTAINER_MODE
+
+# Current release settings
+#{fn:toUpperCase(projectName)}_MAJOR_VERSION=0
+#{fn:toUpperCase(projectName)}_MINOR_VERSION=1
+#{fn:toUpperCase(projectName)}_MICRO_VERSION=0
+#{fn:toUpperCase(projectName)}_VERSION=$#{fn:toUpperCase(projectName)}_MAJOR_VERSION.$#{fn:toUpperCase(projectName)}_MINOR_VERSION.$#{fn:toUpperCase(projectName)}_MICRO_VERSION
+
+# checking for local tools
+AC_PROG_CC
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
+AC_PROG_LN_S
+
+AC_CHECK_PROGS(GNATMAKE, gnatmake, "")
+
+# Set the version number of GtkAda
+AC_SUBST(#{fn:toUpperCase(projectName)}_VERSION)
+AC_SUBST(#{fn:toUpperCase(projectName)}_MAJOR_VERSION)
+AC_SUBST(#{fn:toUpperCase(projectName)}_MINOR_VERSION)
+AC_SUBST(#{fn:toUpperCase(projectName)}_MICRO_VERSION)
+
+EXEC_PREFIX="$prefix"
+AC_SUBST(EXEC_PREFIX)
+
+#{fn:toUpperCase(projectName)}_LIBDIR="lib"
+AC_SUBST(#{fn:toUpperCase(projectName)}_LIBDIR)
+
+##########################################
+# Ada Util library
+##########################################
+
+AC_MSG_CHECKING([Ada Util library (code.google.com/p/ada-util)])
+AC_ARG_WITH(ada-util,
+AS_HELP_STRING([--with-ada-util=x], [Path for the Ada Util library (code.google.com/p/ada-util)]),
+[
+  UTIL_DIR=\${withval}/
+],
+[
+  echo "with \"util\"; project t is for Source_Dirs use (); end t;" > t.gpr
+  gnatmake -p -Pt >/dev/null 2>/dev/null
+  if test $? -eq 0; then
+    UTIL_DIR=
+  else
+    UTIL_DIR=../util/
+  fi;
+])
+echo "with \"\${UTIL_DIR}util\"; project t is for Source_Dirs use (); end t;" > t.gpr
+gnatmake -p -Pt >/dev/null 2>/dev/null
+if test $? -ne 0 ; then
+   rm -f t.gpr
+   AC_MSG_ERROR([Ada Util Library not found in \${UTIL_DIR}])
+fi
+rm -f t.gpr
+AC_MSG_RESULT(\${UTIL_DIR})
+AC_SUBST(UTIL_DIR)
+
+
+##########################################
+# Ada Database Objects library
+##########################################
+AC_MSG_CHECKING([Ada Database Objects library (code.google.com/p/ada-ado)])
+AC_ARG_WITH(ada-ado,
+AS_HELP_STRING([--with-ada-ado=x], [Path for the Ada Database Objects library (code.google.com/p/ada-ado)]),
+[
+  ADO_DIR=\${withval}/
+],
+[
+  echo "with \"ado\"; project t is for Source_Dirs use (); end t;" > t.gpr
+  gnatmake -p -Pt >/dev/null 2>/dev/null
+  if test $? -eq 0; then
+    ADO_DIR=
+  else
+    ADO_DIR=../ado/
+  fi;
+  rm -f t.gpr
+])
+echo "with \"\${ADO_DIR}ado\"; project t is for Source_Dirs use (); end t;" > t.gpr
+gnatmake -p -Pt >/dev/null 2>/dev/null
+if test $? -ne 0 ; then
+   rm -f t.gpr
+   AC_MSG_ERROR([Ada Database Objects library not found in \${ADO_DIR}])
+fi
+rm -f t.gpr
+AC_MSG_RESULT(\${ADO_DIR})
+AC_SUBST(ADO_DIR)
+
+
+AC_OUTPUT(
+Makefile #{projectName}.gpr
+)
+</f:view>

@@ -1,0 +1,41 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}-main.adb">-----------------------------------------------------------------------
+--  #{fn:capitalize(projectName)}-server -- Application server
+<ui:include src="../../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+with Ada.Exceptions;
+#{''}
+with Util.Log.loggers;
+#{''}
+with ADO;
+with ADO.SQL;
+with ADO.Objects;
+with ADO.Drivers;
+with ADO.Sessions;
+with ADO.Sessions.Factory;
+with ADO.Statements;
+#{''}
+procedure #{fn:capitalize(projectName)}.Main is
+#{''}
+   Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.Main");
+#{''}
+   Factory : ADO.Sessions.Factory.Session_Factory;
+   DB      : ADO.Sessions.Master_Session;
+begin
+   Util.Log.Loggers.Initialize ("#{projectName}.properties");
+#{''}
+   --  Initialize the database drivers.
+   ADO.Drivers.Initialize ("#{projectName}.properties");
+#{''}
+   --  Initialize the session factory to connect to the
+   --  database defined by 'ado.database' property.
+   Factory.Create (ADO.Drivers.Get_Config ("ado.database"));
+   DB := Factory.Get_Master_Session;
+   DB.Begin_Transaction;
+   DB.Commit;
+end #{fn:capitalize(projectName)}.Main;
+</f:view>

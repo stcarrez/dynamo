@@ -52,7 +52,9 @@ package body Gen.Commands.Project is
       end if;
    end Get_Name_From_Email;
 
+   --  ------------------------------
    --  Execute the command with the arguments.
+   --  ------------------------------
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
@@ -184,7 +186,7 @@ package body Gen.Commands.Project is
       use Ada.Text_IO;
    begin
       Put_Line ("create-project: Create a new Ada Web Application project");
-      Put_Line ("Usage: create-project [-l apache|gpl|proprietary] [-web] [-tool] [-ado] "
+      Put_Line ("Usage: create-project [-l apache|gpl|proprietary] [--web] [--tool] [--ado] "
                 & "NAME [AUTHOR] [EMAIL]");
       New_Line;
       Put_Line ("  Creates a new AWA application with the name passed in NAME.");
@@ -193,9 +195,9 @@ package body Gen.Commands.Project is
       Put_Line ("  a proprietary license. The author's name and email addresses");
       Put_Line ("  are also reported in generated files.");
       New_Line;
-      Put_Line ("  -web   Generate a Web application");
-      Put_Line ("  -tool  Generate a command line tool");
-      Put_Line ("  -ado   Generate a database tool operation for ADO");
+      Put_Line ("  --web   Generate a Web application (the default)");
+      Put_Line ("  --tool  Generate a command line tool");
+      Put_Line ("  --ado   Generate a database tool operation for ADO");
    end Help;
 
 end Gen.Commands.Project;

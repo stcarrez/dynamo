@@ -72,7 +72,7 @@ package body Gen.Commands.Project is
       end if;
       --  Parse the command line
       loop
-         case Getopt ("l: -web -tool -ado") is
+         case Getopt ("l: ? -web -tool -ado") is
          when ASCII.NUL => exit;
 
          when '-' =>
@@ -139,9 +139,16 @@ package body Gen.Commands.Project is
             return;
          end if;
 
+         Generator.Set_Project_Property ("is_web", Boolean'Image (Web_Flag));
+         Generator.Set_Project_Property ("is_tool", Boolean'Image (Tool_Flag));
+         Generator.Set_Project_Property ("is_ado", Boolean'Image (Ado_Flag));
          Generator.Set_Project_Name (Name);
          Generator.Set_Force_Save (False);
-         Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project");
+         if Ado_Flag then
+            Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project-ado");
+         else
+            Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project");
+         end if;
 
          Generator.Save_Project;
          declare

@@ -164,6 +164,19 @@ It will use the admin user for this connection. The database is created if it do
 not yet exist. If a user is specified in the connection string, a grant command is
 issued to create that user and allow him to access the new database.
 .PP
+Example of connection string for MySQL database:
+.\"
+.RS 0
+mysql://localhost:3306/my_db?user=joe&password=admin
+.\"
+.PP
+The MySQL server is running on localhost and TCP/IP port 3306.  The database name is
+.I my_db
+and the user
+.I joe
+is created for the application with the password
+.I admin.
+.PP
 The database tables are created by using the
 .I create-name-driver.sql
 script where

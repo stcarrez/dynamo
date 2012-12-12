@@ -40,6 +40,8 @@ package body Gen.Integration.Tests is
    begin
       Caller.Add_Test (Suite, "Create_Project",
                        Test_Create_Project'Access);
+      Caller.Add_Test (Suite, "Create_ADO_Project",
+                       Test_Create_ADO_Project'Access);
       Caller.Add_Test (Suite, "Configure",
                        Test_Configure'Access);
       Caller.Add_Test (Suite, "Propset",
@@ -151,6 +153,19 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Matches (T, ".*Generating file.*src/test.ads", Result,
                                  "Invalid generation");
    end Test_Create_Project;
+
+   --  ------------------------------
+   --  Test dynamo create-project command --ado.
+   --  ------------------------------
+   procedure Test_Create_ADO_Project (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " -o test-ado create-project -l apache --ado test", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test.properties", Result,
+                                 "Invalid generation");
+      Util.Tests.Assert_Matches (T, ".*Generating file.*src/test.ads", Result,
+                                 "Invalid generation");
+   end Test_Create_ADO_Project;
 
    --  ------------------------------
    --  Test project configure.

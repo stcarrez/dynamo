@@ -44,6 +44,7 @@ package body Gen.Testsuite is
    end Get_Test_Directory;
 
    procedure Initialize (Props : in Util.Properties.Manager) is
+      pragma Unreferenced (Props);
    begin
       Dir := Ada.Strings.Unbounded.To_Unbounded_String (Ada.Directories.Current_Directory);
    end Initialize;

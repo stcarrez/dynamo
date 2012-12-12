@@ -1140,6 +1140,9 @@ begin
    XMI_Mapping.Add_Mapping ("**/Classifier/@xmi.idref", FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Classifier/@href", FIELD_CLASSIFIER_HREF);
 
+   XMI_Mapping.Add_Mapping ("**/Dependency.client/Class/@xmi.idref", FIELD_CLASSIFIER_HREF);
+   XMI_Mapping.Add_Mapping ("**/Dependency.supplier/Class/@xmi.idref", FIELD_CLASSIFIER_HREF);
+
    --  Data type mapping.
    XMI_Mapping.Add_Mapping ("**/DataType/@xmi.id", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/DataType/@name", FIELD_NAME);

@@ -97,8 +97,6 @@ package body Gen.Artifacts.XMI is
                        FIELD_MULTIPLICITY_UPPER,
                        FIELD_MULTIPLICITY_LOWER,
 
-                       FIELD_NAMESPACE,
-
                        FIELD_PACKAGE_ID,
                        FIELD_PACKAGE_NAME,
                        FIELD_PACKAGE_END,
@@ -184,6 +182,9 @@ package body Gen.Artifacts.XMI is
       Stereotype         : Gen.Model.XMI.Stereotype_Element_Access;
       Tagged_Value       : Gen.Model.XMI.Tagged_Value_Element_Access;
       Comment            : Gen.Model.XMI.Comment_Element_Access;
+
+      Has_Package_Id     : Boolean := False;
+      Has_Package_Name   : Boolean := False;
    end record;
    type XMI_Access is access all XMI_Info;
 
@@ -192,6 +193,11 @@ package body Gen.Artifacts.XMI is
    procedure Set_Member (P     : in out XMI_Info;
                          Field : in XMI_Fields;
                          Value : in Util.Beans.Objects.Object);
+
+   --  Set the package name and or XMI id.
+   procedure Set_Package (P    : in out XMI_Info;
+                          Name : in Util.Beans.Objects.Object;
+                          Id   : in Util.Beans.Objects.Object);
 
    use type Gen.Model.XMI.Model_Element_Access;
    use type Gen.Model.XMI.Attribute_Element_Access;
@@ -293,6 +299,39 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Tagged value {0} ignored", Util.Beans.Objects.To_String (P.Id));
       end if;
    end Add_Tagged_Value;
+
+   --  ------------------------------
+   --  Set the package name and or XMI id.
+   --  ------------------------------
+   procedure Set_Package (P    : in out XMI_Info;
+                          Name : in Util.Beans.Objects.Object;
+                          Id   : in Util.Beans.Objects.Object) is
+      Parent : Gen.Model.XMI.Package_Element_Access := P.Package_Element;
+   begin
+      --  This is a new nested package, create it.
+      if Parent /= null and P.Has_Package_Name and P.Has_Package_Id then
+         P.Package_Element := null;
+      end if;
+      if P.Package_Element = null then
+         P.Package_Element := new Gen.Model.XMI.Package_Element (P.Model);
+         if Parent /= null then
+            P.Package_Element.Parent := Parent.all'Access;
+         else
+            P.Package_Element.Parent := null;
+         end if;
+         P.Has_Package_Name := False;
+         P.Has_Package_Id := False;
+      end if;
+      if not Util.Beans.Objects.Is_Null (Id) then
+         P.Package_Element.Set_XMI_Id (Id);
+         P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
+         P.Has_Package_Id := True;
+      end if;
+      if not Util.Beans.Objects.Is_Null (Name) then
+         P.Package_Element.Set_Name (Name);
+         P.Has_Package_Name := True;
+      end if;
+   end Set_Package;
 
    procedure Set_Member (P     : in out XMI_Info;
                          Field : in XMI_Fields;
@@ -467,32 +506,11 @@ package body Gen.Artifacts.XMI is
             end if;
             P.Association := null;
 
-         when FIELD_NAMESPACE =>
-            if P.Need_Register_Package and P.Package_Element /= null then
-               P.Package_Element.Set_XMI_Id (P.Package_Id);
-               P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
-               if P.Package_Element /= null then
-                  P.Package_Id := Util.Beans.Objects.To_Object (P.Package_Element.XMI_Id);
-               end if;
-               P.Need_Register_Package := False;
-            end if;
-
          when FIELD_PACKAGE_ID =>
-            P.Package_Id := Value;
+            Set_Package (P, Util.Beans.Objects.Null_Object, Value);
 
          when FIELD_PACKAGE_NAME =>
-            declare
-               Parent : constant Gen.Model.XMI.Package_Element_Access := P.Package_Element;
-            begin
-               P.Package_Element := new Gen.Model.XMI.Package_Element (P.Model);
-               P.Package_Element.Set_Name (Value);
-               if Parent /= null then
-                  P.Package_Element.Parent := Parent.all'Access;
-               else
-                  P.Package_Element.Parent := null;
-               end if;
-               P.Need_Register_Package := True;
-            end;
+            Set_Package (P, Value, Util.Beans.Objects.Null_Object);
 
          when FIELD_PACKAGE_END =>
             if P.Package_Element /= null then
@@ -1053,7 +1071,6 @@ begin
    XMI_Mapping.Add_Mapping ("**/Package/@name", FIELD_PACKAGE_NAME);
    XMI_Mapping.Add_Mapping ("**/Package/@xmi.id", FIELD_PACKAGE_ID);
    XMI_Mapping.Add_Mapping ("**/Package", FIELD_PACKAGE_END);
-   XMI_Mapping.Add_Mapping ("**/Namespace.ownedElement", FIELD_NAMESPACE);
 
    XMI_Mapping.Add_Mapping ("**/Class/@name", FIELD_CLASS_NAME);
    XMI_Mapping.Add_Mapping ("**/Class/@xmi.id", FIELD_CLASS_ID);

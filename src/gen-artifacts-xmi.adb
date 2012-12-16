@@ -1109,6 +1109,8 @@ begin
    XMI_Mapping.Add_Mapping ("**/AssociationEnd", FIELD_ASSOCIATION_END);
    XMI_Mapping.Add_Mapping ("**/AssociationEnd.participant/Class/@xmi.idref",
                             FIELD_ASSOCIATION_CLASS_ID);
+   XMI_Mapping.Add_Mapping ("**/AssociationEnd.participant/Class/@href",
+                            FIELD_ASSOCIATION_CLASS_ID);
 
    --  Comment mapping.
    XMI_Mapping.Add_Mapping ("**/Comment/@xmi.id", FIELD_COMMENT_ID);

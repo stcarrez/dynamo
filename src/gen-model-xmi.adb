@@ -687,6 +687,7 @@ package body Gen.Model.XMI is
                         Model : in UML_Model) is
       use type Ada.Containers.Count_Type;
    begin
+      Model_Element (Node).Reconcile (Model);
       if Node.Connections.Length >= 2 then
          declare
             First, Second : Association_End_Element_Access;

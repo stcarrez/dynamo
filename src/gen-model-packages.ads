@@ -34,6 +34,14 @@ package Gen.Model.Packages is
    use Ada.Strings.Unbounded;
 
    --  ------------------------------
+   --  Model Definition
+   --  ------------------------------
+   --  The <b>Model_Definition</b> contains the complete model from one or
+   --  several files.  It maintains a list of Ada packages that must be generated.
+   type Model_Definition is new Definition with private;
+   type Model_Definition_Access is access all Model_Definition'Class;
+
+   --  ------------------------------
    --  Package Definition
    --  ------------------------------
    --  The <b>Package_Definition</b> holds the tables, queries and other information
@@ -62,13 +70,10 @@ package Gen.Model.Packages is
                        Name : in Unbounded_String)
                        return Gen.Model.Mappings.Mapping_Definition_Access;
 
-   --  ------------------------------
-   --  Model Definition
-   --  ------------------------------
-   --  The <b>Model_Definition</b> contains the complete model from one or
-   --  several files.  It maintains a list of Ada packages that must be generated.
-   type Model_Definition is new Definition with private;
-   type Model_Definition_Access is access all Model_Definition'Class;
+   --  Get the model which contains all the package definitions.
+   function Get_Model (From : in Package_Definition)
+                       return Model_Definition_Access;
+
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.

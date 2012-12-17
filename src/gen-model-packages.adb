@@ -96,6 +96,15 @@ package body Gen.Model.Packages is
    end Find_Type;
 
    --  ------------------------------
+   --  Get the model which contains all the package definitions.
+   --  ------------------------------
+   function Get_Model (From : in Package_Definition)
+                       return Model_Definition_Access is
+   begin
+      return From.Model;
+   end Get_Model;
+
+   --  ------------------------------
    --  Register the declaration of the given enum in the model.
    --  ------------------------------
    procedure Register_Enum (O      : in out Model_Definition;
@@ -453,8 +462,11 @@ package body Gen.Model.Packages is
          Pos      : constant Package_Map.Cursor := From.Packages.Find (To_Unbounded_String (Key));
          L        : constant Natural := Ada.Strings.Unbounded.Length (Name);
       begin
+         if Name = "AWA.Users.Models.User" then
+            Log.Info ("Found type");
+         end if;
          if Package_Map.Has_Element (Pos) then
-            return Package_Map.Element (Pos).Find_Type (Ada.Strings.Unbounded.Unbounded_Slice (Name, N, L));
+            return Package_Map.Element (Pos).Find_Type (Ada.Strings.Unbounded.Unbounded_Slice (Name, N + 1, L));
          end if;
          return null;
       end;

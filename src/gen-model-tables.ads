@@ -70,6 +70,9 @@ package Gen.Model.Tables is
       --  True if the column is included in the update statement
       Is_Updated   : Boolean := True;
 
+      --  True if the Ada mapping must use the foreign key type.
+      Use_Foreign_Key_Type : Boolean := False;
+
       --  The class generator to use for this column.
       Generator    : Util.Beans.Objects.Object;
    end record;

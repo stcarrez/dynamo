@@ -306,7 +306,7 @@ package body Gen.Artifacts.XMI is
    procedure Set_Package (P    : in out XMI_Info;
                           Name : in Util.Beans.Objects.Object;
                           Id   : in Util.Beans.Objects.Object) is
-      Parent : Gen.Model.XMI.Package_Element_Access := P.Package_Element;
+      Parent : constant Gen.Model.XMI.Package_Element_Access := P.Package_Element;
    begin
       --  This is a new nested package, create it.
       if Parent /= null and P.Has_Package_Name and P.Has_Package_Id then
@@ -580,10 +580,16 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_STEREOTYPE_HREF =>
             declare
-               S : Gen.Model.XMI.Ref_Type_Element_Access := new Gen.Model.XMI.Ref_Type_Element (P.Model);
+               S : constant Gen.Model.XMI.Ref_Type_Element_Access
+                 := new Gen.Model.XMI.Ref_Type_Element (P.Model);
             begin
                S.Href := Util.Beans.Objects.To_Unbounded_String (Value);
-               if P.Attr_Element /= null then
+               if Index (S.Href, "00002DCB") > 0 then
+                  Log.Info ("Found the stereotype");
+               end if;
+               if P.Association /= null then
+                  P.Association.Stereotypes.Append (S.all'Access);
+               elsif P.Attr_Element /= null then
                   P.Attr_Element.Stereotypes.Append (S.all'Access);
                elsif P.Class_Element /= null then
                   P.Class_Element.Stereotypes.Append (S.all'Access);
@@ -770,10 +776,14 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       procedure Prepare_Association (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                      Node   : in Model_Element_Access) is
-         A    : Association_Definition_Access;
+         A     : Association_Definition_Access;
          Assoc : Association_End_Element_Access := Association_End_Element'Class (Node.all)'Access;
       begin
          Log.Info ("Prepare class association {0}", Assoc.Name);
+
+         if Assoc.Name = "user" then
+            Log.Info ("Found the association");
+         end if;
 
          if Assoc.Multiplicity_Upper /= 1 then
             Log.Warn ("Multiple association are not yet supported.");
@@ -781,6 +791,14 @@ package body Gen.Artifacts.XMI is
             Table.Add_Association (Assoc.Name, A);
             A.Set_Comment (Assoc.Get_Comment);
             A.Type_Name := To_Unbounded_String (Assoc.Source_Element.Get_Qualified_Name);
+            A.Not_Null  := Assoc.Multiplicity_Lower > 0;
+
+            --  If the <<use foreign key>> stereotype is set on the association, to not use
+            --  the Ada tagged object but create an attribute using the foreign key type.
+            A.Use_Foreign_Key_Type := Node.Parent.Has_Stereotype (Handler.Use_FK_Stereotype);
+            if A.Use_Foreign_Key_Type then
+               Log.Info ("Association {0} type is using foreign key", Assoc.Name);
+            end if;
          end if;
       end Prepare_Association;
 
@@ -928,6 +946,10 @@ package body Gen.Artifacts.XMI is
                                                         "Dynamo.xmi",
                                                         "ADO.DataModel",
                                                         Gen.Model.XMI.BY_NAME);
+      Handler.Use_FK_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                    "Dynamo.xmi",
+                                                    "ADO.use foreign key",
+                                                    Gen.Model.XMI.BY_NAME);
       Handler.Bean_Stereotype := Find_Stereotype (Handler.Nodes,
                                                   "Dynamo.xmi",
                                                   "AWA.Bean",

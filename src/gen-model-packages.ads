@@ -168,6 +168,14 @@ private
    package Table_List is new Gen.Model.List (T        => Definition,
                                              T_Access => Definition_Access);
 
+
+   --  Returns False if the <tt>Left</tt> table does not depend on <tt>Right</tt>.
+   --  Returns True if the <tt>Left</tt> table depends on the <tt>Right</tt> table.
+   function Dependency_Compare (Left, Right : in Definition_Access) return Boolean;
+
+   --  Sort the tables on their dependency.
+   procedure Dependency_Sort is new Table_List.Sort_On ("<" => Dependency_Compare);
+
    subtype Table_List_Definition is Table_List.List_Definition;
    subtype Enum_List_Definition is Table_List.List_Definition;
 

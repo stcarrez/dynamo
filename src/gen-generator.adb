@@ -132,16 +132,21 @@ package body Gen.Generator is
       if Column /= null then
          Type_Mapping := Column.Get_Type_Mapping;
          if Type_Mapping /= null then
+
             if Type_Mapping.Kind = T_DATE and Util.Beans.Objects.To_Integer (Param) = 2 then
                return Util.Beans.Objects.To_Object (String '("Time"));
-            elsif Type_Mapping.Kind = T_TABLE then
-               if Util.Beans.Objects.To_Integer (Param) = 1 then
-                  return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
-               else
-                  return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref");
-               end if;
-            else
+
+            elsif Type_Mapping.Kind /= T_TABLE then
                return Util.Beans.Objects.To_Object (Type_Mapping.Target);
+
+            elsif Column.Use_Foreign_Key_Type then
+               return Util.Beans.Objects.To_Object (Type_Mapping.Target);
+
+            elsif Util.Beans.Objects.To_Integer (Param) = 1 then
+               return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
+
+            else
+               return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref");
             end if;
          elsif Column.Is_Basic_Type then
             return To_Ada_Type (Column.Get_Type);

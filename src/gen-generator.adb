@@ -68,9 +68,6 @@ package body Gen.Generator is
    --  EL function to create an Ada identifier from a file name
    function To_Ada_Ident (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
-   --  EL function to indent the code
-   function To_Sql_Type (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
-
    --  EL function to format an Ada comment
    function Comment (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
@@ -186,27 +183,6 @@ package body Gen.Generator is
    begin
       return Util.Beans.Objects.To_Object (Result);
    end Indent;
-
-   --  ------------------------------
-   --  EL function to indent the code
-   --  ------------------------------
-   function To_Sql_Type (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
-      Name   : constant String := Util.Beans.Objects.To_String (Value);
-      Result : Unbounded_String;
-   begin
-      if Name = "Identifier" then
-         Append (Result, "BIGINT NOT NULL");
-      elsif Name = "Integer" then
-         Append (Result, "INTEGER");
-      elsif Name = "String" then
-         Append (Result, "VARCHAR(255)");
-      elsif Name = "Date" then
-         Append (Result, "DATE");
-      else
-         Append (Result, "VARCHAR(255)");
-      end if;
-      return Util.Beans.Objects.To_Object (Result);
-   end To_Sql_Type;
 
    --  ------------------------------
    --  EL function to create an Ada identifier from a file name
@@ -328,9 +304,6 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "indent",
                            Namespace => URI,
                            Func      => Indent'Access);
-      Mapper.Set_Function (Name      => "sqlType",
-                           Namespace => URI,
-                           Func      => To_Sql_Type'Access);
       Mapper.Set_Function (Name      => "keyEnum",
                            Namespace => URI,
                            Func      => To_Key_Enum'Access);

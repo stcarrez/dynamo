@@ -216,7 +216,8 @@ package body Gen.Model.Packages is
       use Gen.Model.Tables;
 
       procedure Prepare_Table (Table : in Table_Definition_Access);
-      procedure Prepare_Tables (Tables : in Table_List.List_Definition);
+      procedure Prepare_Definition (Def : in Definition_Access);
+      procedure Collect_Dependencies (Table : in Definition_Access);
 
       Used_Types  : Gen.Utils.String_Set.Set;
       T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
@@ -246,22 +247,21 @@ package body Gen.Model.Packages is
          end loop;
       end Prepare_Table;
 
-      procedure Prepare_Tables (Tables : in Table_List.List_Definition) is
-         Table_Iter  : Table_List.Cursor := Tables.First;
+      procedure Prepare_Definition (Def : in Definition_Access) is
       begin
-         while Table_List.Has_Element (Table_Iter) loop
-            declare
-               Table : constant Definition_Access := Table_List.Element (Table_Iter);
-            begin
-               if Table.all in Table_Definition'Class then
-                  Prepare_Table (Table_Definition_Access (Table));
-               else
-                  Table.Prepare;
-               end if;
-            end;
-            Table_List.Next (Table_Iter);
-         end loop;
-      end Prepare_Tables;
+         if Def.all in Table_Definition'Class then
+            Prepare_Table (Table_Definition_Access (Def));
+         else
+            Def.Prepare;
+         end if;
+      end Prepare_Definition;
+
+      procedure Collect_Dependencies (Table : in Definition_Access) is
+      begin
+         if Table.all in Table_Definition'Class then
+            Table_Definition'Class (Table.all).Collect_Dependencies;
+         end if;
+      end Collect_Dependencies;
 
    begin
       Log.Info ("Preparing package {0}", O.Pkg_Name);
@@ -273,10 +273,16 @@ package body Gen.Model.Packages is
 
       O.Enums.Sort;
       O.Queries.Sort;
-      Prepare_Tables (O.Enums);
-      Prepare_Tables (O.Tables);
-      Prepare_Tables (O.Queries);
-      Prepare_Tables (O.Beans);
+      O.Enums.Iterate (Process => Prepare_Definition'Access);
+      O.Tables.Iterate (Process => Prepare_Definition'Access);
+      O.Queries.Iterate (Process => Prepare_Definition'Access);
+      O.Beans.Iterate (Process => Prepare_Definition'Access);
+
+      --  Collect the table dependencies and sort the tables so that tables that depend on
+      --  others are processed at the end.
+      O.Tables.Iterate (Process => Collect_Dependencies'Access);
+      Dependency_Sort (O.Tables);
+
       declare
          P : Gen.Utils.String_Set.Cursor := Used_Types.First;
       begin
@@ -444,6 +450,32 @@ package body Gen.Model.Packages is
    begin
       null;
    end Register_Type;
+
+   --  ------------------------------
+   --  Returns False if the <tt>Left</tt> table does not depend on <tt>Right</tt>.
+   --  Returns True if the <tt>Left</tt> table depends on the <tt>Right</tt> table.
+   --  ------------------------------
+   function Dependency_Compare (Left, Right : in Definition_Access) return Boolean is
+      use Gen.Model.Tables;
+
+      T_Left  : constant Table_Definition_Access := Table_Definition'Class (Left.all)'Access;
+      T_Right : constant Table_Definition_Access := Table_Definition'Class (Right.all)'Access;
+   begin
+      Log.Info ("Table {0} and {1} do not depend on each other",
+                To_String (Left.Name), To_String (Right.Name));
+
+      case Gen.Model.Tables.Depends_On (T_Left, T_Right) is
+         when FORWARD =>
+            return False;
+
+         when BACKWARD =>
+            return True;
+
+         when others =>
+            --  Two tables that don't depend on each other are sorted on their name.
+            return Left.Name < Right.Name;
+      end case;
+   end Dependency_Compare;
 
    --  ------------------------------
    --  Find the type identified by the name.

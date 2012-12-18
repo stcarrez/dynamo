@@ -78,6 +78,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_Zargo_Association'Access);
       Caller.Add_Test (Suite, "Generate ArgoUML Association (dependencies)",
                        Test_Generate_Zargo_Dependencies'Access);
+      Caller.Add_Test (Suite, "Generate ArgoUML several packages",
+                       Test_Generate_Zargo_Packages'Access);
       Caller.Add_Test (Suite, "Build generated project",
                        Test_Build'Access);
       Caller.Add_Test (Suite, "Build generated model files (UML)",
@@ -421,6 +423,25 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-dependencies.ads");
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-dependencies.adb");
    end Test_Generate_Zargo_Dependencies;
+
+   --  ------------------------------
+   --  Test UML with several tables in several packages (non circular).
+   --  ------------------------------
+   procedure Test_Generate_Zargo_Packages (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-packages.zargo", Result);
+
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.adb");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-b.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-b.adb");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-c.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-c.adb");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.adb");
+   end Test_Generate_Zargo_Packages;
+
 
    --  ------------------------------
    --  Test GNAT compilation of the final project.

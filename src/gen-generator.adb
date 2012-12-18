@@ -850,6 +850,17 @@ package body Gen.Generator is
    end Add_Generation;
 
    --  ------------------------------
+   --  Enable the generation of the Ada package given by the name.  By default all the Ada
+   --  packages found in the model are generated.  When called, this enables the generation
+   --  only for the Ada packages registered here.
+   --  ------------------------------
+   procedure Enable_Package_Generation (H    : in out Handler;
+                                        Name : in String) is
+   begin
+      H.Packages.Include (Util.Strings.Transforms.To_Upper_Case (Name));
+   end Enable_Package_Generation;
+
+   --  ------------------------------
    --  Generate the code using the template file
    --  ------------------------------
    procedure Generate (H     : in out Handler;
@@ -928,8 +939,20 @@ package body Gen.Generator is
                Pos : Gen.Model.Packages.Package_Cursor := H.Model.First;
             begin
                while Gen.Model.Packages.Has_Element (Pos) loop
-                  Log.Debug ("  Generate for package");
-                  H.Generate (File, Gen.Model.Packages.Element (Pos).all'Access);
+                  declare
+                     P          : constant Gen.Model.Packages.Package_Definition_Access
+                       := Gen.Model.Packages.Element (Pos);
+                     Name       : constant String := P.Get_Name;
+                     Upper_Name : constant String := Util.Strings.Transforms.To_Upper_Case (Name);
+                  begin
+                     if H.Packages.Is_Empty or H.Packages.Contains (Upper_Name) then
+                        Log.Debug ("  Generate for package {0}", Name);
+
+                        H.Generate (File, Gen.Model.Definition_Access (P));
+                     else
+                        Log.Debug ("Package {0} not generated", Name);
+                     end if;
+                  end;
                   Gen.Model.Packages.Next (Pos);
                end loop;
             end;

@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 
 with Ada.Containers.Hashed_Maps;
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Hash;
 
@@ -117,6 +118,8 @@ package Gen.Model.Tables is
      new Gen.Model.List (T         => Gen.Model.Operations.Operation_Definition,
                          T_Access  => Gen.Model.Operations.Operation_Definition_Access);
 
+   package Table_Vectors is new Ada.Containers.Vectors (Index_Type   => Positive,
+                                                        Element_Type => Table_Definition_Access);
    --  ------------------------------
    --  Table Definition
    --  ------------------------------
@@ -133,6 +136,9 @@ package Gen.Model.Tables is
       Version_Column : Column_Definition_Access;
       Id_Column      : Column_Definition_Access;
       Has_Associations : Boolean := False;
+
+      --  The list of tables that this table depends on.
+      Dependencies     : Table_Vectors.Vector;
 
       --  Controls whether the <tt>Vector</tt> type and the <tt>List</tt> procedure must
       --  be generated.
@@ -152,6 +158,17 @@ package Gen.Model.Tables is
    --  Initialize the table definition instance.
    overriding
    procedure Initialize (O : in out Table_Definition);
+
+   --  Collect the dependencies to other tables.
+   procedure Collect_Dependencies (O : in out Table_Definition);
+
+   type Dependency_Type is (NONE, FORWARD, BACKWARD);  -- CIRCULAR is not yet managed.
+
+   --  Get the dependency between the two tables.
+   --  Returns NONE if both table don't depend on each other.
+   --  Returns FORWARD if the <tt>Left</tt> table depends on <tt>Right</tt>.
+   --  Returns BACKWARD if the <tt>Right</tt> table depends on <tt>Left</tt>.
+   function Depends_On (Left, Right : in Table_Definition_Access) return Dependency_Type;
 
    --  Create a table with the given name.
    function Create_Table (Name : in Unbounded_String) return Table_Definition_Access;

@@ -107,6 +107,12 @@ package body Gen.Model.List is
       Sorting.Sort (List.Nodes);
    end Sort;
 
+   procedure Sort_On (List : in out List_Definition) is
+      package Sorting is new Vectors.Generic_Sorting;
+   begin
+      Sorting.Sort (List.Nodes);
+   end Sort_On;
+
    --  ------------------------------
    --  Find a definition given the name.
    --  Returns the definition object or null.
@@ -123,5 +129,18 @@ package body Gen.Model.List is
       end loop;
       return null;
    end Find;
+
+   --  ------------------------------
+   --  Iterate over the elements of the list executing the <tt>Process</tt> procedure.
+   --  ------------------------------
+   procedure Iterate (Def     : in List_Definition;
+                      Process : not null access procedure (Item : in T_Access)) is
+      Iter : Vectors.Cursor := Def.Nodes.First;
+   begin
+      while Vectors.Has_Element (Iter) loop
+         Process (Vectors.Element (Iter));
+         Vectors.Next (Iter);
+      end loop;
+   end Iterate;
 
 end Gen.Model.List;

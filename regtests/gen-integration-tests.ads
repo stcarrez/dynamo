@@ -94,6 +94,9 @@ package Gen.Integration.Tests is
    --  Test generate command using the ArgoUML file directly (runs unzip -cq and parse the output).
    procedure Test_Generate_Zargo_Association (T : in out Test);
 
+   --  Test UML with several tables that have dependencies between each of them (non circular).
+   procedure Test_Generate_Zargo_Dependencies (T : in out Test);
+
    --  Test GNAT compilation of the final project.
    procedure Test_Build (T : in out Test);
 

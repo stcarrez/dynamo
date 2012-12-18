@@ -379,12 +379,18 @@ package body Gen.Model.Tables is
    begin
       Log.Info ("Collect dependencies of {0}", O.Name);
 
+      if O.Has_Mark then
+         return;
+      end if;
+
+      O.Has_Mark := True;
       while Table_Vectors.Has_Element (Iter) loop
          D := Table_Vectors.Element (Iter);
          D.Collect_Dependencies;
          List.Append (D.Dependencies);
          Table_Vectors.Next (Iter);
       end loop;
+      O.Has_Mark := False;
 
       Iter := List.First;
       while Table_Vectors.Has_Element (Iter) loop

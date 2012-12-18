@@ -143,6 +143,9 @@ package Gen.Model.Tables is
       --  Controls whether the <tt>Vector</tt> type and the <tt>List</tt> procedure must
       --  be generated.
       Has_List         : Boolean := True;
+
+      --  Mark flag used by the dependency calculation.
+      Has_Mark         : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

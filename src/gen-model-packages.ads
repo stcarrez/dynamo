@@ -228,9 +228,6 @@ private
       --  A map of all types defined in this package.
       Types        : Gen.Model.Mappings.Mapping_Maps.Map;
 
-      --  The package Ada name
-      Pkg_Name     : Unbounded_String;
-
       --  The base name for the package (ex: gen-model-users)
       Base_Name    : Unbounded_String;
 

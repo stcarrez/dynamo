@@ -44,7 +44,7 @@ package body Gen.Model.Packages is
                        Name : in String) return Util.Beans.Objects.Object is
    begin
       if Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Pkg_Name);
+         return Util.Beans.Objects.To_Object (From.Name);
 
       elsif Name = "package" then
          return Util.Beans.Objects.To_Object (From.Base_Name);
@@ -86,7 +86,7 @@ package body Gen.Model.Packages is
             return From.Model.Find_Type (Name);
          end if;
       else
-         Pos := From.Types.Find (From.Pkg_Name & "." & Name);
+         Pos := From.Types.Find (From.Name & "." & Name);
       end if;
       if Mappings.Mapping_Maps.Has_Element (Pos) then
          return Mappings.Mapping_Maps.Element (Pos);
@@ -184,7 +184,7 @@ package body Gen.Model.Packages is
             Base_Name := Translate (Name, Map);
 
             Result := new Package_Definition;
-            Result.Pkg_Name := Name;
+            Result.Name  := Name;
             Result.Model := O'Unchecked_Access;
             Result.Tables_Bean := Util.Beans.Objects.To_Object (Result.Tables'Access,
                                                                 Util.Beans.Objects.STATIC);
@@ -234,7 +234,7 @@ package body Gen.Model.Packages is
                T    : constant String := To_String (Col.Type_Name);
                Name : constant String := Gen.Utils.Get_Package_Name (T);
             begin
-               if not Col.Is_Basic_Type and Name'Length > 0 and Name /= O.Pkg_Name then
+               if not Col.Is_Basic_Type and Name'Length > 0 and Name /= O.Name then
                   Used_Types.Include (To_Unbounded_String (Name));
 
                elsif T = "Time" or T = "Date" or T = "Timestamp" or T = "Nullable_Time" then
@@ -264,7 +264,7 @@ package body Gen.Model.Packages is
       end Collect_Dependencies;
 
    begin
-      Log.Info ("Preparing package {0}", O.Pkg_Name);
+      Log.Info ("Preparing package {0}", O.Name);
 
       O.Used := Util.Beans.Objects.To_Object (T, Util.Beans.Objects.STATIC);
       O.Used_Types.Row := 0;

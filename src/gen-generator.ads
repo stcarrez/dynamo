@@ -24,6 +24,7 @@ with Ada.Containers.Hashed_Maps;
 
 with Util.Beans.Objects;
 with Util.Properties;
+with Util.Strings.Sets;
 
 with ASF.Applications.Main;
 with ASF.Contexts.Faces;
@@ -101,6 +102,12 @@ package Gen.Generator is
                              Name : in String;
                              Mode : in Gen.Artifacts.Iteration_Mode;
                              Mapping : in String);
+
+   --  Enable the generation of the Ada package given by the name.  By default all the Ada
+   --  packages found in the model are generated.  When called, this enables the generation
+   --  only for the Ada packages registered here.
+   procedure Enable_Package_Generation (H    : in out Handler;
+                                        Name : in String);
 
    --  Generate the code using the template file
    procedure Generate (H     : in out Handler;
@@ -263,6 +270,10 @@ private
 
       --  The list of templates that must be generated.
       Templates : Template_Map.Map;
+
+      --  When not empty, a list of packages that must be taken into account for the generation.
+      --  By default all packages and tables defined in the model are generated.
+      Packages  : Util.Strings.Sets.Set;
 
       --  Force the saving of a generated file, even if a file already exist.
       Force_Save : Boolean := True;

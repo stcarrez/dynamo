@@ -15,7 +15,7 @@
       Table => #{fn:toUpperCase(table.type)}_NAME'Access,
       Members => (
       <h:list value="#{table.members}" var="column">
-         COL_#{column.index}_#{table.rowIndex}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
+         #{column.rowIndex} =&gt; COL_#{column.index}_#{table.rowIndex}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
       </h:list>)
      );
 #{''}
@@ -27,13 +27,13 @@
    type #{fn:capitalize(table.type)}_Impl is
       new ADO.Objects.Object_Record (Key_Type => ADO.Objects.#{table.id.type.isIdentifier ? 'KEY_INTEGER' : 'KEY_STRING'},
                                      Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access)
-   with record
+   with #{table.members.size == 1 ? 'null record;' : 'record'}
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{column.name ne table.id.name}">
        #{fn:capitalize(column.name)} : #{g:adaType(column,0)};
 </h:panelGroup>
 </h:list>
-   end record;
+#{table.members.size != 1 ? '   end record;' : ''}
 #{''}
 
    type #{fn:capitalize(table.type)}_Access is access all #{fn:capitalize(table.type)}_Impl;

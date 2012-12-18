@@ -152,7 +152,8 @@ package body Gen.Artifacts.XMI is
       Attr_Id            : Util.Beans.Objects.Object;
       Attr_Element       : Gen.Model.XMI.Attribute_Element_Access;
       Attr_Visibility    : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
-      Attr_Changeability : Gen.Model.XMI.Changeability_Type := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
+      Attr_Changeability : Gen.Model.XMI.Changeability_Type
+        := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
       Attr_Value         : Util.Beans.Objects.Object;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
@@ -515,7 +516,8 @@ package body Gen.Artifacts.XMI is
          when FIELD_PACKAGE_END =>
             if P.Package_Element /= null then
                if P.Package_Element.Parent /= null then
-                  P.Package_Element := Gen.Model.XMI.Package_Element (P.Package_Element.Parent.all)'Access;
+                  P.Package_Element
+                    := Gen.Model.XMI.Package_Element (P.Package_Element.Parent.all)'Access;
                else
                   P.Package_Element := null;
                end if;
@@ -684,6 +686,24 @@ package body Gen.Artifacts.XMI is
       use Gen.Model.Tables;
       use Gen.Model.Beans;
 
+      --  Register the attribute in the table
+      procedure Prepare_Attribute (Table  : in out Gen.Model.Tables.Table_Definition'Class;
+                                   Column : in Model_Element_Access);
+
+      --  Register the attribute in the bean definition.
+      procedure Prepare_Attribute (Bean   : in out Gen.Model.Beans.Bean_Definition'Class;
+                                   Column : in Model_Element_Access);
+
+      --  Identify the UML association and create an entry for it in the table.
+      procedure Prepare_Association (Table  : in out Gen.Model.Tables.Table_Definition'Class;
+                                     Node   : in Model_Element_Access);
+
+      --  Prepare a UML/XMI class:
+      --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
+      --   o if the class has the <<Dynamo.AWA.bean>> stereotype, create a bean
+      procedure Prepare_Class (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
+                               Item : in Gen.Model.XMI.Model_Element_Access);
+
       --  Scan the package for the model generation.
       procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
                                  Item : in Gen.Model.XMI.Model_Element_Access);
@@ -692,7 +712,7 @@ package body Gen.Artifacts.XMI is
                                Model : in out Gen.Model.XMI.Model_Map.Map);
 
       --  ------------------------------
-      --  Register the column definition in the table
+      --  Register the attribute in the table
       --  ------------------------------
       procedure Prepare_Attribute (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                    Column : in Model_Element_Access) is
@@ -704,7 +724,8 @@ package body Gen.Artifacts.XMI is
          C.Set_Comment (Column.Get_Comment);
          if Column.all in Attribute_Element'Class then
             declare
-               Attr : Attribute_Element_Access := Attribute_Element'Class (Column.all)'Access;
+               Attr : constant Attribute_Element_Access
+                 := Attribute_Element'Class (Column.all)'Access;
             begin
                if Attr.Data_Type /= null then
                   C.Type_Name := To_Unbounded_String (Attr.Data_Type.Get_Qualified_Name);
@@ -753,7 +774,7 @@ package body Gen.Artifacts.XMI is
       end Prepare_Attribute;
 
       --  ------------------------------
-      --  Register the column definition in the table
+      --  Register the attribute in the bean definition.
       --  ------------------------------
       procedure Prepare_Attribute (Bean   : in out Gen.Model.Beans.Bean_Definition'Class;
                                    Column : in Model_Element_Access) is
@@ -765,7 +786,8 @@ package body Gen.Artifacts.XMI is
          C.Set_Comment (Column.Get_Comment);
          if Column.all in Attribute_Element'Class then
             declare
-               Attr : Attribute_Element_Access := Attribute_Element'Class (Column.all)'Access;
+               Attr : constant Attribute_Element_Access
+                 := Attribute_Element'Class (Column.all)'Access;
             begin
                if Attr.Data_Type /= null then
                   C.Type_Name := Attr.Data_Type.Name;
@@ -776,12 +798,13 @@ package body Gen.Artifacts.XMI is
       end Prepare_Attribute;
 
       --  ------------------------------
-      --  Register the column definition in the table
+      --  Identify the UML association and create an entry for it in the table.
       --  ------------------------------
       procedure Prepare_Association (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                      Node   : in Model_Element_Access) is
          A     : Association_Definition_Access;
-         Assoc : Association_End_Element_Access := Association_End_Element'Class (Node.all)'Access;
+         Assoc : constant Association_End_Element_Access
+           := Association_End_Element'Class (Node.all)'Access;
       begin
          Log.Info ("Prepare class association {0}", Assoc.Name);
 
@@ -803,12 +826,15 @@ package body Gen.Artifacts.XMI is
          end if;
       end Prepare_Association;
 
+      --  ------------------------------
       --  Prepare a UML/XMI class:
       --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
+      --   o if the class has the <<Dynamo.AWA.bean>> stereotype, create a bean
+      --  ------------------------------
       procedure Prepare_Class (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
                                Item : in Gen.Model.XMI.Model_Element_Access) is
          Class : constant Class_Element_Access := Class_Element'Class (Item.all)'Access;
-         Name  : Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Class.Name);
+         Name  : constant Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Class.Name);
       begin
          Log.Info ("Prepare class {0}", Name);
 
@@ -844,8 +870,8 @@ package body Gen.Artifacts.XMI is
             end;
 
          else
-            Log.Warn ("UML class {0} not generated: no <<Bean>> and no <<Table>> stereotype",
-                       To_String (Name));
+            Log.Info ("UML class {0} not generated: no <<Bean>> and no <<Table>> stereotype",
+                      To_String (Name));
          end if;
       exception
          when E : others =>
@@ -890,9 +916,9 @@ package body Gen.Artifacts.XMI is
                                  Item : in Gen.Model.XMI.Model_Element_Access) is
          pragma Unreferenced (Id);
 
-         Pkg : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
+         Pkg  : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
          Name : constant String := Pkg.Get_Qualified_Name;
-         P   : Gen.Model.Packages.Package_Definition_Access
+         P    : Gen.Model.Packages.Package_Definition_Access
            := new Gen.Model.Packages.Package_Definition;
       begin
          Log.Info ("Prepare package {0}", Name);

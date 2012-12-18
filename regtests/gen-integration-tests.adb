@@ -76,6 +76,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_XMI_Association'Access);
       Caller.Add_Test (Suite, "Generate ArgoUML Association",
                        Test_Generate_Zargo_Association'Access);
+      Caller.Add_Test (Suite, "Generate ArgoUML Association (dependencies)",
+                       Test_Generate_Zargo_Dependencies'Access);
       Caller.Add_Test (Suite, "Build generated project",
                        Test_Build'Access);
       Caller.Add_Test (Suite, "Build generated model files (UML)",
@@ -407,6 +409,18 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.ads");
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.adb");
    end Test_Generate_Zargo_Association;
+
+   --  ------------------------------
+   --  Test UML with several tables that have dependencies between each of them (non circular).
+   --  ------------------------------
+   procedure Test_Generate_Zargo_Dependencies (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-dependencies.zargo", Result);
+
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-dependencies.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-dependencies.adb");
+   end Test_Generate_Zargo_Dependencies;
 
    --  ------------------------------
    --  Test GNAT compilation of the final project.

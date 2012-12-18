@@ -79,10 +79,18 @@ package Gen.Model.List is
    --  Sort the list of items on their names.
    procedure Sort (List : in out List_Definition);
 
+   generic
+      with function "<" (Left, Right : T_Access) return Boolean is <>;
+   procedure Sort_On (List : in out List_Definition);
+
    --  Find a definition given the name.
    --  Returns the definition object or null.
    function Find (Def  : in List_Definition;
                   Name : in String) return T_Access;
+
+   --  Iterate over the elements of the list executing the <tt>Process</tt> procedure.
+   procedure Iterate (Def     : in List_Definition;
+                      Process : not null access procedure (Item : in T_Access));
 
 private
    type List_Definition is limited new Util.Beans.Basic.List_Bean with record

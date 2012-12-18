@@ -136,18 +136,23 @@ package body Gen.Model.Tables is
    function Get_Type_Mapping (From : in Column_Definition)
                               return Gen.Model.Mappings.Mapping_Definition_Access is
       use type Mappings.Mapping_Definition_Access;
+      use type Gen.Model.Packages.Package_Definition_Access;
 
       Result : Gen.Model.Mappings.Mapping_Definition_Access := null;
       Pos    : constant Natural := Ada.Strings.Unbounded.Index (From.Type_Name, ".");
    begin
+      if From.Table /= null and then From.Table.Package_Def /= null then
+         Result := From.Table.Package_Def.Find_Type (From.Type_Name);
+         if Result /= null then
+            return Result;
+         end if;
+      end if;
+      Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
+      if Result /= null then
+         return Result;
+      end if;
       if Pos = 0 then
          Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
-      end if;
-      if From.Type_Name = "Gen.Tests.Tables.Test_Enum" then
-         Log.Debug ("Found enum");
-      end if;
-      if Result = null then
-         Result := From.Table.Package_Def.Find_Type (From.Type_Name);
       end if;
       return Result;
    end Get_Type_Mapping;
@@ -258,6 +263,27 @@ package body Gen.Model.Tables is
    end Add_Association;
 
    --  ------------------------------
+   --  Get the dependency between the two tables.
+   --  Returns NONE if both table don't depend on each other.
+   --  Returns FORWARD if the <tt>Left</tt> table depends on <tt>Right</tt>.
+   --  Returns BACKWARD if the <tt>Right</tt> table depends on <tt>Left</tt>.
+   --  ------------------------------
+   function Depends_On (Left, Right : in Table_Definition_Access) return Dependency_Type is
+   begin
+      if Left.Dependencies.Contains (Right) then
+         Log.Info ("Table {0} depends on {1}",
+                   To_String (Left.Name), To_String (Right.Name));
+         return FORWARD;
+      end if;
+      if Right.Dependencies.Contains (Left) then
+         Log.Info ("Table {1} depends on {0}",
+                   To_String (Left.Name), To_String (Right.Name));
+         return BACKWARD;
+      end if;
+      return NONE;
+   end Depends_On;
+
+   --  ------------------------------
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
@@ -316,8 +342,11 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    procedure Prepare (O : in out Table_Definition) is
+      use type Gen.Model.Mappings.Mapping_Definition_Access;
+
       Iter : Column_List.Cursor := O.Members.First;
       C    : Column_Definition_Access;
+      T    : Gen.Model.Mappings.Mapping_Definition_Access;
    begin
       Log.Info ("Prepare table {0}", O.Name);
 
@@ -328,9 +357,45 @@ package body Gen.Model.Tables is
             Log.Info ("Found key {0}", C.Name);
             O.Id_Column := C;
          end if;
+
+         --  Collect in the dependencies vectors the tables that we are using.
+         if not C.Use_Foreign_Key_Type and then C.all in Association_Definition'Class then
+            T := C.Get_Type_Mapping;
+            if T /= null then
+               O.Dependencies.Append (Table_Definition'Class (T.all)'Access);
+            end if;
+         end if;
          Column_List.Next (Iter);
       end loop;
    end Prepare;
+
+   --  ------------------------------
+   --  Collect the dependencies to other tables.
+   --  ------------------------------
+   procedure Collect_Dependencies (O : in out Table_Definition) is
+      Iter : Table_Vectors.Cursor := O.Dependencies.First;
+      List : Table_Vectors.Vector;
+      D    : Table_Definition_Access;
+   begin
+      Log.Info ("Collect dependencies of {0}", O.Name);
+
+      while Table_Vectors.Has_Element (Iter) loop
+         D := Table_Vectors.Element (Iter);
+         D.Collect_Dependencies;
+         List.Append (D.Dependencies);
+         Table_Vectors.Next (Iter);
+      end loop;
+
+      Iter := List.First;
+      while Table_Vectors.Has_Element (Iter) loop
+         D := Table_Vectors.Element (Iter);
+         if not O.Dependencies.Contains (D) then
+            Log.Info ("Adding dependency for {0} on {1}", To_String (O.Name), To_String (D.Name));
+            O.Dependencies.Append (D);
+         end if;
+         Table_Vectors.Next (Iter);
+      end loop;
+   end Collect_Dependencies;
 
    --  ------------------------------
    --  Set the table name and determines the package name.

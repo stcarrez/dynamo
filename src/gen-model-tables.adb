@@ -139,20 +139,16 @@ package body Gen.Model.Tables is
       use type Gen.Model.Packages.Package_Definition_Access;
 
       Result : Gen.Model.Mappings.Mapping_Definition_Access := null;
-      Pos    : constant Natural := Ada.Strings.Unbounded.Index (From.Type_Name, ".");
    begin
       if From.Table /= null and then From.Table.Package_Def /= null then
          Result := From.Table.Package_Def.Find_Type (From.Type_Name);
-         if Result /= null then
-            return Result;
-         end if;
       end if;
-      Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
-      if Result /= null then
-         return Result;
-      end if;
-      if Pos = 0 then
+      if Result = null then
          Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
+      end if;
+      if Result /= null and then From.Use_Foreign_Key_Type
+        and then Result.all in Table_Definition'Class then
+         return Table_Definition'Class (Result.all).Id_Column.Get_Type_Mapping;
       end if;
       return Result;
    end Get_Type_Mapping;

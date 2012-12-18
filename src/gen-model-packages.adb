@@ -484,23 +484,22 @@ package body Gen.Model.Packages is
                        Name : in Unbounded_String)
                        return Gen.Model.Mappings.Mapping_Definition_Access is
       N : constant Natural := Ada.Strings.Unbounded.Index (Name, ".", Ada.Strings.Backward);
+      L : constant Natural := Ada.Strings.Unbounded.Length (Name);
    begin
       if N = 0 then
          return null;
       end if;
       declare
-         Pkg_Name : constant String := Ada.Strings.Unbounded.Slice (Name, 1, N - 1);
-         Key      : constant String := Util.Strings.Transforms.To_Upper_Case (Pkg_Name);
-         Pos      : constant Package_Map.Cursor := From.Packages.Find (To_Unbounded_String (Key));
-         L        : constant Natural := Ada.Strings.Unbounded.Length (Name);
+         Pkg_Name  : constant String := Ada.Strings.Unbounded.Slice (Name, 1, N - 1);
+         Base_Name : constant String := Ada.Strings.Unbounded.Slice (Name, N + 1, L);
+         Key       : constant String := Util.Strings.Transforms.To_Upper_Case (Pkg_Name);
+         Pos       : constant Package_Map.Cursor := From.Packages.Find (To_Unbounded_String (Key));
       begin
-         if Name = "AWA.Users.Models.User" then
-            Log.Info ("Found type");
-         end if;
          if Package_Map.Has_Element (Pos) then
-            return Package_Map.Element (Pos).Find_Type (Ada.Strings.Unbounded.Unbounded_Slice (Name, N + 1, L));
+            return Package_Map.Element (Pos).Find_Type (To_Unbounded_String (Base_Name));
+         else
+            return null;
          end if;
-         return null;
       end;
    end Find_Type;
 

@@ -108,7 +108,8 @@ package body Gen.Model.Tables is
       Name : constant String := To_String (From.Type_Name);
    begin
       if T /= null then
-         return T.Kind /= Gen.Model.Mappings.T_BLOB;
+         return T.Kind /= Gen.Model.Mappings.T_BLOB and T.Kind /= Gen.Model.Mappings.T_TABLE
+         and T.Kind /= Gen.Model.Mappings.T_BEAN;
       end if;
       return Name = "int" or Name = "String"
         or Name = "ADO.Identifier" or Name = "Timestamp"

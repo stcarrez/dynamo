@@ -71,6 +71,11 @@ package body Gen.Model.Tables is
             if T = null then
                return Util.Beans.Objects.Null_Object;
             end if;
+
+            --  If this is an association to another table, use the primary key of that table.
+            if T.all in Table_Definition'Class then
+               return Table_Definition'Class (T.all).Id_Column.Get_Value (Name);
+            end if;
             return T.Get_Value ("name");
          end;
 
@@ -176,9 +181,6 @@ package body Gen.Model.Tables is
    function Get_Value (From : Association_Definition;
                        Name : String) return Util.Beans.Objects.Object is
    begin
-      if Name = "type" then
-         Log.Debug ("Association type");
-      end if;
       return Column_Definition (From).Get_Value (Name);
    end Get_Value;
 

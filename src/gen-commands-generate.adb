@@ -32,10 +32,28 @@ package body Gen.Commands.Generate is
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
 
-      File_Count : Natural := 0;
+      File_Count   : Natural := 0;
    begin
       Generator.Read_Project ("dynamo.xml", True);
       Gen.Generator.Read_Mappings (Generator);
+
+      --  Parse the command line for the --package option.
+      loop
+         case Getopt ("p: ? -package:") is
+         when ASCII.NUL => exit;
+
+         when '-' =>
+            if Full_Switch = "-package" then
+               Generator.Enable_Package_Generation (Parameter);
+            end if;
+
+         when 'p' =>
+            Generator.Enable_Package_Generation (Parameter);
+
+         when others =>
+            null;
+         end case;
+      end loop;
 
       --  Read the model files.
       loop
@@ -73,10 +91,12 @@ package body Gen.Commands.Generate is
       use Ada.Text_IO;
    begin
       Put_Line ("generate: Generate the Ada files for the database model or queries");
-      Put_Line ("Usage: generate [MODEL ...]");
+      Put_Line ("Usage: generate [--package NAME] [MODEL ...]");
       New_Line;
       Put_Line ("  Read the XML/XMI model description (Hibernate mapping, query mapping, ...)");
       Put_Line ("  and generate the Ada model files that correspond to the mapping.");
+      Put_Line ("  The --package option allows to generate only the package with the given name.");
+      Put_Line ("  The default is to generate all the packages that are recognized.");
    end Help;
 
 end Gen.Commands.Generate;

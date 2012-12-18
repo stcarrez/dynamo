@@ -684,6 +684,10 @@ package body Gen.Artifacts.XMI is
       use Gen.Model.Tables;
       use Gen.Model.Beans;
 
+      --  Scan the package for the model generation.
+      procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
+                                 Item : in Gen.Model.XMI.Model_Element_Access);
+
       procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                                Model : in out Gen.Model.XMI.Model_Map.Map);
 
@@ -781,12 +785,9 @@ package body Gen.Artifacts.XMI is
       begin
          Log.Info ("Prepare class association {0}", Assoc.Name);
 
-         if Assoc.Name = "user" then
-            Log.Info ("Found the association");
-         end if;
-
          if Assoc.Multiplicity_Upper /= 1 then
-            Log.Warn ("Multiple association are not yet supported.");
+            Log.Warn ("Association '{0}' for table '{1}' is not supported.",
+                      To_String (Assoc.Name), Table.Get_Name);
          else
             Table.Add_Association (Assoc.Name, A);
             A.Set_Comment (Assoc.Get_Comment);
@@ -868,6 +869,8 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       procedure Prepare_Enum (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
                               Item : in Gen.Model.XMI.Model_Element_Access) is
+         pragma Unreferenced (Pkg);
+
          Name  : constant String := Item.Get_Qualified_Name;
          Enum  : Gen.Model.Enums.Enum_Definition_Access;
       begin
@@ -880,6 +883,9 @@ package body Gen.Artifacts.XMI is
          Iterate_For_Enum (Enum.all, Item.Elements, Prepare_Enum_Literal'Access);
       end Prepare_Enum;
 
+      --  ------------------------------
+      --  Scan the package for the model generation.
+      --  ------------------------------
       procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
                                  Item : in Gen.Model.XMI.Model_Element_Access) is
          pragma Unreferenced (Id);

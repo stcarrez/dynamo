@@ -262,7 +262,8 @@ package body Gen.Generator is
 
       START_POS : constant Natural := 8;
 
-      Comment   : constant String := Util.Beans.Objects.To_String (Value);
+      Comment   : constant String := Ada.Strings.Fixed.Trim (Util.Beans.Objects.To_String (Value),
+                                                             Ada.Strings.Both);
       Result    : Unbounded_String;
       C         : Character;
       Pos       : Natural := START_POS;
@@ -280,6 +281,8 @@ package body Gen.Generator is
             if Length (Result) > 0 then
                Append (Result, ASCII.LF);
                Append (Result, "   --  ");
+            else
+               Append (Result, "  ");
             end if;
             Append (Result, C);
             Pos := Pos + 1;

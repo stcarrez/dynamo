@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Dec 19 17:23:35 CET 2012'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Dec 19 17:44:47 CET 2012'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
@@ -402,6 +402,9 @@
                     <UML:Association xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001E9C'
                       name = 'is-described-by' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
                       isAbstract = 'false'>
+                      <UML:ModelElement.stereotype>
+                        <UML:Stereotype href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--26e7efa5:13b90d90c51:-8000:0000000000002DCB'/>
+                      </UML:ModelElement.stereotype>
                       <UML:Association.connection>
                         <UML:AssociationEnd xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001E9D'
                           name = 'definition' visibility = 'public' isSpecification = 'false' isNavigable = 'true'

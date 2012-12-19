@@ -825,7 +825,7 @@ package body Gen.Artifacts.XMI is
          end if;
          if Assoc.Multiplicity_Upper /= 1 then
             Context.Error (To_String (Assoc.Location) &
-                             ": Multiple association '{0}' for table '{1}' is not supported.",
+                             ": multiple association '{0}' for table '{1}' is not supported.",
                            To_String (Assoc.Name), Table.Get_Name);
          else
             Table.Add_Association (Assoc.Name, A);

@@ -181,6 +181,10 @@ package Gen.Model.XMI is
    procedure Set_XMI_Id (Node  : in out Model_Element;
                          Value : in Util.Beans.Objects.Object);
 
+   --  Validate the node definition as much as we can before the reconcile phase.
+   --  If an error is detected, return a message.  Returns an empty string if everything is ok.
+   function Get_Error_Message (Node : in Model_Element) return String;
+
    --  Find the tag value element with the given name.
    --  Returns null if there is no such tag.
    function Find_Tag_Value (Node : in Model_Element;
@@ -251,6 +255,12 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Enum_Element) return Element_Type;
+
+   --  Validate the node definition as much as we can before the reconcile phase.
+   --  An enum must not be empty, it must have at least one literal.
+   --  If an error is detected, return a message.  Returns an empty string if everything is ok.
+   overriding
+   function Get_Error_Message (Node : in Enum_Element) return String;
 
    procedure Add_Literal (Node : in out Enum_Element;
                           Id   : in Util.Beans.Objects.Object;
@@ -382,6 +392,12 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Association_Element) return Element_Type;
+
+   --  Validate the node definition as much as we can before the reconcile phase.
+   --  An association must contain two ends and a name is necessary on the navigable ends.
+   --  If an error is detected, return a message.  Returns an empty string if everything is ok.
+   overriding
+   function Get_Error_Message (Node : in Association_Element) return String;
 
    --  Reconcile the association between classes in the package.  Find the association
    --  ends and add the necessary links to the corresponding class elements.

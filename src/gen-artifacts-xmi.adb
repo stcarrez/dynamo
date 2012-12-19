@@ -135,6 +135,7 @@ package body Gen.Artifacts.XMI is
    type XMI_Info is record
       Model                : Gen.Model.XMI.Model_Map_Access;
       Default_Type         : Unbounded_String;
+      Parser               : access Util.Serialize.IO.XML.Parser'Class;
 
       Class_Element        : Gen.Model.XMI.Class_Element_Access;
       Class_Name           : Util.Beans.Objects.Object;
@@ -931,7 +932,7 @@ package body Gen.Artifacts.XMI is
 
          Pkg  : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
          Name : constant String := Pkg.Get_Qualified_Name;
-         P    : Gen.Model.Packages.Package_Definition_Access
+         P    : constant Gen.Model.Packages.Package_Definition_Access
            := new Gen.Model.Packages.Package_Definition;
       begin
          Log.Info ("Prepare package {0}", Name);
@@ -1062,7 +1063,6 @@ package body Gen.Artifacts.XMI is
                       Model : in out Gen.Model.XMI.Model_Map.Map) is
          pragma Unreferenced (Key);
 
-         Info   : aliased XMI_Info;
          N      : constant Natural := Util.Strings.Rindex (File, '.');
          Name   : constant String := Ada.Directories.Base_Name (File);
 
@@ -1093,10 +1093,12 @@ package body Gen.Artifacts.XMI is
                            Message);
          end Error;
 
-         Reader : Parser;
+         Reader   : aliased Parser;
+         Info     : aliased XMI_Info;
          Def_Type : constant String := Context.Get_Parameter (Gen.Configs.GEN_UML_DEFAULT_TYPE);
       begin
-         Info.Model := Model'Unchecked_Access;
+         Info.Model  := Model'Unchecked_Access;
+         Info.Parser := Reader'Unchecked_Access;
          Info.Default_Type := To_Unbounded_String (Def_Type);
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
          if Context.Get_Parameter (Gen.Configs.GEN_DEBUG_ENABLE) then

@@ -13,11 +13,13 @@
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 pragma Warnings (Off, "unit * is not referenced");
+<h:panelGroup rendered="#{not empty package.queries or not empty package.tables}">
 with ADO.Sessions;
 with ADO.Objects;
 with ADO.Statements;
 with ADO.SQL;
 with ADO.Schemas;
+</h:panelGroup>
 
 <h:panelGroup rendered="#{not empty package.queries}">
 with ADO.Queries;

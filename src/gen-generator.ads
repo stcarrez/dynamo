@@ -24,7 +24,6 @@ with Ada.Containers.Hashed_Maps;
 
 with Util.Beans.Objects;
 with Util.Properties;
-with Util.Strings.Sets;
 
 with ASF.Applications.Main;
 with ASF.Contexts.Faces;
@@ -270,10 +269,6 @@ private
 
       --  The list of templates that must be generated.
       Templates : Template_Map.Map;
-
-      --  When not empty, a list of packages that must be taken into account for the generation.
-      --  By default all packages and tables defined in the model are generated.
-      Packages  : Util.Strings.Sets.Set;
 
       --  Force the saving of a generated file, even if a file already exist.
       Force_Save : Boolean := True;

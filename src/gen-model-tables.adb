@@ -153,7 +153,8 @@ package body Gen.Model.Tables is
          Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
       end if;
       if Result /= null and then From.Use_Foreign_Key_Type
-        and then Result.all in Table_Definition'Class then
+        and then Result.all in Table_Definition'Class
+        and then Table_Definition'Class (Result.all).Id_Column /= null then
          return Table_Definition'Class (Result.all).Id_Column.Get_Type_Mapping;
       end if;
       return Result;

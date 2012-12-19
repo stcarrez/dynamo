@@ -755,6 +755,12 @@ package body Gen.Artifacts.XMI is
                C.Is_Version  := Column.Has_Stereotype (Handler.Version_Stereotype);
                C.Is_Updated  := Attr.Changeability /= CHANGEABILITY_FROZEN;
                C.Is_Inserted := Attr.Changeability = CHANGEABILITY_INSERT;
+
+               --  For the <<Version>> columns, do not allow users to modify them.
+               if C.Is_Version then
+                  C.Is_Updated  := False;
+                  C.Is_Inserted := False;
+               end if;
                if Column.Has_Stereotype (Handler.Not_Null_Stereotype) then
                   C.Not_Null := True;
                end if;

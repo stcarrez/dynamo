@@ -860,7 +860,7 @@ package body Gen.Generator is
    procedure Enable_Package_Generation (H    : in out Handler;
                                         Name : in String) is
    begin
-      H.Packages.Include (Util.Strings.Transforms.To_Upper_Case (Name));
+      H.Model.Enable_Package_Generation (Name);
    end Enable_Package_Generation;
 
    --  ------------------------------
@@ -946,9 +946,8 @@ package body Gen.Generator is
                      P          : constant Gen.Model.Packages.Package_Definition_Access
                        := Gen.Model.Packages.Element (Pos);
                      Name       : constant String := P.Get_Name;
-                     Upper_Name : constant String := Util.Strings.Transforms.To_Upper_Case (Name);
                   begin
-                     if H.Packages.Is_Empty or H.Packages.Contains (Upper_Name) then
+                     if H.Model.Is_Generation_Enabled (Name) then
                         Log.Debug ("  Generate for package {0}", Name);
 
                         H.Generate (File, Gen.Model.Definition_Access (P));

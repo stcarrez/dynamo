@@ -809,7 +809,7 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare class association {0}", Assoc.Name);
 
          if Assoc.Multiplicity_Upper /= 1 then
-            Log.Warn ("Association '{0}' for table '{1}' is not supported.",
+            Log.Warn ("Multiple association '{0}' for table '{1}' is not supported.",
                       To_String (Assoc.Name), Table.Get_Name);
          else
             Table.Add_Association (Assoc.Name, A);

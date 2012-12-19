@@ -451,7 +451,7 @@ package body Gen.Integration.Tests is
    procedure Test_Generate_Zargo_Errors (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-errors.zargo", Result, 1);
+      T.Execute (Dynamo & " -o tmp generate ../regtests/uml/dynamo-test-errors.zargo", Result, 1);
 
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.ads");
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.adb");

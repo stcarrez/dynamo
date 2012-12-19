@@ -5,6 +5,16 @@
         xmlns:f="http://java.sun.com/jsf/core">
 
 <h:list value="#{package.tables}" var="table">
+<h:panelGroup rendered="#{table.bean eq 'yes'}">
+   type #{table.type}_Ref is new ADO.Objects.Object_Ref and Util.Beans.Basic.Bean with null record;
+</h:panelGroup>
+<h:panelGroup rendered="#{table.bean ne 'yes'}">
+   type #{table.type}_Ref is new ADO.Objects.Object_Ref with null record;
+</h:panelGroup>
+#{''}
+</h:list>
+
+<h:list value="#{package.tables}" var="table">
  <h:panelGroup rendered="#{not empty table.comment}">
    --  --------------------
    --<h:outputText value="#{g:comment(table.comment)}" escape="false"/>
@@ -15,13 +25,6 @@
    --  Create an object key for #{table.type} from a string.
    --  Raises Constraint_Error if the string cannot be converted into the object key.
    function #{table.type}_Key (Id : in String) return ADO.Objects.Object_Key;
-#{''}
-<h:panelGroup rendered="#{table.bean eq 'yes'}">
-   type #{table.type}_Ref is new ADO.Objects.Object_Ref and Util.Beans.Basic.Bean with null record;
-</h:panelGroup>
-<h:panelGroup rendered="#{table.bean ne 'yes'}">
-   type #{table.type}_Ref is new ADO.Objects.Object_Ref with null record;
-</h:panelGroup>
 #{''}
 
    Null_#{table.type} : constant #{table.type}_Ref;

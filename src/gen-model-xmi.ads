@@ -158,6 +158,9 @@ package Gen.Model.XMI is
 
       --  The parent model element;
       Parent        : Model_Element_Access;
+
+      --  The location (file and line) where the definition was found in the XMI file.
+      Location      : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 
    --  Get the element type.
@@ -180,6 +183,10 @@ package Gen.Model.XMI is
    --  Set the model XMI unique id.
    procedure Set_XMI_Id (Node  : in out Model_Element;
                          Value : in Util.Beans.Objects.Object);
+
+   --  Set the location (file and line) where the model element is defined in the XMI file.
+   procedure Set_Location (Node     : in out Model_Element;
+                           Location : in String);
 
    --  Validate the node definition as much as we can before the reconcile phase.
    --  If an error is detected, return a message.  Returns an empty string if everything is ok.

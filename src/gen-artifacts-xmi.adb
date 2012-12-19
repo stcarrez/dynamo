@@ -752,6 +752,7 @@ package body Gen.Artifacts.XMI is
                end if;
                C.Not_Null    := Attr.Multiplicity_Lower > 0;
                C.Is_Key      := Column.Has_Stereotype (Handler.PK_Stereotype);
+               C.Is_Version  := Column.Has_Stereotype (Handler.Version_Stereotype);
                C.Is_Updated  := Attr.Changeability /= CHANGEABILITY_FROZEN;
                C.Is_Inserted := Attr.Changeability = CHANGEABILITY_INSERT;
                if Column.Has_Stereotype (Handler.Not_Null_Stereotype) then
@@ -986,6 +987,10 @@ package body Gen.Artifacts.XMI is
                                                 "Dynamo.xmi",
                                                 "ADO.FK",
                                                 Gen.Model.XMI.BY_NAME);
+      Handler.Version_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                     "Dynamo.xmi",
+                                                     "ADO.Version",
+                                                     Gen.Model.XMI.BY_NAME);
       Handler.Nullable_Stereotype := Find_Stereotype (Handler.Nodes,
                                                       "Dynamo.xmi",
                                                       "ADO.Nullable",

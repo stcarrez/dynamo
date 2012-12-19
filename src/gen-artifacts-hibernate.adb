@@ -81,9 +81,21 @@ package body Gen.Artifacts.Hibernate is
    begin
       Table.Add_Column (Name, C);
       C.Initialize (Name, Column);
-
       C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
       C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
+
+      if Name = "version" then
+         Table.Version_Column := C;
+         C.Is_Version  := True;
+         C.Is_Updated  := False;
+         C.Is_Inserted := False;
+
+      elsif Name = "id" then
+         Table.Id_Column := C;
+         C.Is_Key := True;
+
+      end if;
+
       if G /= null then
          C.Generator := Gen.Utils.Get_Attribute (Column, "class");
       end if;

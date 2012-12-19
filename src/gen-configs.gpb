@@ -18,18 +18,19 @@
 
 package Gen.Configs is
 
-   RELEASE             : constant String := "Dynamo Ada Generator " & $VERSION & " - Revision"
+   RELEASE                  : constant String := "Dynamo Ada Generator " & $VERSION & " - Revision"
                               & Positive'Image (Gen.SVN_REV) & ", Stephane Carrez";
-   GEN_PACKAGE_BODY    : constant String := "generator.template.package.body";
-   GEN_PACKAGE_SPEC    : constant String := "generator.template.package.spec";
-   GEN_MYSQL_SQL_FILE  : constant String := "generator.template.sql.mysql";
-   GEN_SQLITE_SQL_FILE : constant String := "generator.template.sql.sqlite";
+   GEN_PACKAGE_BODY         : constant String := "generator.template.package.body";
+   GEN_PACKAGE_SPEC         : constant String := "generator.template.package.spec";
+   GEN_MYSQL_SQL_FILE       : constant String := "generator.template.sql.mysql";
+   GEN_SQLITE_SQL_FILE      : constant String := "generator.template.sql.sqlite";
    GEN_MYSQL_DROP_SQL_FILE  : constant String := "generator.template.drop.sql.mysql";
    GEN_SQLITE_DROP_SQL_FILE : constant String := "generator.template.drop.sql.sqlite";
    GEN_UML_DIR              : constant String := "generator.uml.dir";
+   GEN_UML_DEFAULT_TYPE     : constant String := "generator.uml.default_type";
    GEN_DEBUG_ENABLE         : constant String := "generator.debug";
 
    --  Path of the config directory
-   CONFIG_DIR       : constant String := $CONFIG_DIR;
+   CONFIG_DIR               : constant String := $CONFIG_DIR;
 
 end Gen.Configs;

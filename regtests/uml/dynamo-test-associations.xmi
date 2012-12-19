@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Dec 19 17:44:47 CET 2012'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Dec 19 18:22:45 CET 2012'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
@@ -305,6 +305,24 @@
                           </UML:ModelElement.taggedValue>
                           <UML:StructuralFeature.type>
                             <UML:DataType href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1-60d24178:13b32cd98ef:-8000:0000000000002B75'/>
+                          </UML:StructuralFeature.type>
+                        </UML:Attribute>
+                        <UML:Attribute xmi.id = '127-0-1-1-1b409691:13bb42ea2fb:-8000:00000000000020FC'
+                          name = 'my_version' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                          changeability = 'changeable' targetScope = 'instance'>
+                          <UML:StructuralFeature.multiplicity>
+                            <UML:Multiplicity xmi.id = '127-0-1-1-1b409691:13bb42ea2fb:-8000:00000000000020FD'>
+                              <UML:Multiplicity.range>
+                                <UML:MultiplicityRange xmi.id = '127-0-1-1-1b409691:13bb42ea2fb:-8000:00000000000020FE'
+                                  lower = '1' upper = '1'/>
+                              </UML:Multiplicity.range>
+                            </UML:Multiplicity>
+                          </UML:StructuralFeature.multiplicity>
+                          <UML:ModelElement.stereotype>
+                            <UML:Stereotype href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--4126d209:13bad9e2ffa:-8000:00000000000054E6'/>
+                          </UML:ModelElement.stereotype>
+                          <UML:StructuralFeature.type>
+                            <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087C'/>
                           </UML:StructuralFeature.type>
                         </UML:Attribute>
                       </UML:Classifier.feature>

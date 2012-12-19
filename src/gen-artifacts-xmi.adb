@@ -130,7 +130,8 @@ package body Gen.Artifacts.XMI is
 
                        FIELD_ENUMERATION,
                        FIELD_ENUMERATION_LITERAL,
-                       FIELD_ENUMERATION_HREF);
+                       FIELD_ENUMERATION_HREF,
+                       FIELD_ENUMERATION_END);
 
    type XMI_Info is record
       Model                : Gen.Model.XMI.Model_Map_Access;
@@ -583,6 +584,17 @@ package body Gen.Artifacts.XMI is
          when FIELD_ENUMERATION_LITERAL =>
             P.Enumeration.Add_Literal (P.Id, P.Name);
 
+         when FIELD_ENUMERATION_END =>
+            if P.Enumeration /= null then
+               declare
+                  Msg : constant String := P.Enumeration.Get_Error_Message;
+               begin
+                  P.Enumeration := null;
+                  raise Util.Serialize.Mappers.Field_Error with Msg;
+               end;
+            end if;
+            P.Enumeration := null;
+
          when FIELD_STEREOTYPE_NAME =>
             P.Stereotype := new Gen.Model.XMI.Stereotype_Element (P.Model);
             P.Stereotype.Set_Name (Value);
@@ -758,8 +770,10 @@ package body Gen.Artifacts.XMI is
                if Attr.Data_Type /= null then
                   C.Type_Name := To_Unbounded_String (Attr.Data_Type.Get_Qualified_Name);
                end if;
-               C.Not_Null := Attr.Multiplicity_Lower > 0;
-               C.Is_Key   := Column.Has_Stereotype (Handler.PK_Stereotype);
+               C.Not_Null    := Attr.Multiplicity_Lower > 0;
+               C.Is_Key      := Column.Has_Stereotype (Handler.PK_Stereotype);
+               C.Is_Updated  := Attr.Changeability /= CHANGEABILITY_FROZEN;
+               C.Is_Inserted := Attr.Changeability = CHANGEABILITY_INSERT;
                if Column.Has_Stereotype (Handler.Not_Null_Stereotype) then
                   C.Not_Null := True;
                end if;
@@ -768,24 +782,9 @@ package body Gen.Artifacts.XMI is
                end if;
             end;
          end if;
-
---
---           C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
---           C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
 --           if G /= null then
 --              C.Generator := Gen.Utils.Get_Attribute (Column, "class");
 --           end if;
-
-         --  Get the SQL mapping from an optional <column> element.
---           declare
---              N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
---              T : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "type");
---           begin
---              if T /= null then
---                 C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (T, "name"));
---              else
---                 C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (Column, "type"));
---              end if;
 --
 --              Log.Debug ("Register column {0} of type {1}", Name, To_String (C.Type_Name));
 --              if N /= null then
@@ -796,7 +795,6 @@ package body Gen.Artifacts.XMI is
 --                 C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
 --                 C.Sql_Type := C.Type_Name;
 --              end if;
---              C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
 --              C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
 --           end;
       end Prepare_Attribute;
@@ -1245,6 +1243,7 @@ begin
                             FIELD_ENUMERATION_LITERAL);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@href", FIELD_ENUMERATION_HREF);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@xmi.idref", FIELD_ENUMERATION_HREF);
+   XMI_Mapping.Add_Mapping ("**/Enumeration", FIELD_ENUMERATION_END);
 
    XMI_Mapping.Add_Mapping ("**/Classifier/@xmi.idref", FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Classifier/@href", FIELD_CLASSIFIER_HREF);

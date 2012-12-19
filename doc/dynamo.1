@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Oct 20, 2012" "Ada Web Application"
+.TH DYNAMO 1 "Dec 19, 2012" "Ada Web Application"
 .SH NAME
 dynamo - Ada Web Application Generator
 .SH SYNOPSIS
@@ -312,7 +312,7 @@ Give an help description about a command.
 .\"
 .SS The generate command
 .RS 0
-dynamo \fBgenerate [\fImodel ... \fR]\fR
+dynamo \fBgenerate [--package \fIname\fR] [\fImodel ... \fR]\fR
 .RE
 .PP
 Generate the Ada model implementation from the XML model mappings or from a UML model.
@@ -342,6 +342,11 @@ UML profile and assign the
 and
 .I Bean
 stereotypes to the model element for the generation to be activated.
+For large or complex UML models, the
+.I --package
+option allows to activate the generation for the package specified by the option.
+In that case, other packages defined by the model are not generated although they could
+be referenced and used.
 .\"
 .SS The propset command
 .RS 0

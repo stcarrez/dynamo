@@ -20,10 +20,12 @@ with Util.Beans.Objects.Time;
 </h:panelGroup>
 
 package body #{package.name} is
+<h:panelGroup rendered="#{not empty package.queries or not empty package.tables}">
 #{''}
    use type ADO.Objects.Object_Record_Access;
    use type ADO.Objects.Object_Ref;
    use type ADO.Objects.Object_Record;
+</h:panelGroup>
 #{''}
 
   <ui:include src="package-body-objects.xhtml"/>

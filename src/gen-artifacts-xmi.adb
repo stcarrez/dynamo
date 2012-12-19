@@ -595,9 +595,6 @@ package body Gen.Artifacts.XMI is
                  := new Gen.Model.XMI.Ref_Type_Element (P.Model);
             begin
                S.Href := Util.Beans.Objects.To_Unbounded_String (Value);
-               if Index (S.Href, "00002DCB") > 0 then
-                  Log.Info ("Found the stereotype");
-               end if;
                if P.Association /= null then
                   P.Association.Stereotypes.Append (S.all'Access);
                elsif P.Attr_Element /= null then
@@ -1058,40 +1055,42 @@ package body Gen.Artifacts.XMI is
       procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                       Model : in out Gen.Model.XMI.Model_Map.Map);
 
-      type Parser is new Util.Serialize.IO.XML.Parser with null record;
-
-      --  Report an error while parsing the input stream.  The error message will be reported
-      --  on the logger associated with the parser.  The parser will be set as in error so that
-      --  the <b>Has_Error</b> function will return True after parsing the whole file.
-      overriding
-      procedure Error (Handler : in out Parser;
-                       Message : in String);
-
-      --  ------------------------------
-      --  Report an error while parsing the input stream.  The error message will be reported
-      --  on the logger associated with the parser.  The parser will be set as in error so that
-      --  the <b>Has_Error</b> function will return True after parsing the whole file.
-      --  ------------------------------
-      overriding
-      procedure Error (Handler : in out Parser;
-                       Message : in String) is
-      begin
-         if Ada.Strings.Fixed.Index (Message, "Invalid absolute IRI") > 0
-           and then Ada.Strings.Fixed.Index (Message, "org.omg.xmi.namespace.UML") > 0 then
-            return;
-         end if;
-         Context.Error ("{0}: {1}",
-                        File & Parser'Class (Handler).Get_Location,
-                        Message);
-      end Error;
-
       procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                       Model : in out Gen.Model.XMI.Model_Map.Map) is
          pragma Unreferenced (Key);
 
          Info   : aliased XMI_Info;
-         Reader : Parser;
          N      : constant Natural := Util.Strings.Rindex (File, '.');
+         Name   : constant String := Ada.Directories.Base_Name (File);
+
+         type Parser is new Util.Serialize.IO.XML.Parser with null record;
+
+         --  Report an error while parsing the input stream.  The error message will be reported
+         --  on the logger associated with the parser.  The parser will be set as in error so that
+         --  the <b>Has_Error</b> function will return True after parsing the whole file.
+         overriding
+         procedure Error (Handler : in out Parser;
+                          Message : in String);
+
+         --  ------------------------------
+         --  Report an error while parsing the input stream.  The error message will be reported
+         --  on the logger associated with the parser.  The parser will be set as in error so that
+         --  the <b>Has_Error</b> function will return True after parsing the whole file.
+         --  ------------------------------
+         overriding
+         procedure Error (Handler : in out Parser;
+                          Message : in String) is
+         begin
+            if Ada.Strings.Fixed.Index (Message, "Invalid absolute IRI") > 0
+              and then Ada.Strings.Fixed.Index (Message, "org.omg.xmi.namespace.UML") > 0 then
+               return;
+            end if;
+            Context.Error ("{0}: {1}",
+                           Name & ".xmi" & Parser'Class (Handler).Get_Location,
+                           Message);
+         end Error;
+
+         Reader : Parser;
       begin
          Info.Model := Model'Unchecked_Access;
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
@@ -1102,7 +1101,6 @@ package body Gen.Artifacts.XMI is
 
          if N > 0 and then File (N .. File'Last) = ".zargo" then
             declare
-               Name   : constant String := Ada.Directories.Base_Name (File);
                Pipe   : aliased Util.Streams.Pipes.Pipe_Stream;
                Buffer : Util.Streams.Buffered.Buffered_Stream;
             begin

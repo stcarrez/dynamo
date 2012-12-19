@@ -506,6 +506,16 @@ package body Gen.Artifacts.XMI is
                if P.Package_Element /= null then
                   P.Package_Element.Associations.Append (P.Association.all'Access);
                end if;
+
+               --  Check that the association is valid and report an error if there is a problem.
+               declare
+                  Msg : constant String := P.Association.Get_Error_Message;
+               begin
+                  if Msg'Length /= 0 then
+                     P.Association := null;
+                     raise Util.Serialize.Mappers.Field_Error with Msg;
+                  end if;
+               end;
             end if;
             P.Association := null;
 

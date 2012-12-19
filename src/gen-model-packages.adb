@@ -129,7 +129,7 @@ package body Gen.Model.Packages is
    --  ------------------------------
    procedure Register_Table (O     : in out Model_Definition;
                              Table : access Gen.Model.Tables.Table_Definition'Class) is
-      Name : constant String := Table.Get_Name;
+      Name           : constant String := Table.Get_Name;
    begin
       Log.Info ("Registering table {0}", Name);
 
@@ -139,7 +139,9 @@ package body Gen.Model.Packages is
       end if;
       Table.Package_Def.Tables.Append (Table.all'Access);
       Table.Package_Def.Types.Include (Table.Name, Table.all'Access);
-      O.Tables.Append (Table.all'Access);
+      if O.Is_Generation_Enabled (Ada.Strings.Unbounded.To_String (Table.Pkg_Name)) then
+         O.Tables.Append (Table.all'Access);
+      end if;
    end Register_Table;
 
    --  ------------------------------
@@ -205,6 +207,27 @@ package body Gen.Model.Packages is
    begin
       return not O.Packages.Is_Empty;
    end Has_Packages;
+
+   --  ------------------------------
+   --  Enable the generation of the Ada package given by the name.  By default all the Ada
+   --  packages found in the model are generated.  When called, this enables the generation
+   --  only for the Ada packages registered here.
+   --  ------------------------------
+   procedure Enable_Package_Generation (Model : in out Model_Definition;
+                                        Name  : in String) is
+   begin
+      Model.Gen_Packages.Include (Util.Strings.Transforms.To_Upper_Case (Name));
+   end Enable_Package_Generation;
+
+   --  ------------------------------
+   --  Returns True if the generation is enabled for the given package name.
+   --  ------------------------------
+   function Is_Generation_Enabled (Model : in Model_Definition;
+                                   Name  : in String) return Boolean is
+      Upper_Name : constant String := Util.Strings.Transforms.To_Upper_Case (Name);
+   begin
+      return Model.Gen_Packages.Is_Empty or Model.Gen_Packages.Contains (Upper_Name);
+   end Is_Generation_Enabled;
 
    --  ------------------------------
    --  Prepare the generation of the package:

@@ -80,6 +80,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_Zargo_Dependencies'Access);
       Caller.Add_Test (Suite, "Generate ArgoUML several packages",
                        Test_Generate_Zargo_Packages'Access);
+      Caller.Add_Test (Suite, "Generate ArgoUML with several UML errors",
+                       Test_Generate_Zargo_Errors'Access);
       Caller.Add_Test (Suite, "Build generated project",
                        Test_Build'Access);
       Caller.Add_Test (Suite, "Build generated model files (UML)",
@@ -131,7 +133,8 @@ package body Gen.Integration.Tests is
    --  ------------------------------
    procedure Execute (T       : in out Test;
                       Command : in String;
-                      Result  : out Ada.Strings.Unbounded.Unbounded_String) is
+                      Result  : out Ada.Strings.Unbounded.Unbounded_String;
+                      Status  : in Natural := 0) is
       P       : aliased Util.Streams.Pipes.Pipe_Stream;
       Buffer  : Util.Streams.Buffered.Buffered_Stream;
    begin
@@ -142,7 +145,7 @@ package body Gen.Integration.Tests is
       Buffer.Read (Result);
       P.Close;
       Log.Info ("Command result: {0}", Result);
-      Util.Tests.Assert_Equals (T, 0, P.Get_Exit_Status, "Command '" & Command & "' failed");
+      Util.Tests.Assert_Equals (T, Status, P.Get_Exit_Status, "Command '" & Command & "' failed");
    end Execute;
 
    --  ------------------------------
@@ -442,6 +445,23 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.adb");
    end Test_Generate_Zargo_Packages;
 
+   --  ------------------------------
+   --  Test UML with several errors in the UML model.
+   --  ------------------------------
+   procedure Test_Generate_Zargo_Errors (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-errors.zargo", Result, 1);
+
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.adb");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-b.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-b.adb");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-c.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-c.adb");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.adb");
+   end Test_Generate_Zargo_Errors;
 
    --  ------------------------------
    --  Test GNAT compilation of the final project.

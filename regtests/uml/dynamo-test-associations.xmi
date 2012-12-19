@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sat Oct 20 16:22:55 CEST 2012'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Dec 19 17:23:35 CET 2012'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
@@ -125,7 +125,7 @@
                             </UML:TaggedValue>
                           </UML:ModelElement.taggedValue>
                           <UML:StructuralFeature.type>
-                            <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087C'/>
+                            <UML:DataType href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1-60d24178:13b32cd98ef:-8000:0000000000002B75'/>
                           </UML:StructuralFeature.type>
                         </UML:Attribute>
                         <UML:Attribute xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:000000000000167E'
@@ -221,7 +221,7 @@
                             <UML:Stereotype href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D50'/>
                           </UML:ModelElement.stereotype>
                           <UML:StructuralFeature.type>
-                            <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087C'/>
+                            <UML:DataType href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1-60d24178:13b32cd98ef:-8000:0000000000002B75'/>
                           </UML:StructuralFeature.type>
                         </UML:Attribute>
                       </UML:Classifier.feature>
@@ -304,7 +304,7 @@
                             </UML:TaggedValue>
                           </UML:ModelElement.taggedValue>
                           <UML:StructuralFeature.type>
-                            <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087C'/>
+                            <UML:DataType href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1-60d24178:13b32cd98ef:-8000:0000000000002B75'/>
                           </UML:StructuralFeature.type>
                         </UML:Attribute>
                       </UML:Classifier.feature>
@@ -423,10 +423,10 @@
                           name = 'properties' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
                           ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                           <UML:AssociationEnd.multiplicity>
-                            <UML:Multiplicity xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001EA5'>
+                            <UML:Multiplicity xmi.id = '127-0-1-1--4126d209:13bad9e2ffa:-8000:00000000000052A5'>
                               <UML:Multiplicity.range>
-                                <UML:MultiplicityRange xmi.id = '127-0-1-1--2cbef895:13a7aa0289e:-8000:0000000000001EA4'
-                                  lower = '0' upper = '-1'/>
+                                <UML:MultiplicityRange xmi.id = '127-0-1-1--4126d209:13bad9e2ffa:-8000:00000000000052A4'
+                                  lower = '0' upper = '1'/>
                               </UML:Multiplicity.range>
                             </UML:Multiplicity>
                           </UML:AssociationEnd.multiplicity>

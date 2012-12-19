@@ -133,25 +133,25 @@ package body Gen.Artifacts.XMI is
                        FIELD_ENUMERATION_HREF);
 
    type XMI_Info is record
-      Model              : Gen.Model.XMI.Model_Map_Access;
-      Indent : Natural := 1;
-      Class_Element    : Gen.Model.XMI.Class_Element_Access;
-      Class_Name       : Util.Beans.Objects.Object;
-      Class_Visibility   : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
-      Class_Id           : Util.Beans.Objects.Object;
+      Model                : Gen.Model.XMI.Model_Map_Access;
+      Default_Type         : Unbounded_String;
 
-      Package_Element    : Gen.Model.XMI.Package_Element_Access;
-      Package_Id         : Util.Beans.Objects.Object;
-      Need_Register_Package : Boolean := False;
+      Class_Element        : Gen.Model.XMI.Class_Element_Access;
+      Class_Name           : Util.Beans.Objects.Object;
+      Class_Visibility     : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
+      Class_Id             : Util.Beans.Objects.Object;
 
-      Attr_Id            : Util.Beans.Objects.Object;
-      Attr_Element       : Gen.Model.XMI.Attribute_Element_Access;
-      Attr_Visibility    : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
-      Attr_Changeability : Gen.Model.XMI.Changeability_Type
+      Package_Element      : Gen.Model.XMI.Package_Element_Access;
+      Package_Id           : Util.Beans.Objects.Object;
+
+      Attr_Id              : Util.Beans.Objects.Object;
+      Attr_Element         : Gen.Model.XMI.Attribute_Element_Access;
+      Attr_Visibility      : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
+      Attr_Changeability   : Gen.Model.XMI.Changeability_Type
         := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
-      Attr_Value         : Util.Beans.Objects.Object;
-      Multiplicity_Lower : Integer := 0;
-      Multiplicity_Upper : Integer := 0;
+      Attr_Value           : Util.Beans.Objects.Object;
+      Multiplicity_Lower   : Integer := 0;
+      Multiplicity_Upper   : Integer := 0;
 
       Association          : Gen.Model.XMI.Association_Element_Access;
       Assos_End_Element    : Gen.Model.XMI.Association_End_Element_Access;
@@ -162,25 +162,25 @@ package body Gen.Artifacts.XMI is
       Operation            : Gen.Model.XMI.Operation_Element_Access;
       Parameter            : Gen.Model.XMI.Parameter_Element_Access;
 
-      Name               : Util.Beans.Objects.Object;
-      Id                 : Util.Beans.Objects.Object;
-      Ref_Id             : Util.Beans.Objects.Object;
-      Value              : Util.Beans.Objects.Object;
-      Href               : Util.Beans.Objects.Object;
-      Tag_Name           : Util.Beans.Objects.Object;
+      Name                 : Util.Beans.Objects.Object;
+      Id                   : Util.Beans.Objects.Object;
+      Ref_Id               : Util.Beans.Objects.Object;
+      Value                : Util.Beans.Objects.Object;
+      Href                 : Util.Beans.Objects.Object;
+      Tag_Name             : Util.Beans.Objects.Object;
 
-      Association_Id     : Util.Beans.Objects.Object;
-      Stereotype_Id      : Util.Beans.Objects.Object;
-      Data_Type          : Gen.Model.XMI.Data_Type_Element_Access;
-      Enumeration        : Gen.Model.XMI.Enum_Element_Access;
-      Tag_Definition     : Gen.Model.XMI.Tag_Definition_Element_Access;
+      Association_Id       : Util.Beans.Objects.Object;
+      Stereotype_Id        : Util.Beans.Objects.Object;
+      Data_Type            : Gen.Model.XMI.Data_Type_Element_Access;
+      Enumeration          : Gen.Model.XMI.Enum_Element_Access;
+      Tag_Definition       : Gen.Model.XMI.Tag_Definition_Element_Access;
 
-      Stereotype         : Gen.Model.XMI.Stereotype_Element_Access;
-      Tagged_Value       : Gen.Model.XMI.Tagged_Value_Element_Access;
-      Comment            : Gen.Model.XMI.Comment_Element_Access;
+      Stereotype           : Gen.Model.XMI.Stereotype_Element_Access;
+      Tagged_Value         : Gen.Model.XMI.Tagged_Value_Element_Access;
+      Comment              : Gen.Model.XMI.Comment_Element_Access;
 
-      Has_Package_Id     : Boolean := False;
-      Has_Package_Name   : Boolean := False;
+      Has_Package_Id       : Boolean := False;
+      Has_Package_Name     : Boolean := False;
    end record;
    type XMI_Access is access all XMI_Info;
 
@@ -405,22 +405,32 @@ package body Gen.Artifacts.XMI is
             P.Attr_Element.Multiplicity_Lower := P.Multiplicity_Lower;
             P.Attr_Element.Multiplicity_Upper := P.Multiplicity_Upper;
             P.Attr_Element.Initial_Value      := P.Attr_Value;
+
+            --  Prepare for next attribute.
+            P.Attr_Visibility    := Gen.Model.XMI.VISIBILITY_PUBLIC;
+            P.Attr_Changeability := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
+            P.Multiplicity_Lower := 0;
+            P.Multiplicity_Upper := 0;
+
+            --  Sanity check and add this attribute to the class.
             if P.Class_Element /= null then
                P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
                P.Attr_Element.Parent := P.Class_Element.all'Access;
                P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
                P.Class_Element.Attributes.Append (P.Attr_Element.all'Access);
                if Length (P.Attr_Element.Ref_Id) = 0 then
-                  Log.Error ("Class {0}: attribute {1} has no type",
-                             To_String (P.Class_Element.Name),
-                             To_String (P.Attr_Element.Name));
+                  P.Attr_Element.Ref_Id := P.Default_Type;
+                  declare
+                     Msg : constant String := "attribute '" & To_String (P.Attr_Element.Name)
+                       & "' in table '" & To_String (P.Class_Element.Name)
+                       & "' has no type.";
+                  begin
+                     P.Attr_Element := null;
+                     raise Util.Serialize.Mappers.Field_Error with Msg;
+                  end;
                end if;
             end if;
             P.Attr_Element       := null;
-            P.Attr_Visibility    := Gen.Model.XMI.VISIBILITY_PUBLIC;
-            P.Attr_Changeability := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
-            P.Multiplicity_Lower := 0;
-            P.Multiplicity_Upper := 0;
 
          when FIELD_OPERATION_NAME =>
             P.Operation := new Gen.Model.XMI.Operation_Element (P.Model);
@@ -1074,8 +1084,10 @@ package body Gen.Artifacts.XMI is
          end Error;
 
          Reader : Parser;
+         Def_Type : constant String := Context.Get_Parameter (Gen.Configs.GEN_UML_DEFAULT_TYPE);
       begin
          Info.Model := Model'Unchecked_Access;
+         Info.Default_Type := To_Unbounded_String (Def_Type);
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
          if Context.Get_Parameter (Gen.Configs.GEN_DEBUG_ENABLE) then
             Reader.Dump (Log);

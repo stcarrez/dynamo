@@ -130,8 +130,7 @@ package body Gen.Artifacts.XMI is
 
                        FIELD_ENUMERATION,
                        FIELD_ENUMERATION_LITERAL,
-                       FIELD_ENUMERATION_HREF,
-                       FIELD_ENUMERATION_END);
+                       FIELD_ENUMERATION_HREF);
 
    type XMI_Info is record
       Model                : Gen.Model.XMI.Model_Map_Access;
@@ -459,9 +458,6 @@ package body Gen.Artifacts.XMI is
             P.Association := new Gen.Model.XMI.Association_Element (P.Model);
             P.Association.Set_Name (Value);
             P.Association.Set_Location (To_String (P.File) & P.Parser.Get_Location);
-            if Length (P.Association.Name) = 0 then
-               raise Util.Serialize.Mappers.Field_Error with "association name is empty";
-            end if;
 
          when FIELD_ASSOCIATION_END_NAME =>
             P.Assos_End_Name := Value;
@@ -516,16 +512,6 @@ package body Gen.Artifacts.XMI is
                if P.Package_Element /= null then
                   P.Package_Element.Associations.Append (P.Association.all'Access);
                end if;
-
-               --  Check that the association is valid and report an error if there is a problem.
-               declare
-                  Msg : constant String := P.Association.Get_Error_Message;
-               begin
-                  if Msg'Length /= 0 then
-                     P.Association := null;
-                     raise Util.Serialize.Mappers.Field_Error with Msg;
-                  end if;
-               end;
             end if;
             P.Association := null;
 
@@ -583,17 +569,6 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_ENUMERATION_LITERAL =>
             P.Enumeration.Add_Literal (P.Id, P.Name);
-
-         when FIELD_ENUMERATION_END =>
-            if P.Enumeration /= null then
-               declare
-                  Msg : constant String := P.Enumeration.Get_Error_Message;
-               begin
-                  P.Enumeration := null;
-                  raise Util.Serialize.Mappers.Field_Error with Msg;
-               end;
-            end if;
-            P.Enumeration := null;
 
          when FIELD_STEREOTYPE_NAME =>
             P.Stereotype := new Gen.Model.XMI.Stereotype_Element (P.Model);
@@ -756,9 +731,14 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       procedure Prepare_Attribute (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                    Column : in Model_Element_Access) is
+         Msg  : constant String := Column.Get_Error_Message;
          C    : Column_Definition_Access;
       begin
          Log.Info ("Prepare class attribute {0}", Column.Name);
+
+         if Msg'Length /= 0 then
+            Context.Error (To_String (Column.Location) & ": " & Msg);
+         end if;
 
          Table.Add_Column (Column.Name, C);
          C.Set_Comment (Column.Get_Comment);
@@ -804,9 +784,14 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       procedure Prepare_Attribute (Bean   : in out Gen.Model.Beans.Bean_Definition'Class;
                                    Column : in Model_Element_Access) is
+         Msg  : constant String := Column.Get_Error_Message;
          C    : Column_Definition_Access;
       begin
          Log.Info ("Prepare class attribute {0}", Column.Name);
+
+         if Msg'Length /= 0 then
+            Context.Error (To_String (Column.Location) & ": " & Msg);
+         end if;
 
          Bean.Add_Attribute (Column.Name, C);
          C.Set_Comment (Column.Get_Comment);
@@ -831,9 +816,13 @@ package body Gen.Artifacts.XMI is
          A     : Association_Definition_Access;
          Assoc : constant Association_End_Element_Access
            := Association_End_Element'Class (Node.all)'Access;
+         Msg   : constant String := Node.Get_Error_Message;
       begin
          Log.Info ("Prepare class association {0}", Assoc.Name);
 
+         if Msg'Length /= 0 then
+            Context.Error (To_String (Assoc.Location) & ": " & Msg);
+         end if;
          if Assoc.Multiplicity_Upper /= 1 then
             Context.Error (To_String (Assoc.Location) &
                              ": Multiple association '{0}' for table '{1}' is not supported.",
@@ -925,10 +914,14 @@ package body Gen.Artifacts.XMI is
          pragma Unreferenced (Pkg);
 
          Name  : constant String := Item.Get_Qualified_Name;
+         Msg   : constant String := Item.Get_Error_Message;
          Enum  : Gen.Model.Enums.Enum_Definition_Access;
       begin
          Log.Info ("Prepare enum {0}", Name);
 
+         if Msg'Length > 0 then
+            Context.Error (To_String (Item.Location) & ": " & Msg);
+         end if;
          Enum := Gen.Model.Enums.Create_Enum (To_Unbounded_String (Name));
          Enum.Set_Comment (Item.Get_Comment);
          Model.Register_Enum (Enum);
@@ -1243,7 +1236,6 @@ begin
                             FIELD_ENUMERATION_LITERAL);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@href", FIELD_ENUMERATION_HREF);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@xmi.idref", FIELD_ENUMERATION_HREF);
-   XMI_Mapping.Add_Mapping ("**/Enumeration", FIELD_ENUMERATION_END);
 
    XMI_Mapping.Add_Mapping ("**/Classifier/@xmi.idref", FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Classifier/@href", FIELD_CLASSIFIER_HREF);

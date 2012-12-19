@@ -17,13 +17,28 @@
 -----------------------------------------------------------------------
 
 with Ada.Tags;
-with Ada.Text_IO;
 
 with Util.Strings;
 with Util.Log.Loggers;
 package body Gen.Model.XMI is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.XMI");
+
+   procedure Append_Message (Into : in out Ada.Strings.Unbounded.Unbounded_String;
+                             Message : in String);
+
+   --  ------------------------------
+   --  Append a message to the error message.  A newline is inserted if the buffer contains
+   --  an existing message.
+   --  ------------------------------
+   procedure Append_Message (Into    : in out Ada.Strings.Unbounded.Unbounded_String;
+                             Message : in String) is
+   begin
+      if Length (Into) > 0 then
+         Append (Into, ASCII.LF);
+      end if;
+      Append (Into, Message);
+   end Append_Message;
 
    --  ------------------------------
    --  Iterate on the model element of the type <tt>On</tt> and execute the <tt>Process</tt>
@@ -314,6 +329,19 @@ package body Gen.Model.XMI is
    end Set_XMI_Id;
 
    --  ------------------------------
+   --  Validate the node definition as much as we can before the reconcile phase.
+   --  If an error is detected, return a message.  Returns an empty string if everything is ok.
+   --  ------------------------------
+   function Get_Error_Message (Node : in Model_Element) return String is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      if Length (Node.XMI_Id) = 0 then
+         Append (Result, "the 'xmi.id' attribute is empty");
+      end if;
+      return To_String (Result);
+   end Get_Error_Message;
+
+   --  ------------------------------
    --  Dump the node to get some debugging description about it.
    --  ------------------------------
    procedure Dump (Node : in Model_Element) is
@@ -485,6 +513,22 @@ package body Gen.Model.XMI is
    begin
       return XMI_ENUMERATION;
    end Get_Type;
+
+   --  ------------------------------
+   --  Validate the node definition as much as we can before the reconcile phase.
+   --  An enum must not be empty, it must have at least one literal.
+   --  If an error is detected, return a message.  Returns an empty string if everything is ok.
+   --  ------------------------------
+   overriding
+   function Get_Error_Message (Node : in Enum_Element) return String is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      Append (Result, Model_Element (Node).Get_Error_Message);
+      if Node.Elements.Is_Empty then
+         Append_Message (Result, "the enum '" & To_String (Node.Name) & "' is empty.");
+      end if;
+      return To_String (Result);
+   end Get_Error_Message;
 
    procedure Add_Literal (Node : in out Enum_Element;
                           Id   : in Util.Beans.Objects.Object;
@@ -677,6 +721,49 @@ package body Gen.Model.XMI is
    begin
       return XMI_ASSOCIATION;
    end Get_Type;
+
+   --  ------------------------------
+   --  Validate the node definition as much as we can before the reconcile phase.
+   --  An association must contain two ends and a name is necessary on the navigable ends.
+   --  If an error is detected, return a message.  Returns an empty string if everything is ok.
+   --  ------------------------------
+   overriding
+   function Get_Error_Message (Node : in Association_Element) return String is
+      use type Ada.Containers.Count_Type;
+
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      Append (Result, Model_Element (Node).Get_Error_Message);
+      if Length (Node.Name) = 0 then
+         Append_Message (Result, "Association has an empty name.");
+      end if;
+      if Node.Connections.Length = 2 then
+         declare
+            First, Second : Association_End_Element_Access;
+         begin
+            First  := Association_End_Element'Class (Node.Connections.Element (1).all)'Access;
+            Second := Association_End_Element'Class (Node.Connections.Element (2).all)'Access;
+
+            if First.Navigable and Length (First.Name) = 0 then
+               Append_Message (Result, "Association '" & To_String (Node.Name) &
+                                 "' has a navigable association end with an empty name.");
+            end if;
+            if Second.Navigable and Length (Second.Name) = 0 then
+               Append_Message (Result, "Association '" & To_String (Node.Name) &
+                                 "' has a navigable association end with an empty name.");
+            end if;
+            if not First.Navigable and not Second.Navigable then
+               Append_Message (Result, "Association '" & To_String (Node.Name) &
+                                 "' has no navigable association ends.");
+            end if;
+
+         end;
+      elsif Node.Connections.Length /= 0 then
+         Append_Message (Result, "Association '" & To_String (Node.Name)
+                         & "' needs 2 association ends");
+      end if;
+      return To_String (Result);
+   end Get_Error_Message;
 
    --  ------------------------------
    --  Reconcile the association between classes in the package.  Find the association

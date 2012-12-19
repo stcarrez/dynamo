@@ -795,8 +795,7 @@ package body Gen.Model.XMI is
             Second.Make_Association (First.all, Model);
          end;
       elsif Node.Connections.Length > 0 then
-         Log.Error ("Association {0} needs 2 association ends",
-                    To_String (Node.Name));
+         Log.Info ("Association {0} needs 2 association ends", To_String (Node.Name));
       end if;
    end Reconcile;
 

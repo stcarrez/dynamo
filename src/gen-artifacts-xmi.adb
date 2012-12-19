@@ -42,10 +42,7 @@ package body Gen.Artifacts.XMI is
    use Gen.Model;
    use Gen.Configs;
 
-   use type DOM.Core.Node;
-   use Util.Log;
-
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.XMI");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.XMI");
 
    --  Get the visibility from the XMI visibility value.
    function Get_Visibility (Value : in Util.Beans.Objects.Object) return Model.XMI.Visibility_Type;
@@ -71,8 +68,9 @@ package body Gen.Artifacts.XMI is
                                      Element_Type_Access => Model.XMI.Stereotype_Element_Access);
 
    function Find_Tag_Definition is
-     new Gen.Model.XMI.Find_Element (Element_Type        => Model.XMI.Tag_Definition_Element,
-                                     Element_Type_Access => Model.XMI.Tag_Definition_Element_Access);
+     new Gen.Model.XMI.Find_Element
+       (Element_Type        => Model.XMI.Tag_Definition_Element,
+        Element_Type_Access => Model.XMI.Tag_Definition_Element_Access);
 
    type XMI_Fields is (FIELD_NAME,
                        FIELD_ID,
@@ -103,11 +101,8 @@ package body Gen.Artifacts.XMI is
                        FIELD_CLASS_VISIBILITY,
                        FIELD_DATA_TYPE,
                        FIELD_DATA_TYPE_HREF,
-                       FIELD_ENUM_DATA_TYPE,
                        FIELD_CLASS_END,
-                       FIELD_ASSOCIATION_AGGREGATION,
                        FIELD_ASSOCIATION_NAME,
-                       FIELD_ASSOCIATION_VISIBILITY,
                        FIELD_ASSOCIATION_ID,
                        FIELD_ASSOCIATION,
                        FIELD_ASSOCIATION_CLASS_ID,
@@ -427,10 +422,6 @@ package body Gen.Artifacts.XMI is
             P.Multiplicity_Lower := 0;
             P.Multiplicity_Upper := 0;
 
-         when FIELD_ENUM_DATA_TYPE =>
-            --           Print (P.Indent, "  enum-type:" & Util.Beans.Objects.To_String (Value));
-            null;
-
          when FIELD_OPERATION_NAME =>
             P.Operation := new Gen.Model.XMI.Operation_Element (P.Model);
             P.Operation.Set_Name (Value);
@@ -452,14 +443,6 @@ package body Gen.Artifacts.XMI is
             if Length (P.Association.Name) = 0 then
                raise Util.Serialize.Mappers.Field_Error with "association name is empty";
             end if;
-
-         when FIELD_ASSOCIATION_VISIBILITY =>
-            --           Print (P.Indent, "visibility: " & Util.Beans.Objects.To_String (Value));
-            null;
-
-         when FIELD_ASSOCIATION_AGGREGATION =>
-            --           Print (P.Indent, "   aggregate: " & Util.Beans.Objects.To_String (Value));
-            null;
 
          when FIELD_ASSOCIATION_END_NAME =>
             P.Assos_End_Name := Value;

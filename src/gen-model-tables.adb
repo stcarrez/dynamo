@@ -233,17 +233,6 @@ package body Gen.Model.Tables is
       Column.Number   := Table.Members.Get_Count;
       Column.Table    := Table'Unchecked_Access;
       Table.Members.Append (Column);
-      if Name = "version" then
-         Table.Version_Column := Column;
-         Column.Is_Version  := True;
-         Column.Is_Updated  := False;
-         Column.Is_Inserted := False;
-
-      elsif Name = "id" then
-         Table.Id_Column := Column;
-         Column.Is_Key := True;
-
-      end if;
    end Add_Column;
 
    --  ------------------------------

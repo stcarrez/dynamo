@@ -410,11 +410,12 @@ package body Gen.Artifacts.XMI is
             P.Attr_Element.Multiplicity_Lower := P.Multiplicity_Lower;
             P.Attr_Element.Multiplicity_Upper := P.Multiplicity_Upper;
             P.Attr_Element.Initial_Value      := P.Attr_Value;
-            P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
             if P.Class_Element /= null then
+               P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
+               P.Attr_Element.Parent := P.Class_Element.all'Access;
                P.Class_Element.Elements.Append (P.Attr_Element.all'Access);
                P.Class_Element.Attributes.Append (P.Attr_Element.all'Access);
-               if P.Attr_Element.Ref_Id = "" then
+               if Length (P.Attr_Element.Ref_Id) = 0 then
                   Log.Error ("Class {0}: attribute {1} has no type",
                              To_String (P.Class_Element.Name),
                              To_String (P.Attr_Element.Name));
@@ -448,6 +449,9 @@ package body Gen.Artifacts.XMI is
          when FIELD_ASSOCIATION_NAME =>
             P.Association := new Gen.Model.XMI.Association_Element (P.Model);
             P.Association.Set_Name (Value);
+            if Length (P.Association.Name) = 0 then
+               raise Util.Serialize.Mappers.Field_Error with "association name is empty";
+            end if;
 
          when FIELD_ASSOCIATION_VISIBILITY =>
             --           Print (P.Indent, "visibility: " & Util.Beans.Objects.To_String (Value));
@@ -470,9 +474,6 @@ package body Gen.Artifacts.XMI is
             P.Assos_End_Element := new Gen.Model.XMI.Association_End_Element (P.Model);
             P.Assos_End_Element.Set_XMI_Id (Value);
             P.Model.Include (P.Assos_End_Element.XMI_Id, P.Assos_End_Element.all'Access);
-            if P.Association /= null then
-               P.Association.Connections.Append (P.Assos_End_Element.all'Access);
-            end if;
 
          when FIELD_ASSOCIATION_CLASS_ID =>
             if P.Assos_End_Element /= null then
@@ -487,6 +488,14 @@ package body Gen.Artifacts.XMI is
                P.Assos_End_Element.Multiplicity_Lower := P.Multiplicity_Lower;
                P.Assos_End_Element.Multiplicity_Upper := P.Multiplicity_Upper;
                P.Assos_End_Element.Parent := P.Association.all'Access;
+
+               --  Keep the association if the target class is specified.
+               --  We ignore association to a UML Component for example.
+               if Length (P.Assos_End_Element.Target) > 0 then
+                  P.Association.Connections.Append (P.Assos_End_Element.all'Access);
+               else
+                  Log.Info ("Association end {0} ignored", P.Assos_End_Element.Name);
+               end if;
             end if;
             P.Multiplicity_Lower := 0;
             P.Multiplicity_Upper := 0;
@@ -632,7 +641,11 @@ package body Gen.Artifacts.XMI is
             P.Comment := null;
 
       end case;
+
    exception
+      when Util.Serialize.Mappers.Field_Error =>
+         raise;
+
       when E : others =>
          Log.Error ("Extraction of field {0} with value '{1}' failed",
                     XMI_Fields'Image (Field), Util.Beans.Objects.To_String (Value));
@@ -1149,6 +1162,8 @@ begin
    XMI_Mapping.Add_Mapping ("**/Operation/@xmi.id", FIELD_ATTRIBUTE_ID);
    XMI_Mapping.Add_Mapping ("**/Operation", FIELD_OPERATION_END);
    XMI_Mapping.Add_Mapping ("**/Parameter/@xname", FIELD_PARAMETER_NAME);
+   XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@xmi.idref", FIELD_CLASSIFIER_HREF);
+   XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@xmi.href", FIELD_CLASSIFIER_HREF);
 
    --  Association mapping.
    XMI_Mapping.Add_Mapping ("**/Association/@name", FIELD_ASSOCIATION_NAME);

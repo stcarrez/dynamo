@@ -35,7 +35,8 @@ package Gen.Integration.Tests is
    --  Execute the command and get the output in a string.
    procedure Execute (T       : in out Test;
                       Command : in String;
-                      Result  : out Ada.Strings.Unbounded.Unbounded_String);
+                      Result  : out Ada.Strings.Unbounded.Unbounded_String;
+                      Status  : in Natural := 0);
 
    --  Test dynamo create-project command.
    procedure Test_Create_Project (T : in out Test);
@@ -99,6 +100,9 @@ package Gen.Integration.Tests is
 
    --  Test UML with several tables in several packages (non circular).
    procedure Test_Generate_Zargo_Packages (T : in out Test);
+
+   --  Test UML with several errors in the UML model.
+   procedure Test_Generate_Zargo_Errors (T : in out Test);
 
    --  Test GNAT compilation of the final project.
    procedure Test_Build (T : in out Test);

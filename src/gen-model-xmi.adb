@@ -329,6 +329,15 @@ package body Gen.Model.XMI is
    end Set_XMI_Id;
 
    --  ------------------------------
+   --  Set the location (file and line) where the model element is defined in the XMI file.
+   --  ------------------------------
+   procedure Set_Location (Node     : in out Model_Element;
+                           Location : in String) is
+   begin
+      Node.Location := Ada.Strings.Unbounded.To_Unbounded_String (Location);
+   end Set_Location;
+
+   --  ------------------------------
    --  Validate the node definition as much as we can before the reconcile phase.
    --  If an error is detected, return a message.  Returns an empty string if everything is ok.
    --  ------------------------------

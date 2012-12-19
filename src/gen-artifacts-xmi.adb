@@ -135,6 +135,7 @@ package body Gen.Artifacts.XMI is
    type XMI_Info is record
       Model                : Gen.Model.XMI.Model_Map_Access;
       Default_Type         : Unbounded_String;
+      File                 : Unbounded_String;
       Parser               : access Util.Serialize.IO.XML.Parser'Class;
 
       Class_Element        : Gen.Model.XMI.Class_Element_Access;
@@ -362,7 +363,7 @@ package body Gen.Artifacts.XMI is
          when FIELD_CLASS_NAME =>
             P.Class_Element := new Gen.Model.XMI.Class_Element (P.Model);
             P.Class_Element.Set_Name (Value);
-            P.Class_Element.Set_Location (P.Parser.Get_Location);
+            P.Class_Element.Set_Location (To_String (P.File) & P.Parser.Get_Location);
 
          when FIELD_CLASS_VISIBILITY =>
             P.Class_Visibility := Get_Visibility (Value);
@@ -397,7 +398,7 @@ package body Gen.Artifacts.XMI is
          when FIELD_ATTRIBUTE_NAME =>
             P.Attr_Element := new Gen.Model.XMI.Attribute_Element (P.Model);
             P.Attr_Element.Set_Name (Value);
-            P.Attr_Element.Set_Location (P.Parser.Get_Location);
+            P.Attr_Element.Set_Location (To_String (P.File) & P.Parser.Get_Location);
 
          when FIELD_ATTRIBUTE_INITIAL_VALUE =>
             P.Attr_Value := Value;
@@ -439,12 +440,12 @@ package body Gen.Artifacts.XMI is
          when FIELD_OPERATION_NAME =>
             P.Operation := new Gen.Model.XMI.Operation_Element (P.Model);
             P.Operation.Set_Name (Value);
-            P.Operation.Set_Location (P.Parser.Get_Location);
+            P.Operation.Set_Location (To_String (P.File) & P.Parser.Get_Location);
 
          when FIELD_PARAMETER_NAME =>
             P.Attr_Element := new Gen.Model.XMI.Attribute_Element (P.Model);
             P.Attr_Element.Set_Name (Value);
-            P.Attr_Element.Set_Location (P.Parser.Get_Location);
+            P.Attr_Element.Set_Location (To_String (P.File) & P.Parser.Get_Location);
 
          when FIELD_OPERATION_END =>
             P.Operation := null;
@@ -456,7 +457,7 @@ package body Gen.Artifacts.XMI is
          when FIELD_ASSOCIATION_NAME =>
             P.Association := new Gen.Model.XMI.Association_Element (P.Model);
             P.Association.Set_Name (Value);
-            P.Association.Set_Location (P.Parser.Get_Location);
+            P.Association.Set_Location (To_String (P.File) & P.Parser.Get_Location);
             if Length (P.Association.Name) = 0 then
                raise Util.Serialize.Mappers.Field_Error with "association name is empty";
             end if;
@@ -473,7 +474,7 @@ package body Gen.Artifacts.XMI is
          when FIELD_ASSOCIATION_END_ID =>
             P.Assos_End_Element := new Gen.Model.XMI.Association_End_Element (P.Model);
             P.Assos_End_Element.Set_XMI_Id (Value);
-            P.Assos_End_Element.Set_Location (P.Parser.Get_Location);
+            P.Assos_End_Element.Set_Location (To_String (P.File) & P.Parser.Get_Location);
             P.Model.Include (P.Assos_End_Element.XMI_Id, P.Assos_End_Element.all'Access);
 
          when FIELD_ASSOCIATION_CLASS_ID =>
@@ -552,7 +553,7 @@ package body Gen.Artifacts.XMI is
             if P.Attr_Element = null and P.Operation = null then
                P.Data_Type := new Gen.Model.XMI.Data_Type_Element (P.Model);
                P.Data_Type.Set_Name (P.Name);
-               P.Data_Type.Set_Location (P.Parser.Get_Location);
+               P.Data_Type.Set_Location (To_String (P.File) & P.Parser.Get_Location);
                P.Data_Type.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
                P.Model.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
             end if;
@@ -568,7 +569,7 @@ package body Gen.Artifacts.XMI is
          when FIELD_ENUMERATION =>
             P.Enumeration := new Gen.Model.XMI.Enum_Element (P.Model);
             P.Enumeration.Set_Name (Value);
-            P.Enumeration.Set_Location (P.Parser.Get_Location);
+            P.Enumeration.Set_Location (To_String (P.File) & P.Parser.Get_Location);
             P.Enumeration.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
             if P.Package_Element /= null then
                P.Enumeration.Parent := P.Package_Element.all'Access;
@@ -585,7 +586,7 @@ package body Gen.Artifacts.XMI is
          when FIELD_STEREOTYPE_NAME =>
             P.Stereotype := new Gen.Model.XMI.Stereotype_Element (P.Model);
             P.Stereotype.Set_Name (Value);
-            P.Stereotype.Set_Location (P.Parser.Get_Location);
+            P.Stereotype.Set_Location (To_String (P.File) & P.Parser.Get_Location);
 
          when FIELD_STEREOTYPE_ID =>
             P.Stereotype_Id := Value;
@@ -608,7 +609,7 @@ package body Gen.Artifacts.XMI is
                S : constant Gen.Model.XMI.Ref_Type_Element_Access
                  := new Gen.Model.XMI.Ref_Type_Element (P.Model);
             begin
-               S.Set_Location (P.Parser.Get_Location);
+               S.Set_Location (To_String (P.File) & P.Parser.Get_Location);
                S.Href := Util.Beans.Objects.To_Unbounded_String (Value);
                if P.Association /= null then
                   P.Association.Stereotypes.Append (S.all'Access);
@@ -628,7 +629,7 @@ package body Gen.Artifacts.XMI is
          when FIELD_TAG_DEFINITION_ID =>
             P.Tag_Definition := new Gen.Model.XMI.Tag_Definition_Element (P.Model);
             P.Tag_Definition.Set_XMI_Id (Value);
-            P.Tag_Definition.Set_Location (P.Parser.Get_Location);
+            P.Tag_Definition.Set_Location (To_String (P.File) & P.Parser.Get_Location);
             P.Model.Insert (P.Tag_Definition.XMI_Id, P.Tag_Definition.all'Access);
 
          when FIELD_TAG_DEFINITION =>
@@ -641,7 +642,7 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_COMMENT_ID =>
             P.Comment := new Gen.Model.XMI.Comment_Element (P.Model);
-            P.Comment.Set_Location (P.Parser.Get_Location);
+            P.Comment.Set_Location (To_String (P.File) & P.Parser.Get_Location);
             P.Comment.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Value);
             P.Ref_Id := Util.Beans.Objects.Null_Object;
 
@@ -1111,8 +1112,9 @@ package body Gen.Artifacts.XMI is
          Info     : aliased XMI_Info;
          Def_Type : constant String := Context.Get_Parameter (Gen.Configs.GEN_UML_DEFAULT_TYPE);
       begin
-         Info.Model  := Model'Unchecked_Access;
-         Info.Parser := Reader'Unchecked_Access;
+         Info.Model        := Model'Unchecked_Access;
+         Info.Parser       := Reader'Unchecked_Access;
+         Info.File         := To_Unbounded_String (Name & ".xmi");
          Info.Default_Type := To_Unbounded_String (Def_Type);
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
          if Context.Get_Parameter (Gen.Configs.GEN_DEBUG_ENABLE) then

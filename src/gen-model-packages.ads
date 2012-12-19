@@ -22,6 +22,7 @@ with Ada.Strings.Unbounded.Hash;
 
 with Util.Beans.Objects;
 with Util.Beans.Objects.Vectors;
+with Util.Strings.Sets;
 
 with Gen.Model.List;
 with Gen.Model.Mappings;
@@ -133,6 +134,16 @@ package Gen.Model.Packages is
 
    --  Get the directory name which contains the model.
    function Get_Model_Directory (O : in Model_Definition) return String;
+
+   --  Enable the generation of the Ada package given by the name.  By default all the Ada
+   --  packages found in the model are generated.  When called, this enables the generation
+   --  only for the Ada packages registered here.
+   procedure Enable_Package_Generation (Model : in out Model_Definition;
+                                        Name  : in String);
+
+   --  Returns True if the generation is enabled for the given package name.
+   function Is_Generation_Enabled (Model : in Model_Definition;
+                                   Name  : in String) return Boolean;
 
    --  Prepare the generation of the package:
    --  o identify the column types which are used
@@ -263,6 +274,10 @@ private
 
       --  Directory that contains the SQL and model files.
       DB_Name      : Unbounded_String;
+
+      --  When not empty, a list of packages that must be taken into account for the generation.
+      --  By default all packages and tables defined in the model are generated.
+      Gen_Packages : Util.Strings.Sets.Set;
    end record;
 
 end Gen.Model.Packages;

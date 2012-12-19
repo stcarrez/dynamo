@@ -57,6 +57,7 @@ package Gen.Model.Enums is
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
       Type_Name      : Unbounded_String;
       Pkg_Name       : Unbounded_String;
+      Sql_Type       : Unbounded_String;
    end record;
 
    --  Get the value identified by the name.

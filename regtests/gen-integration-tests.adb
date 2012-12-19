@@ -453,14 +453,21 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " -o tmp generate ../regtests/uml/dynamo-test-errors.zargo", Result, 1);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-b.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-b.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-c.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-c.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.adb");
+      Util.Tests.Assert_Matches (T, ".*attribute .name. in table .Table_A. has no type.*",
+                                 Result,
+                                 "attribute with no type error not detected");
+      Util.Tests.Assert_Matches (T, ".*attribute .count. in table .Table_A. has no type.*",
+                                 Result,
+                                 "attribute with no type error not detected");
+      Util.Tests.Assert_Matches (T, ".*attribute .name. in table .Table_C. has no type.*",
+                                 Result,
+                                 "attribute with no type error not detected");
+      Util.Tests.Assert_Matches (T, ".*the enum 'Test_Import_Enum' is empty.*",
+                                 Result,
+                                 "empty enum error not detected");
+      Util.Tests.Assert_Matches (T, ".*multiple association 'properties' for table.*",
+                                 Result,
+                                 "multiple association not detected");
    end Test_Generate_Zargo_Errors;
 
    --  ------------------------------

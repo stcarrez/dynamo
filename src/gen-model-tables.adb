@@ -346,6 +346,10 @@ package body Gen.Model.Tables is
             Log.Info ("Found key {0}", C.Name);
             O.Id_Column := C;
          end if;
+         if C.Is_Version then
+            Log.Info ("Found version column {0}", C.Name);
+            O.Version_Column := C;
+         end if;
 
          --  Collect in the dependencies vectors the tables that we are using.
          if not C.Use_Foreign_Key_Type and then C.all in Association_Definition'Class then

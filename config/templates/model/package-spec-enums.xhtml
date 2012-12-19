@@ -6,7 +6,7 @@
   <h:list value="#{package.enums}" var="enum">
     <h:panelGroup rendered="#{not empty enum.comment}">
    --  --------------------
-   --  <h:outputText value="#{g:comment(enum.comment)}" escape="false"/>
+   --<h:outputText value="#{g:comment(enum.comment)}" escape="false"/>
    --  --------------------
     </h:panelGroup>
    type #{enum.name} is (<h:list value="#{enum.values}" var="value">#{value.rowIndex > 1 ? ', ' : ''}#{value.name}</h:list>);

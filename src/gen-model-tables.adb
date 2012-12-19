@@ -19,6 +19,8 @@
 with Ada.Strings;
 with Util.Strings;
 with Util.Log.Loggers;
+
+with Gen.Model.Enums;
 package body Gen.Model.Tables is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Tables");
@@ -75,6 +77,9 @@ package body Gen.Model.Tables is
             --  If this is an association to another table, use the primary key of that table.
             if T.all in Table_Definition'Class then
                return Table_Definition'Class (T.all).Id_Column.Get_Value (Name);
+            end if;
+            if T.all in Enums.Enum_Definition'Class then
+               return T.Get_Value ("sqlType");
             end if;
             return T.Get_Value ("name");
          end;

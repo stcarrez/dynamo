@@ -69,7 +69,8 @@ package body Gen.Generator is
    function To_Ada_Ident (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
    --  EL function to format an Ada comment
-   function Comment (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+   function Comment (Value  : in Util.Beans.Objects.Object;
+                     Prefix : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
    --  EL function to return a singular form of a name
    function To_Singular (Value : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
@@ -258,7 +259,8 @@ package body Gen.Generator is
    --  ------------------------------
    --  EL function to format an Ada comment
    --  ------------------------------
-   function Comment (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+   function Comment (Value  : in Util.Beans.Objects.Object;
+                     Prefix : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
 
       START_POS : constant Natural := 8;
 
@@ -283,6 +285,10 @@ package body Gen.Generator is
                Append (Result, "   --  ");
             else
                Append (Result, "  ");
+               if not Util.Beans.Objects.Is_Null (Prefix)
+                 and not Util.Beans.Objects.Is_Empty (Prefix) then
+                  Append (Result, Util.Beans.Objects.To_String (Prefix));
+               end if;
             end if;
             Append (Result, C);
             Pos := Pos + 1;

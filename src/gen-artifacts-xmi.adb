@@ -624,6 +624,10 @@ package body Gen.Artifacts.XMI is
             Log.Info ("Adding tag definition {0}", P.Tag_Definition.Name);
             if P.Stereotype /= null then
                P.Stereotype.Elements.Append (P.Tag_Definition.all'Access);
+
+            elsif P.Package_Element /= null then
+               P.Package_Element.Elements.Append (P.Tag_Definition.all'Access);
+
             end if;
             P.Tag_Definition := null;
 
@@ -732,6 +736,7 @@ package body Gen.Artifacts.XMI is
       procedure Prepare_Attribute (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                    Column : in Model_Element_Access) is
          Msg  : constant String := Column.Get_Error_Message;
+         Sql  : constant String := Column.Find_Tag_Value (Handler.Sql_Type_Tag, "");
          C    : Column_Definition_Access;
       begin
          Log.Info ("Prepare class attribute {0}", Column.Name);
@@ -755,6 +760,7 @@ package body Gen.Artifacts.XMI is
                C.Is_Version  := Column.Has_Stereotype (Handler.Version_Stereotype);
                C.Is_Updated  := Attr.Changeability /= CHANGEABILITY_FROZEN;
                C.Is_Inserted := Attr.Changeability = CHANGEABILITY_INSERT;
+               C.Sql_Type    := To_Unbounded_String (Sql);
 
                --  For the <<Version>> columns, do not allow users to modify them.
                if C.Is_Version then
@@ -923,6 +929,7 @@ package body Gen.Artifacts.XMI is
          Name  : constant String := Item.Get_Qualified_Name;
          Msg   : constant String := Item.Get_Error_Message;
          Enum  : Gen.Model.Enums.Enum_Definition_Access;
+         Sql   : constant String := Item.Find_Tag_Value (Handler.Sql_Type_Tag, "");
       begin
          Log.Info ("Prepare enum {0}", Name);
 
@@ -931,6 +938,7 @@ package body Gen.Artifacts.XMI is
          end if;
          Enum := Gen.Model.Enums.Create_Enum (To_Unbounded_String (Name));
          Enum.Set_Comment (Item.Get_Comment);
+         Enum.Sql_Type := To_Unbounded_String (Sql);
          Model.Register_Enum (Enum);
 
          Iterate_For_Enum (Enum.all, Item.Elements, Prepare_Enum_Literal'Access);
@@ -1025,6 +1033,10 @@ package body Gen.Artifacts.XMI is
                                                      "Dynamo.xmi",
                                                      "ADO.Table.@dynamo.table.name",
                                                      Gen.Model.XMI.BY_NAME);
+      Handler.Sql_Type_Tag := Find_Tag_Definition (Handler.Nodes,
+                                                   "Dynamo.xmi",
+                                                   "ADO.@dynamo.sql.type",
+                                                   Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);

@@ -208,8 +208,9 @@ package body Gen.Model.Tables is
    function Create_Table (Name : in Unbounded_String) return Table_Definition_Access is
       Table : constant Table_Definition_Access := new Table_Definition;
    begin
-      Table.Name := Name;
-      Table.Kind := Gen.Model.Mappings.T_TABLE;
+      Table.Name   := Name;
+      Table.Kind   := Gen.Model.Mappings.T_TABLE;
+      Table.Target := Name;
       declare
          Pos : constant Natural := Index (Table.Name, ".", Ada.Strings.Backward);
       begin

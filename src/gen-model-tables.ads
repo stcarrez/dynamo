@@ -76,6 +76,9 @@ package Gen.Model.Tables is
 
       --  The class generator to use for this column.
       Generator    : Util.Beans.Objects.Object;
+
+      --  The type mapping of the column.
+      Type_Mapping : Gen.Model.Mappings.Mapping_Definition_Access;
    end record;
    type Column_Definition_Access is access all Column_Definition'Class;
 
@@ -113,6 +116,10 @@ package Gen.Model.Tables is
    overriding
    function Get_Value (From : Association_Definition;
                        Name : String) return Util.Beans.Objects.Object;
+
+   --  Prepare the generation of the model.
+   overriding
+   procedure Prepare (O : in out Association_Definition);
 
    package Operation_List is
      new Gen.Model.List (T         => Gen.Model.Operations.Operation_Definition,

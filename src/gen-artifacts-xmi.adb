@@ -882,7 +882,6 @@ package body Gen.Artifacts.XMI is
                   Log.Info ("Using table name {0}", Name);
                   Table.Table_Name := To_Unbounded_String (T_Name);
                end if;
-               Table.Target := Name;
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);
             end;

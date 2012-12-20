@@ -85,13 +85,9 @@ package body Gen.Artifacts.Hibernate is
       C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
 
       if Name = "version" then
-         Table.Version_Column := C;
          C.Is_Version  := True;
-         C.Is_Updated  := False;
-         C.Is_Inserted := False;
 
       elsif Name = "id" then
-         Table.Id_Column := C;
          C.Is_Key := True;
 
       end if;

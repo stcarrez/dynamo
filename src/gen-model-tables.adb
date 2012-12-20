@@ -45,9 +45,6 @@ package body Gen.Model.Tables is
             return Util.Beans.Objects.To_Object (T.all'Access, Util.Beans.Objects.STATIC);
          end;
 
-      elsif Name = "type" then
-         return Util.Beans.Objects.To_Object (From.Type_Name);
-
       elsif Name = "index" then
          return Util.Beans.Objects.To_Object (From.Number);
 
@@ -151,6 +148,9 @@ package body Gen.Model.Tables is
 
       Result : Gen.Model.Mappings.Mapping_Definition_Access := null;
    begin
+      if From.Type_Mapping /= null then
+         return From.Type_Mapping;
+      end if;
       if From.Table /= null and then From.Table.Package_Def /= null then
          Result := From.Table.Package_Def.Find_Type (From.Type_Name);
       end if;
@@ -171,6 +171,7 @@ package body Gen.Model.Tables is
    overriding
    procedure Prepare (O : in out Column_Definition) is
       use type Mappings.Mapping_Definition_Access;
+
    begin
 --        O.Type_Mapping := Gen.Model.Mappings.Find_Type (O.Type_Name);
 --        if O.Type_Mapping = null then
@@ -189,6 +190,22 @@ package body Gen.Model.Tables is
    begin
       return Column_Definition (From).Get_Value (Name);
    end Get_Value;
+
+   --  ------------------------------
+   --  Prepare the generation of the model.
+   --  ------------------------------
+   overriding
+   procedure Prepare (O : in out Association_Definition) is
+      use type Gen.Model.Mappings.Mapping_Definition_Access;
+
+      T     : constant Gen.Model.Mappings.Mapping_Definition_Access := O.Get_Type_Mapping;
+      Table : Table_Definition_Access;
+   begin
+      if T = null then
+         Table := Create_Table (O.Type_Name);
+         O.Type_Mapping := Table.all'Access;
+      end if;
+   end Prepare;
 
    --  ------------------------------
    --  Initialize the table definition instance.

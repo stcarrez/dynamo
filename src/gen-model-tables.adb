@@ -69,20 +69,33 @@ package body Gen.Model.Tables is
          begin
             if T = null then
                return Util.Beans.Objects.Null_Object;
-            end if;
-
-            --  If this is an association to another table, use the primary key of that table.
-            if T.all in Table_Definition'Class then
+               --  If this is an association to another table, use the primary key of that table.
+            elsif T.all in Table_Definition'Class then
                return Table_Definition'Class (T.all).Id_Column.Get_Value (Name);
-            end if;
-            if T.all in Enums.Enum_Definition'Class then
+            elsif T.all in Enums.Enum_Definition'Class then
                return T.Get_Value ("sqlType");
+            else
+               return T.Get_Value ("name");
             end if;
-            return T.Get_Value ("name");
          end;
 
       elsif Name = "sqlName" then
-         return Util.Beans.Objects.To_Object (From.Sql_Name);
+         if Length (From.Sql_Name) > 0 then
+            return Util.Beans.Objects.To_Object (From.Sql_Name);
+         end if;
+         declare
+            T     : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
+            Table : Table_Definition_Access;
+         begin
+            if T.all in Table_Definition'Class then
+               Table := Table_Definition'Class (T.all)'Access;
+            end if;
+            if Table /= null and then Table.Id_Column /= null then
+               return Util.Beans.Objects.To_Object (From.Name & "_" & Table.Id_Column.Name);
+            else
+               return Util.Beans.Objects.To_Object (From.Name);
+            end if;
+         end;
 
       elsif Name = "isVersion" then
          return Util.Beans.Objects.To_Object (From.Is_Version);
@@ -269,7 +282,6 @@ package body Gen.Model.Tables is
       Assoc.Name   := Name;
       Assoc.Number := Table.Members.Get_Count;
       Assoc.Table  := Table'Unchecked_Access;
-      Assoc.Sql_Name := Name;
       Table.Members.Append (Assoc.all'Access);
       Table.Has_Associations := True;
    end Add_Association;
@@ -286,13 +298,13 @@ package body Gen.Model.Tables is
          Log.Info ("Table {0} depends on {1}",
                    To_String (Left.Name), To_String (Right.Name));
          return FORWARD;
-      end if;
-      if Right.Dependencies.Contains (Left) then
+      elsif Right.Dependencies.Contains (Left) then
          Log.Info ("Table {1} depends on {0}",
                    To_String (Left.Name), To_String (Right.Name));
          return BACKWARD;
+      else
+         return NONE;
       end if;
-      return NONE;
    end Depends_On;
 
    --  ------------------------------

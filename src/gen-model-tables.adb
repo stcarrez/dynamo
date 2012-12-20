@@ -372,6 +372,10 @@ package body Gen.Model.Tables is
          if C.Is_Version then
             Log.Info ("Found version column {0}", C.Name);
             O.Version_Column := C;
+
+            --  For the <<Version>> columns, do not allow users to modify them.
+            C.Is_Updated  := False;
+            C.Is_Inserted := False;
          end if;
 
          --  Collect in the dependencies vectors the tables that we are using.

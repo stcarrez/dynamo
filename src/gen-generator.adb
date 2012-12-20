@@ -141,7 +141,7 @@ package body Gen.Generator is
                return Util.Beans.Objects.To_Object (Type_Mapping.Target);
 
             elsif Util.Beans.Objects.To_Integer (Param) = 1 then
-               return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
+               return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref'Class");
 
             else
                return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref");

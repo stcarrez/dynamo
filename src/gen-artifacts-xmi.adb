@@ -762,11 +762,6 @@ package body Gen.Artifacts.XMI is
                C.Is_Inserted := Attr.Changeability = CHANGEABILITY_INSERT;
                C.Sql_Type    := To_Unbounded_String (Sql);
 
-               --  For the <<Version>> columns, do not allow users to modify them.
-               if C.Is_Version then
-                  C.Is_Updated  := False;
-                  C.Is_Inserted := False;
-               end if;
                if Column.Has_Stereotype (Handler.Not_Null_Stereotype) then
                   C.Not_Null := True;
                end if;

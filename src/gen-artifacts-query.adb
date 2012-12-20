@@ -75,11 +75,10 @@ package body Gen.Artifacts.Query is
       procedure Register_Column (Table  : in out Query_Definition;
                                  Column : in DOM.Core.Node) is
          Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
-         C     : constant Column_Definition_Access := new Column_Definition;
+         C     : Column_Definition_Access;
       begin
+         Table.Add_Column (Name, C);
          C.Initialize (Name, Column);
-         C.Number := Table.Members.Get_Count;
-         Table.Members.Append (C);
 
          C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (Column, "type"));
 

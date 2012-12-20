@@ -735,6 +735,8 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       procedure Prepare_Attribute (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                    Column : in Model_Element_Access) is
+         use Util.Beans.Objects;
+
          Msg  : constant String := Column.Get_Error_Message;
          Sql  : constant String := Column.Find_Tag_Value (Handler.Sql_Type_Tag, "");
          C    : Column_Definition_Access;
@@ -768,23 +770,11 @@ package body Gen.Artifacts.XMI is
                if Column.Has_Stereotype (Handler.Nullable_Stereotype) then
                   C.Not_Null := False;
                end if;
+               if C.Is_Key then
+                  C.Generator := To_Object (Column.Find_Tag_Value (Handler.Generator_Tag, ""));
+               end if;
             end;
          end if;
---           if G /= null then
---              C.Generator := Gen.Utils.Get_Attribute (Column, "class");
---           end if;
---
---              Log.Debug ("Register column {0} of type {1}", Name, To_String (C.Type_Name));
---              if N /= null then
---                 C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
---                 C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");
---              else
---                 N := Column;
---                 C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
---                 C.Sql_Type := C.Type_Name;
---              end if;
---              C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
---           end;
       end Prepare_Attribute;
 
       --  ------------------------------
@@ -1031,6 +1021,10 @@ package body Gen.Artifacts.XMI is
                                                    "Dynamo.xmi",
                                                    "ADO.@dynamo.sql.type",
                                                    Gen.Model.XMI.BY_NAME);
+      Handler.Generator_Tag := Find_Tag_Definition (Handler.Nodes,
+                                                    "Dynamo.xmi",
+                                                    "ADO.Table.@dynamo.table.generator",
+                                                    Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);

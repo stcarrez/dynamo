@@ -66,6 +66,8 @@ package body Gen.Integration.Tests is
                        Test_Info'Access);
       Caller.Add_Test (Suite, "Build Doc",
                        Test_Build_Doc'Access);
+      Caller.Add_Test (Suite, "Generate from Hibernate XML model",
+                       Test_Generate_Hibernate'Access);
       Caller.Add_Test (Suite, "Generate XMI Enum",
                        Test_Generate_XMI_Enum'Access);
       Caller.Add_Test (Suite, "Generate XMI Bean",
@@ -356,6 +358,44 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "wiki/blog.wiki");
       Util.Tests.Assert_Exists (T, "wiki/user-user_query.wiki");
    end Test_Build_Doc;
+
+   --  ------------------------------
+   --  Test generate command with Hibernate XML mapping files.
+   --  ------------------------------
+   procedure Test_Generate_Hibernate (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      Ada.Directories.Copy_File (Source_Name => "../regtests/files/User.hbm.xml",
+                                 Target_Name => "db/User.hbm.xml");
+      Ada.Directories.Copy_File (Source_Name => "../regtests/files/Queues.hbm.xml",
+                                 Target_Name => "db/Queues.hbm.xml");
+      Ada.Directories.Copy_File (Source_Name => "../regtests/files/Permission.hbm.xml",
+                                 Target_Name => "db/Permission.hbm.xml");
+      Ada.Directories.Copy_File (Source_Name => "../regtests/files/permissions.xml",
+                                 Target_Name => "db/permissions.xml");
+      Ada.Directories.Copy_File (Source_Name => "../regtests/files/queue-messages.xml",
+                                 Target_Name => "db/queue-messages.xml");
+      T.Execute (Dynamo & " generate db", Result);
+      Util.Tests.Assert_Matches (T,
+                                 ".*Reading model file stored in .db.*",
+                                 Result,
+                                 "Invalid generate");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Generating file.*src/model/test-user-models.*",
+                                 Result,
+                                 "Invalid generate");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Generating mysql.*db/mysql/create-test-mysql.sql.*",
+                                 Result,
+                                 "Invalid generate");
+      Util.Tests.Assert_Exists (T, "src/model/gen-permissions-models.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-permissions-models.adb");
+      Util.Tests.Assert_Exists (T, "src/model/gen-users-models.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-users-models.adb");
+      Util.Tests.Assert_Exists (T, "src/model/gen-events-models.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-events-models.adb");
+
+   end Test_Generate_Hibernate;
 
    --  ------------------------------
    --  Test generate command (XMI enum).

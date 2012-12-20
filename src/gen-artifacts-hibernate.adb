@@ -93,7 +93,7 @@ package body Gen.Artifacts.Hibernate is
       end if;
 
       if G /= null then
-         C.Generator := Gen.Utils.Get_Attribute (Column, "class");
+         C.Generator := Gen.Utils.Get_Attribute (G, "class");
       end if;
 
       --  Get the SQL mapping from an optional <column> element.

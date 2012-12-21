@@ -477,6 +477,7 @@ package Gen.Model.XMI is
       Classes      : Model_Vector;
       Enums        : Model_Vector;
       Associations : Model_Vector;
+      Is_Profile   : Boolean := False;
    end record;
 
    --  Get the element type.

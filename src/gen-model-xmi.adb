@@ -493,15 +493,34 @@ package body Gen.Model.XMI is
    overriding
    procedure Reconcile (Node  : in out Ref_Type_Element;
                         Model : in UML_Model) is
-      Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Href);
+      Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Ref_Id);
    begin
       if Item /= null then
-         Node.Name := Item.Name;
-         Node.Ref  := Item;
+         Node.Name   := Item.Name;
+         Node.Ref    := Item;
          Node.XMI_Id := Item.XMI_Id;
       end if;
       Model_Element (Node).Reconcile (Model);
    end Reconcile;
+
+   --  ------------------------------
+   --  Set the reference id and collect in the profiles set the UML profiles that must
+   --  be loaded to get the reference.
+   --  ------------------------------
+   procedure Set_Reference_Id (Node     : in out Ref_Type_Element;
+                               Ref      : in String;
+                               Profiles : in out Util.Strings.Sets.Set) is
+      Pos : constant Natural := Util.Strings.Index (Ref, '#');
+   begin
+      Node.Ref_Id := To_Unbounded_String (Ref);
+      if Pos > 0 then
+         declare
+            First : constant Natural := Util.Strings.Rindex (Ref, '/', Pos);
+         begin
+            Profiles.Include (Ref (First + 1 .. Pos - 1));
+         end;
+      end if;
+   end Set_Reference_Id;
 
    --  ------------------------------
    --  Get the element type.

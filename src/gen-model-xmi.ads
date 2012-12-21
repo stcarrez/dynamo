@@ -22,6 +22,7 @@ with Ada.Strings.Unbounded.Hash;
 with Ada.Containers.Vectors;
 
 with Util.Beans.Objects;
+with Util.Strings.Sets;
 
 package Gen.Model.XMI is
 
@@ -117,6 +118,7 @@ package Gen.Model.XMI is
                                  Equivalent_Keys => "=",
                                  "="             => Model_Map."=");
    subtype UML_Model is UML_Model_Map.Map;
+   type UML_Model_Access is access all UML_Model;
 
    type Search_Type is (BY_NAME, BY_ID);
 
@@ -229,8 +231,8 @@ package Gen.Model.XMI is
    --  Data type
    --  ------------------------------
    type Ref_Type_Element is new Model_Element with record
-      Href : Unbounded_String;
-      Ref  : Model_Element_Access;
+      Ref_Id : Unbounded_String;
+      Ref    : Model_Element_Access;
    end record;
    type Ref_Type_Element_Access is access all Ref_Type_Element'Class;
 
@@ -242,6 +244,12 @@ package Gen.Model.XMI is
    overriding
    procedure Reconcile (Node  : in out Ref_Type_Element;
                         Model : in UML_Model);
+
+   --  Set the reference id and collect in the profiles set the UML profiles that must
+   --  be loaded to get the reference.
+   procedure Set_Reference_Id (Node     : in out Ref_Type_Element;
+                               Ref      : in String;
+                               Profiles : in out Util.Strings.Sets.Set);
 
    --  ------------------------------
    --  Data type
@@ -430,10 +438,9 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  Tagged value
    --  ------------------------------
-   type Tagged_Value_Element is new Model_Element with record
+   type Tagged_Value_Element is new Ref_Type_Element with record
       Value      : Ada.Strings.Unbounded.Unbounded_String;
       Value_Type : Ada.Strings.Unbounded.Unbounded_String;
-      Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
       Tag_Def    : Tag_Definition_Element_Access;
    end record;
 

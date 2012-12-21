@@ -953,7 +953,7 @@ package body Gen.Generator is
                        := Gen.Model.Packages.Element (Pos);
                      Name       : constant String := P.Get_Name;
                   begin
-                     if H.Model.Is_Generation_Enabled (Name) then
+                     if not P.Is_Predefined and H.Model.Is_Generation_Enabled (Name) then
                         Log.Debug ("  Generate for package {0}", Name);
 
                         H.Generate (File, Gen.Model.Definition_Access (P));

@@ -105,6 +105,22 @@ package body Gen.Model.Packages is
    end Get_Model;
 
    --  ------------------------------
+   --  Returns True if the package is a pre-defined package and must not be generated.
+   --  ------------------------------
+   function Is_Predefined (From : in Package_Definition) return Boolean is
+   begin
+      return From.Is_Predefined;
+   end Is_Predefined;
+
+   --  ------------------------------
+   --  Set the package as a pre-defined package.
+   --  ------------------------------
+   procedure Set_Predefined (From : in out Package_Definition) is
+   begin
+      From.Is_Predefined := True;
+   end Set_Predefined;
+
+   --  ------------------------------
    --  Register the declaration of the given enum in the model.
    --  ------------------------------
    procedure Register_Enum (O      : in out Model_Definition;

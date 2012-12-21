@@ -19,6 +19,8 @@
 with Ada.Strings.Unbounded;
 
 with Util.Test_Caller;
+
+with Gen.Configs;
 with Gen.Generator;
 package body Gen.Artifacts.XMI.Tests is
 
@@ -65,7 +67,7 @@ package body Gen.Artifacts.XMI.Tests is
 
    begin
       Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
-      A.Read_UML_Configuration (G);
+      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
 
       --  ArgoUML Integer DataType
       Check ("default-uml14.xmi", "Integer",
@@ -108,7 +110,7 @@ package body Gen.Artifacts.XMI.Tests is
 
    begin
       Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
-      A.Read_UML_Configuration (G);
+      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
 
       declare
          S : Gen.Model.XMI.Stereotype_Element_Access;
@@ -144,7 +146,7 @@ package body Gen.Artifacts.XMI.Tests is
 
    begin
       Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
-      A.Read_UML_Configuration (G);
+      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
 
       declare
          Tag : Tag_Definition_Element_Access;

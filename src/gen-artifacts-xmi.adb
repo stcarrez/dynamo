@@ -139,6 +139,7 @@ package body Gen.Artifacts.XMI is
       File                 : Unbounded_String;
       Parser               : access Util.Serialize.IO.XML.Parser'Class;
       Profiles             : access Util.Strings.Sets.Set;
+      Is_Profile           : Boolean := False;
 
       Class_Element        : Gen.Model.XMI.Class_Element_Access;
       Class_Name           : Util.Beans.Objects.Object;
@@ -315,6 +316,7 @@ package body Gen.Artifacts.XMI is
       if P.Package_Element = null then
          P.Package_Element := new Gen.Model.XMI.Package_Element (P.Model);
          P.Package_Element.Set_Location (P.Parser.Get_Location);
+         P.Package_Element.Is_Profile := P.Is_Profile;
          if Parent /= null then
             P.Package_Element.Parent := Parent.all'Access;
          else
@@ -954,6 +956,9 @@ package body Gen.Artifacts.XMI is
             Log.Info ("Package {0} does not have the <<DataModel>> stereotype.", Name);
          end if;
 
+         if Pkg.Is_Profile then
+            P.Set_Predefined;
+         end if;
          P.Set_Comment (Pkg.Get_Comment);
          Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
          Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
@@ -1080,9 +1085,10 @@ package body Gen.Artifacts.XMI is
    --  ------------------------------
    --  Read the UML/XMI model file.
    --  ------------------------------
-   procedure Read_Model (Handler : in out Artifact;
-                         File    : in String;
-                         Context : in out Generator'Class) is
+   procedure Read_Model (Handler       : in out Artifact;
+                         File          : in String;
+                         Context       : in out Generator'Class;
+                         Is_Predefined : in Boolean := False) is
       procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                       Model : in out Gen.Model.XMI.Model_Map.Map);
 
@@ -1129,6 +1135,7 @@ package body Gen.Artifacts.XMI is
          Info.Profiles     := Handler.Profiles'Unchecked_Access;
          Info.File         := To_Unbounded_String (Name & ".xmi");
          Info.Default_Type := To_Unbounded_String (Def_Type);
+         Info.Is_Profile   := Is_Predefined;
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
          if Context.Get_Parameter (Gen.Configs.GEN_DEBUG_ENABLE) then
             Reader.Dump (Log);

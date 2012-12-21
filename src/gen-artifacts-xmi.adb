@@ -28,6 +28,7 @@ with Gen.Model.Beans;
 
 with Util.Log.Loggers;
 with Util.Strings;
+with Util.Files;
 with Util.Beans;
 with Util.Beans.Objects;
 with Util.Serialize.Mappers.Record_Mapper;
@@ -137,6 +138,7 @@ package body Gen.Artifacts.XMI is
       Default_Type         : Unbounded_String;
       File                 : Unbounded_String;
       Parser               : access Util.Serialize.IO.XML.Parser'Class;
+      Profiles             : access Util.Strings.Sets.Set;
 
       Class_Element        : Gen.Model.XMI.Class_Element_Access;
       Class_Name           : Util.Beans.Objects.Object;
@@ -264,9 +266,9 @@ package body Gen.Artifacts.XMI is
 
       Tagged_Value.Value  := Util.Beans.Objects.To_Unbounded_String (P.Value);
       if not Util.Beans.Objects.Is_Null (P.Ref_Id) then
-         Tagged_Value.Ref_Id := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
+         Tagged_Value.Set_Reference_Id (Util.Beans.Objects.To_String (P.Ref_Id), P.Profiles.all);
       else
-         Tagged_Value.Ref_Id := Util.Beans.Objects.To_Unbounded_String (P.Href);
+         Tagged_Value.Set_Reference_Id (Util.Beans.Objects.To_String (P.Href), P.Profiles.all);
       end if;
       Tagged_Value.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
       P.Model.Insert (Tagged_Value.XMI_Id, Tagged_Value.all'Access);
@@ -597,7 +599,8 @@ package body Gen.Artifacts.XMI is
                  := new Gen.Model.XMI.Ref_Type_Element (P.Model);
             begin
                S.Set_Location (To_String (P.File) & P.Parser.Get_Location);
-               S.Href := Util.Beans.Objects.To_Unbounded_String (Value);
+               S.Set_Reference_Id (Util.Beans.Objects.To_String (Value), P.Profiles.all);
+
                if P.Association /= null then
                   P.Association.Stereotypes.Append (S.all'Access);
                elsif P.Attr_Element /= null then
@@ -1040,32 +1043,38 @@ package body Gen.Artifacts.XMI is
    end Prepare;
 
    --  ------------------------------
-   --  Read the UML configuration files that define the pre-defined types, stereotypes
-   --  and other components used by a model.  These files are XMI files as well.
-   --  All the XMI files in the UML config directory are read.
+   --  Read the UML profiles that are referenced by the current models.
+   --  The UML profiles are installed in the UML config directory for dynamo's installation.
    --  ------------------------------
-   procedure Read_UML_Configuration (Handler : in out Artifact;
-                                     Context : in out Generator'Class) is
-      use Ada.Directories;
-
-      Path    : constant String := Context.Get_Parameter (Gen.Configs.GEN_UML_DIR);
-      Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
-      Search  : Search_Type;
-      Ent     : Directory_Entry_Type;
+   procedure Read_Profiles (Handler : in out Artifact;
+                            Context : in out Generator'Class) is
+      Path : constant String := Context.Get_Parameter (Gen.Configs.GEN_UML_DIR);
+      Iter : Util.Strings.Sets.Cursor := Handler.Profiles.First;
    begin
-      Log.Info ("Reading the UML configuration files from {0}", Path);
+      while Util.Strings.Sets.Has_Element (Iter) loop
+         declare
+            Profile : constant String := Util.Strings.Sets.Element (Iter);
+         begin
+            if not Handler.Nodes.Contains (To_Unbounded_String (Profile)) then
+               Log.Info ("Reading the UML profile {0}", Profile);
 
-      Handler.Has_Config  := True;
-      Handler.Initialized := True;
-      Start_Search (Search, Directory => Path, Pattern => "*.xmi", Filter => Filter);
+               --  We have a profile, load the UML model.
+               Handler.Read_Model (Util.Files.Compose (Path, Profile), Context);
 
-      --  Collect the files in the vector array.
-      while More_Entries (Search) loop
-         Get_Next_Entry (Search, Ent);
+               --  Verify that we have the model, report an error and remove it from the profiles.
+               if not Handler.Nodes.Contains (To_Unbounded_String (Profile)) then
+                  Context.Error ("UML profile {0} was not found", Profile);
+                  Handler.Profiles.Delete (Profile);
+               end if;
 
-         Handler.Read_Model (Full_Name (Ent), Context);
+               --  And start again from the beginning since new profiles could be necessary.
+               Iter := Handler.Profiles.First;
+            else
+               Util.Strings.Sets.Next (Iter);
+            end if;
+         end;
       end loop;
-   end Read_UML_Configuration;
+   end Read_Profiles;
 
    --  ------------------------------
    --  Read the UML/XMI model file.
@@ -1116,6 +1125,7 @@ package body Gen.Artifacts.XMI is
       begin
          Info.Model        := Model'Unchecked_Access;
          Info.Parser       := Reader'Unchecked_Access;
+         Info.Profiles     := Handler.Profiles'Unchecked_Access;
          Info.File         := To_Unbounded_String (Name & ".xmi");
          Info.Default_Type := To_Unbounded_String (Def_Type);
          Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
@@ -1146,13 +1156,10 @@ package body Gen.Artifacts.XMI is
    begin
       Log.Info ("Reading XMI {0}", File);
 
-      if not Handler.Has_Config then
-         Handler.Has_Config := True;
-         Handler.Read_UML_Configuration (Context);
-      end if;
       Handler.Nodes.Include (Name, UML);
       Handler.Nodes.Update_Element (Handler.Nodes.Find (Name),
                                     Read'Access);
+      Handler.Read_Profiles (Context);
    end Read_Model;
 
 begin

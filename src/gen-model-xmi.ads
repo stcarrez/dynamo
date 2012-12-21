@@ -335,8 +335,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  An attribute
    --  ------------------------------
-   type Attribute_Element is new Model_Element with record
-      Ref_Id             : Ada.Strings.Unbounded.Unbounded_String;
+   type Attribute_Element is new Ref_Type_Element with record
       Data_Type          : Data_Type_Element_Access;
       Visibility         : Visibility_Type := VISIBILITY_PUBLIC;
       Changeability      : Changeability_Type := CHANGEABILITY_CHANGEABLE;

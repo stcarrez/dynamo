@@ -75,6 +75,11 @@ package Gen.Model.Packages is
    function Get_Model (From : in Package_Definition)
                        return Model_Definition_Access;
 
+   --  Returns True if the package is a pre-defined package and must not be generated.
+   function Is_Predefined (From : in Package_Definition) return Boolean;
+
+   --  Set the package as a pre-defined package.
+   procedure Set_Predefined (From : in out Package_Definition);
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
@@ -242,11 +247,14 @@ private
       --  The base name for the package (ex: gen-model-users)
       Base_Name    : Unbounded_String;
 
+      --  The global model (used to resolve types from other packages).
+      Model              : Model_Definition_Access;
+
       --  True if the package uses Ada.Calendar.Time
       Uses_Calendar_Time : Boolean := False;
 
-      --  The global model (used to resolve types from other packages).
-      Model              : Model_Definition_Access;
+      --  True if the package is a pre-defined package (ie, defined by a UML profile).
+      Is_Predefined      : Boolean := False;
    end record;
 
    type Model_Definition is new Definition with record

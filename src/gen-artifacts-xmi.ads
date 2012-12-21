@@ -19,6 +19,7 @@
 with DOM.Core;
 with Gen.Model.Packages;
 with Gen.Model.XMI;
+with Util.Strings.Sets;
 
 --  The <b>Gen.Artifacts.XMI</b> package is an artifact for the generation of Ada code
 --  from an UML XMI description.
@@ -50,16 +51,19 @@ package Gen.Artifacts.XMI is
                          File    : in String;
                          Context : in out Generator'Class);
 
-   --  Read the UML configuration files that define the pre-defined types, stereotypes
-   --  and other components used by a model.  These files are XMI files as well.
-   --  All the XMI files in the UML config directory are read.
-   procedure Read_UML_Configuration (Handler : in out Artifact;
-                                     Context : in out Generator'Class);
-
 private
+
+   --  Read the UML profiles that are referenced by the current models.
+   --  The UML profiles are installed in the UML config directory for dynamo's installation.
+   procedure Read_Profiles (Handler : in out Artifact;
+                            Context : in out Generator'Class);
 
    type Artifact is new Gen.Artifacts.Artifact with record
       Nodes      : aliased Gen.Model.XMI.UML_Model;
+
+      --  A set of profiles that are necessary for the model definitions.
+      Profiles   : aliased Util.Strings.Sets.Set;
+
       Has_Config : Boolean := False;
 
       --  Stereotype which triggers the generation of database table.

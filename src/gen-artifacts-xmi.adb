@@ -549,7 +549,8 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_DATA_TYPE_HREF | FIELD_ENUMERATION_HREF | FIELD_CLASSIFIER_HREF =>
             if P.Attr_Element /= null then
-               P.Attr_Element.Ref_Id := Util.Beans.Objects.To_Unbounded_String (Value);
+               P.Attr_Element.Set_Reference_Id (Util.Beans.Objects.To_String (Value),
+                                                P.Profiles.all);
                Log.Debug ("Attribute {0} has type {1}",
                           P.Attr_Element.Name, P.Attr_Element.Ref_Id);
             end if;
@@ -1156,6 +1157,7 @@ package body Gen.Artifacts.XMI is
    begin
       Log.Info ("Reading XMI {0}", File);
 
+      Handler.Initialized := True;
       Handler.Nodes.Include (Name, UML);
       Handler.Nodes.Update_Element (Handler.Nodes.Find (Name),
                                     Read'Access);

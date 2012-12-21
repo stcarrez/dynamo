@@ -260,7 +260,8 @@ package body Gen.Model.Packages is
                if not Col.Is_Basic_Type and Name'Length > 0 and Name /= O.Name then
                   Used_Types.Include (To_Unbounded_String (Name));
 
-               elsif T = "Time" or T = "Date" or T = "Timestamp" or T = "Nullable_Time" then
+               elsif T = "Time" or T = "Date" or T = "Timestamp" or T = "Nullable_Time"
+                 or T = "DateTime" or T = "Ada.Calendar.Time" then
                   O.Uses_Calendar_Time := True;
 
 

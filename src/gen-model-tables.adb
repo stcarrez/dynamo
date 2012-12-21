@@ -70,7 +70,8 @@ package body Gen.Model.Tables is
             if T = null then
                return Util.Beans.Objects.Null_Object;
                --  If this is an association to another table, use the primary key of that table.
-            elsif T.all in Table_Definition'Class then
+            elsif T.all in Table_Definition'Class
+              and then Table_Definition'Class (T.all).Id_Column /= null  then
                return Table_Definition'Class (T.all).Id_Column.Get_Value (Name);
             elsif T.all in Enums.Enum_Definition'Class then
                return T.Get_Value ("sqlType");

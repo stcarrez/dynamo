@@ -73,6 +73,8 @@ package body Gen.Model.Operations is
    --  Create an operation with the given name.
    --  ------------------------------
    function Create_Operation (Name : in Unbounded_String) return Operation_Definition_Access is
+      pragma Unreferenced (Name);
+
       Result : constant Operation_Definition_Access := new Operation_Definition;
    begin
       return Result;

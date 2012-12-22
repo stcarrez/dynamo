@@ -241,8 +241,10 @@ package body Gen.Model.Packages is
    function Is_Generation_Enabled (Model : in Model_Definition;
                                    Name  : in String) return Boolean is
       Upper_Name : constant String := Util.Strings.Transforms.To_Upper_Case (Name);
+      Key        : constant Unbounded_String := To_Unbounded_String (Upper_Name);
    begin
-      return Model.Gen_Packages.Is_Empty or Model.Gen_Packages.Contains (Upper_Name);
+      return not Model.Packages.Element (Key).Is_Predefined
+        and (Model.Gen_Packages.Is_Empty or Model.Gen_Packages.Contains (Upper_Name));
    end Is_Generation_Enabled;
 
    --  ------------------------------

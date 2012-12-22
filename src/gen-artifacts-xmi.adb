@@ -943,11 +943,11 @@ package body Gen.Artifacts.XMI is
 
          Pkg  : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
          Name : constant String := Pkg.Get_Qualified_Name;
-         P    : constant Gen.Model.Packages.Package_Definition_Access
-           := new Gen.Model.Packages.Package_Definition;
+         P    : Gen.Model.Packages.Package_Definition_Access;
       begin
          Log.Info ("Prepare package {0}", Name);
-         P.Name := To_Unbounded_String (Name);
+
+         Model.Register_Package (To_Unbounded_String (Name), P);
 
          if Item.Has_Stereotype (Handler.Data_Model_Stereotype) then
             Log.Info ("Package {0} has the <<DataModel>> stereotype", Name);
@@ -1065,7 +1065,7 @@ package body Gen.Artifacts.XMI is
                Log.Info ("Reading the UML profile {0}", Profile);
 
                --  We have a profile, load the UML model.
-               Handler.Read_Model (Util.Files.Compose (Path, Profile), Context);
+               Handler.Read_Model (Util.Files.Compose (Path, Profile), Context, True);
 
                --  Verify that we have the model, report an error and remove it from the profiles.
                if not Handler.Nodes.Contains (To_Unbounded_String (Profile)) then

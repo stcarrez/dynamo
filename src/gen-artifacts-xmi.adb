@@ -954,6 +954,10 @@ package body Gen.Artifacts.XMI is
 
          else
             Log.Info ("Package {0} does not have the <<DataModel>> stereotype.", Name);
+
+            --  Do not generate packages that don't have the <<DataModel>> stereotype.
+            --  But still get their UML definition so that we can use their classes.
+            P.Set_Predefined;
          end if;
 
          if Pkg.Is_Profile then

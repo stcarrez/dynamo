@@ -80,6 +80,13 @@ package body Gen.Generator is
    function Replace (Value, Item, By : in Util.Beans.Objects.Object)
                      return Util.Beans.Objects.Object;
 
+   --  Concat the arguments converted as a string.
+   function Concat (Arg1, Arg2, Arg3, Arg4 : in Util.Beans.Objects.Object)
+                    return Util.Beans.Objects.Object;
+
+   --  EL function to check if a file exists.
+   function File_Exists (Path : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class);
 
    --  ------------------------------
@@ -97,8 +104,7 @@ package body Gen.Generator is
 
       function To_Ada_Type (Value : in String) return Util.Beans.Objects.Object;
 
---        Def    : constant Definition_Access := To_Definition_Access (Value);
-      Column : Column_Definition_Access := null; --  To_Definition_Access (Value);
+      Column : Column_Definition_Access := null;
 
       function To_Ada_Type (Value : in String) return Util.Beans.Objects.Object is
       begin
@@ -157,6 +163,28 @@ package body Gen.Generator is
          return To_Ada_Type (Util.Beans.Objects.To_String (Value));
       end if;
    end To_Ada_Type;
+
+   --  ------------------------------
+   --  Concat the arguments converted as a string.
+   --  ------------------------------
+   function Concat (Arg1, Arg2, Arg3, Arg4 : in Util.Beans.Objects.Object)
+                    return Util.Beans.Objects.Object is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      if not Util.Beans.Objects.Is_Null (Arg1) then
+         Append (Result, Util.Beans.Objects.To_String (Arg1));
+      end if;
+      if not Util.Beans.Objects.Is_Null (Arg2) then
+         Append (Result, Util.Beans.Objects.To_String (Arg2));
+      end if;
+      if not Util.Beans.Objects.Is_Null (Arg3) then
+         Append (Result, Util.Beans.Objects.To_String (Arg3));
+      end if;
+      if not Util.Beans.Objects.Is_Null (Arg4) then
+         Append (Result, Util.Beans.Objects.To_String (Arg4));
+      end if;
+      return Util.Beans.Objects.To_Object (Result);
+   end Concat;
 
    KEY_INTEGER_LABEL : constant String := "KEY_INTEGER";
    KEY_STRING_LABEL  : constant String := "KEY_STRING";
@@ -299,6 +327,15 @@ package body Gen.Generator is
    end Comment;
 
    --  ------------------------------
+   --  EL function to check if a file exists.
+   --  ------------------------------
+   function File_Exists (Path : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+      P : constant String := Util.Beans.Objects.To_String (Path);
+   begin
+      return Util.Beans.Objects.To_Object (Ada.Directories.Exists (P));
+   end File_Exists;
+
+   --  ------------------------------
    --  Register the generator EL functions
    --  ------------------------------
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class) is
@@ -325,6 +362,12 @@ package body Gen.Generator is
       Mapper.Set_Function (Name      => "replace",
                            Namespace => URI,
                            Func      => Replace'Access);
+      Mapper.Set_Function (Name      => "exists",
+                           Namespace => URI,
+                           Func      => File_Exists'Access);
+      Mapper.Set_Function (Name      => "concat",
+                           Namespace => URI,
+                           Func      => Concat'Access);
    end Set_Functions;
 
    --  ------------------------------

@@ -17,6 +17,8 @@
 -----------------------------------------------------------------------
 with Ada.IO_Exceptions;
 with Ada.Directories;
+with Ada.Strings.Fixed;
+with Ada.Strings.Maps;
 
 with Util.Files;
 with Util.Log.Loggers;
@@ -55,6 +57,8 @@ package body Gen.Model.Projects is
       return To_String (Project.Name);
    end Get_Project_Name;
 
+   To_GNAT_Mapping : Ada.Strings.Maps.Character_Mapping;
+
    --  ------------------------------
    --  Get the GNAT project file name.  The default is to use the Dynamo project
    --  name and add the <b>.gpr</b> extension.  The <b>gnat.project</b> configuration
@@ -64,7 +68,7 @@ package body Gen.Model.Projects is
       Name : constant String := Project.Props.Get ("gnat.project", "");
    begin
       if Name'Length = 0 then
-         return To_String (Project.Name) & ".gpr";
+         return Ada.Strings.Fixed.Translate (To_String (Project.Name), To_GNAT_Mapping) & ".gpr";
       else
          return Name;
       end if;
@@ -803,5 +807,8 @@ package body Gen.Model.Projects is
          end;
       end if;
    end Read_Project;
+
+   begin
+      To_GNAT_Mapping := Ada.Strings.Maps.To_Mapping (From => "-", To => "_");
 
 end Gen.Model.Projects;

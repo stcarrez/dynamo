@@ -55,13 +55,21 @@ package body Gen.Model.Enums is
    end Get_Value;
 
    --  ------------------------------
+   --  Compare two enum literals.
+   --  ------------------------------
+   function "<" (Left, Right : in Value_Definition_Access) return Boolean is
+   begin
+      return Left.Number < Right.Number;
+   end "<";
+
+   --  ------------------------------
    --  Prepare the generation of the model.
    --  ------------------------------
    overriding
    procedure Prepare (O : in out Enum_Definition) is
    begin
       O.Target := O.Type_Name;
-      null;
+      O.Values.Sort;
    end Prepare;
 
    --  ------------------------------

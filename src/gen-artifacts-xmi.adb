@@ -788,6 +788,13 @@ package body Gen.Artifacts.XMI is
                if Column.Has_Stereotype (Handler.Nullable_Stereotype) then
                   C.Not_Null := False;
                end if;
+               if C.Type_Name = "DateTime" and not C.Not_Null then
+                  C.Type_Name := To_Unbounded_String ("Nullable_DateTime");
+               elsif C.Type_Name = "Integer" and not C.Not_Null then
+                  C.Type_Name := To_Unbounded_String ("Nullable_Integer");
+               elsif C.Type_Name = "String" and not C.Not_Null then
+                  C.Type_Name := To_Unbounded_String ("Nullable_String");
+               end if;
                if C.Is_Key then
                   C.Generator := To_Object (Column.Find_Tag_Value (Handler.Generator_Tag, ""));
                end if;

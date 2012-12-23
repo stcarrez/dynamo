@@ -72,6 +72,7 @@
         <from>datatype::double</from>
         <from>datatype::Double</from>
         <from>datatype::Money</from>
+        <from>double</from>
         <to>DOUBLE</to>
     </mapping>
     <mapping>
@@ -92,6 +93,12 @@
         <to>TEXT</to>
     </mapping>
     <mapping>
+        <from>ADO.Model.Entity_Type</from>
+        <from>ADO.Entity_Type</from>
+        <from>Entity_Type</from>
+	<to>INTEGER</to>
+    </mapping>
+    <mapping>
         <from>ADO.Identifier</from>
         <from>Identifier</from>
         <from>identifier</from>
@@ -101,6 +108,7 @@
     </mapping>
     <mapping>
         <from>datatype::Blob</from>
+        <from>Blob</from>
         <to>LONGBLOB</to>
     </mapping>
 </mappings>

@@ -92,6 +92,12 @@
         <to>TEXT</to>
     </mapping>
     <mapping>
+        <from>ADO.Model.Entity_Type</from>
+        <from>ADO.Entity_Type</from>
+        <from>Entity_Type</from>
+	<to>INTEGER</to>
+    </mapping>
+    <mapping>
         <from>ADO.Identifier</from>
         <from>Identifier</from>
         <from>identifier</from>
@@ -101,6 +107,7 @@
     </mapping>
     <mapping>
         <from>datatype::Blob</from>
+        <from>Blob</from>
         <to>LONGBLOB</to>
     </mapping>
 </mappings>

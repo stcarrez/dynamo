@@ -277,10 +277,6 @@ package Gen.Model.XMI is
    overriding
    function Get_Error_Message (Node : in Enum_Element) return String;
 
-   procedure Add_Literal (Node : in out Enum_Element;
-                          Id   : in Util.Beans.Objects.Object;
-                          Name : in Util.Beans.Objects.Object);
-
    --  ------------------------------
    --  Literal
    --  ------------------------------
@@ -291,6 +287,12 @@ package Gen.Model.XMI is
    --  Get the element type.
    overriding
    function Get_Type (Node : in Literal_Element) return Element_Type;
+
+   --  Create an enum literal and add it to the enum.
+   procedure Add_Literal (Node    : in out Enum_Element;
+                          Id      : in Util.Beans.Objects.Object;
+                          Name    : in Util.Beans.Objects.Object;
+                          Literal : out Literal_Element_Access);
 
    --  ------------------------------
    --  Stereotype

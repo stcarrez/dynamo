@@ -400,7 +400,7 @@ package body Gen.Model.Tables is
          end if;
          Column_List.Next (Iter);
       end loop;
-      if O.Id_Column = null then
+      if O.Id_Column = null and Length (O.Table_Name) > 0 then
          Log.Error ("Table {0} does not have any primary key", To_String (O.Name));
       end if;
    end Prepare;

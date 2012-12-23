@@ -914,11 +914,23 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       procedure Prepare_Enum_Literal (Enum : in out Gen.Model.Enums.Enum_Definition'Class;
                                       Item : in Gen.Model.XMI.Model_Element_Access) is
-         Value : Gen.Model.Enums.Value_Definition_Access;
+         Literal : Gen.Model.Enums.Value_Definition_Access;
+         Value   : constant String := Item.Find_Tag_Value (Handler.Literal_Tag, "");
       begin
          Log.Info ("Prepare enum literal {0}", Item.Name);
 
-         Enum.Add_Value (To_String (Item.Name), Value);
+         Enum.Add_Value (To_String (Item.Name), Literal);
+         if Value'Length > 0 then
+            begin
+               Literal.Number := Natural'Value (Value);
+
+            exception
+               when others =>
+                  Context.Error (To_String (Item.Location) &
+                                   ": value '{0}' for enum literal '{1}' must be a number",
+                                 Value, To_String (Item.Name));
+            end;
+         end if;
       end Prepare_Enum_Literal;
 
       --  ------------------------------

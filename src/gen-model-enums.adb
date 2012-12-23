@@ -67,9 +67,10 @@ package body Gen.Model.Enums is
    --  ------------------------------
    overriding
    procedure Prepare (O : in out Enum_Definition) is
+      procedure Sort is new Value_List.Sort_On ("<");
    begin
       O.Target := O.Type_Name;
-      O.Values.Sort;
+      Sort (O.Values);
    end Prepare;
 
    --  ------------------------------

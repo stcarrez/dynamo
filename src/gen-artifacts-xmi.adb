@@ -131,6 +131,7 @@ package body Gen.Artifacts.XMI is
 
                        FIELD_ENUMERATION,
                        FIELD_ENUMERATION_LITERAL,
+                       FIELD_ENUMERATION_LITERAL_END,
                        FIELD_ENUMERATION_HREF);
 
    type XMI_Info is record
@@ -578,7 +579,11 @@ package body Gen.Artifacts.XMI is
             end if;
 
          when FIELD_ENUMERATION_LITERAL =>
-            P.Enumeration.Add_Literal (P.Id, P.Name, P.Enumeration_Literal);
+            P.Enumeration.Add_Literal (Value, P.Name, P.Enumeration_Literal);
+
+         when FIELD_ENUMERATION_LITERAL_END =>
+            P.Enumeration_Literal.Set_Name (P.Name);
+            P.Enumeration_Literal := null;
 
          when FIELD_STEREOTYPE_NAME =>
             P.Stereotype := new Gen.Model.XMI.Stereotype_Element (P.Model);
@@ -1045,6 +1050,10 @@ package body Gen.Artifacts.XMI is
                                                     "Dynamo.xmi",
                                                     "ADO.Table.@dynamo.table.generator",
                                                     Gen.Model.XMI.BY_NAME);
+      Handler.Literal_Tag := Find_Tag_Definition (Handler.Nodes,
+                                                    "Dynamo.xmi",
+                                                    "ADO.Literal.@dynamo.literal",
+                                                    Gen.Model.XMI.BY_NAME);
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);
@@ -1267,11 +1276,11 @@ begin
    XMI_Mapping.Add_Mapping ("**/Enumeration/@xmi.id", FIELD_ID);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@name", FIELD_ENUMERATION);
    XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral/@xmi.id",
-                            FIELD_ID);
+                            FIELD_ENUMERATION_LITERAL);
    XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral/@name",
                             FIELD_NAME);
    XMI_Mapping.Add_Mapping ("**/Enumeration/Enumeration.literal/EnumerationLiteral",
-                            FIELD_ENUMERATION_LITERAL);
+                            FIELD_ENUMERATION_LITERAL_END);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@href", FIELD_ENUMERATION_HREF);
    XMI_Mapping.Add_Mapping ("**/Enumeration/@xmi.idref", FIELD_ENUMERATION_HREF);
 

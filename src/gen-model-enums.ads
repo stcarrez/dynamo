@@ -45,6 +45,9 @@ package Gen.Model.Enums is
    function Get_Value (From : Value_Definition;
                        Name : String) return Util.Beans.Objects.Object;
 
+   --  Compare two enum literals.
+   function "<" (Left, Right : in Value_Definition_Access) return Boolean;
+
    package Value_List is new Gen.Model.List (T         => Value_Definition,
                                              T_Access  => Value_Definition_Access);
 

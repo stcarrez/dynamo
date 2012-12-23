@@ -178,6 +178,7 @@ package body Gen.Artifacts.XMI is
       Stereotype_Id        : Util.Beans.Objects.Object;
       Data_Type            : Gen.Model.XMI.Data_Type_Element_Access;
       Enumeration          : Gen.Model.XMI.Enum_Element_Access;
+      Enumeration_Literal  : Gen.Model.XMI.Literal_Element_Access;
       Tag_Definition       : Gen.Model.XMI.Tag_Definition_Element_Access;
 
       Stereotype           : Gen.Model.XMI.Stereotype_Element_Access;
@@ -208,6 +209,7 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Association_End_Element_Access;
    use type Gen.Model.XMI.Stereotype_Element_Access;
    use type Gen.Model.XMI.Enum_Element_Access;
+   use type Gen.Model.XMI.Literal_Element_Access;
    use type Gen.Model.XMI.Comment_Element_Access;
    use type Gen.Model.XMI.Operation_Element_Access;
    use type Gen.Model.XMI.Association_Element_Access;
@@ -286,6 +288,9 @@ package body Gen.Artifacts.XMI is
 
       elsif P.Class_Element /= null then
          P.Class_Element.Tagged_Values.Append (Tagged_Value.all'Access);
+
+      elsif P.Enumeration_Literal /= null then
+         P.Enumeration_Literal.Tagged_Values.Append (Tagged_Value.all'Access);
 
       elsif P.Enumeration /= null then
          P.Enumeration.Tagged_Values.Append (Tagged_Value.all'Access);
@@ -573,7 +578,7 @@ package body Gen.Artifacts.XMI is
             end if;
 
          when FIELD_ENUMERATION_LITERAL =>
-            P.Enumeration.Add_Literal (P.Id, P.Name);
+            P.Enumeration.Add_Literal (P.Id, P.Name, P.Enumeration_Literal);
 
          when FIELD_STEREOTYPE_NAME =>
             P.Stereotype := new Gen.Model.XMI.Stereotype_Element (P.Model);
@@ -604,7 +609,9 @@ package body Gen.Artifacts.XMI is
                S.Set_Location (To_String (P.File) & P.Parser.Get_Location);
                S.Set_Reference_Id (Util.Beans.Objects.To_String (Value), P.Profiles.all);
 
-               if P.Association /= null then
+               if P.Enumeration_Literal /= null then
+                  P.Enumeration_Literal.Stereotypes.Append (S.all'Access);
+               elsif P.Association /= null then
                   P.Association.Stereotypes.Append (S.all'Access);
                elsif P.Attr_Element /= null then
                   P.Attr_Element.Stereotypes.Append (S.all'Access);

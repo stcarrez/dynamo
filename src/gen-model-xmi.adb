@@ -558,11 +558,15 @@ package body Gen.Model.XMI is
       return To_String (Result);
    end Get_Error_Message;
 
-   procedure Add_Literal (Node : in out Enum_Element;
-                          Id   : in Util.Beans.Objects.Object;
-                          Name : in Util.Beans.Objects.Object) is
-      Literal : constant Literal_Element_Access := new Literal_Element (Node.Model);
+   --  ------------------------------
+   --  Create an enum literal and add it to the enum.
+   --  ------------------------------
+   procedure Add_Literal (Node    : in out Enum_Element;
+                          Id      : in Util.Beans.Objects.Object;
+                          Name    : in Util.Beans.Objects.Object;
+                          Literal : out Literal_Element_Access) is
    begin
+      Literal := new Literal_Element (Node.Model);
       Literal.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Id);
       Literal.Name   := Util.Beans.Objects.To_Unbounded_String (Name);
       Node.Elements.Append (Literal.all'Access);

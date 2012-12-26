@@ -707,6 +707,16 @@ package body Gen.Model.XMI is
    end Get_Comment;
 
    --  ------------------------------
+   --  Reconcile the element by resolving the references to other elements in the model.
+   --  ------------------------------
+   overriding
+   procedure Reconcile (Node  : in out Association_End_Element;
+                        Model : in UML_Model) is
+   begin
+      Model_Element (Node).Reconcile (Model);
+   end Reconcile;
+
+   --  ------------------------------
    --  Make the association between the two ends.
    --  ------------------------------
    procedure Make_Association (From  : in out Association_End_Element;
@@ -718,12 +728,12 @@ package body Gen.Model.XMI is
       Log.Info ("Reconcile association {0} - {1}",
                 To_String (From.Name), To_String (To.Name));
 
-      Target := Find (Model, From.Model.all, To.Target);
+      Target := Find (Model, From.Model.all, To.Ref_Id);
       if Target = null then
          Log.Error ("Association end {0} not found", To_String (From.Name));
          return;
       end if;
-      Source := Find (Model, From.Model.all, From.Target);
+      Source := Find (Model, From.Model.all, From.Ref_Id);
       if Source = null then
          Log.Error ("Association end {0} not found", To_String (To.Name));
          return;

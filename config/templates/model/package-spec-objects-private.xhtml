@@ -10,7 +10,7 @@
    COL_#{column.index}_#{table.rowIndex}_NAME : aliased constant String := "#{column.sqlName}";
    </h:list>
 #{''}
-   #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping :=
+   #{fn:toUpperCase(table.type)}_DEF : aliased constant ADO.Schemas.Class_Mapping :=
      (Count => #{table.members.size},
       Table => #{fn:toUpperCase(table.type)}_NAME'Access,
       Members => (
@@ -18,6 +18,7 @@
          #{column.rowIndex} =&gt; COL_#{column.index}_#{table.rowIndex}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
       </h:list>)
      );
+   #{fn:toUpperCase(table.type)}_TABLE : constant ADO.Schemas.Class_Mapping_Access := #{fn:toUpperCase(table.type)}_DEF'Access;
 #{''}
 
    Null_#{table.type} : constant #{table.type}_Ref
@@ -26,7 +27,7 @@
 
    type #{fn:capitalize(table.type)}_Impl is
       new ADO.Objects.Object_Record (Key_Type => ADO.Objects.#{table.id.type.isIdentifier ? 'KEY_INTEGER' : 'KEY_STRING'},
-                                     Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access)
+                                     Of_Class => #{fn:toUpperCase(table.type)}_DEF'Access)
    with #{table.members.size == 1 ? 'null record;' : 'record'}
 <h:list value="#{table.members}" var="column">
 <h:panelGroup rendered="#{column.name ne table.id.name}">

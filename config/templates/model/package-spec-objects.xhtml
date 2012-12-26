@@ -103,7 +103,7 @@
 #{''}
 </h:panelGroup>
    --  Table definition
-   #{fn:toUpperCase(table.type)}_TABLE : aliased constant ADO.Schemas.Class_Mapping;
+   #{fn:toUpperCase(table.type)}_TABLE : constant ADO.Schemas.Class_Mapping_Access;
 #{''}
 
    --  Internal method to allocate the Object_Record instance

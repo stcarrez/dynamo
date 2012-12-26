@@ -98,6 +98,9 @@ package body Gen.Model.Tables is
             end if;
          end;
 
+      elsif Name = "sqlLength" then
+         return Util.Beans.Objects.To_Object (From.Sql_Length);
+
       elsif Name = "isVersion" then
          return Util.Beans.Objects.To_Object (From.Is_Version);
 

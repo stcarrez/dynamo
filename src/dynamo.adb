@@ -41,11 +41,27 @@ procedure Dynamo is
    procedure Set_Config_Directory (Path   : in String;
                                    Silent : in Boolean := False);
 
+   procedure Print_Configuration (Generator : in Gen.Generator.Handler);
+
    Out_Dir      : Unbounded_String;
    Config_Dir   : Unbounded_String;
    Template_Dir : Unbounded_String;
    Status       : Exit_Status := Success;
    Debug        : Boolean := False;
+   Print_Config  : Boolean := False;
+
+   --  ------------------------------
+   --  Print information about dynamo configuration
+   --  ------------------------------
+   procedure Print_Configuration (Generator : in Gen.Generator.Handler) is
+   begin
+      Ada.Text_IO.Put_Line ("Dynamo version          : " & Gen.Configs.VERSION);
+      Ada.Text_IO.Put_Line ("Config directory        : " & Generator.Get_Config_Directory);
+      Ada.Text_IO.Put_Line ("UML directory           : "
+                            & Generator.Get_Parameter (Gen.Configs.GEN_UML_DIR));
+      Ada.Text_IO.Put_Line ("GNAT project directory  : "
+                            & Generator.Get_Parameter (Gen.Configs.GEN_GNAT_PROJECT_DIRS));
+   end Print_Configuration;
 
    --  ------------------------------
    --  Verify and set the configuration path
@@ -77,7 +93,7 @@ begin
    Initialize_Option_Scan (Stop_At_First_Non_Switch => True, Section_Delimiters => "targs");
    --  Parse the command line
    loop
-      case Getopt ("* d o: t: c:") is
+      case Getopt ("* p d o: t: c:") is
          when ASCII.NUL => exit;
 
          when 'o' =>
@@ -91,6 +107,9 @@ begin
 
          when 'd' =>
             Debug := True;
+
+         when 'p' =>
+            Print_Config := True;
 
          when '*' =>
             exit;
@@ -136,6 +155,11 @@ begin
       end if;
 
       Gen.Generator.Initialize (Generator, Config_Dir, Debug);
+      if Print_Config then
+         Print_Configuration (Generator);
+         return;
+      end if;
+
       Cmd := Gen.Commands.Find_Command (Cmd_Name);
 
       --  Check that the command exists.
@@ -154,8 +178,8 @@ begin
    end;
 
 exception
-   when Invalid_Switch =>
-      Ada.Text_IO.Put_Line ("Invalid option.");
+   when E : Invalid_Switch =>
+      Ada.Text_IO.Put_Line ("Invalid option: " & Ada.Exceptions.Exception_Message (E));
       Gen.Commands.Short_Help_Usage;
       Ada.Command_Line.Set_Exit_Status (2);
 

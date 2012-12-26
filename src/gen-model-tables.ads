@@ -38,23 +38,26 @@ package Gen.Model.Tables is
    --  Column Definition
    --  ------------------------------
    type Column_Definition is new Definition with record
-      Number : Natural := 0;
-      Table  : Table_Definition_Access;
-
-      --  Whether the column must not be null in the database
-      Not_Null : Boolean := False;
-
-      --  Whether the column must be unique
-      Unique   : Boolean := False;
+      Number   : Natural := 0;
+      Table    : Table_Definition_Access;
 
       --  The column type name.
       Type_Name : Unbounded_String;
 
       --  The SQL type associated with the column.
-      Sql_Type : Unbounded_String;
+      Sql_Type  : Unbounded_String;
 
       --  The SQL name associated with the column.
-      Sql_Name : Unbounded_String;
+      Sql_Name   : Unbounded_String;
+
+      --  The SQL length for strings.
+      Sql_Length : Positive := 255;
+
+      --  Whether the column must not be null in the database
+      Not_Null : Boolean := False;
+
+      --  Whether the column must be unique
+      Unique    : Boolean := False;
 
       --  True if this column is the optimistic locking version column.
       Is_Version : Boolean := False;

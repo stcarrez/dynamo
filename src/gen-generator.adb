@@ -402,6 +402,7 @@ package body Gen.Generator is
       H.Conf.Set (ASF.Applications.VIEW_FILE_EXT, "");
       H.Conf.Set ("ado.queries.paths", Compose (Dir, "db"));
       if Debug then
+         Log.Info ("Setting debug mode");
          H.Conf.Set (Gen.Configs.GEN_DEBUG_ENABLE, "1");
       end if;
       Props.Set ("generator_config_dir", Dir);

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils-gnat -- GNAT utilities
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2012 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,8 @@
 -----------------------------------------------------------------------
 
 with Util.Log.Loggers;
+
+with Gen.Configs;
 
 with Csets;
 with Snames;
@@ -40,7 +42,7 @@ package body Gen.Utils.GNAT is
    --  Configure it according to the dynamo configuration properties.
    --  ------------------------------
    procedure Initialize (Config : in Util.Properties.Manager'Class) is
-      Project_Dirs : constant String := Config.Get ("generator.gnat.projects.dir",
+      Project_Dirs : constant String := Config.Get (Gen.Configs.GEN_GNAT_PROJECT_DIRS,
                                                     DEFAULT_GNAT_PROJECT_DIR);
    begin
       Log.Info ("Initializing GNAT runtime to read projects from: {0}", Project_Dirs);

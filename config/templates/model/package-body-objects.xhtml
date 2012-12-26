@@ -7,7 +7,7 @@
 <h:list value="#{package.tables}" var="table">
    function #{table.type}_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.#{g:keyEnum(table.id.type)},
-                                       Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access);
+                                       Of_Class => #{fn:toUpperCase(table.type)}_DEF'Access);
    begin
       ADO.Objects.Set_Value (Result, Id);
       return Result;
@@ -15,7 +15,7 @@
 #{''}
    function #{table.type}_Key (Id : in String) return ADO.Objects.Object_Key is
       Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.#{g:keyEnum(table.id.type)},
-                                       Of_Class => #{fn:toUpperCase(table.type)}_TABLE'Access);
+                                       Of_Class => #{fn:toUpperCase(table.type)}_DEF'Access);
    begin
       ADO.Objects.Set_Value (Result, Id);
       return Result;
@@ -309,7 +309,7 @@
                    Query   : in ADO.SQL.Query'Class;
                    Found   : out Boolean) is
       Stmt : ADO.Statements.Query_Statement
-          := Session.Create_Statement (Query, #{fn:toUpperCase(table.type)}_TABLE'Access);
+          := Session.Create_Statement (Query, #{fn:toUpperCase(table.type)}_DEF'Access);
    begin
       Stmt.Execute;
       if Stmt.Has_Elements then
@@ -346,7 +346,7 @@
    procedure Save (Object  : in out #{fn:capitalize(table.type)}_Impl;
                    Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Update_Statement
-         := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
+         := Session.Create_Statement (#{fn:toUpperCase(table.type)}_DEF'Access);
    begin
 <h:list value="#{table.members}" var="column">
     <h:panelGroup rendered="#{column.isUpdated}">
@@ -401,7 +401,7 @@
    procedure Create (Object  : in out #{fn:capitalize(table.type)}_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Query : ADO.Statements.Insert_Statement
-                  := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
+                  := Session.Create_Statement (#{fn:toUpperCase(table.type)}_DEF'Access);
       Result : Integer;
    begin
 <h:panelGroup rendered="#{not empty table.version}">
@@ -442,7 +442,7 @@
    procedure Delete (Object  : in out #{fn:capitalize(table.type)}_Impl;
                      Session : in out ADO.Sessions.Master_Session'Class) is
       Stmt : ADO.Statements.Delete_Statement
-         := Session.Create_Statement (#{fn:toUpperCase(table.type)}_TABLE'Access);
+         := Session.Create_Statement (#{fn:toUpperCase(table.type)}_DEF'Access);
    begin
       Stmt.Set_Filter (Filter => "#{table.id.name} = ?");
       Stmt.Add_Param (Value => Object.Get_Key);
@@ -460,7 +460,7 @@
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class) is
       Stmt : ADO.Statements.Query_Statement
-        := Session.Create_Statement (Query, #{fn:toUpperCase(table.type)}_TABLE'Access);
+        := Session.Create_Statement (Query, #{fn:toUpperCase(table.type)}_DEF'Access);
    begin
       Stmt.Execute;
       #{fn:capitalize(table.type)}_Vectors.Clear (Object);

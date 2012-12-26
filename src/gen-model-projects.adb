@@ -808,7 +808,6 @@ package body Gen.Model.Projects is
       end if;
    end Read_Project;
 
-   begin
-      To_GNAT_Mapping := Ada.Strings.Maps.To_Mapping (From => "-", To => "_");
-
+begin
+   To_GNAT_Mapping := Ada.Strings.Maps.To_Mapping (From => "-", To => "_");
 end Gen.Model.Projects;

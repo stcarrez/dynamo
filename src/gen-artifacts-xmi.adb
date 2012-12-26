@@ -1068,6 +1068,10 @@ package body Gen.Artifacts.XMI is
                                                    "Dynamo.xmi",
                                                    "ADO.@dynamo.sql.type",
                                                    Gen.Model.XMI.BY_NAME);
+      Handler.Sql_Length_Tag := Find_Tag_Definition (Handler.Nodes,
+                                                     "Dynamo.xmi",
+                                                     "ADO.@dynamo.sql.length",
+                                                     Gen.Model.XMI.BY_NAME);
       Handler.Generator_Tag := Find_Tag_Definition (Handler.Nodes,
                                                     "Dynamo.xmi",
                                                     "ADO.Table.@dynamo.table.generator",

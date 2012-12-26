@@ -7,7 +7,7 @@
     <mapping>
         <from>String</from>
         <from>datatype::String</from>
-        <to>VARCHAR(255)</to>
+        <to>VARCHAR(#{column.sqlLength})</to>
     </mapping>
     <mapping>
         <from>Nullable_Time</from>

@@ -757,6 +757,7 @@ package body Gen.Artifacts.XMI is
 
          Msg  : constant String := Column.Get_Error_Message;
          Sql  : constant String := Column.Find_Tag_Value (Handler.Sql_Type_Tag, "");
+         Len  : constant String := Column.Find_Tag_Value (Handler.Sql_Length_Tag, "");
          C    : Column_Definition_Access;
       begin
          Log.Info ("Prepare class attribute {0}", Column.Name);
@@ -800,6 +801,18 @@ package body Gen.Artifacts.XMI is
                end if;
                if C.Is_Key then
                   C.Generator := To_Object (Column.Find_Tag_Value (Handler.Generator_Tag, ""));
+               end if;
+
+               if Len'Length > 0 then
+                  begin
+                     C.Sql_Length := Positive'Value (Len);
+
+                  exception
+                     when others =>
+                        Context.Error (To_String (Column.Location) &
+                                         ": SQL length '{0}' for column '{1}' must be a number",
+                                       Len, To_String (Column.Name));
+                  end;
                end if;
             end;
          end if;

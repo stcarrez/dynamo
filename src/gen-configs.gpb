@@ -31,6 +31,7 @@ package Gen.Configs is
    GEN_UML_DEFAULT_TYPE     : constant String := "generator.uml.default_type";
    GEN_DEBUG_ENABLE         : constant String := "generator.debug";
    GEN_GNAT_PROJECT_DIRS    : constant String := "generator.gnat.projects.dir";
+   GEN_TEMPLATES_DIRS       : constant String := "generator.model.dir";
 
    --  Path of the config directory
    CONFIG_DIR               : constant String := $CONFIG_DIR;

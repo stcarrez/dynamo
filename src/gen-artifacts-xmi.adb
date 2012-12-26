@@ -486,7 +486,9 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_ASSOCIATION_CLASS_ID =>
             if P.Assos_End_Element /= null then
-               P.Assos_End_Element.Target := Util.Beans.Objects.To_Unbounded_String (Value);
+--                 P.Assos_End_Element.Target := Util.Beans.Objects.To_Unbounded_String (Value);
+               P.Assos_End_Element.Set_Reference_Id (Util.Beans.Objects.To_String (Value),
+                                                     P.Profiles.all);
             end if;
 
          when FIELD_ASSOCIATION_END =>
@@ -500,7 +502,7 @@ package body Gen.Artifacts.XMI is
 
                --  Keep the association if the target class is specified.
                --  We ignore association to a UML Component for example.
-               if Length (P.Assos_End_Element.Target) > 0 then
+               if Length (P.Assos_End_Element.Ref_Id) > 0 then
                   P.Association.Connections.Append (P.Assos_End_Element.all'Access);
                else
                   Log.Info ("Association end {0} ignored", P.Assos_End_Element.Name);

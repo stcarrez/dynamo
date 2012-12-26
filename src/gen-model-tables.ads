@@ -40,6 +40,7 @@ package Gen.Model.Tables is
    type Column_Definition is new Definition with record
       Number   : Natural := 0;
       Table    : Table_Definition_Access;
+      Bean     : Util.Beans.Objects.Object;
 
       --  The column type name.
       Type_Name : Unbounded_String;

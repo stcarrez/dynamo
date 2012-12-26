@@ -779,7 +779,7 @@ package body Gen.Artifacts.XMI is
                C.Is_Key      := Column.Has_Stereotype (Handler.PK_Stereotype);
                C.Is_Version  := Column.Has_Stereotype (Handler.Version_Stereotype);
                C.Is_Updated  := Attr.Changeability /= CHANGEABILITY_FROZEN;
-               C.Is_Inserted := Attr.Changeability = CHANGEABILITY_INSERT;
+               C.Is_Inserted := True; --  Attr.Changeability = CHANGEABILITY_INSERT;
                C.Sql_Type    := To_Unbounded_String (Sql);
 
                if Column.Has_Stereotype (Handler.Not_Null_Stereotype) then
@@ -787,6 +787,9 @@ package body Gen.Artifacts.XMI is
                end if;
                if Column.Has_Stereotype (Handler.Nullable_Stereotype) then
                   C.Not_Null := False;
+               end if;
+               if C.Is_Version then
+                  C.Not_Null := True;
                end if;
                if C.Type_Name = "DateTime" and not C.Not_Null then
                   C.Type_Name := To_Unbounded_String ("Nullable_DateTime");

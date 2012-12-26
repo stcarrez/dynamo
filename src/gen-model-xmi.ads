@@ -370,11 +370,10 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  An association end
    --  ------------------------------
-   type Association_End_Element is new Model_Element with record
+   type Association_End_Element is new Ref_Type_Element with record
       Visibility         : Visibility_Type := VISIBILITY_PUBLIC;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 0;
-      Target             : Unbounded_String;
       Target_Element     : Model_Element_Access;
       Source_Element     : Model_Element_Access;
       Navigable          : Boolean := True;
@@ -390,6 +389,11 @@ package Gen.Model.XMI is
    --  Returns the empty string if there is no comment.
    overriding
    function Get_Comment (Node : in Association_End_Element) return String;
+
+   --  Reconcile the element by resolving the references to other elements in the model.
+   overriding
+   procedure Reconcile (Node  : in out Association_End_Element;
+                        Model : in UML_Model);
 
    --  Make the association between the two ends.
    procedure Make_Association (From  : in out Association_End_Element;

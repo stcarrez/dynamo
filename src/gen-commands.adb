@@ -74,8 +74,9 @@ package body Gen.Commands is
       New_Line;
       Put ("Usage: ");
       Put (Ada.Command_Line.Command_Name);
-      Put_Line (" [-o directory] [-t templates] {command} {arguments}");
+      Put_Line (" [-v] [-o directory] [-t templates] {command} {arguments}");
       Put_Line ("where:");
+      Put_Line ("   -v           Print the version, configuration and installation paths");
       Put_Line ("   -o directory Directory where the Ada mapping files are generated");
       Put_Line ("   -t templates Directory where the Ada templates are defined");
       Put_Line ("   -c dir       Directory where the Ada templates "

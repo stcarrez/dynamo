@@ -95,7 +95,7 @@ begin
    Initialize_Option_Scan (Stop_At_First_Non_Switch => True, Section_Delimiters => "targs");
    --  Parse the command line
    loop
-      case Getopt ("* p d o: t: c:") is
+      case Getopt ("* v d o: t: c:") is
          when ASCII.NUL => exit;
 
          when 'o' =>
@@ -110,7 +110,7 @@ begin
          when 'd' =>
             Debug := True;
 
-         when 'p' =>
+         when 'v' =>
             Print_Config := True;
 
          when '*' =>

@@ -20,6 +20,9 @@ with Ada.Strings;
 with Util.Strings;
 with Util.Log.Loggers;
 
+with EL.Contexts.Default;
+with EL.Utils;
+with EL.Variables.Default;
 with Gen.Model.Enums;
 package body Gen.Model.Tables is
 
@@ -76,7 +79,14 @@ package body Gen.Model.Tables is
             elsif T.all in Enums.Enum_Definition'Class then
                return T.Get_Value ("sqlType");
             else
-               return T.Get_Value ("name");
+               declare
+                  Ctx       : EL.Contexts.Default.Default_Context;
+                  Variables : aliased EL.Variables.Default.Default_Variable_Mapper;
+               begin
+                  Variables.Bind ("column", From.Bean);
+                  Ctx.Set_Variable_Mapper (Variables'Unchecked_Access);
+                  return EL.Utils.Eval (To_String (T.Target), Ctx);
+               end;
             end if;
          end;
 
@@ -190,11 +200,8 @@ package body Gen.Model.Tables is
       use type Mappings.Mapping_Definition_Access;
 
    begin
---        O.Type_Mapping := Gen.Model.Mappings.Find_Type (O.Type_Name);
---        if O.Type_Mapping = null then
---           O.Type_Mapping := O.Table.Package_Def.Find_Type (O.Type_Name);
---        end if;
-      null;
+      O.Bean := Util.Beans.Objects.To_Object (O'Unchecked_Access,
+                                              Util.Beans.Objects.STATIC);
    end Prepare;
 
    --  ------------------------------

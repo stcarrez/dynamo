@@ -59,6 +59,8 @@ procedure Dynamo is
       Ada.Text_IO.Put_Line ("Config directory        : " & Generator.Get_Config_Directory);
       Ada.Text_IO.Put_Line ("UML directory           : "
                             & Generator.Get_Parameter (Gen.Configs.GEN_UML_DIR));
+      Ada.Text_IO.Put_Line ("Templates directory     : "
+                            & Generator.Get_Parameter (Gen.Configs.GEN_TEMPLATES_DIRS));
       Ada.Text_IO.Put_Line ("GNAT project directory  : "
                             & Generator.Get_Parameter (Gen.Configs.GEN_GNAT_PROJECT_DIRS));
    end Print_Configuration;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -537,7 +537,6 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Set_Project_Name (H    : in out Handler;
                                Name : in String) is
-      Code : constant String := Util.Strings.Transforms.To_Upper_Case (Name);
    begin
       if not Gen.Utils.Is_Valid_Name (Name) then
          H.Error ("The project name should be a valid Ada identifier ([A-Za-z][A-Za-z0-9_]*).");
@@ -545,7 +544,6 @@ package body Gen.Generator is
       end if;
       H.Project.Name := To_Unbounded_String (Name);
       H.Set_Global ("projectName", Name);
-      H.Set_Global ("projectCode", Code);
    end Set_Project_Name;
 
    --  ------------------------------

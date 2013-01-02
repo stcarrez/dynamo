@@ -111,6 +111,8 @@ package body Gen.Artifacts.XMI is
 
                        FIELD_CLASSIFIER_HREF,
 
+                       FIELD_GENERALIZATION_ID,
+
                        FIELD_ASSOCIATION_END_ID,
                        FIELD_ASSOCIATION_END_NAME,
                        FIELD_ASSOCIATION_END_VISIBILITY,
@@ -425,6 +427,9 @@ package body Gen.Artifacts.XMI is
                P.Class_Element := null;
                P.Class_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
             end if;
+
+         when FIELD_GENERALIZATION_ID =>
+            null;
 
          when FIELD_OPERATION_ID =>
             P.Operation_Id := Value;
@@ -1331,6 +1336,10 @@ begin
    XMI_Mapping.Add_Mapping ("**/Class/@xmi.id", FIELD_CLASS_ID);
    XMI_Mapping.Add_Mapping ("**/Class/@visibility", FIELD_CLASS_VISIBILITY);
    XMI_Mapping.Add_Mapping ("**/Class", FIELD_CLASS_END);
+
+   --  Generalization (limited to single inheritance).
+   XMI_Mapping.Add_Mapping ("**/Generalization/@xmi.idref", FIELD_GENERALIZATION_ID);
+   XMI_Mapping.Add_Mapping ("**/Generalization/@xmi.href", FIELD_GENERALIZATION_ID);
 
    --  Class attribute mapping.
    XMI_Mapping.Add_Mapping ("**/Attribute/@name", FIELD_ATTRIBUTE_NAME);

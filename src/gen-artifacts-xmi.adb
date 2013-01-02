@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ with Gen.Model.Tables;
 with Gen.Model.Enums;
 with Gen.Model.Mappings;
 with Gen.Model.Beans;
+with Gen.Model.Operations;
 
 with Util.Log.Loggers;
 with Util.Strings;
@@ -941,12 +942,14 @@ package body Gen.Artifacts.XMI is
                                    Node   : in Model_Element_Access) is
          Op   : constant Operation_Element_Access := Operation_Element'Class (Node.all)'Access;
          Msg  : constant String := Node.Get_Error_Message;
+         Operation : Gen.Model.Operations.Operation_Definition_Access;
       begin
          Log.Info ("Prepare class operation {0}", Op.Name);
 
          if Msg'Length /= 0 then
             Context.Error (To_String (Op.Location) & ": " & Msg);
          end if;
+            Table.Add_Operation (Op.Name, Operation);
 --           if Assoc.Multiplicity_Upper /= 1 then
 --              Context.Error (To_String (Assoc.Location) &
 --                               ": multiple association '{0}' for table '{1}' is not supported.",

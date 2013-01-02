@@ -53,6 +53,10 @@ package body Gen.Artifacts.XMI is
    function Get_Changeability (Value : in Util.Beans.Objects.Object)
                                return Model.XMI.Changeability_Type;
 
+   --  Get the parameter kind from the XMI parameter kind value.
+   function Get_Parameter_Type (Value : in Util.Beans.Objects.Object)
+                                return Model.XMI.Parameter_Type;
+
    procedure Iterate_For_Table is
      new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Tables.Table_Definition'Class);
 
@@ -175,6 +179,7 @@ package body Gen.Artifacts.XMI is
       Operation_Id         : Util.Beans.Objects.Object;
       Operation            : Gen.Model.XMI.Operation_Element_Access;
       Parameter            : Gen.Model.XMI.Parameter_Element_Access;
+      Parameter_Type       : Gen.Model.XMI.Parameter_Type;
 
       Name                 : Util.Beans.Objects.Object;
       Id                   : Util.Beans.Objects.Object;
@@ -496,7 +501,7 @@ package body Gen.Artifacts.XMI is
             P.Attr_Element.Set_Location (To_String (P.File) & P.Parser.Get_Location);
 
          when FIELD_PARAMETER_KIND =>
-            null;
+            P.Parameter_Type := Get_Parameter_Type (Value);
 
          when FIELD_PARAMETER_END =>
             if P.Attr_Element /= null and P.Operation /= null then
@@ -1364,7 +1369,8 @@ begin
    XMI_Mapping.Add_Mapping ("**/Parameter", FIELD_PARAMETER_END);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@xmi.idref", FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@xmi.href", FIELD_CLASSIFIER_HREF);
-   XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/DataType/@xmi.href", FIELD_CLASSIFIER_HREF);
+   XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/DataType/@xmi.href",
+                            FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/DataType/@href", FIELD_CLASSIFIER_HREF);
 
    --  Association mapping.

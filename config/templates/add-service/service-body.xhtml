@@ -12,7 +12,7 @@ with AWA.Permissions;
 with AWA.Permissions.Services;
 with AWA.Services.Contexts;
 with AWA.Workspaces.Models;
-with AWA.Workspaces.Module;
+with AWA.Workspaces.Modules;
 #{''}
 with ADO.Sessions;
 with ADO.Objects;
@@ -41,7 +41,7 @@ package body #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Servi
       Log.Info ("Creating #{fn:capitalize(serviceName)}");
 #{''}
       Ctx.Start;
-      AWA.Workspaces.Module.Get_Workspace (DB, Ctx, WS);
+      AWA.Workspaces.Modules.Get_Workspace (DB, Ctx, WS);
 #{''}
       --  Check that the user has the create permission on the given workspace.
       AWA.Permissions.Check (Permission => ACL_Create_#{fn:capitalize(serviceName)}.Permission,

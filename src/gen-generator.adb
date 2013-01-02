@@ -46,7 +46,6 @@ with Gen.Commands.Templates;
 
 with Util.Strings;
 with Util.Files;
-with Util.Strings.Transforms;
 with Util.Log.Loggers;
 
 package body Gen.Generator is
@@ -537,13 +536,21 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Set_Project_Name (H    : in out Handler;
                                Name : in String) is
+      Pos : constant Natural := Util.Strings.Index (Name, '-');
    begin
-      if not Gen.Utils.Is_Valid_Name (Name) then
+      if not Gen.Utils.Is_Valid_Name (Name)
+        and then (Pos <= Name'First
+                  or else not Gen.Utils.Is_Valid_Name (Name (Name'First .. Pos - 1))) then
          H.Error ("The project name should be a valid Ada identifier ([A-Za-z][A-Za-z0-9_]*).");
          raise Fatal_Error with "Invalid project name: " & Name;
       end if;
       H.Project.Name := To_Unbounded_String (Name);
       H.Set_Global ("projectName", Name);
+      if Pos > Name'First then
+         H.Set_Global ("projectAdaName", Name (Name'First .. Pos - 1));
+      else
+         H.Set_Global ("projectAdaName", Name);
+      end if;
    end Set_Project_Name;
 
    --  ------------------------------
@@ -629,7 +636,7 @@ package body Gen.Generator is
       H.Project.Read_Project (File      => File,
                               Config    => H.Conf,
                               Recursive => Recursive);
-      H.Set_Global ("projectName", H.Get_Project_Name);
+      H.Set_Project_Name (H.Get_Project_Name);
    end Read_Project;
 
    --  ------------------------------

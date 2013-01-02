@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -470,6 +470,7 @@ package Gen.Model.XMI is
       Attributes   : Model_Vector;
       Associations : Model_Vector;
       Visibility   : Visibility_Type := VISIBILITY_PUBLIC;
+      Parent_Class : Ref_Type_Element_Access;
    end record;
    type Class_Element_Access is access all Class_Element'Class;
 

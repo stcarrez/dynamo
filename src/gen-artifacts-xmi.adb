@@ -227,6 +227,7 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Comment_Element_Access;
    use type Gen.Model.XMI.Operation_Element_Access;
    use type Gen.Model.XMI.Association_Element_Access;
+   use type Gen.Model.XMI.Ref_Type_Element_Access;
 
    --  ------------------------------
    --  Get the visibility from the XMI visibility value.
@@ -434,7 +435,15 @@ package body Gen.Artifacts.XMI is
             end if;
 
          when FIELD_GENERALIZATION_ID =>
-            null;
+            if P.Class_Element /= null then
+               if P.Class_Element.Parent_Class /= null then
+                  raise Util.Serialize.Mappers.Field_Error
+                    with "multiple inheritance is not supported";
+               end if;
+               P.Class_Element.Parent_Class := new Gen.Model.XMI.Ref_Type_Element (P.Model);
+               P.Class_Element.Parent_Class.Set_Reference_Id (Util.Beans.Objects.To_String (Value),
+                                                              P.Profiles.all);
+            end if;
 
          when FIELD_OPERATION_ID =>
             P.Operation_Id := Value;

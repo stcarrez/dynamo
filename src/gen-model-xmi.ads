@@ -55,6 +55,8 @@ package Gen.Model.XMI is
                                CHANGEABILITY_CHANGEABLE,
                                CHANGEABILITY_FROZEN);
 
+   type Parameter_Type is (PARAM_IN, PARAM_OUT, PARAM_INOUT, PARAM_RETURN);
+
    type Model_Element;
    type Tagged_Value_Element;
    type Tag_Definition_Element;
@@ -360,7 +362,9 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  A parameter
    --  ------------------------------
-   type Parameter_Element is new Attribute_Element with null record;
+   type Parameter_Element is new Attribute_Element with record
+      Kind : Parameter_Type := PARAM_IN;
+   end record;
    type Parameter_Element_Access is access all Parameter_Element'Class;
 
    --  Get the element type.

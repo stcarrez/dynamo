@@ -41,10 +41,6 @@ package Gen.Model.Beans is
    overriding
    procedure Prepare (O : in out Bean_Definition);
 
-   --  Initialize the table definition instance.
-   overriding
-   procedure Initialize (O : in out Bean_Definition);
-
    --  Create an attribute with the given name and add it to the bean.
    procedure Add_Attribute (Bean   : in out Bean_Definition;
                             Name   : in Unbounded_String;

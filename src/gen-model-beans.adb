@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-beans -- Ada Bean declarations
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,16 +53,6 @@ package body Gen.Model.Beans is
          Gen.Model.Tables.Column_List.Next (Iter);
       end loop;
    end Prepare;
-
-   --  ------------------------------
-   --  Initialize the table definition instance.
-   --  ------------------------------
-   overriding
-   procedure Initialize (O : in out Bean_Definition) is
-   begin
-      O.Members_Bean := Util.Beans.Objects.To_Object (O.Members'Unchecked_Access,
-                                                      Util.Beans.Objects.STATIC);
-   end Initialize;
 
    --  ------------------------------
    --  Create an attribute with the given name and add it to the bean.

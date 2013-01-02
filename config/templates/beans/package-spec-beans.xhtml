@@ -7,11 +7,11 @@
 <h:list value="#{package.beans}" var="bean">
  <h:panelGroup rendered="#{not empty bean.comment}">
    --  --------------------
-   --  <h:outputText value="#{g:comment(table.comment)}" escape="false"/>
+   --  <h:outputText value="#{g:comment(bean.comment)}" escape="false"/>
    --  --------------------
  </h:panelGroup>
-   type #{bean.type} is abstract#{not empty bean.parentType ? ' new' : ''}#{bean.parentType}
-     #{empty bean.parentType ? 'new ' : 'and '}Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with #{empty bean.members ? 'null record;' : ' record'}
+   type #{bean.type} is abstract#{not empty bean.parent ? ' new ' : ''}#{not empty bean.parent ? bean.parent.name : ''}#{not empty bean.parent ? '_Ref' : ''}
+     #{empty bean.parent.name ? 'new ' : 'and '}Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with #{empty bean.members ? 'null record;' : ' record'}
    <h:list value="#{bean.members}" var="attribute">
       #{fn:capitalize(attribute.name)} : #{g:adaType(attribute,0)};
    </h:list>
@@ -30,7 +30,7 @@
 #{''}
    --  Set the value identified by the name.
    overriding
-   procedure Set_Value (From  : in out #{bean.type};
+   procedure Set_Value (Item  : in out #{bean.type};
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object);
 <h:list value="#{bean.operations}" var="operation">

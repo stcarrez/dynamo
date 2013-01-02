@@ -20,7 +20,7 @@
 </h:panelGroup>
 <h:list value="#{bean.members}" var="column">
   <h:panelGroup rendered="#{not column.isVersion and (column.type.isPrimitiveType or column.type.isEnum)}">
-      if Name = "#{column.name}" then
+      #{column.rowIndex ge 2 ? 'els' : ''}if Name = "#{column.name}" then
     <h:panelGroup rendered="#{column.name eq bean.id.name}">
          return ADO.Objects.To_Object (#{impl}.Get_Key);
     </h:panelGroup>
@@ -45,9 +45,16 @@
          return Util.Beans.Objects.To_Object (#{impl}.#{fn:capitalize(column.name)});
   </h:panelGroup>
 </h:panelGroup>
-      end if;
 </h:panelGroup></h:list>
+<h:panelGroup rendered="#{bean.columns.size ge 1}">
+      end if;
+</h:panelGroup>
+<h:panelGroup rendered="#{not empty bean.parent}">
+      return #{fn:capitalize(bean.parent.name)}_Ref (#{impl}).Get_Value (Name);
+</h:panelGroup>
+<h:panelGroup rendered="#{empty bean.parent}">
       return Util.Beans.Objects.Null_Object;
+</h:panelGroup>
    end Get_Value;
 #{''}
 </ui:composition>

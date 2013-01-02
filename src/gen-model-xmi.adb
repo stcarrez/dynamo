@@ -836,6 +836,33 @@ package body Gen.Model.XMI is
    --  Get the element type.
    --  ------------------------------
    overriding
+   function Get_Type (Node : in Generalization_Element) return Element_Type is
+      pragma Unreferenced (Node);
+   begin
+      return XMI_GENERALIZATION;
+   end Get_Type;
+
+   --  ------------------------------
+   --  Reconcile the association between classes in the package.  Find the association
+   --  ends and add the necessary links to the corresponding class elements.
+   --  ------------------------------
+   overriding
+   procedure Reconcile (Node  : in out Generalization_Element;
+                        Model : in UML_Model) is
+   begin
+      Ref_Type_Element (Node).Reconcile (Model);
+      Node.Child_Class := Find (Model, Node.Model.all, Node.Child_Id);
+      if Node.Child_Class /= null then
+         if Node.Child_Class.all in Class_Element'Class then
+            Class_Element'Class (Node.Child_Class.all).Parent_Class := Node'Unchecked_Access;
+         end if;
+      end if;
+   end Reconcile;
+
+   --  ------------------------------
+   --  Get the element type.
+   --  ------------------------------
+   overriding
    function Get_Type (Node : in Tagged_Value_Element) return Element_Type is
       pragma Unreferenced (Node);
    begin

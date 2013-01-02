@@ -31,6 +31,7 @@ package Gen.Model.XMI is
    type Element_Type is (XMI_UNKNOWN,
                          XMI_PACKAGE,
                          XMI_CLASS,
+                         XMI_GENERALIZATION,
                          XMI_ASSOCIATION,
                          XMI_ASSOCIATION_END,
                          XMI_ATTRIBUTE,
@@ -427,6 +428,25 @@ package Gen.Model.XMI is
    --  ends and add the necessary links to the corresponding class elements.
    overriding
    procedure Reconcile (Node  : in out Association_Element;
+                        Model : in UML_Model);
+
+   --  ------------------------------
+   --  An association
+   --  ------------------------------
+   type Generalization_Element is new Ref_Type_Element with record
+      Child_Class  : Model_Element_Access;
+      Child_Id     : Ada.Strings.Unbounded.Unbounded_String;
+   end record;
+   type Generalization_Element_Access is access all Generalization_Element'Class;
+
+   --  Get the element type.
+   overriding
+   function Get_Type (Node : in Generalization_Element) return Element_Type;
+
+   --  Reconcile the association between classes in the package.  Find the association
+   --  ends and add the necessary links to the corresponding class elements.
+   overriding
+   procedure Reconcile (Node  : in out Generalization_Element;
                         Model : in UML_Model);
 
    --  ------------------------------

@@ -2,6 +2,7 @@ Version 0.6.0   -
   - New command 'build-doc' to extract some documentation from the sources
   - Generate MySQL and SQLite schemas from UML models
   - Generate Ada database mappings from UML models
+  - Generate Ada beans from the UML models
   - New project template for command line tools using ADO
 
 Version 0.5.0   - May 2012

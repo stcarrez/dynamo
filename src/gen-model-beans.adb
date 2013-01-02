@@ -42,19 +42,6 @@ package body Gen.Model.Beans is
    end Get_Value;
 
    --  ------------------------------
-   --  Prepare the generation of the model.
-   --  ------------------------------
-   overriding
-   procedure Prepare (O : in out Bean_Definition) is
-      Iter : Gen.Model.Tables.Column_List.Cursor := O.Members.First;
-   begin
-      while Gen.Model.Tables.Column_List.Has_Element (Iter) loop
-         Gen.Model.Tables.Column_List.Element (Iter).Prepare;
-         Gen.Model.Tables.Column_List.Next (Iter);
-      end loop;
-   end Prepare;
-
-   --  ------------------------------
    --  Create an attribute with the given name and add it to the bean.
    --  ------------------------------
    procedure Add_Attribute (Bean   : in out Bean_Definition;

@@ -37,10 +37,6 @@ package Gen.Model.Beans is
    function Get_Value (From : in Bean_Definition;
                        Name : in String) return Util.Beans.Objects.Object;
 
-   --  Prepare the generation of the model.
-   overriding
-   procedure Prepare (O : in out Bean_Definition);
-
    --  Create an attribute with the given name and add it to the bean.
    procedure Add_Attribute (Bean   : in out Bean_Definition;
                             Name   : in Unbounded_String;

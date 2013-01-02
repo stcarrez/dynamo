@@ -14,9 +14,9 @@ with Security.Permissions;
 package #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Services is
 #{''}
    --  Define the permissions.
-   package ACL_Create_#{fn:capitalize(serviceName)} is new Security.Permissions.Permission_ACL ("#{fn:toLowerCase(serviceName)}-create");
-   package ACL_Delete_#{fn:capitalize(serviceName)} is new Security.Permissions.Permission_ACL ("#{fn:toLowerCase(serviceName)}-delete");
-   package ACL_Update_#{fn:capitalize(serviceName)} is new Security.Permissions.Permission_ACL ("#{fn:toLowerCase(serviceName)}-update");
+   package ACL_Create_#{fn:capitalize(serviceName)} is new Security.Permissions.Definition ("#{fn:toLowerCase(serviceName)}-create");
+   package ACL_Delete_#{fn:capitalize(serviceName)} is new Security.Permissions.Definition ("#{fn:toLowerCase(serviceName)}-delete");
+   package ACL_Update_#{fn:capitalize(serviceName)} is new Security.Permissions.Definition ("#{fn:toLowerCase(serviceName)}-update");
 #{''}
    --  ------------------------------
    --  Service #{serviceName}

@@ -16,7 +16,7 @@ project #{g:replace(pluginName,'-','_')} is
    for Library_Kind use "LIBRARY_TYPE";
 
    for Source_Dirs use ("INSTALL/share/ada/adainclude/" &amp; Name);
-   for Library_ALI_Dir use "INSTALL/lib/ada/adalib/" &amp; Name &amp; '/' &amp; Project'Library_Kind;
+   for Library_ALI_Dir use "INSTALL/lib/ada/adalib/" &amp; Name &amp; "/" &amp; Project'Library_Kind;
    for Externally_Built use "true";
 
 end #{g:replace(pluginName,'-','_')};

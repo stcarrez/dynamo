@@ -116,9 +116,13 @@ package body Gen.Artifacts.XMI is
                        FIELD_ASSOCIATION_END_NAVIGABLE,
                        FIELD_ASSOCIATION_END,
 
+                       FIELD_OPERATION_ID,
                        FIELD_OPERATION_NAME,
                        FIELD_OPERATION_END,
+                       FIELD_PARAMETER_ID,
                        FIELD_PARAMETER_NAME,
+                       FIELD_PARAMETER_KIND,
+                       FIELD_PARAMETER_END,
 
                        FIELD_COMMENT,
                        FIELD_COMMENT_ID,
@@ -165,6 +169,7 @@ package body Gen.Artifacts.XMI is
       Assos_End_Visibility : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
       Assos_End_Navigable  : Boolean := False;
 
+      Operation_Id         : Util.Beans.Objects.Object;
       Operation            : Gen.Model.XMI.Operation_Element_Access;
       Parameter            : Gen.Model.XMI.Parameter_Element_Access;
 
@@ -259,6 +264,30 @@ package body Gen.Artifacts.XMI is
          return Model.XMI.CHANGEABILITY_CHANGEABLE;
       end if;
    end Get_Changeability;
+
+   --  ------------------------------
+   --  Get the parameter kind from the XMI parameter kind value.
+   --  ------------------------------
+   function Get_Parameter_Type (Value : in Util.Beans.Objects.Object)
+                                return Model.XMI.Parameter_Type is
+      S : constant String := Util.Beans.Objects.To_String (Value);
+   begin
+      if S = "return" then
+         return Model.XMI.PARAM_RETURN;
+
+      elsif S = "in" then
+         return Model.XMI.PARAM_IN;
+
+      elsif S = "out" then
+         return Model.XMI.PARAM_OUT;
+
+      elsif S = "inout" then
+         return Model.XMI.PARAM_INOUT;
+
+      else
+         return Model.XMI.PARAM_INOUT;
+      end if;
+   end Get_Parameter_Type;
 
    procedure Add_Tagged_Value (P : in out XMI_Info) is
       Tagged_Value : constant Model.XMI.Tagged_Value_Element_Access
@@ -396,7 +425,10 @@ package body Gen.Artifacts.XMI is
                P.Class_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
             end if;
 
-         when FIELD_ATTRIBUTE_ID =>
+         when FIELD_OPERATION_ID =>
+            P.Operation_Id := Value;
+
+         when FIELD_ATTRIBUTE_ID | FIELD_PARAMETER_ID =>
             P.Attr_Id := Value;
 
          when FIELD_ATTRIBUTE_VISIBILITY =>
@@ -457,7 +489,22 @@ package body Gen.Artifacts.XMI is
             P.Attr_Element.Set_Name (Value);
             P.Attr_Element.Set_Location (To_String (P.File) & P.Parser.Get_Location);
 
+         when FIELD_PARAMETER_KIND =>
+            null;
+
+         when FIELD_PARAMETER_END =>
+            if P.Attr_Element /= null and P.Operation /= null then
+               P.Attr_Element.Set_XMI_Id (P.Attr_Id);
+               P.Operation.Elements.Append (P.Attr_Element.all'Access);
+            end if;
+            P.Attr_Element := null;
+
          when FIELD_OPERATION_END =>
+            if P.Operation /= null and P.Class_Element /= null then
+               P.Operation.Set_XMI_Id (P.Operation_Id);
+               P.Model.Insert (P.Operation.XMI_Id, P.Operation.all'Access);
+               P.Class_Element.Operations.Append (P.Operation.all'Access);
+            end if;
             P.Operation := null;
 
             --  Extract an association.
@@ -737,6 +784,10 @@ package body Gen.Artifacts.XMI is
       procedure Prepare_Association (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                      Node   : in Model_Element_Access);
 
+      --  Identify the UML operation and create an entry for it in the table.
+      procedure Prepare_Operation (Table  : in out Gen.Model.Tables.Table_Definition'Class;
+                                   Node   : in Model_Element_Access);
+
       --  Prepare a UML/XMI class:
       --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
       --   o if the class has the <<Dynamo.AWA.bean>> stereotype, create a bean
@@ -884,6 +935,38 @@ package body Gen.Artifacts.XMI is
       end Prepare_Association;
 
       --  ------------------------------
+      --  Identify the UML operation and create an entry for it in the table.
+      --  ------------------------------
+      procedure Prepare_Operation (Table  : in out Gen.Model.Tables.Table_Definition'Class;
+                                   Node   : in Model_Element_Access) is
+         Op   : constant Operation_Element_Access := Operation_Element'Class (Node.all)'Access;
+         Msg  : constant String := Node.Get_Error_Message;
+      begin
+         Log.Info ("Prepare class operation {0}", Op.Name);
+
+         if Msg'Length /= 0 then
+            Context.Error (To_String (Op.Location) & ": " & Msg);
+         end if;
+--           if Assoc.Multiplicity_Upper /= 1 then
+--              Context.Error (To_String (Assoc.Location) &
+--                               ": multiple association '{0}' for table '{1}' is not supported.",
+--                             To_String (Assoc.Name), Table.Get_Name);
+--           else
+--              Table.Add_Association (Assoc.Name, A);
+--              A.Set_Comment (Assoc.Get_Comment);
+--              A.Type_Name := To_Unbounded_String (Assoc.Source_Element.Get_Qualified_Name);
+--              A.Not_Null  := Assoc.Multiplicity_Lower > 0;
+--
+--              --  If the <<use foreign key>> stereotype is set on the association, to not use
+--              --  the Ada tagged object but create an attribute using the foreign key type.
+--              A.Use_Foreign_Key_Type := Node.Parent.Has_Stereotype (Handler.Use_FK_Stereotype);
+--              if A.Use_Foreign_Key_Type then
+--                 Log.Info ("Association {0} type is using foreign key", Assoc.Name);
+--              end if;
+--           end if;
+      end Prepare_Operation;
+
+      --  ------------------------------
       --  Prepare a UML/XMI class:
       --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
       --   o if the class has the <<Dynamo.AWA.bean>> stereotype, create a bean
@@ -923,6 +1006,8 @@ package body Gen.Artifacts.XMI is
                Bean.Set_Comment (Item.Get_Comment);
                Bean.Target := Name;
                Iterate_For_Bean (Bean.all, Class.Attributes, Prepare_Attribute'Access);
+               Iterate_For_Table (Bean.all, Class.Associations, Prepare_Association'Access);
+               Iterate_For_Table (Bean.all, Class.Operations, Prepare_Operation'Access);
             end;
 
          else
@@ -1259,11 +1344,16 @@ begin
 
    --  Operation mapping.
    XMI_Mapping.Add_Mapping ("**/Operation/@name", FIELD_OPERATION_NAME);
-   XMI_Mapping.Add_Mapping ("**/Operation/@xmi.id", FIELD_ATTRIBUTE_ID);
+   XMI_Mapping.Add_Mapping ("**/Operation/@xmi.id", FIELD_OPERATION_ID);
    XMI_Mapping.Add_Mapping ("**/Operation", FIELD_OPERATION_END);
-   XMI_Mapping.Add_Mapping ("**/Parameter/@xname", FIELD_PARAMETER_NAME);
+   XMI_Mapping.Add_Mapping ("**/Parameter/@xmi.id", FIELD_PARAMETER_ID);
+   XMI_Mapping.Add_Mapping ("**/Parameter/@name", FIELD_PARAMETER_NAME);
+   XMI_Mapping.Add_Mapping ("**/Parameter/@kind", FIELD_PARAMETER_KIND);
+   XMI_Mapping.Add_Mapping ("**/Parameter", FIELD_PARAMETER_END);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@xmi.idref", FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@xmi.href", FIELD_CLASSIFIER_HREF);
+   XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/DataType/@xmi.href", FIELD_CLASSIFIER_HREF);
+   XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/DataType/@href", FIELD_CLASSIFIER_HREF);
 
    --  Association mapping.
    XMI_Mapping.Add_Mapping ("**/Association/@name", FIELD_ASSOCIATION_NAME);

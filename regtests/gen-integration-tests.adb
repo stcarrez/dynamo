@@ -71,6 +71,8 @@ package body Gen.Integration.Tests is
       Caller.Add_Test (Suite, "Generate XMI Enum",
                        Test_Generate_XMI_Enum'Access);
       Caller.Add_Test (Suite, "Generate XMI Bean",
+                       Test_Generate_XMI_Bean_Table'Access);
+      Caller.Add_Test (Suite, "Generate XMI Bean with table inheritance",
                        Test_Generate_XMI_Bean'Access);
       Caller.Add_Test (Suite, "Generate XMI Table",
                        Test_Generate_XMI_Table'Access);
@@ -418,6 +420,18 @@ package body Gen.Integration.Tests is
 
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-beans.ads");
    end Test_Generate_XMI_Bean;
+
+   --  ------------------------------
+   --  Test generate command (XMI Ada Bean with inheritance).
+   --  ------------------------------
+   procedure Test_Generate_XMI_Bean_Table (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-table-beans.zargo", Result);
+
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-table_beans.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-table_beans.adb");
+   end Test_Generate_XMI_Bean_Table;
 
    --  ------------------------------
    --  Test generate command (XMI Ada Table).

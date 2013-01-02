@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -88,6 +88,9 @@ package Gen.Integration.Tests is
 
    --  Test generate command (XMI Ada Bean).
    procedure Test_Generate_XMI_Bean (T : in out Test);
+
+   --  Test generate command (XMI Ada Bean with inheritance).
+   procedure Test_Generate_XMI_Bean_Table (T : in out Test);
 
    --  Test generate command (XMI Ada Table).
    procedure Test_Generate_XMI_Table (T : in out Test);

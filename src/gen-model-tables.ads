@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -196,6 +196,11 @@ package Gen.Model.Tables is
    procedure Add_Association (Table  : in out Table_Definition;
                               Name   : in Unbounded_String;
                               Assoc  : out Association_Definition_Access);
+
+   --  Create an operation with the given name and add it to the table.
+   procedure Add_Operation (Table     : in out Table_Definition;
+                            Name      : in Unbounded_String;
+                            Operation : out Model.Operations.Operation_Definition_Access);
 
    --  Set the table name and determines the package name.
    procedure Set_Table_Name (Table : in out Table_Definition;

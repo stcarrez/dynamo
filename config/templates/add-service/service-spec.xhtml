@@ -3,15 +3,15 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="src/#{projectName}-#{moduleName}-services.ads">-----------------------------------------------------------------------
---  #{projectName}-#{moduleName}-services -- Service #{serviceName}
+        file="src/#{projectAdaName}-#{moduleName}-services.ads">-----------------------------------------------------------------------
+--  #{projectAdaName}-#{moduleName}-services -- Service #{serviceName}
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
 with ADO;
 with AWA.Modules;
 with Security.Permissions;
-package #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Services is
+package #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Services is
 #{''}
    --  Define the permissions.
    package ACL_Create_#{fn:capitalize(serviceName)} is new Security.Permissions.Definition ("#{fn:toLowerCase(serviceName)}-create");
@@ -33,5 +33,5 @@ private
 #{''}
    type #{fn:capitalize(serviceName)}_Service is new AWA.Modules.Module_Manager with null record;
 #{''}
-end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Services;
+end #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Services;
 </f:view>

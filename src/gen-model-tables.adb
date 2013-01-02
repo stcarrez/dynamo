@@ -371,6 +371,18 @@ package body Gen.Model.Tables is
       elsif Name = "table" then
          return Util.Beans.Objects.To_Object (From.Table_Name);
 
+      elsif Name = "parent" then
+         if From.Parent /= null then
+            declare
+               Bean : constant Util.Beans.Basic.Readonly_Bean_Access
+                 := From.Parent.all'Unchecked_Access;
+            begin
+               return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
+            end;
+         else
+            return Util.Beans.Objects.Null_Object;
+         end if;
+
       elsif Name = "isVersion" or Name = "isPrimaryKey" or Name = "isBean"
         or Name = "isPrimitiveType" or Name = "isEnum" or Name = "isIdentifier"
         or Name = "isBoolean" or Name = "isBlob" or Name = "isDate" or Name = "isString" then

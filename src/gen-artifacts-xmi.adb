@@ -116,6 +116,9 @@ package body Gen.Artifacts.XMI is
                        FIELD_CLASSIFIER_HREF,
 
                        FIELD_GENERALIZATION_ID,
+                       FIELD_GENERALIZATION_CHILD_ID,
+                       FIELD_GENERALIZATION_PARENT_ID,
+                       FIELD_GENERALIZATION_END,
 
                        FIELD_ASSOCIATION_END_ID,
                        FIELD_ASSOCIATION_END_NAME,
@@ -157,6 +160,12 @@ package body Gen.Artifacts.XMI is
       Class_Name           : Util.Beans.Objects.Object;
       Class_Visibility     : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
       Class_Id             : Util.Beans.Objects.Object;
+
+      --  UML Generalization.
+      Child_Id             : Util.Beans.Objects.Object;
+      Parent_Id            : Util.Beans.Objects.Object;
+      Generalization_Id    : Util.Beans.Objects.Object;
+      Generalization       : Gen.Model.XMI.Generalization_Element_Access;
 
       Package_Element      : Gen.Model.XMI.Package_Element_Access;
       Package_Id           : Util.Beans.Objects.Object;
@@ -434,16 +443,29 @@ package body Gen.Artifacts.XMI is
                P.Class_Visibility := Gen.Model.XMI.VISIBILITY_PUBLIC;
             end if;
 
+         when FIELD_GENERALIZATION_CHILD_ID =>
+            P.Child_Id := Value;
+
+         when FIELD_GENERALIZATION_PARENT_ID =>
+            P.Parent_Id := Value;
+
          when FIELD_GENERALIZATION_ID =>
-            if P.Class_Element /= null then
-               if P.Class_Element.Parent_Class /= null then
-                  raise Util.Serialize.Mappers.Field_Error
-                    with "multiple inheritance is not supported";
-               end if;
-               P.Class_Element.Parent_Class := new Gen.Model.XMI.Ref_Type_Element (P.Model);
-               P.Class_Element.Parent_Class.Set_Reference_Id (Util.Beans.Objects.To_String (Value),
-                                                              P.Profiles.all);
+            P.Generalization_Id := Value;
+
+         when FIELD_GENERALIZATION_END =>
+            if not Util.Beans.Objects.Is_Null (P.Child_Id)
+              and not Util.Beans.Objects.Is_Null (P.Parent_Id)
+              and not Util.Beans.Objects.Is_Null (P.Generalization_Id) then
+               P.Generalization := new Gen.Model.XMI.Generalization_Element (P.Model);
+               P.Generalization.Set_XMI_Id (P.Generalization_Id);
+               P.Model.Insert (P.Generalization.XMI_Id, P.Generalization.all'Access);
+               P.Generalization.Set_Reference_Id (Util.Beans.Objects.To_String (P.Parent_Id),
+                                                P.Profiles.all);
+               P.Generalization.Child_Id := Util.Beans.Objects.To_Unbounded_String (P.Child_Id);
             end if;
+            P.Child_Id          := Util.Beans.Objects.Null_Object;
+            P.Generalization_Id := Util.Beans.Objects.Null_Object;
+            P.Parent_Id         := Util.Beans.Objects.Null_Object;
 
          when FIELD_OPERATION_ID =>
             P.Operation_Id := Value;
@@ -553,7 +575,6 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_ASSOCIATION_CLASS_ID =>
             if P.Assos_End_Element /= null then
---                 P.Assos_End_Element.Target := Util.Beans.Objects.To_Unbounded_String (Value);
                P.Assos_End_Element.Set_Reference_Id (Util.Beans.Objects.To_String (Value),
                                                      P.Profiles.all);
             end if;
@@ -969,23 +990,6 @@ package body Gen.Artifacts.XMI is
             Context.Error (To_String (Op.Location) & ": " & Msg);
          end if;
             Table.Add_Operation (Op.Name, Operation);
---           if Assoc.Multiplicity_Upper /= 1 then
---              Context.Error (To_String (Assoc.Location) &
---                               ": multiple association '{0}' for table '{1}' is not supported.",
---                             To_String (Assoc.Name), Table.Get_Name);
---           else
---              Table.Add_Association (Assoc.Name, A);
---              A.Set_Comment (Assoc.Get_Comment);
---              A.Type_Name := To_Unbounded_String (Assoc.Source_Element.Get_Qualified_Name);
---              A.Not_Null  := Assoc.Multiplicity_Lower > 0;
---
---              --  If the <<use foreign key>> stereotype is set on the association, to not use
---              --  the Ada tagged object but create an attribute using the foreign key type.
---              A.Use_Foreign_Key_Type := Node.Parent.Has_Stereotype (Handler.Use_FK_Stereotype);
---              if A.Use_Foreign_Key_Type then
---                 Log.Info ("Association {0} type is using foreign key", Assoc.Name);
---              end if;
---           end if;
       end Prepare_Operation;
 
       --  ------------------------------
@@ -1017,6 +1021,7 @@ package body Gen.Artifacts.XMI is
                end if;
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);
+--                 Iterate_For_Table (Table.all, Class.Operations, Prepare_Operation'Access);
             end;
 
          elsif Item.Has_Stereotype (Handler.Bean_Stereotype) then
@@ -1027,6 +1032,10 @@ package body Gen.Artifacts.XMI is
                Model.Register_Bean (Bean);
                Bean.Set_Comment (Item.Get_Comment);
                Bean.Target := Name;
+               if Class.Parent_Class /= null then
+                  Log.Info ("Bean {0} inherit from {1}", Name,
+                            To_String (Class.Parent_Class.Name));
+               end if;
                Iterate_For_Bean (Bean.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Bean.all, Class.Associations, Prepare_Association'Access);
                Iterate_For_Table (Bean.all, Class.Operations, Prepare_Operation'Access);
@@ -1354,6 +1363,12 @@ begin
    --  Generalization (limited to single inheritance).
    XMI_Mapping.Add_Mapping ("**/Generalization/@xmi.idref", FIELD_GENERALIZATION_ID);
    XMI_Mapping.Add_Mapping ("**/Generalization/@xmi.href", FIELD_GENERALIZATION_ID);
+   XMI_Mapping.Add_Mapping ("**/Generalization/@xmi.id", FIELD_GENERALIZATION_ID);
+   XMI_Mapping.Add_Mapping ("**/Generalization/Generalization.child/Class/@xmi.idref",
+                            FIELD_GENERALIZATION_CHILD_ID);
+   XMI_Mapping.Add_Mapping ("**/Generalization/Generalization.parent/Class/@xmi.idref",
+                            FIELD_GENERALIZATION_PARENT_ID);
+   XMI_Mapping.Add_Mapping ("**/Generalization", FIELD_GENERALIZATION_END);
 
    --  Class attribute mapping.
    XMI_Mapping.Add_Mapping ("**/Attribute/@name", FIELD_ATTRIBUTE_NAME);

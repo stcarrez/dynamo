@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,11 +61,11 @@ package body Gen.Model.Projects is
 
    --  ------------------------------
    --  Get the GNAT project file name.  The default is to use the Dynamo project
-   --  name and add the <b>.gpr</b> extension.  The <b>gnat.project</b> configuration
+   --  name and add the <b>.gpr</b> extension.  The <b>gnat_project</b> configuration
    --  property allows to override this default.
    --  ------------------------------
    function Get_GNAT_Project_Name (Project : in Project_Definition) return String is
-      Name : constant String := Project.Props.Get ("gnat.project", "");
+      Name : constant String := Project.Props.Get ("gnat_project", "");
    begin
       if Name'Length = 0 then
          return Ada.Strings.Fixed.Translate (To_String (Project.Name), To_GNAT_Mapping) & ".gpr";

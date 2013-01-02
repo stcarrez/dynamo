@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -883,6 +883,19 @@ package body Gen.Model.XMI is
    begin
       return XMI_CLASS;
    end Get_Type;
+
+   --  ------------------------------
+   --  Reconcile the element by resolving the references to other elements in the model.
+   --  ------------------------------
+   overriding
+   procedure Reconcile (Node  : in out Class_Element;
+                        Model : in UML_Model) is
+   begin
+      if Node.Parent_Class /= null then
+         Node.Parent_Class.Reconcile (Model);
+      end if;
+      Data_Type_Element (Node).Reconcile (Model);
+   end Reconcile;
 
    --  ------------------------------
    --  Get the element type.

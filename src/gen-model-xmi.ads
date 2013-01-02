@@ -478,6 +478,11 @@ package Gen.Model.XMI is
    overriding
    function Get_Type (Node : in Class_Element) return Element_Type;
 
+   --  Reconcile the element by resolving the references to other elements in the model.
+   overriding
+   procedure Reconcile (Node  : in out Class_Element;
+                        Model : in UML_Model);
+
    --  ------------------------------
    --  A package
    --  ------------------------------

@@ -140,6 +140,7 @@ package Gen.Model.Tables is
       Operations     : aliased Operation_List.List_Definition;
       Operations_Bean : Util.Beans.Objects.Object;
       Parent         : Table_Definition_Access;
+      Parent_Name    : Unbounded_String;
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
       Type_Name      : Unbounded_String;
       Pkg_Name       : Unbounded_String;

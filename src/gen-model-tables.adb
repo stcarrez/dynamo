@@ -437,6 +437,15 @@ package body Gen.Model.Tables is
       if O.Id_Column = null and Length (O.Table_Name) > 0 then
          Log.Error ("Table {0} does not have any primary key", To_String (O.Name));
       end if;
+      if Length (O.Parent_Name) > 0 then
+         declare
+            Result : Mappings.Mapping_Definition_Access := O.Package_Def.Find_Type (O.Parent_Name);
+         begin
+            if Result /= null and then Result.all in Table_Definition'Class then
+               O.Parent := Table_Definition'Class (Result.all)'Access;
+            end if;
+         end;
+      end if;
    end Prepare;
 
    --  ------------------------------

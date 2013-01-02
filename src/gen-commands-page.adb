@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-page -- Page creation command for dynamo
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@ with Ada.Text_IO;
 with Gen.Artifacts;
 with GNAT.Command_Line;
 
-with Util.Strings.Transforms;
 package body Gen.Commands.Page is
 
    --  ------------------------------
@@ -62,7 +61,6 @@ package body Gen.Commands.Page is
       Generator.Set_Result_Directory (Dir);
       Generator.Set_Global ("pageName", Name);
       Generator.Set_Global ("layout", Layout);
-      Generator.Set_Global ("projectCode", Util.Strings.Transforms.To_Upper_Case (Name));
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "page");
    end Execute;
 

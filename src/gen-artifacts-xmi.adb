@@ -1035,6 +1035,7 @@ package body Gen.Artifacts.XMI is
                if Class.Parent_Class /= null then
                   Log.Info ("Bean {0} inherit from {1}", Name,
                             To_String (Class.Parent_Class.Name));
+                  Bean.Parent_Name := To_Unbounded_String (Class.Parent_Class.Get_Qualified_Name);
                end if;
                Iterate_For_Bean (Bean.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Bean.all, Class.Associations, Prepare_Association'Access);

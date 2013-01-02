@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -296,6 +296,18 @@ package body Gen.Model.Tables is
       Table.Members.Append (Assoc.all'Access);
       Table.Has_Associations := True;
    end Add_Association;
+
+   --  ------------------------------
+   --  Create an operation with the given name and add it to the table.
+   --  ------------------------------
+   procedure Add_Operation (Table     : in out Table_Definition;
+                            Name      : in Unbounded_String;
+                            Operation : out Model.Operations.Operation_Definition_Access) is
+   begin
+      Operation := new Model.Operations.Operation_Definition;
+      Operation.Name := Name;
+      Table.Operations.Append (Operation.all'Access);
+   end Add_Operation;
 
    --  ------------------------------
    --  Get the dependency between the two tables.

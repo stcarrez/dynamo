@@ -6,16 +6,25 @@
 
 <h:list value="#{package.beans}" var="bean">
    <h:list value="#{bean.operations}" var="operation">
-   package #{fn:capitalize(operation)}_Binding is
+   procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
+                #{g:indent(operation.name)}  Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+
+   procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
+                #{g:indent(operation.name)}  Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      #{bean.type}'Class (Bean).#{fn:capitalize(operation.name)} (Outcome);
+   end Op_#{fn:capitalize(operation.name)};
+
+   package Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex} is
      new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => #{bean.type},
-                                                      Method => #{fn:capitalize(operation)},
-                                                      Name   => "#{operation}");
+                                                      Method => Op_#{fn:capitalize(operation.name)},
+                                                      Name   => "#{operation.name}");
    </h:list>
 #{''}
 <h:panelGroup rendered="#{not empty bean.operations}">
    Binding_#{bean.type}_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
-     := (<h:list value="#{bean.operations}" var="operation">#{fn:capitalize(operation)}_Binding'Access
-</h:list>);
+     := (<h:list value="#{bean.operations}" var="operation">#{operation.rowIndex ne 1 ? '         ' : ''}Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex}'Access#{operation.rowIndex ne bean.operations.size ? ',' : ''}
+</h:list>     );
 </h:panelGroup>
 
 #{''}

@@ -18,6 +18,9 @@ with Ada.Unchecked_Deallocation;
 <h:panelGroup rendered="#{package.useCalendarTime}">
 with Util.Beans.Objects.Time;
 </h:panelGroup>
+<h:panelGroup rendered="#{not empty package.beans}">
+with ASF.Events.Faces.Actions;
+</h:panelGroup>
 
 package body #{package.name} is
 <h:panelGroup rendered="#{not empty package.queries or not empty package.tables}">

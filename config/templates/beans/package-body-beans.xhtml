@@ -23,7 +23,7 @@
 #{''}
 <h:panelGroup rendered="#{not empty bean.operations}">
    Binding_#{bean.type}_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
-     := (<h:list value="#{bean.operations}" var="operation">#{operation.rowIndex ne 1 ? '         ' : ''}Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex}'Access#{operation.rowIndex ne bean.operations.size ? ',' : ''}
+     := (<h:list value="#{bean.operations}" var="operation">#{operation.rowIndex ne 1 ? '         ' : ''}Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex}.Proxy'Access#{operation.rowIndex ne bean.operations.size ? ',' : ''}
 </h:list>     );
 </h:panelGroup>
 

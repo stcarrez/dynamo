@@ -23,10 +23,12 @@
    function Get_Method_Bindings (From : in #{bean.type})
                                  return Util.Beans.Methods.Method_Binding_Array_Access;
 #{''}
+<h:panelGroup rendered="#{empty bean.parent or bean.members.size gt 0}">
    --  Get the value identified by the name.
    overriding
    function Get_Value (From : in #{bean.type};
                        Name : in String) return Util.Beans.Objects.Object;
+</h:panelGroup>
 #{''}
    --  Set the value identified by the name.
    overriding

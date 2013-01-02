@@ -4,10 +4,12 @@
 		xmlns:g="http://code.google.com/p/ada-ado/generator"
                 xmlns:u="http://code.google.com/p/ada-asf/util"
 		xmlns:f="http://java.sun.com/jsf/core">
-<ui:include src="package-bean-get_impl.xhtml">
-   <ui:param name="impl" value="#{bean.isBean ? 'From' : 'Impl'}"/>
-</ui:include>
-   
+<h:panelGroup rendered="#{empty bean.parent or bean.members.size gt 0}">
+  <ui:include src="package-bean-get_impl.xhtml">
+    <ui:param name="impl" value="#{bean.isBean ? 'From' : 'Impl'}"/>
+  </ui:include>
+</h:panelGroup>
+
 <h:panelGroup rendered="#{bean.isBean}">
 #{''}
    --  Set the value identified by the name

@@ -3,14 +3,14 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="src/#{projectName}-#{moduleName}-beans.adb">-----------------------------------------------------------------------
---  #{projectName}-#{moduleName}-beans -- Beans for module #{moduleName}
+        file="src/#{projectAdaName}-#{moduleName}-beans.adb">-----------------------------------------------------------------------
+--  #{projectAdaName}-#{moduleName}-beans -- Beans for module #{moduleName}
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
 
 with ASF.Events.Faces.Actions;
-package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans is
+package body #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Beans is
 #{''}
    --  ------------------------------
    --  Example of action method.
@@ -70,7 +70,7 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans is
    --  ------------------------------
    --  Create the #{fn:capitalize(g:singular(moduleName))}_Bean bean instance.
    --  ------------------------------
-   function Create_#{fn:capitalize(g:singular(moduleName))}_Bean (Module : in #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Modules.#{fn:capitalize(g:singular(moduleName))}_Module_Access)
+   function Create_#{fn:capitalize(g:singular(moduleName))}_Bean (Module : in #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Modules.#{fn:capitalize(g:singular(moduleName))}_Module_Access)
       return Util.Beans.Basic.Readonly_Bean_Access is
       Object : constant #{fn:capitalize(g:singular(moduleName))}_Bean_Access := new #{fn:capitalize(g:singular(moduleName))}_Bean;
    begin
@@ -78,5 +78,5 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans is
       return Object.all'Access;
    end Create_#{fn:capitalize(g:singular(moduleName))}_Bean;
 #{''}
-end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans;
+end #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Beans;
 </f:view>

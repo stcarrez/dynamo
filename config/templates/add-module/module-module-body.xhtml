@@ -3,18 +3,18 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="src/#{projectName}-#{moduleName}-modules.adb">-----------------------------------------------------------------------
---  #{projectName}-#{moduleName}-modules -- Module #{moduleName}
+        file="src/#{projectAdaName}-#{moduleName}-modules.adb">-----------------------------------------------------------------------
+--  #{projectAdaName}-#{moduleName}-modules -- Module #{moduleName}
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
 with AWA.Modules.Beans;
 with AWA.Modules.Get;
-with Util.Log.loggers;
-with #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans;
-package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Modules is
+with Util.Log.Loggers;
+with #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Beans;
+package body #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Modules is
 #{''}
-   Log : constant Util.log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Module");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Module");
 #{''}
    package Register is new AWA.Modules.Beans (Module => #{fn:capitalize(g:singular(moduleName))}_Module,
                                               Module_Access => #{fn:capitalize(g:singular(moduleName))}_Module_Access);
@@ -31,8 +31,8 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Modules 
 #{''}
       --  Register here any bean class, servlet, filter.
       Register.Register (Plugin => Plugin,
-                         Name   => "#{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.#{fn:capitalize(moduleName)}_Bean",
-                         Handler => #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Beans.Create_#{fn:capitalize(g:singular(moduleName))}_Bean'Access);
+                         Name   => "#{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Beans.#{fn:capitalize(moduleName)}_Bean",
+                         Handler => #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Beans.Create_#{fn:capitalize(g:singular(moduleName))}_Bean'Access);
 #{''}
       AWA.Modules.Module (Plugin).Initialize (App, Props);
 #{''}
@@ -48,5 +48,5 @@ package body #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Modules 
       return Get;
    end Get_#{fn:capitalize(g:singular(moduleName))}_Module;
 #{''}
-end #{fn:capitalize(projectName)}.#{fn:capitalize(moduleName)}.Modules;
+end #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Modules;
 </f:view>

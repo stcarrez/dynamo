@@ -6,7 +6,7 @@
 
 <h:list value="#{package.tables}" var="table">
    function #{table.type}_Key (Id : in ADO.Identifier) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.#{g:keyEnum(table.id.type)},
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.#{table.id.type.isIdentifier ? 'KEY_INTEGER' : 'KEY_STRING'},
                                        Of_Class => #{fn:toUpperCase(table.type)}_DEF'Access);
    begin
       ADO.Objects.Set_Value (Result, Id);
@@ -14,7 +14,7 @@
    end #{table.type}_Key;
 #{''}
    function #{table.type}_Key (Id : in String) return ADO.Objects.Object_Key is
-      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.#{g:keyEnum(table.id.type)},
+      Result : ADO.Objects.Object_Key (Of_Type  => ADO.Objects.#{table.id.type.isIdentifier ? 'KEY_INTEGER' : 'KEY_STRING'},
                                        Of_Class => #{fn:toUpperCase(table.type)}_DEF'Access);
    begin
       ADO.Objects.Set_Value (Result, Id);
@@ -133,7 +133,7 @@
       ADO.Objects.Set_Field_Entity_Type (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
-    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isEnum and not column.type.isDate and not column.type.isString and not column.type.isIdentifier and column.type.name ne 'ADO.Entity_Type' and not column.type.isObject}">
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isEnum and not column.type.isDate and not column.type.isString and not column.type.isInteger and not column.type.isIdentifier and column.type.name ne 'ADO.Entity_Type' and not column.type.isObject}">
       ADO.Objects.Set_Field_#{fn:capitalize(g:adaType(column,2))} (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 

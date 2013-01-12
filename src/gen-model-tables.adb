@@ -428,7 +428,7 @@ package body Gen.Model.Tables is
          --  Collect in the dependencies vectors the tables that we are using.
          if not C.Use_Foreign_Key_Type and then C.all in Association_Definition'Class then
             T := C.Get_Type_Mapping;
-            if T /= null then
+            if T /= null and then T.all in Table_Definition'Class then
                O.Dependencies.Append (Table_Definition'Class (T.all)'Access);
             end if;
          end if;

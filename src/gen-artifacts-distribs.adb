@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs -- Artifact for distributions
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ with Gen.Artifacts.Distribs.Copies;
 with Gen.Artifacts.Distribs.Exec;
 with Gen.Artifacts.Distribs.Concat;
 with Gen.Artifacts.Distribs.Libs;
+with Gen.Artifacts.Distribs.Bundles;
 
 --  The <b>Gen.Artifacts.Distribs</b> package is an artifact for the generation of
 --  application distributions.
@@ -58,6 +59,8 @@ package body Gen.Artifacts.Distribs is
          return Gen.Artifacts.Distribs.Exec.Create_Rule (Node, True);
       elsif Kind = "concat" then
          return Gen.Artifacts.Distribs.Concat.Create_Rule (Node);
+      elsif Kind = "bundle" then
+         return Gen.Artifacts.Distribs.Bundles.Create_Rule (Node);
       elsif Kind = "libs" then
          return Gen.Artifacts.Distribs.Libs.Create_Rule (Node);
       else

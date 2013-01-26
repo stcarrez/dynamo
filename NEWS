@@ -4,6 +4,7 @@ Version 0.6.0   -
   - Generate Ada database mappings from UML models
   - Generate Ada beans from the UML models
   - New project template for command line tools using ADO
+  - New distribution command to merge the resource bundles
 
 Version 0.5.0   - May 2012
   - Support multi-line comments in XML mappings

@@ -49,7 +49,9 @@ package body Gen.Artifacts.Distribs is
       Log.Debug ("Creating distribution rule {0}", Kind);
 
       if Kind = "copy" or Kind = "" then
-         return Gen.Artifacts.Distribs.Copies.Create_Rule (Node);
+         return Gen.Artifacts.Distribs.Copies.Create_Rule (Node, False);
+      elsif Kind = "copy-first" then
+         return Gen.Artifacts.Distribs.Copies.Create_Rule (Node, True);
       elsif Kind = "exec" then
          return Gen.Artifacts.Distribs.Exec.Create_Rule (Node, False);
       elsif Kind = "copy-exec" then
@@ -266,19 +268,26 @@ package body Gen.Artifacts.Distribs is
    --  ------------------------------
    --  Get the first source path from the list.
    --  ------------------------------
-   function Get_First_Path (From : in File_Vector) return String is
+   function Get_Source_Path (From           : in File_Vector;
+                             Use_First_File : in Boolean := False) return String is
       use type Ada.Containers.Count_Type;
    begin
       if From.Length = 0 then
          return "";
-      else
+      elsif Use_First_File then
          declare
             File : constant File_Record := From.Element (1);
          begin
             return Util.Files.Compose (File.Dir.Path, File.Name);
          end;
+      else
+         declare
+            File : constant File_Record := From.Element (From.Last_Index);
+         begin
+            return Util.Files.Compose (File.Dir.Path, File.Name);
+         end;
       end if;
-   end Get_First_Path;
+   end Get_Source_Path;
 
    --  ------------------------------
    --  Build a regular expression pattern from a pattern string.

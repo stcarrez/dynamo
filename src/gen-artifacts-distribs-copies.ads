@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-copies -- Copy based distribution artifact
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,8 @@
 private package Gen.Artifacts.Distribs.Copies is
 
    --  Create a distribution rule to copy a set of files or directories.
-   function Create_Rule (Node : in DOM.Core.Node) return Distrib_Rule_Access;
+   function Create_Rule (Node : in DOM.Core.Node;
+                         Copy_First_File : in Boolean) return Distrib_Rule_Access;
 
    --  ------------------------------
    --  Distribution artifact
@@ -41,6 +42,10 @@ private package Gen.Artifacts.Distribs.Copies is
 
 private
 
-   type Copy_Rule is new Distrib_Rule with null record;
+   type Copy_Rule is new Distrib_Rule with record
+      --  When True and there are several source files, use the first file.
+      --  Otherwise, use the last file.
+      Copy_First_File : Boolean := False;
+   end record;
 
 end Gen.Artifacts.Distribs.Copies;

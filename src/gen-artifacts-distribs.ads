@@ -89,7 +89,8 @@ private
    subtype File_Cursor is File_Record_Vectors.Cursor;
 
    --  Get the first source path from the list.
-   function Get_First_Path (From : in File_Vector) return String;
+   function Get_Source_Path (From           : in File_Vector;
+                             Use_First_File : in Boolean := False) return String;
 
    --  The file tree represents the target distribution tree that must be built.
    --  Each key represent a target file and it is associated with a <b>File_Vector</b> which

@@ -88,7 +88,7 @@ package body Gen.Artifacts.Distribs.Exec is
 
       Ctx       : EL.Contexts.Default.Default_Context;
       Variables : aliased EL.Variables.Default.Default_Variable_Mapper;
-      Source    : constant String := Get_First_Path (Files);
+      Source    : constant String := Get_Source_Path (Files);
       Dir       : constant String := Ada.Directories.Containing_Directory (Path);
    begin
       Log.Print (Rule.Level, "install {0} to {1}", Source, Path);

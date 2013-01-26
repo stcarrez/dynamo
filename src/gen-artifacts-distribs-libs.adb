@@ -138,7 +138,7 @@ package body Gen.Artifacts.Distribs.Libs is
 
       Ctx       : EL.Contexts.Default.Default_Context;
       Variables : aliased EL.Variables.Default.Default_Variable_Mapper;
-      Source    : constant String := Get_First_Path (Files);
+      Source    : constant String := Get_Source_Path (Files);
    begin
       Log.Info ("install {0} to {1}", Source, Path);
 

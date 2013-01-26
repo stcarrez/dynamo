@@ -62,7 +62,6 @@ package body Gen.Artifacts.Distribs.Concat is
                       Context : in out Generator'Class) is
       procedure Concat_File (File : in File_Record);
 
-      Source : constant String := Get_First_Path (Files);
       Dir    : constant String := Ada.Directories.Containing_Directory (Path);
       Output : Util.Streams.Files.File_Stream;
 
@@ -73,6 +72,7 @@ package body Gen.Artifacts.Distribs.Concat is
          File_Path : constant String := Rule.Get_Source_Path (File);
          Input     : Util.Streams.Files.File_Stream;
       begin
+         Log.Info ("concat {0} to {1}", File_Path, Path);
          Input.Open (Name => File_Path, Mode => Ada.Streams.Stream_IO.In_File);
          Util.Streams.Copy (From => Input, Into => Output);
          Input.Close;
@@ -85,8 +85,6 @@ package body Gen.Artifacts.Distribs.Concat is
 
       Iter   : File_Cursor := Files.First;
    begin
-      Log.Info ("copy {0} to {1}", Source, Path);
-
       Ada.Directories.Create_Path (Dir);
       Output.Create (Name => Path, Mode => Ada.Streams.Stream_IO.Out_File);
       while File_Record_Vectors.Has_Element (Iter) loop

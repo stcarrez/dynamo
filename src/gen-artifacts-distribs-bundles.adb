@@ -108,7 +108,7 @@ package body Gen.Artifacts.Distribs.Bundles is
          File_Record_Vectors.Query_Element (Iter, Load_File'Access);
          File_Record_Vectors.Next (Iter);
       end loop;
-      Ada.Text_IO.Open (File => Output, Mode => Ada.Text_IO.Out_File, Name => Path);
+      Ada.Text_IO.Create (File => Output, Mode => Ada.Text_IO.Out_File, Name => Path);
       Merge.Iterate (Process => Save_Property'Access);
       Ada.Text_IO.Close (File => Output);
    end Install;

@@ -690,8 +690,6 @@ package body Gen.Model.Projects is
             begin
                Project_Info_Vectors.Next (Iter);
 
-               Log.Debug ("Dynamo file {0} is used", Dynamo);
-
                --  Do not include the 'dynamo.xml' path if it is already in the list
                --  (this happens if a project uses several GNAT project files).
                --  We have to make sure that the 'dynamo.xml' stored in the current directory
@@ -699,6 +697,8 @@ package body Gen.Model.Projects is
                if (not Has_File or else not Project_Info_Vectors.Has_Element (Iter))
                --  Insert only if there is a file.
                  and Dynamo'Length > 0 then
+
+                  Log.Debug ("Dynamo file {0} is used", Dynamo);
                   if Has_File then
                      Result.Delete (Result.Find_Index (Dynamo));
                   end if;
@@ -780,7 +780,8 @@ package body Gen.Model.Projects is
                         Log.Error ("Project {0} not found in dynamo search path", Name);
                      end if;
                   end;
-               elsif not Item.Project.Recursive_Scan then
+               end if;
+               if Item.Project /= null and then not Item.Project.Recursive_Scan then
                   Item.Project.Recursive_Scan := True;
                   Iterate (Item.Project.Modules, Update'Access);
                end if;
@@ -788,6 +789,7 @@ package body Gen.Model.Projects is
 
             Iter : Project_Vectors.Cursor;
          begin
+            Iterate (Project.Modules, Update'Access);
             for Pass in 1 .. 2 loop
                Iter := Project.Projects.First;
 

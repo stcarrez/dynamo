@@ -74,7 +74,7 @@ bin/dynamo_harness:  bin/dynamo
 check test:	 build bin/dynamo_harness
 	-rm -rf test-app
 	-rm -f dynamo-junit.xml
-	bin/dynamo_harness
+	bin/dynamo_harness -xml dynamo-aunit.xml
 
 GENERATOR=dynamo
 

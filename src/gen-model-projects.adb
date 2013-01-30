@@ -771,6 +771,9 @@ package body Gen.Model.Projects is
                   begin
                      Log.Debug ("Checking dynamo file {0}", Dynamo);
                      if Ada.Directories.Exists (Dynamo) then
+                        if not  Project.Dynamo_Files.Contains (Dynamo) then
+                           Project.Dynamo_Files.Append (Dynamo);
+                        end if;
                         Item.Project      := new Project_Definition;
                         Item.Project.Path := To_Unbounded_String (Dynamo);
                         Item.Project.Name := Item.Name;

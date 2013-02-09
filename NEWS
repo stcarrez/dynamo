@@ -1,4 +1,4 @@
-Version 0.6.0   -
+Version 0.6.0   - Feb 2013
   - New command 'build-doc' to extract some documentation from the sources
   - Generate MySQL and SQLite schemas from UML models
   - Generate Ada database mappings from UML models

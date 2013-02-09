@@ -105,6 +105,7 @@ dist:
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
+	-rm -rf $(distdir)/src/asis
 	-rm -f $(distdir)/bin/*
 	-rm -f $(distdir)/obj/*
 	tar --exclude=.svn --exclude="*~" --exclude="*.o" --exclude="*.ali" \

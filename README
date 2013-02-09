@@ -2,8 +2,8 @@ Dynamo Ada Generator
 
 This Ada05 application is a code generator used to generate
 an Ada Web Application or database mappings from hibernate-like
-XML description.  It provides various commands for the generation
-of a web application which uses the Ada Web Application framework
+XML description or UML models.  It provides various commands for the
+generation of a web application which uses the Ada Web Application framework
 (http://code.google.com/p/ada-awa/).
 
 Build with the following commands:

@@ -4,52 +4,12 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{projectName}.properties">
-app_search_dirs=\#{empty dynamo_search_dirs ? '.' : dynamo_search_dirs}
-
-app.modules.dir=\#{fn:composePath(app_search_dirs,'config')}
-app.config=awa.xml;#{projectName}.xml
-
-contextPath=/#{fn:toLowerCase(projectName)}
-
-web.dir=\#{fn:composePath(app_search_dirs,'web')}
-view.dir=\#{fn:composePath(app_search_dirs,'web')}
-bundle.dir=\#{fn:composePath(app_search_dirs,'bundles')}
-
-view.debug=true
-view.ignore_spaces=false
-view.escape_unknown_tags=true
-view.ext=.html
-
-content-type.default=text/plain
 ado.queries.load=true
-
-ado.queries.paths=\#{fn:composePath(app_search_dirs,'db')}
+ado.queries.paths=db
 ado.queries.load=true
 #{''}
+ado.database=mysql://localhost:3306/#{projectName}?user=#{projectName}
 
-# Login page
-user.auth-filter.redirect=/\#{contextPath}/auth/login.html
-#{''}
-
-# The base URL to construct URL to the application page.
-app_base_url=http://localhost:8080#{contextPath}
-#{''}
-
-# The application name
-app_name=#{fn:capitalize(projectName)}
-#{''}
-
-# Redirect to a page if the access key is invalid.
-user.verify-filter.redirect=#{contextPath}/auth/login.html
-#{''}
-bundle.var.samplesMsg=samples
-openid.realm=http://localhost:8080\#{contextPath}/auth
-openid.callback_url=http://localhost:8080\#{contextPath}/auth/verify
-openid.success_url=http://localhost:8080\#{contextPath}/auth/success.html
-openid.provider.orange=http://openid.orange.fr
-openid.provider.google=https://www.google.com/accounts/o8/id
-openid.provider.yahoo=http://open.login.yahooapis.com/openid20/www.yahoo.com/xrds
-openid.provider.myopenid=http://www.myopenid.com/server
 #{''}
 # Configuration for log4j
 log4j.rootCategory=DEBUG,console,result
@@ -80,5 +40,4 @@ log4j.logger.AWA.Applications.Configs=WARN
 log4j.logger.AWA.Modules=WARN
 #{''}
 
-database=\#{empty dynamo_database?'mysql://localhost:3306/#{projectName}?user=#{projectName}':dynamo_database}
 </f:view>

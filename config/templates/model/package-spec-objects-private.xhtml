@@ -18,7 +18,8 @@
          #{column.rowIndex} =&gt; COL_#{column.index}_#{table.rowIndex}_NAME'Access<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,</h:panelGroup>
       </h:list>)
      );
-   #{fn:toUpperCase(table.type)}_TABLE : constant ADO.Schemas.Class_Mapping_Access := #{fn:toUpperCase(table.type)}_DEF'Access;
+   #{fn:toUpperCase(table.type)}_TABLE : constant ADO.Schemas.Class_Mapping_Access
+      := #{fn:toUpperCase(table.type)}_DEF'Access;
 #{''}
 
    Null_#{table.type} : constant #{table.type}_Ref

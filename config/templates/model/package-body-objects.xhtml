@@ -161,12 +161,14 @@
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
                   return #{g:adaType(column,1)} is
     <h:panelGroup rendered="#{column.name ne table.id.name}">
-      Impl : constant #{fn:capitalize(table.type)}_Access := #{fn:capitalize(table.type)}_Impl (Object.Get_Load_Object.all)'Access;
+      Impl : constant #{fn:capitalize(table.type)}_Access
+         := #{fn:capitalize(table.type)}_Impl (Object.Get_Load_Object.all)'Access;
    begin
       return Impl.#{fn:capitalize(column.name)};
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name eq table.id.name}">
-      Impl : constant #{fn:capitalize(table.type)}_Access := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
+      Impl : constant #{fn:capitalize(table.type)}_Access
+         := #{fn:capitalize(table.type)}_Impl (Object.Get_Object.all)'Access;
    begin
 <h:panelGroup rendered="#{table.id.type.isString or table.id.type.isIdentifier}">
       return Impl.Get_Key_Value;

@@ -1,0 +1,38 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{dir}#{projectAdaName}-#{moduleName}-modules.ads">-----------------------------------------------------------------------
+--  #{projectAdaName}-#{moduleName}-modules -- Module #{moduleName}
+<ui:include src="../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+with ASF.Applications;
+#{''}
+with AWA.Modules;
+package #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Modules is
+#{''}
+   --  The name under which the module is registered.
+   NAME : constant String := "#{moduleName}";
+#{''}
+   --  ------------------------------
+   --  Module #{moduleName}
+   --  ------------------------------
+   type #{fn:capitalize(g:singular(moduleName))}_Module is new AWA.Modules.Module with private;
+   type #{fn:capitalize(g:singular(moduleName))}_Module_Access is access all #{fn:capitalize(g:singular(moduleName))}_Module'Class;
+#{''}
+   --  Initialize the #{moduleName} module.
+   overriding
+   procedure Initialize (Plugin : in out #{fn:capitalize(g:singular(moduleName))}_Module;
+                         App    : in AWA.Modules.Application_Access;
+                         Props  : in ASF.Applications.Config);
+#{''}
+   --  Get the #{moduleName} module.
+   function Get_#{fn:capitalize(g:singular(moduleName))}_Module return #{fn:capitalize(g:singular(moduleName))}_Module_Access;
+#{''}
+private
+#{''}
+   type #{fn:capitalize(g:singular(moduleName))}_Module is new AWA.Modules.Module with null record;
+#{''}
+end #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Modules;
+</f:view>

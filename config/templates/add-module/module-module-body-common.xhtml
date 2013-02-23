@@ -1,0 +1,61 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+	xmlns:c="http://java.sun.com/jstl/core"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{dir}#{projectAdaName}-#{moduleName}-modules.adb">-----------------------------------------------------------------------
+--  #{projectAdaName}-#{moduleName}-modules -- Module #{moduleName}
+<ui:include src="../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+#{''}
+<c:if test="#{hasBeans}">
+with AWA.Modules.Beans;
+</c:if>
+with AWA.Modules.Get;
+with Util.Log.Loggers;
+<c:if test="#{hasBeans}">
+with #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Beans;
+</c:if>
+package body #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Modules is
+#{''}
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Module");
+<c:if test="#{hasBeans}">
+#{''}
+   package Register is new AWA.Modules.Beans (Module => #{fn:capitalize(g:singular(moduleName))}_Module,
+                                              Module_Access => #{fn:capitalize(g:singular(moduleName))}_Module_Access);
+</c:if>
+#{''}
+   --  ------------------------------
+   --  Initialize the #{moduleName} module.
+   --  ------------------------------
+   overriding
+   procedure Initialize (Plugin : in out #{fn:capitalize(g:singular(moduleName))}_Module;
+                         App    : in AWA.Modules.Application_Access;
+                         Props  : in ASF.Applications.Config) is
+   begin
+      Log.Info ("Initializing the #{moduleName} module");
+#{''}
+<c:if test="#{hasBeans}">
+      --  Register here any bean class, servlet, filter.
+      Register.Register (Plugin => Plugin,
+                         Name   => "#{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Beans.#{fn:capitalize(moduleName)}_Bean",
+                         Handler => #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Beans.Create_#{fn:capitalize(g:singular(moduleName))}_Bean'Access);
+#{''}
+</c:if>
+      AWA.Modules.Module (Plugin).Initialize (App, Props);
+#{''}
+      --  Add here the creation of manager instances.
+   end Initialize;
+#{''}
+   --  ------------------------------
+   --  Get the #{moduleName} module.
+   --  ------------------------------
+   function Get_#{fn:capitalize(g:singular(moduleName))}_Module return #{fn:capitalize(g:singular(moduleName))}_Module_Access is
+      function Get is new AWA.Modules.Get (#{fn:capitalize(g:singular(moduleName))}_Module, #{fn:capitalize(g:singular(moduleName))}_Module_Access, NAME);
+   begin
+      return Get;
+   end Get_#{fn:capitalize(g:singular(moduleName))}_Module;
+#{''}
+end #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Modules;
+</f:view>

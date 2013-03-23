@@ -1,0 +1,31 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}.gpr.in">
+with "config";
+with "gtkada";
+#{''}
+
+project #{projectName} is
+#{''}
+
+   Mains := ("#{projectName}-main.adb");
+
+   for Main use Mains;
+
+   for Source_Dirs use ("src");
+
+   for Object_Dir use "./" &amp; Config'Object_Dir &amp; "/obj";
+   for Exec_Dir use "./" &amp; Config'Exec_Dir &amp; "/bin";
+#{''}
+
+   package Binder renames Config.Binder;
+   package Builder renames Config.Builder;
+   package Compiler renames Config.Compiler;
+   package Linker renames Config.Linker;
+#{''}
+
+end #{projectName};
+</f:view>

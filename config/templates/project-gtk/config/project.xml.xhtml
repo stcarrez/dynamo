@@ -1,0 +1,24 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}.xml"><![CDATA[
+<?xml version='1.0' encoding='UTF-8'?>
+<module version="1.0">
+
+    <application>
+        <locale-config>
+               <default-locale>en</default-locale>
+               <supported-locale>en</supported-locale>
+        </locale-config>
+        <message-bundle var='#{projectName}Msg'>#{projectName}</message-bundle>
+    </application>
+
+    <servlet-mapping>
+      <servlet-name>measures</servlet-name>
+      <url-pattern>/statistics.xml</url-pattern>
+    </servlet-mapping>
+
+</module>
+]]></f:view>

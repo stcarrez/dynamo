@@ -1,0 +1,46 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}.adb">-----------------------------------------------------------------------
+--  #{projectName} -- 
+-----------------------------------------------------------------------
+<ui:include src="../../licenses/license-ada.xhtml"/>
+-----------------------------------------------------------------------
+
+with Gtk.Enums;
+with Gtk.Handlers;
+with Gtk.Main;
+with Gtk.Widget;
+#{''}
+package body #{fn:capitalize(projectName)} is
+#{''}
+   package Window_Cb is new Gtk.Handlers.Callback (Gtk.Widget.Gtk_Widget_Record);
+#{''}
+   procedure Exit_Main (Object : access Gtk.Widget.Gtk_Widget_Record'Class);
+#{''}
+   --  ------------------------------
+   --  Exit the application.
+   --  ------------------------------
+   procedure Exit_Main (Object : access Gtk.Widget.Gtk_Widget_Record'Class) is
+   begin
+      Gtk.Widget.Destroy (Object);
+      Gtk.Main.Main_Quit;
+   end Exit_Main;
+#{''}
+   procedure Gtk_New (Win : out Main_Window) is
+   begin
+      Win := new Main_Window_Record;
+      Initialize (Win);
+   end Gtk_New;
+#{''}
+   procedure Initialize (Win : access Main_Window_Record'Class) is
+   begin
+      Gtk.Window.Initialize (Win, Gtk.Enums.Window_Toplevel);
+      Window_Cb.Connect (Win, "destroy",
+                         Window_Cb.To_Marshaller (Exit_Main'Access));
+   end Initialize;
+#{''}
+end #{fn:capitalize(projectName)};
+</f:view>

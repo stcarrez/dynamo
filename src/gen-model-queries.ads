@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-queries -- XML Mapped Database queries representation
---  Copyright (C) 2009, 2010, 2011 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +21,29 @@ with Ada.Strings.Unbounded;
 with Util.Beans.Objects;
 with Util.Encoders.SHA1;
 
+with Gen.Model.List;
 with Gen.Model.Tables;
 package Gen.Model.Queries is
 
    use Ada.Strings.Unbounded;
+
+   --  ------------------------------
+   --  Sort definition
+   --  ------------------------------
+   type Sort_Definition is new Definition with record
+      --  Name   : Unbounded_String;
+      Sql    : Unbounded_String;
+   end record;
+   type Sort_Definition_Access is access all Sort_Definition'Class;
+
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   overriding
+   function Get_Value (From : in Sort_Definition;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   package Sort_List is new Gen.Model.List (T         => Sort_Definition,
+                                            T_Access  => Sort_Definition_Access);
 
    --  ------------------------------
    --  Table Definition
@@ -34,14 +53,16 @@ package Gen.Model.Queries is
       Sha1           : Util.Encoders.SHA1.Digest;
       Queries        : aliased Gen.Model.Tables.Column_List.List_Definition;
       Queries_Bean   : Util.Beans.Objects.Object;
+      Sorts_Bean     : Util.Beans.Objects.Object;
+      Sorts          : aliased Sort_List.List_Definition;
    end record;
    type Query_Definition_Access is access all Query_Definition'Class;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    overriding
-   function Get_Value (From : Query_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+   function Get_Value (From : in Query_Definition;
+                       Name : in String) return Util.Beans.Objects.Object;
 
    --  Prepare the generation of the model.
    overriding
@@ -52,6 +73,10 @@ package Gen.Model.Queries is
                         Name   : in Unbounded_String;
                         Query  : out Gen.Model.Tables.Column_Definition_Access);
 
+   --  Add a new sort mode for the query definition.
+   procedure Add_Sort (Into : in out Query_Definition;
+                       Name : in Unbounded_String;
+                       Sql  : in Unbounded_String);
 private
 
    --  Initialize the table definition instance.

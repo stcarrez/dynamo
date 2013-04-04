@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-query -- Query artifact for Code Generator
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,6 +51,12 @@ package body Gen.Artifacts.Query is
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
+
+      procedure Register_Sort (Query  : in out Query_Definition;
+                               Node   : in DOM.Core.Node);
+
+      procedure Register_Sorts (Query : in out Query_Definition;
+                                Node  : in DOM.Core.Node);
 
       procedure Register_Column (Table  : in out Query_Definition;
                                  Column : in DOM.Core.Node);
@@ -108,6 +114,30 @@ package body Gen.Artifacts.Query is
       end Register_Columns;
 
       --  ------------------------------
+      --  Register the sort definition in the query
+      --  ------------------------------
+      procedure Register_Sort (Query  : in out Query_Definition;
+                               Node   : in DOM.Core.Node) is
+         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Sql  : constant String := Gen.Utils.Get_Data_Content (Node);
+      begin
+         Query.Add_Sort (Name, To_Unbounded_String (Sql));
+      end Register_Sort;
+
+      --  ------------------------------
+      --  Register all the sort modes defined in the query
+      --  ------------------------------
+      procedure Register_Sorts (Query : in out Query_Definition;
+                                Node  : in DOM.Core.Node) is
+         procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Query_Definition,
+                                                           Process => Register_Sort);
+      begin
+         Log.Debug ("Register sorts from query {0}", Query.Name);
+
+         Iterate (Query, Node, "sort");
+      end Register_Sorts;
+
+      --  ------------------------------
       --  Register a new class definition in the model.
       --  ------------------------------
       procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
@@ -140,6 +170,7 @@ package body Gen.Artifacts.Query is
          C    : Column_Definition_Access;
       begin
          Query.Add_Query (Name, C);
+         Register_Sorts (Query, Node);
       end Register_Query;
 
       --  ------------------------------

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-queries -- XML Mapped Database queries representation
---  Copyright (C) 2009, 2010, 2011 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,25 @@ package body Gen.Model.Queries is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    overriding
+   function Get_Value (From : in Sort_Definition;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "name" then
+         return Util.Beans.Objects.To_Object (From.Name);
+
+      elsif Name = "sql" then
+         return Util.Beans.Objects.To_Object (From.Sql);
+
+      else
+         return Definition (From).Get_Value (Name);
+      end if;
+   end Get_Value;
+
+   --  ------------------------------
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   --  ------------------------------
+   overriding
    function Get_Value (From : Query_Definition;
                        Name : String) return Util.Beans.Objects.Object is
    begin
@@ -34,6 +53,9 @@ package body Gen.Model.Queries is
 
       elsif Name = "sha1" then
          return Util.Beans.Objects.To_Object (From.Sha1);
+
+      elsif Name = "sorts" then
+         return From.Sorts_Bean;
 
       else
          return Tables.Table_Definition (From).Get_Value (Name);
@@ -63,6 +85,19 @@ package body Gen.Model.Queries is
    end Add_Query;
 
    --  ------------------------------
+   --  Add a new sort mode for the query definition.
+   --  ------------------------------
+   procedure Add_Sort (Into : in out Query_Definition;
+                       Name : in Unbounded_String;
+                       Sql  : in Unbounded_String) is
+      Item : constant Sort_Definition_Access := new Sort_Definition;
+   begin
+      Item.Name := Name;
+      Item.Sql  := Sql;
+      Into.Sorts.Append (Item);
+   end Add_Sort;
+
+   --  ------------------------------
    --  Initialize the table definition instance.
    --  ------------------------------
    overriding
@@ -70,6 +105,8 @@ package body Gen.Model.Queries is
    begin
       O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access,
                                                       Util.Beans.Objects.STATIC);
+      O.Sorts_Bean := Util.Beans.Objects.To_Object (O.Sorts'Unchecked_Access,
+                                                    Util.Beans.Objects.STATIC);
       Tables.Table_Definition (O).Initialize;
    end Initialize;
 

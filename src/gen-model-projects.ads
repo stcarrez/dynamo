@@ -66,6 +66,9 @@ package Gen.Model.Projects is
 
       --  Whether we did a recursive scan of GNAT project files.
       Recursive_Scan : Boolean := False;
+
+      --  Whether we are doing a recursive operation on the project (prevent from cycles).
+      Recursing      : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

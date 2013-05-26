@@ -333,13 +333,17 @@ package body Gen.Model.Projects is
             Item.Name := Project.Name;
 
          end if;
-         if Item.Project /= null and Item.Project /= Project then
+         if Item.Project /= null and then not Item.Project.Recursing then
+            Item.Project.Recursing := True;
             Iterate (Item.Project.Modules, Update'Access);
+            Item.Project.Recursing := False;
          end if;
       end Update;
 
    begin
+      Root.Recursing := True;
       Iterate (Root.Projects, Update'Access);
+      Root.Recursing := False;
    end Update_Project;
 
    --  ------------------------------

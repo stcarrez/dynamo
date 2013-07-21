@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -360,6 +360,12 @@ package body Gen.Artifacts.Docs is
                      Line  : in String) is
    begin
       if Line'Length >= 1 and then Line (Line'First) = TAG_CHAR then
+         --  Force a close of the code extract if we see some @xxx command.
+         if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
+            Append_Line (Doc, "}}}");
+            Append_Line (Doc, "");
+         end if;
+         Doc.State := IN_PARA;
          Append_Tag (Doc, Line (Line'First + 1 .. Line'Last));
          return;
       end if;

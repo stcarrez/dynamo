@@ -784,7 +784,7 @@ package body Gen.Model.Projects is
                         Pending.Append (Item);
                         Log.Info ("Preparing to load {0} from {1}", Name, Dynamo);
                      else
-                        Log.Error ("Project {0} not found in dynamo search path", Name);
+                        Log.Info ("Project {0} not found in dynamo search path", Name);
                      end if;
                   end;
                end if;

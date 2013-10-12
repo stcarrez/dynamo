@@ -213,12 +213,12 @@ package body Gen.Integration.Tests is
    procedure Test_Add_Module (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.Execute (Dynamo & " add-module blog", Result);
-      Util.Tests.Assert_Matches (T, ".*Generating file.*test-blog-beans.ads.*", Result,
+      T.Execute (Dynamo & " add-module tblog", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test-tblog-beans.ads.*", Result,
                                  "Invalid add-module");
 
-      T.Execute (Dynamo & " add-module user", Result);
-      Util.Tests.Assert_Matches (T, ".*Generating file.*test-user-beans.ads.*", Result,
+      T.Execute (Dynamo & " add-module tuser", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test-tuser-beans.ads.*", Result,
                                  "Invalid add-module");
    end Test_Add_Module;
 
@@ -228,12 +228,12 @@ package body Gen.Integration.Tests is
    procedure Test_Add_Service (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.Execute (Dynamo & " add-service blog blogging", Result);
-      Util.Tests.Assert_Matches (T, ".*Generating file.*test-blog-services.ads.*", Result,
+      T.Execute (Dynamo & " add-service tblog blogging", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test-tblog-services.ads.*", Result,
                                  "Invalid add-module");
 
-      T.Execute (Dynamo & " add-service user admin", Result);
-      Util.Tests.Assert_Matches (T, ".*Generating file.*test-user-services.ads.*", Result,
+      T.Execute (Dynamo & " add-service tuser admin", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test-tuser-services.ads.*", Result,
                                  "Invalid add-module");
    end Test_Add_Service;
 
@@ -243,12 +243,12 @@ package body Gen.Integration.Tests is
    procedure Test_Add_Query (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.Execute (Dynamo & " add-query user user_query", Result);
-      Util.Tests.Assert_Matches (T, ".*Generating file.*db/user-user_query.xml*", Result,
+      T.Execute (Dynamo & " add-query tuser user_query", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*db/tuser-user_query.xml*", Result,
                                  "Invalid add-query");
 
-      T.Execute (Dynamo & " add-query blog blog_query", Result);
-      Util.Tests.Assert_Matches (T, ".*Generating file.*db/blog-blog_query.xml.*", Result,
+      T.Execute (Dynamo & " add-query tblog blog_query", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*db/tblog-blog_query.xml.*", Result,
                                  "Invalid add-query");
    end Test_Add_Query;
 
@@ -269,9 +269,9 @@ package body Gen.Integration.Tests is
    procedure Test_Add_Ajax_Form (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.Execute (Dynamo & " add-ajax-form user create-user", Result);
+      T.Execute (Dynamo & " add-ajax-form tuser create-user", Result);
       Util.Tests.Assert_Matches (T,
-                                 ".*Generating file.*web/user/forms/create-user-response.xhtml.*",
+                                 ".*Generating file.*web/tuser/forms/create-user-response.xhtml.*",
                                  Result,
                                  "Invalid add-ajax-form");
    end Test_Add_Ajax_Form;
@@ -357,8 +357,8 @@ package body Gen.Integration.Tests is
       T.Execute (Dynamo & " build-doc wiki", Result);
       Util.Tests.Assert_Equals (T, "", Result, "Invalid build-doc command");
 
-      Util.Tests.Assert_Exists (T, "wiki/blog.wiki");
-      Util.Tests.Assert_Exists (T, "wiki/user-user_query.wiki");
+      Util.Tests.Assert_Exists (T, "wiki/tblog.wiki");
+      Util.Tests.Assert_Exists (T, "wiki/tuser-user_query.wiki");
    end Test_Build_Doc;
 
    --  ------------------------------

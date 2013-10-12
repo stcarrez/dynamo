@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,28 +19,154 @@
 with Ada.Text_IO;
 with Ada.IO_Exceptions;
 with Ada.Directories;
+with Ada.Streams.Stream_IO;
 
 with GNAT.Command_Line;
 
 with Gen.Artifacts;
 
+with EL.Contexts.Default;
+with EL.Expressions;
+with EL.Variables.Default;
+
 with Util.Log.Loggers;
 with Util.Files;
+with Util.Streams.Files;
+with Util.Streams.Texts;
 with Util.Beans.Objects;
 with Util.Serialize.Mappers.Record_Mapper;
 with Util.Serialize.IO.XML;
 package body Gen.Commands.Templates is
 
    use Ada.Strings.Unbounded;
-   use Util.Log;
    use GNAT.Command_Line;
 
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Commands.Templates");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Commands.Templates");
+
+   --  Apply the patch instruction
+   procedure Patch_File (Generator : in out Gen.Generator.Handler;
+                         Info      : in Patch);
+
+   function Match_Line (Line    : in String;
+                        Pattern : in String) return Boolean;
 
    --  ------------------------------
-   --  Page Creation Command
+   --  Check if the line matches the pseudo pattern.
    --  ------------------------------
-   --  This command adds a XHTML page to the web application.
+   function Match_Line (Line    : in String;
+                        Pattern : in String) return Boolean is
+      L_Pos : Natural := Line'First;
+      P_Pos : Natural := Pattern'First;
+   begin
+      while P_Pos <= Pattern'Last loop
+         if L_Pos > Line'Last then
+            return False;
+         end if;
+         if Line (L_Pos) = Pattern (P_Pos) then
+            if Pattern (P_Pos) /= ' ' then
+               P_Pos := P_Pos + 1;
+            end if;
+            L_Pos := L_Pos + 1;
+         elsif Pattern (P_Pos) = ' ' and Line (L_Pos) = Pattern (P_Pos + 1) then
+            P_Pos := P_Pos + 2;
+            L_Pos := L_Pos + 1;
+         elsif Pattern (P_Pos) = ' ' and Pattern (P_Pos + 1) = '*' then
+            P_Pos := P_Pos + 1;
+            L_Pos := L_Pos + 1;
+         elsif Pattern (P_Pos) = '*' and Line (L_Pos) = Pattern (P_Pos + 1) then
+            P_Pos := P_Pos + 2;
+            L_Pos := L_Pos + 1;
+         elsif Pattern (P_Pos) = '*' and Line (L_Pos) /= ' ' then
+            L_Pos := L_Pos + 1;
+         else
+            return False;
+         end if;
+      end loop;
+      return True;
+   end Match_Line;
+
+   --  ------------------------------
+   --  Apply the patch instruction
+   --  ------------------------------
+   procedure Patch_File (Generator : in out Gen.Generator.Handler;
+                         Info      : in Patch) is
+      procedure Save_Output (H       : in out Gen.Generator.Handler;
+                             File    : in String;
+                             Content : in Ada.Strings.Unbounded.Unbounded_String);
+
+      Ctx         : EL.Contexts.Default.Default_Context;
+      Variables   : aliased EL.Variables.Default.Default_Variable_Mapper;
+
+      procedure Save_Output (H       : in out Gen.Generator.Handler;
+                             File    : in String;
+                             Content : in Ada.Strings.Unbounded.Unbounded_String) is
+
+         type State is (MATCH_AFTER, MATCH_BEFORE, MATCH_DONE);
+
+         Output_Dir    : constant String := H.Get_Result_Directory;
+         Path          : constant String := Util.Files.Compose (Output_Dir, File);
+         Tmp_File      : constant String := Path & ".tmp";
+         Line_Number   : Natural := 0;
+         After_Pos     : Natural := 1;
+         Current_State : State := MATCH_AFTER;
+         Tmp_Output    : aliased Util.Streams.Files.File_Stream;
+         Output        : Util.Streams.Texts.Print_Stream;
+
+         procedure Process (Line : in String);
+
+         procedure Process (Line : in String) is
+         begin
+            Line_Number := Line_Number + 1;
+            case Current_State is
+            when MATCH_AFTER =>
+               if Match_Line (Line, Info.After.Element (After_Pos)) then
+                  Log.Info ("Match after at line {0}", Natural'Image (Line_Number));
+                  After_Pos := After_Pos + 1;
+                  if After_Pos >= Natural (Info.After.Length) then
+                     Current_State := MATCH_BEFORE;
+                  end if;
+               end if;
+
+            when MATCH_BEFORE =>
+               if Match_Line (Line, To_String (Info.Before)) then
+                  Log.Info ("Match before at line {0}", Natural'Image (Line_Number));
+                  Log.Info ("Add content {0}", Content);
+                  Output.Write (Content);
+                  Current_State := MATCH_DONE;
+               end if;
+
+            when MATCH_DONE =>
+               null;
+
+            end case;
+            Output.Write (Line);
+            Output.Write (ASCII.LF);
+         end Process;
+
+      begin
+         Tmp_Output.Create (Name => Tmp_File, Mode => Ada.Streams.Stream_IO.Out_File);
+         Output.Initialize (Tmp_Output'Unchecked_Access);
+         Util.Files.Read_File (Path, Process'Access);
+         Output.Close;
+         if Current_State /= MATCH_DONE then
+            H.Error ("Patch {0} failed", Path);
+            Ada.Directories.Delete_File (Tmp_File);
+         else
+            Ada.Directories.Delete_File (Path);
+            Ada.Directories.Rename (Old_Name => Tmp_File,
+                                    New_Name => Path);
+         end if;
+
+      exception
+         when Ada.IO_Exceptions.Name_Error =>
+            H.Error ("Cannot patch file {0}", Path);
+      end Save_Output;
+
+   begin
+      Ctx.Set_Variable_Mapper (Variables'Unchecked_Access);
+      Gen.Generator.Generate (Generator, Gen.Artifacts.ITERATION_TABLE,
+                              To_String (Info.Template), Save_Output'Access);
+   end Patch_File;
 
    --  Execute the command with the arguments.
    procedure Execute (Cmd       : in Command;
@@ -82,8 +208,19 @@ package body Gen.Commands.Templates is
       begin
          while Util.Strings.Sets.Has_Element (Iter) loop
             Gen.Generator.Generate (Generator, Gen.Artifacts.ITERATION_TABLE,
-                                    Util.Strings.Sets.Element (Iter));
+                                    Util.Strings.Sets.Element (Iter),
+                                    Gen.Generator.Save_Content'Access);
             Util.Strings.Sets.Next (Iter);
+         end loop;
+      end;
+
+      --  Apply the patch instructions defined for the command.
+      declare
+         Iter : Patch_Vectors.Cursor := Cmd.Patches.First;
+      begin
+         while Patch_Vectors.Has_Element (Iter) loop
+            Patch_File (Generator, Patch_Vectors.Element (Iter));
+            Patch_Vectors.Next (Iter);
          end loop;
       end;
    end Execute;
@@ -113,11 +250,16 @@ package body Gen.Commands.Templates is
                            FIELD_PARAM_OPTIONAL,
                            FIELD_PARAM_ARG,
                            FIELD_TEMPLATE,
+                           FIELD_PATCH,
+                           FIELD_AFTER,
+                           FIELD_BEFORE,
+                           FIELD_INSERT_TEMPLATE,
                            FIELD_COMMAND);
 
    type Command_Loader is record
       Command : Command_Access := null;
       P       : Param;
+      Info    : Patch;
    end record;
    type Command_Loader_Access is access all Command_Loader;
 
@@ -204,6 +346,20 @@ package body Gen.Commands.Templates is
             when FIELD_COMMAND =>
                null;
 
+            when FIELD_INSERT_TEMPLATE =>
+               Closure.Info.Template := To_Unbounded_String (Value);
+
+            when FIELD_AFTER =>
+               Closure.Info.After.Append (To_String (Value));
+
+            when FIELD_BEFORE =>
+               Closure.Info.Before := To_Unbounded_String (Value);
+
+            when FIELD_PATCH =>
+               Closure.Command.Patches.Append (Closure.Info);
+               Closure.Info.After.Clear;
+               Closure.Info.Before := To_Unbounded_String ("");
+
          end case;
       end if;
    end Set_Member;
@@ -277,6 +433,10 @@ begin
    Cmd_Mapper.Add_Mapping ("command/param/@name", FIELD_PARAM_NAME);
    Cmd_Mapper.Add_Mapping ("command/param/@optional", FIELD_PARAM_OPTIONAL);
    Cmd_Mapper.Add_Mapping ("command/param/@arg", FIELD_PARAM_ARG);
+   Cmd_Mapper.Add_Mapping ("command/patch/template", FIELD_INSERT_TEMPLATE);
+   Cmd_Mapper.Add_Mapping ("command/patch/after", FIELD_AFTER);
+   Cmd_Mapper.Add_Mapping ("command/patch/before", FIELD_BEFORE);
    Cmd_Mapper.Add_Mapping ("command/template", FIELD_TEMPLATE);
+   Cmd_Mapper.Add_Mapping ("command/patch", FIELD_PATCH);
    Cmd_Mapper.Add_Mapping ("command", FIELD_COMMAND);
 end Gen.Commands.Templates;

@@ -1,0 +1,29 @@
+<commands>
+   <command>
+      <name>add-permission</name>
+      <title>Add a set of permissions for an entity in the application's module</title>
+      <usage>add-permission MODULE ENTITY</usage>
+      <help><![CDATA[
+  This command adds several permissions for the a new module in the application.  The module name is
+  given as argument.  Once generated, the module should be registered in
+  the AWA application.  It is configured by using an XML file which defines
+  the beans, servlets, filters that it provides.
+  The following files are updated to register the new permissions:
+    src/<project>-<module>-modules.ads
+]]>      </help>
+      <param optional='false' name='moduleName' arg='MODULE'/>
+      <param optional='false' name='entityName' arg='ENTITY'/>
+      <basedir></basedir>
+      <patch>
+          <template>add-permission/patch-module-spec-1.xhtml</template>
+		  <after>with AWA.Modules</after>
+		  <before>package *.*.Modules is</before>
+      </patch>
+      <patch>
+          <template>add-permission/patch-module-spec-2.xhtml</template>
+		  <after>package *.*.Modules is</after>
+		  <after> NAME : constant String</after>
+		  <before> --</before>
+      </patch>
+   </command>
+</commands>

@@ -67,13 +67,13 @@ package body Gen.Commands.Templates is
                P_Pos := P_Pos + 1;
             end if;
             L_Pos := L_Pos + 1;
-         elsif Pattern (P_Pos) = ' ' and Line (L_Pos) = Pattern (P_Pos + 1) then
+         elsif Pattern (P_Pos) = ' ' and then Line (L_Pos) = Pattern (P_Pos + 1) then
             P_Pos := P_Pos + 2;
             L_Pos := L_Pos + 1;
-         elsif Pattern (P_Pos) = ' ' and Pattern (P_Pos + 1) = '*' then
+         elsif Pattern (P_Pos) = ' ' and then Pattern (P_Pos + 1) = '*' then
             P_Pos := P_Pos + 1;
             L_Pos := L_Pos + 1;
-         elsif Pattern (P_Pos) = '*' and Line (L_Pos) = Pattern (P_Pos + 1) then
+         elsif Pattern (P_Pos) = '*' and then Line (L_Pos) = Pattern (P_Pos + 1) then
             P_Pos := P_Pos + 2;
             L_Pos := L_Pos + 1;
          elsif Pattern (P_Pos) = '*' and Line (L_Pos) /= ' ' then
@@ -122,7 +122,7 @@ package body Gen.Commands.Templates is
                if Match_Line (Line, Info.After.Element (After_Pos)) then
                   Log.Info ("Match after at line {0}", Natural'Image (Line_Number));
                   After_Pos := After_Pos + 1;
-                  if After_Pos >= Natural (Info.After.Length) then
+                  if After_Pos > Natural (Info.After.Length) then
                      Current_State := MATCH_BEFORE;
                   end if;
                end if;

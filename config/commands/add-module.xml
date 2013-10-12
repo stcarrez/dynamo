@@ -16,6 +16,10 @@
     src/<project>-<module>-beans.ads
     src/<project>-<module>-beans.adb
     config/<module>.xml
+
+  And the following files are updated to register the new module:
+    src/<project>-applications.ads
+    src/<project>-applications.adb
 ]]>      </help>
       <param optional='false' name='moduleName' arg='NAME'/>
       <basedir></basedir>
@@ -25,5 +29,24 @@
       <template>add-module/module-module-body.xhtml</template>
       <template>add-module/module-beans-spec.xhtml</template>
       <template>add-module/module-beans-body.xhtml</template>
+      <patch>
+          <template>add-module/patch-application-spec-1.xhtml</template>
+		  <after>with AWA.Applications</after>
+		  <before>package *.Applications is</before>
+      </patch>
+      <patch>
+          <template>add-module/patch-application-spec-2.xhtml</template>
+		  <after>package *.Applications is</after>
+		  <after>private</after>
+		  <after> type Application is new AWA.Applications.Application</after>
+		  <before> end record;</before>
+      </patch>
+      <patch>
+          <template>add-module/patch-application-body-1.xhtml</template>
+		  <after>package body *.Applications is</after>
+		  <after> procedure Initialize_Modules</after>
+		  <after> begin</after>
+		  <before> end Initialize_Modules;</before>
+      </patch>
    </command>
 </commands>

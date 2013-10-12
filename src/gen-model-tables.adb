@@ -439,7 +439,8 @@ package body Gen.Model.Tables is
       end if;
       if Length (O.Parent_Name) > 0 then
          declare
-            Result : Mappings.Mapping_Definition_Access := O.Package_Def.Find_Type (O.Parent_Name);
+            Result : constant Mappings.Mapping_Definition_Access
+              := O.Package_Def.Find_Type (O.Parent_Name);
          begin
             if Result /= null and then Result.all in Table_Definition'Class then
                O.Parent := Table_Definition'Class (Result.all)'Access;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011 Stephane Carrez
+--  Copyright (C) 2011, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 
 with Ada.Containers.Vectors;
 with Util.Strings.Sets;
+with Util.Strings.Vectors;
 package Gen.Commands.Templates is
 
    --  ------------------------------
@@ -51,6 +52,16 @@ private
       new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => Param);
 
+   type Patch is record
+      Template  : Ada.Strings.Unbounded.Unbounded_String;
+      After     : Util.Strings.Vectors.Vector;
+      Before    : Ada.Strings.Unbounded.Unbounded_String;
+   end record;
+
+   package Patch_Vectors is
+     new Ada.Containers.Vectors (Index_Type   => Positive,
+                                 Element_Type => Patch);
+
    type Command is new Gen.Commands.Command with record
       Name      : Ada.Strings.Unbounded.Unbounded_String;
       Title     : Ada.Strings.Unbounded.Unbounded_String;
@@ -58,6 +69,7 @@ private
       Help_Msg  : Ada.Strings.Unbounded.Unbounded_String;
       Base_Dir  : Ada.Strings.Unbounded.Unbounded_String;
       Templates : Util.Strings.Sets.Set;
+      Patches   : Patch_Vectors.Vector;
       Params    : Param_Vectors.Vector;
    end record;
 

@@ -1,0 +1,12 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="src/#{projectAdaName}-#{moduleName}-modules.ads">
+   package ACL_Create_#{fn:capitalize(entityName)}s is new Security.Permissions.Definition ("#{entityName}-create");
+   package ACL_Delete_#{fn:capitalize(entityName)}s is new Security.Permissions.Definition ("#{entityName}-delete");
+   package ACL_Update_#{fn:capitalize(entityName)}s is new Security.Permissions.Definition ("#{entityName}-update");
+
+</f:view>
+

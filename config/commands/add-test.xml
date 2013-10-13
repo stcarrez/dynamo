@@ -15,6 +15,10 @@
     regtests/<project>-testsuite.adb
     regtests/<project>-<module>-tests.ads
     regtests/<project>-<module>-tests.adb
+
+  When a new test is added, the project testsuite (<project>-testsuite.adb) is updated
+  to add the new tests in the testsuite (returned by the Suite function).
+
 ]]>      </help>
       <param optional='false' name='moduleName' arg='MODULE'/>
       <basedir></basedir>

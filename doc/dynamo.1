@@ -1,8 +1,8 @@
 .\"
 .\"
-.TH DYNAMO 1 "Dec 19, 2012" "Ada Web Application"
+.TH DYNAMO 1 "Oct 13, 2013" "Ada Web Application"
 .SH NAME
-dynamo - Ada Web Application Generator
+dynamo - Ada Application Generator
 .SH SYNOPSIS
 .B dynamo
 [ -v ] [ -o
@@ -15,9 +15,15 @@ dynamo - Ada Web Application Generator
 .I command
 .br
 .SH DESCRIPTION
-\fIdynamo\fR is a command to help developers write an Ada Web Application using the
+\fIdynamo\fR is a command to help developers write an Ada Application using the
 .B ASF
-framework.  \fIdynamo\fR provides several commands to perform one specific task in
+,
+.B ADO
+,
+.B AWA
+or
+.B Gtk
+libraries.  \fIdynamo\fR provides several commands to perform one specific task in
 the development process.
 .\"
 .PP
@@ -87,7 +93,7 @@ templates provided by \fIdynamo\fR.
 .\"
 .SS The create-project command
 .RS 0
-dynamo \fBcreate-project\fR [-l \fI{apache|gpl|proprietary}\fR] [--web] [--tool] [--ado] \fIname\fR \fIauthor\fR \fIemail\fR
+dynamo \fBcreate-project\fR [-l \fI{apache|gpl|proprietary}\fR] [--web] [--gtk] [--tool] [--ado] \fIname\fR \fIauthor\fR \fIemail\fR
 .RE
 .PP
 Create a new project in the current working directory or in the
@@ -109,6 +115,8 @@ The project type is controlled by one of the
 .B --web
 ,
 .B --tool
+,
+.B --gtk
 or
 .B --ado
 option.  When
@@ -120,12 +128,16 @@ option is specified, a full web application based on ASF and AWA is created.  Th
 .B --web
 is the default if no other option is specified.
 .\"
+The
+.B --gtk
+option generates a Gtk Ada application.
+.\"
 .SS The dist command
 .RS 0
 dynamo \fBdist \fItarget-dir\fR [\fIpackage.xml\fR]\fR
 .RE
 .PP
-After the project is compiled, this command allows to build the distribution files that
+After a web project is compiled, this command allows to build the distribution files that
 must be installed on the server.  The
 .I dist
 command reads a

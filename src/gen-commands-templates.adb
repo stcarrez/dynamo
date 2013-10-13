@@ -25,10 +25,6 @@ with GNAT.Command_Line;
 
 with Gen.Artifacts;
 
-with EL.Contexts.Default;
-with EL.Expressions;
-with EL.Variables.Default;
-
 with Util.Log.Loggers;
 with Util.Files;
 with Util.Streams.Files;
@@ -93,9 +89,6 @@ package body Gen.Commands.Templates is
       procedure Save_Output (H       : in out Gen.Generator.Handler;
                              File    : in String;
                              Content : in Ada.Strings.Unbounded.Unbounded_String);
-
-      Ctx         : EL.Contexts.Default.Default_Context;
-      Variables   : aliased EL.Variables.Default.Default_Variable_Mapper;
 
       procedure Save_Output (H       : in out Gen.Generator.Handler;
                              File    : in String;
@@ -163,7 +156,6 @@ package body Gen.Commands.Templates is
       end Save_Output;
 
    begin
-      Ctx.Set_Variable_Mapper (Variables'Unchecked_Access);
       Gen.Generator.Generate (Generator, Gen.Artifacts.ITERATION_TABLE,
                               To_String (Info.Template), Save_Output'Access);
    end Patch_File;

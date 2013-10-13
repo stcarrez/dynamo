@@ -288,7 +288,7 @@ package body Gen.Integration.Tests is
                                  Result,
                                  "Invalid generate");
       Util.Tests.Assert_Matches (T,
-                                 ".*Generating file.*src/model/test-user-models.*",
+                                 ".*Generating file.*src/model/test-tuser-models.*",
                                  Result,
                                  "Invalid generate");
       Util.Tests.Assert_Matches (T,

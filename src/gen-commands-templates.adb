@@ -129,7 +129,7 @@ package body Gen.Commands.Templates is
 
             when MATCH_BEFORE =>
                if Match_Line (Line, To_String (Info.Before)) then
-                  Log.Info ("Match before at line {0}", Natural'Image (Line_Number));
+                  H.Info ("Patching file {0} at line {1}", Path, Natural'Image (Line_Number));
                   Log.Info ("Add content {0}", Content);
                   Output.Write (Content);
                   Current_State := MATCH_DONE;

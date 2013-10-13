@@ -63,6 +63,12 @@ package Gen.Generator is
                     Arg1    : in String := "";
                     Arg2    : in String := "");
 
+   --  Report an info message.
+   procedure Info (H : in out Handler;
+                   Message : in String;
+                   Arg1    : in String := "";
+                   Arg2    : in String := "");
+
    --  Read the XML package file
    procedure Read_Package (H    : in out Handler;
                            File : in String);

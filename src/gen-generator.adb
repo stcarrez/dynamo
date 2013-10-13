@@ -623,6 +623,18 @@ package body Gen.Generator is
    end Error;
 
    --  ------------------------------
+   --  Report an info message.
+   --  ------------------------------
+   procedure Info (H : in out Handler;
+                   Message : in String;
+                   Arg1    : in String := "";
+                   Arg2    : in String := "") is
+      pragma Unreferenced (H);
+   begin
+      Log.Info (Message, Arg1, Arg2);
+   end Info;
+
+   --  ------------------------------
    --  Read the XML project file.  When <b>Recursive</b> is set, read the GNAT project
    --  files used by the main project and load all the <b>dynamo.xml</b> files defined
    --  by these project.

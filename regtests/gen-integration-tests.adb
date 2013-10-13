@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -383,7 +383,7 @@ package body Gen.Integration.Tests is
                                  Result,
                                  "Invalid generate");
       Util.Tests.Assert_Matches (T,
-                                 ".*Generating file.*src/model/test-user-models.*",
+                                 ".*Generating file.*src/model/test-tuser-models.*",
                                  Result,
                                  "Invalid generate");
       Util.Tests.Assert_Matches (T,

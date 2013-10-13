@@ -24,5 +24,17 @@
       <template>add-test/test-testsuite-body.xhtml</template>
       <template>add-test/test-harness.xhtml</template>
       <template>add-test/tests.gpr.in.xhtml</template>
+      <patch>
+          <template>add-test/patch-testsuite-body-1.xhtml</template>
+		  <after>with *.*.Tests;</after>
+		  <before>package body *.Testsuite is</before>
+      </patch>
+      <patch>
+          <template>add-test/patch-testsuite-body-2.xhtml</template>
+		  <after>package body *.Testsuite is</after>
+		  <after> function Suite</after>
+		  <after> begin</after>
+		  <before> return Tests'Access;</before>
+      </patch>
    </command>
 </commands>

@@ -2962,8 +2962,8 @@ if test $? -ne 0 ; then
    as_fn_error $? "Ada Utility library not found in ${UTIL_DIR}" "$LINENO" 5
 fi
 rm -f t.gpr
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ${UTIL_DIR}" >&5
-$as_echo "${UTIL_DIR}" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ok ${UTIL_DIR}" >&5
+$as_echo "ok ${UTIL_DIR}" >&6; }
 
 
 ##########################################
@@ -2997,8 +2997,8 @@ if test $? -ne 0 ; then
    as_fn_error $? "Ada Expression Language library not found in ${EL_DIR}" "$LINENO" 5
 fi
 rm -f t.gpr
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ${EL_DIR}" >&5
-$as_echo "${EL_DIR}" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ok ${EL_DIR}" >&5
+$as_echo "ok ${EL_DIR}" >&6; }
 
 
 ##########################################
@@ -3032,8 +3032,8 @@ if test $? -ne 0 ; then
    as_fn_error $? "Ada Server Faces library not found in ${ASF_DIR}" "$LINENO" 5
 fi
 rm -f t.gpr
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ${ASF_DIR}" >&5
-$as_echo "${ASF_DIR}" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ok ${ASF_DIR}" >&5
+$as_echo "ok ${ASF_DIR}" >&6; }
 
 
 ##########################################
@@ -3067,8 +3067,8 @@ if test $? -ne 0 ; then
    as_fn_error $? "Ada Database Objects library not found in ${ADO_DIR}" "$LINENO" 5
 fi
 rm -f t.gpr
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ${ADO_DIR}" >&5
-$as_echo "${ADO_DIR}" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ok ${ADO_DIR}" >&5
+$as_echo "ok ${ADO_DIR}" >&6; }
 
 
 

@@ -2,7 +2,7 @@ with "config";
 with "@UTIL_DIR@util";
 with "@UTIL_DIR@testutil";
 with "@EL_DIR@el";
-with "@ASF_DIR@asf";
+with "@ASF_DIR@asf_core";
 with "@ADO_DIR@ado";
 with "dynamo";
 

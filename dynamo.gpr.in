@@ -2,7 +2,7 @@ with "config";
 with "xmlada";
 with "@UTIL_DIR@util";
 with "@EL_DIR@el";
-with "@ASF_DIR@asf";
+with "@ASF_DIR@asf_core";
 with "@ADO_DIR@ado";
 
 project Dynamo is

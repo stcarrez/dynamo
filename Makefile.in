@@ -1,7 +1,7 @@
 # You may edit this makefile as long as you keep these original 
 # target names defined.
 MODE=debug
-GNATMAKE=gprbuild -XMODE=${MODE} -XPROCESSORS=4
+GNATMAKE=gprbuild
 GNATCLEAN=gprclean
 GPRPATH=dynamo.gpr
 SVN=svn
@@ -37,19 +37,22 @@ includedir = @includedir@
 top_builddir = .
 config_dir=${datadir}/dynamo
 
+CPUS := $(shell getconf _NPROCESSORS_ONLN)
+MAKE_ARGS=-XMODE=${MODE} -XPROCESSORS=$(CPUS)
+
 MKDIR=mkdir
 CP=cp
 
 # Build executables for all mains defined by the project.
 build:	src/gen-configs.ads
-	$(GNATMAKE) -P "$(GPRPATH)"
+	$(GNATMAKE) -P "$(GPRPATH)" $(MAKE_ARGS)
 
 # Not intended for manual invocation.
 # Invoked if automatic builds are enabled.
 # Analyzes only on those sources that have changed.
 # Does not build executables.
 autobuild:
-	$(GNATMAKE) -gnatc -c -k  -P "$(GPRPATH)"
+	$(GNATMAKE) -gnatc -c -k  -P "$(GPRPATH)" $(MAKE_ARGS)
 
 # Clean the root project of all build products.
 clean:
@@ -62,14 +65,14 @@ clean_tree:
 # Check *all* sources for errors, even those not changed.
 # Does not build executables.
 analyze:
-	$(GNATMAKE) -f  -gnatc -c -k  -P "$(GPRPATH)"
+	$(GNATMAKE) -f  -gnatc -c -k  -P "$(GPRPATH)" $(MAKE_ARGS)
 
 # Clean, then build executables for all mains defined by the project.
 rebuild: clean build
 
 
 bin/dynamo_harness:  bin/dynamo
-	$(GNATMAKE) -p -Ptests
+	$(GNATMAKE) -p -Ptests $(MAKE_ARGS)
 
 check test:	 build bin/dynamo_harness
 	-rm -rf test-app

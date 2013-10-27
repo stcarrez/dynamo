@@ -1,0 +1,19 @@
+Source: dynamo
+Section: devel
+Priority: extra
+Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev
+Standards-Version: 3.9.2
+Homepage: http://code.google.com/p/ada-gen
+#Vcs-Git: git://git.debian.org/collab-maint/dynamo.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/dynamo.git;a=summary
+
+Package: dynamo
+Architecture: any
+Depends: ${shlibs:Depends}, libada-asf1.0, libada-util1.7, libada-el1.5, libada-security1.1,
+ libada-ado1.0, libada-ado-mysql1.0, ${misc:Depends}
+Description: Ada Application Generator
+ Dynamo is a command to help developers write an Ada Application
+ using the ASF, ADO, AWA or Gtk libraries.  It provides several commands to
+ setup a new project, generate the Ada code from UML models.
+

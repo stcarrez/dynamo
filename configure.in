@@ -77,7 +77,7 @@ if test $? -ne 0 ; then
    AC_MSG_ERROR([Ada Utility library not found in ${UTIL_DIR}])
 fi
 rm -f t.gpr
-AC_MSG_RESULT(${UTIL_DIR})
+AC_MSG_RESULT(ok ${UTIL_DIR})
 AC_SUBST(UTIL_DIR)
 
 ##########################################
@@ -106,7 +106,7 @@ if test $? -ne 0 ; then
    AC_MSG_ERROR([Ada Expression Language library not found in ${EL_DIR}])
 fi
 rm -f t.gpr
-AC_MSG_RESULT(${EL_DIR})
+AC_MSG_RESULT(ok ${EL_DIR})
 AC_SUBST(EL_DIR)
 
 ##########################################
@@ -135,7 +135,7 @@ if test $? -ne 0 ; then
    AC_MSG_ERROR([Ada Server Faces library not found in ${ASF_DIR}])
 fi
 rm -f t.gpr
-AC_MSG_RESULT(${ASF_DIR})
+AC_MSG_RESULT(ok ${ASF_DIR})
 AC_SUBST(ASF_DIR)
 
 ##########################################
@@ -164,7 +164,7 @@ if test $? -ne 0 ; then
    AC_MSG_ERROR([Ada Database Objects library not found in ${ADO_DIR}])
 fi
 rm -f t.gpr
-AC_MSG_RESULT(${ADO_DIR})
+AC_MSG_RESULT(ok ${ADO_DIR})
 AC_SUBST(ADO_DIR)
 
 AC_SUBST(mkdir_p)

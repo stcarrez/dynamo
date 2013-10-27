@@ -89,7 +89,7 @@ DISTFILES=README NEWS LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess confi
 configure.in Makefile.in install-sh ChangeLog \
 dynamo.gpr.in config.gpr tests.gpr.in \
 src \
-bin obj config doc regtests
+bin obj config doc regtests debian
 
 dist:
 	-rm -rf $(distdir)

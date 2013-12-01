@@ -11,7 +11,7 @@ Homepage: http://code.google.com/p/ada-gen
 Package: dynamo
 Architecture: any
 Depends: ${shlibs:Depends}, libada-asf1.0, libada-util1.7, libada-el1.5, libada-security1.1,
- libada-ado1.0, libada-ado-mysql1.0, ${misc:Depends}
+ libada-ado1.0, libada-ado1.0-mysql, ${misc:Depends}
 Description: Ada Application Generator
  Dynamo is a command to help developers write an Ada Application
  using the ASF, ADO, AWA or Gtk libraries.  It provides several commands to

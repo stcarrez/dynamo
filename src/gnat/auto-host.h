@@ -1261,7 +1261,7 @@
 
 /* Define to 1 if you have the <malloc.h> header file. */
 #ifndef USED_FOR_TARGET
-#define HAVE_MALLOC_H 1
+/* #define HAVE_MALLOC_H 1 */
 #endif
 
 

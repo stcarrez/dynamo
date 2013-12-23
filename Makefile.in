@@ -37,7 +37,7 @@ includedir = @includedir@
 top_builddir = .
 config_dir=${datadir}/dynamo
 
-CPUS := $(shell getconf _NPROCESSORS_ONLN)
+CPUS := @NR_CPUS@
 MAKE_ARGS=-XMODE=${MODE} -XPROCESSORS=$(CPUS)
 
 MKDIR=mkdir

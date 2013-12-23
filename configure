@@ -589,6 +589,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+NR_CPUS
 host_os
 host_vendor
 host_cpu
@@ -1858,6 +1859,13 @@ GEN_MAJOR_VERSION=0
 GEN_MINOR_VERSION=7
 GEN_MICRO_VERSION=0
 GEN_VERSION=$GEN_MAJOR_VERSION.$GEN_MINOR_VERSION.$GEN_MICRO_VERSION
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking number of processors" >&5
+$as_echo_n "checking number of processors... " >&6; }
+NR_CPUS=`getconf _NPROCESSORS_CONF 2>/dev/null || getconf _NPROCESSORS_CONF 2>/dev/null || echo 1`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NR_CPUS" >&5
+$as_echo "$NR_CPUS" >&6; }
+
 
 # checking for local tools
 ac_ext=c

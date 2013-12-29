@@ -227,6 +227,9 @@ package Gen.Model.Tables is
    procedure Next (Position : in out Table_Cursor)
      renames Table_Map.Next;
 
+   package Table_List is new Gen.Model.List (T        => Definition,
+                                             T_Access => Definition_Access);
+
 private
 
    type Association_Definition is new Column_Definition with null record;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -164,7 +164,7 @@ package body Gen.Model.Packages is
    --  Register the declaration of the given query in the model.
    --  ------------------------------
    procedure Register_Query (O     : in out Model_Definition;
-                             Table : access Gen.Model.Queries.Query_Definition'Class) is
+                             Table : access Gen.Model.Queries.Query_File_Definition'Class) is
    begin
       O.Register_Package (Table.Pkg_Name, Table.Package_Def);
       Table.Package_Def.Queries.Append (Table.all'Access);

@@ -64,13 +64,13 @@ package body Gen.Artifacts.Query is
       procedure Register_Columns (Table : in out Query_Definition;
                                   Node  : in DOM.Core.Node);
 
-      procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
+      procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_File_Definition;
                                   Node  : in DOM.Core.Node);
 
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
                                   Node  : in DOM.Core.Node);
 
-      procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
+      procedure Register_Query (Query : in out Gen.Model.Queries.Query_File_Definition;
                                 Node  : in DOM.Core.Node);
 
       Hash : Unbounded_String;
@@ -134,13 +134,13 @@ package body Gen.Artifacts.Query is
       begin
          Log.Debug ("Register sorts from query {0}", Query.Name);
 
-         Iterate (Query, Node, "sort");
+         Iterate (Query, Node, "order");
       end Register_Sorts;
 
       --  ------------------------------
       --  Register a new class definition in the model.
       --  ------------------------------
-      procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_Definition;
+      procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_File_Definition;
                                   Node  : in DOM.Core.Node) is
          Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
       begin
@@ -158,19 +158,19 @@ package body Gen.Artifacts.Query is
          Append (Hash, Query.Name);
 
          Log.Debug ("Register query {0} with type {1}", Query.Name, Query.Type_Name);
-         Register_Columns (Query, Node);
+         Register_Columns (Query_Definition (Query), Node);
       end Register_Mapping;
 
       --  ------------------------------
       --  Register a new query.
       --  ------------------------------
-      procedure Register_Query (Query : in out Gen.Model.Queries.Query_Definition;
+      procedure Register_Query (Query : in out Gen.Model.Queries.Query_File_Definition;
                                 Node  : in DOM.Core.Node) is
          Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
-         C    : Column_Definition_Access;
+         C    : Gen.Model.Queries.Query_Definition_Access;
       begin
          Query.Add_Query (Name, C);
-         Register_Sorts (Query, Node);
+         Register_Sorts (Query_Definition (C.all), Node);
       end Register_Query;
 
       --  ------------------------------
@@ -179,21 +179,21 @@ package body Gen.Artifacts.Query is
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
                                   Node  : in DOM.Core.Node) is
          procedure Iterate_Mapping is
-           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Queries.Query_Definition,
+           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Queries.Query_File_Definition,
                                         Process => Register_Mapping);
          procedure Iterate_Query is
-           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Queries.Query_Definition,
+           new Gen.Utils.Iterate_Nodes (T => Gen.Model.Queries.Query_File_Definition,
                                         Process => Register_Query);
 
-         Table : constant Query_Definition_Access := new Query_Definition;
+         Table : constant Query_File_Definition_Access := new Query_File_Definition;
          Pkg   : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "package");
          Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "table");
       begin
          Table.Initialize (Name, Node);
          Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
          Table.Pkg_Name  := Pkg;
-         Iterate_Mapping (Query_Definition (Table.all), Node, "class");
-         Iterate_Query (Query_Definition (Table.all), Node, "query");
+         Iterate_Mapping (Query_File_Definition (Table.all), Node, "class");
+         Iterate_Query (Query_File_Definition (Table.all), Node, "query");
          if Length (Table.Pkg_Name) = 0 then
             Context.Error ("Missing or empty package attribute");
          else

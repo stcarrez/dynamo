@@ -45,16 +45,7 @@ package body Gen.Model.Queries is
    function Get_Value (From : Query_Definition;
                        Name : String) return Util.Beans.Objects.Object is
    begin
-      if Name = "queries" then
-         return From.Queries_Bean;
-
-      elsif Name = "path" then
-         return Util.Beans.Objects.To_Object (From.File_Name);
-
-      elsif Name = "sha1" then
-         return Util.Beans.Objects.To_Object (From.Sha1);
-
-      elsif Name = "sorts" then
+      if Name = "sorts" then
          return From.Sorts_Bean;
 
       else
@@ -70,19 +61,6 @@ package body Gen.Model.Queries is
    begin
       Tables.Table_Definition (O).Prepare;
    end Prepare;
-
-   --  ------------------------------
-   --  Add a new query to the definition.
-   --  ------------------------------
-   procedure Add_Query (Into   : in out Query_Definition;
-                        Name   : in Unbounded_String;
-                        Query  : out Gen.Model.Tables.Column_Definition_Access) is
-   begin
-      Query := new Gen.Model.Tables.Column_Definition;
-      Query.Name := Name;
-      Into.Queries.Append (Query);
-      Query.Number := Into.Queries.Get_Count;
-   end Add_Query;
 
    --  ------------------------------
    --  Add a new sort mode for the query definition.
@@ -103,10 +81,59 @@ package body Gen.Model.Queries is
    overriding
    procedure Initialize (O : in out Query_Definition) is
    begin
-      O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access,
-                                                      Util.Beans.Objects.STATIC);
       O.Sorts_Bean := Util.Beans.Objects.To_Object (O.Sorts'Unchecked_Access,
                                                     Util.Beans.Objects.STATIC);
+      Tables.Table_Definition (O).Initialize;
+   end Initialize;
+
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   overriding
+   function Get_Value (From : in Query_File_Definition;
+                       Name : in String) return Util.Beans.Objects.Object is
+   begin
+      if Name = "queries" then
+         return From.Queries_Bean;
+
+      elsif Name = "path" then
+         return Util.Beans.Objects.To_Object (From.File_Name);
+
+      elsif Name = "sha1" then
+         return Util.Beans.Objects.To_Object (From.Sha1);
+
+      else
+         return Tables.Table_Definition (From).Get_Value (Name);
+      end if;
+   end Get_Value;
+
+   --  Prepare the generation of the model.
+   overriding
+   procedure Prepare (O : in out Query_File_Definition) is
+   begin
+      Tables.Table_Definition (O).Prepare;
+   end Prepare;
+
+   --  ------------------------------
+   --  Add a new query to the definition.
+   --  ------------------------------
+   procedure Add_Query (Into   : in out Query_File_Definition;
+                        Name   : in Unbounded_String;
+                        Query  : out Query_Definition_Access) is
+   begin
+      Query := new Query_Definition;
+      Query.Name := Name;
+      Into.Queries.Append (Query.all'Access);
+      --  Query.Number := Into.Queries.Get_Count;
+   end Add_Query;
+
+   --  ------------------------------
+   --  Initialize the table definition instance.
+   --  ------------------------------
+   overriding
+   procedure Initialize (O : in out Query_File_Definition) is
+   begin
+      O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access,
+                                                      Util.Beans.Objects.STATIC);
       Tables.Table_Definition (O).Initialize;
    end Initialize;
 

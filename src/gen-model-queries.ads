@@ -31,7 +31,6 @@ package Gen.Model.Queries is
    --  Sort definition
    --  ------------------------------
    type Sort_Definition is new Definition with record
-      --  Name   : Unbounded_String;
       Sql    : Unbounded_String;
    end record;
    type Sort_Definition_Access is access all Sort_Definition'Class;
@@ -46,13 +45,9 @@ package Gen.Model.Queries is
                                             T_Access  => Sort_Definition_Access);
 
    --  ------------------------------
-   --  Table Definition
+   --  Query definition
    --  ------------------------------
    type Query_Definition is new Gen.Model.Tables.Table_Definition with record
-      File_Name      : Unbounded_String;
-      Sha1           : Util.Encoders.SHA1.Digest;
-      Queries        : aliased Gen.Model.Tables.Column_List.List_Definition;
-      Queries_Bean   : Util.Beans.Objects.Object;
       Sorts_Bean     : Util.Beans.Objects.Object;
       Sorts          : aliased Sort_List.List_Definition;
    end record;
@@ -68,19 +63,44 @@ package Gen.Model.Queries is
    overriding
    procedure Prepare (O : in out Query_Definition);
 
-   --  Add a new query to the definition.
-   procedure Add_Query (Into   : in out Query_Definition;
-                        Name   : in Unbounded_String;
-                        Query  : out Gen.Model.Tables.Column_Definition_Access);
-
    --  Add a new sort mode for the query definition.
    procedure Add_Sort (Into : in out Query_Definition;
                        Name : in Unbounded_String;
                        Sql  : in Unbounded_String);
-private
 
    --  Initialize the table definition instance.
    overriding
    procedure Initialize (O : in out Query_Definition);
+
+   --  ------------------------------
+   --  Table Definition
+   --  ------------------------------
+   type Query_File_Definition is new Query_Definition with record
+      File_Name      : Unbounded_String;
+      Sha1           : Util.Encoders.SHA1.Digest;
+      Queries        : aliased Gen.Model.Tables.Table_List.List_Definition;
+      Queries_Bean   : Util.Beans.Objects.Object;
+   end record;
+   type Query_File_Definition_Access is access all Query_File_Definition'Class;
+
+   --  Get the value identified by the name.
+   --  If the name cannot be found, the method should return the Null object.
+   overriding
+   function Get_Value (From : in Query_File_Definition;
+                       Name : in String) return Util.Beans.Objects.Object;
+
+   --  Prepare the generation of the model.
+   overriding
+   procedure Prepare (O : in out Query_File_Definition);
+
+   --  Add a new query to the definition.
+   procedure Add_Query (Into   : in out Query_File_Definition;
+                        Name   : in Unbounded_String;
+                        Query  : out Query_Definition_Access);
+
+private
+
+   overriding
+   procedure Initialize (O : in out Query_File_Definition);
 
 end Gen.Model.Queries;

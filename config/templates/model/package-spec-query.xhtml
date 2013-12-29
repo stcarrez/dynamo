@@ -58,6 +58,10 @@
 
    <h:list value="#{query.queries}" var="basic_query">
 #{''}
+  <h:panelGroup rendered="#{not empty basic_query.sorts}">
+   type #{fn:capitalize(g:adaIdent(basic_query.name))}_Order_Type is (<h:list value="#{basic_query.sorts}" var="sort">#{sort.rowIndex > 1 ? ', ' : ''}#{sort.name}</h:list>);
+  </h:panelGroup>
+
    Query_#{fn:capitalize(g:adaIdent(basic_query.name))} : constant ADO.Queries.Query_Definition_Access;
    </h:list>
 

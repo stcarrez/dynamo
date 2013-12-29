@@ -12,6 +12,17 @@
 
    <h:list value="#{query.queries}" var="basic_query">
 #{''}
+   <h:panelGroup rendered="#{not empty basic_query.sorts}">
+      <h:list value="#{basic_query.sorts}" var="sort">
+   #{fn:capitalize(g:adaIdent(basic_query.name))}_#{sort.rowIndex} : aliased constant String := "#{sort.sql}";
+      </h:list>);
+#{''}
+   #{fn:capitalize(g:adaIdent(basic_query.name))}_Order : constant String_Array (1 .. #{basic_query.sorts.size})
+      := (
+   <h:list value="#{basic_query.sorts}" var="sort">
+         #{fn:capitalize(g:adaIdent(basic_query.name))}_#{sort.rowIndex}'Access#{1 + sort.rowIndex lt basic_query.sorts.size ? ', ' : ''}
+   </h:list>);
+   </h:panelGroup>
    package Def_#{fn:capitalize(g:adaIdent(query.type))}#{not empty query.type ? '_' : ''}#{fn:capitalize(g:adaIdent(basic_query.name))} is
       new ADO.Queries.Loaders.Query (Name => "#{basic_query.name}",
                                      File => File_#{query.rowIndex}.File'Access);

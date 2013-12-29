@@ -219,6 +219,8 @@ extern int LIB$GETSYI (int *, unsigned int *);
 # define GNAT_MAX_PATH_LEN 256
 #endif
 
+#if 0 // SCz
+
 /* Reset the file attributes as if no system call had been performed */
 void __gnat_stat_to_attr (int fd, char* name, struct file_attributes* attr);
 
@@ -686,3 +688,4 @@ __gnat_is_executable_file (char *name)
 /* Used for Ada bindings */
 const int __gnat_size_of_file_attributes = sizeof (struct file_attributes);
 
+#endif

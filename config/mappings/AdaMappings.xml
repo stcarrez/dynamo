@@ -38,6 +38,10 @@
         <to>Integer</to>
     </mapping>
     <mapping type="integer">
+        <from>Nullable_Integer</from>
+        <to>ADO.Nullable_Integer</to>
+    </mapping>
+    <mapping type="integer">
         <from>long</from>
         <from>Long</from>
         <from>PrimitiveTypes::Long</from>

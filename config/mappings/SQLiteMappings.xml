@@ -4,12 +4,12 @@
   MySQL types for generated code.
 -->
 <mappings name="SQLite">
-    <mapping>
+    <mapping type='string'>
         <from>String</from>
         <from>datatype::String</from>
         <to>VARCHAR(#{column.sqlLength})</to>
     </mapping>
-    <mapping>
+    <mapping type='date'>
         <from>Nullable_Time</from>
         <from>Nullable_DateTime</from>
         <from>Nullable_Timestamp</from>
@@ -21,14 +21,14 @@
         <from>datatype::DateTime</from>
         <to>DATETIME</to>
     </mapping>
-    <mapping>
+    <mapping type='date'>
         <from>Nullable_Date</from>
         <from>Date</from>
         <from>PrimitiveTypes::Date</from>
         <from>datatype::Date</from>
         <to>DATE</to>
     </mapping>
-    <mapping>
+    <mapping type='date'>
         <from>Timestamp</from>
         <from>datatype::Timestamp</from>
         <from>datatype::DateTime</from>
@@ -53,6 +53,8 @@
     <mapping>
         <from>int</from>
         <from>Integer</from>
+        <from>Nullable_Integer</from>
+        <from>Natural</from>
         <from>PrimitiveTypes::Integer</from>
         <from>datatype::int</from>
         <from>datatype::Integer</from>
@@ -78,7 +80,7 @@
         <from>double</from>
         <to>DOUBLE</to>
     </mapping>
-    <mapping>
+    <mapping type='boolean'>
         <from>bool</from>
         <from>boolean</from>
         <from>Boolean</from>
@@ -109,7 +111,7 @@
         <from>datatype::Identifier</from>
         <to>BIGINT</to>
     </mapping>
-    <mapping>
+    <mapping type='blob'>
         <from>datatype::Blob</from>
         <from>Blob</from>
         <to>LONGBLOB</to>

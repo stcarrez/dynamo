@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -138,6 +138,9 @@ package body Gen.Generator is
 
             if Type_Mapping.Kind = T_DATE and Util.Beans.Objects.To_Integer (Param) = 2 then
                return Util.Beans.Objects.To_Object (String '("Time"));
+
+            elsif Type_Mapping.Kind = T_ENUM then
+               return Util.Beans.Objects.To_Object (Column.Type_Name);
 
             elsif Type_Mapping.Kind /= T_TABLE then
                return Util.Beans.Objects.To_Object (Type_Mapping.Target);

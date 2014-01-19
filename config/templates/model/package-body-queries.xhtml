@@ -30,7 +30,7 @@
          end if;
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isEnum}">
-         return #{column.type.name}_Objects.To_Object (From.#{fn:capitalize(column.name)});
+         return #{g:adaType(column)}_Objects.To_Object (From.#{fn:capitalize(column.name)});
       </h:panelGroup>
       <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate}">
          return Util.Beans.Objects.To_Object (From.#{fn:capitalize(column.name)});
@@ -74,7 +74,7 @@
          Into.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isEnum}">
-         Into.#{fn:capitalize(column.name)} := #{column.type.name}'Val (Stmt.Get_Integer (#{column.index}));
+         Into.#{fn:capitalize(column.name)} := #{g:adaType(column)}'Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
   <h:panelGroup rendered="#{not column.type.isIdentifier and not column.type.isString and not column.type.isEnum}">
          Into.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});

@@ -53,7 +53,7 @@
       Impl.#{fn:capitalize(column.name)} := 0;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isEnum and not column.isPrimaryKey}">
-      Impl.#{fn:capitalize(column.name)} := #{column.type.name}'First;
+      Impl.#{fn:capitalize(column.name)} := #{g:adaType(column,1)}'First;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
       Impl.#{fn:capitalize(column.name)}.Is_Null := True;

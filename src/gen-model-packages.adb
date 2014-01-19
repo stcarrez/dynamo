@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -271,18 +271,36 @@ package body Gen.Model.Packages is
          --  Walk the columns to get their type.
          while Column_List.Has_Element (C) loop
             declare
+               use type Model.Mappings.Basic_Type;
+               use type Model.Mappings.Mapping_Definition_Access;
+
                Col  : constant Column_Definition_Access := Column_List.Element (C);
-               T    : constant String := To_String (Col.Type_Name);
-               Name : constant String := Gen.Utils.Get_Package_Name (T);
+               T    : constant Model.Mappings.Mapping_Definition_Access := Col.Get_Type_Mapping;
+               Name : constant String := To_String (Col.Type_Name);
+               Pkg  : constant String := Gen.Utils.Get_Package_Name (Name);
             begin
-               if not Col.Is_Basic_Type and Name'Length > 0 and Name /= O.Name then
-                  Used_Types.Include (To_Unbounded_String (Name));
+               if T = null then
+                  Log.Error ("Column {0} has null type in table {1} - type is name {2}",
+                             Col.Get_Name, Table.Get_Name, Name);
 
-               elsif T = "Time" or T = "Date" or T = "Timestamp" or T = "Nullable_Time"
-                 or T = "DateTime" or T = "Ada.Calendar.Time" then
-                  O.Uses_Calendar_Time := True;
+               else
+                  case T.Kind is
+                     when Model.Mappings.T_DATE =>
+                        O.Uses_Calendar_Time := True;
 
+                     when Model.Mappings.T_ENUM | Model.Mappings.T_BEAN | Model.Mappings.T_TABLE =>
+                        if Pkg'Length > 0 and Pkg /= O.Name then
+                           Used_Types.Include (To_Unbounded_String (Pkg));
+                        end if;
 
+                     when others =>
+                        if T.Kind /= Model.Mappings.T_DATE
+                          and (Name = "Date" or Name = "DateTime" or Name = "Time") then
+                           Log.Error ("Date type {0} is invalid in table {1} - type is name {2}",
+                                      Model.Mappings.Basic_Type'Image (T.Kind), Table.Get_Name,
+                                      Name);
+                        end if;
+                  end case;
                end if;
             end;
             Column_List.Next (C);

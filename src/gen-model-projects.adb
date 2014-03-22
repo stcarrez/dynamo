@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -93,7 +93,7 @@ package body Gen.Model.Projects is
       Iter   : Project_Vectors.Cursor := From.Dependencies.First;
       Result : Project_Reference;
    begin
-      while not Project_Vectors.Has_Element (Iter) loop
+      while Project_Vectors.Has_Element (Iter) loop
          Result := Project_Vectors.Element (Iter);
          if Result.Project.Get_Name = Name then
             return Result;

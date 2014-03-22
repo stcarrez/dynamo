@@ -32,6 +32,13 @@ package body Gen.Model.Projects is
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Projects");
 
+   --  Find the Dynamo.xml path associated with the given GNAT project file or installed
+   --  in the Dynamo installation path.
+   --  ------------------------------
+   function Get_Dynamo_Path (Name         : in String;
+                             Project_Path : in String;
+                             Install_Dir  : in String) return String;
+
    --  ------------------------------
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
@@ -83,6 +90,53 @@ package body Gen.Model.Projects is
    begin
       return Project.Props.Get ("modules_dir", "plugins");
    end Get_Module_Dir;
+
+   --  ------------------------------
+   --  Find the Dynamo.xml path associated with the given GNAT project file or installed
+   --  in the Dynamo installation path.
+   --  ------------------------------
+   function Get_Dynamo_Path (Name         : in String;
+                             Project_Path : in String;
+                             Install_Dir  : in String) return String is
+   begin
+      --  Check in the directory which contains the project file.
+      if Project_Path'Length /= 0 then
+         declare
+            Dir    : constant String := Ada.Directories.Containing_Directory (Project_Path);
+            Dynamo : constant String := Util.Files.Compose (Dir, "dynamo.xml");
+         begin
+            Log.Debug ("Checking dynamo file {0}", Dynamo);
+            if Ada.Directories.Exists (Dynamo) then
+               return Dynamo;
+            end if;
+         end;
+      end if;
+
+      --  Look in the Dynamo installation directory.
+      if Name'Length > 0 then
+         declare
+            Path   : constant String := Util.Files.Compose (Install_Dir, Name);
+            Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+         begin
+            Log.Debug ("Checking dynamo file {0}", Dynamo);
+            if Ada.Directories.Exists (Dynamo) then
+               return Dynamo;
+            end if;
+         end;
+      else
+         declare
+            Name   : constant String := Ada.Directories.Base_Name (Project_Path);
+            Path   : constant String := Util.Files.Compose (Install_Dir, Name);
+            Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+         begin
+            Log.Debug ("Checking dynamo file {0}", Dynamo);
+            if Ada.Directories.Exists (Dynamo) then
+               return Dynamo;
+            end if;
+         end;
+      end if;
+      return "";
+   end Get_Dynamo_Path;
 
    --  ------------------------------
    --  Find the dependency for the <b>Name</b> plugin.
@@ -634,61 +688,15 @@ package body Gen.Model.Projects is
                                       Result : out Gen.Utils.String_List.Vector) is
          use Gen.Utils.GNAT;
 
-         function Get_Dynamo_Path (Info : in Project_Info) return String;
-
          Iter : Gen.Utils.GNAT.Project_Info_Vectors.Cursor := List.First;
-
-         --  ------------------------------
-         --  Find the Dynamo.xml path associated with the given GNAT project file.
-         --  ------------------------------
-         function Get_Dynamo_Path (Info : in Project_Info) return String is
-            Project_Path : constant String := To_String (Info.Path);
-         begin
-            --  Check in the directory which contains the project file.
-            declare
-               Dir    : constant String := Ada.Directories.Containing_Directory (Project_Path);
-               Dynamo : constant String := Util.Files.Compose (Dir, "dynamo.xml");
-            begin
-               Log.Debug ("Checking dynamo file {0}", Dynamo);
-               if Ada.Directories.Exists (Dynamo) then
-                  return Dynamo;
-               end if;
-            end;
-
-            declare
-               Dir    : constant String := To_String (Project.Install_Dir);
-            begin
-               if Length (Info.Name) > 0 then
-                  declare
-                     Name   : constant String := To_String (Info.Name);
-                     Path   : constant String := Util.Files.Compose (Dir, Name);
-                     Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
-                  begin
-                     Log.Debug ("Checking dynamo file {0}", Dynamo);
-                     if Ada.Directories.Exists (Dynamo) then
-                        return Dynamo;
-                     end if;
-                  end;
-               end if;
-               declare
-                  Name   : constant String := Ada.Directories.Base_Name (Project_Path);
-                  Path   : constant String := Util.Files.Compose (Dir, Name);
-                  Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
-               begin
-                  Log.Debug ("Checking dynamo file {0}", Dynamo);
-                  if Ada.Directories.Exists (Dynamo) then
-                     return Dynamo;
-                  end if;
-               end;
-            end;
-            return "";
-         end Get_Dynamo_Path;
-
+         Dir  : constant String := To_String (Project.Install_Dir);
       begin
          while Gen.Utils.GNAT.Project_Info_Vectors.Has_Element (Iter) loop
             declare
                Info     : constant Project_Info := Project_Info_Vectors.Element (Iter);
-               Dynamo   : constant String := Get_Dynamo_Path (Info);
+               Dynamo   : constant String := Get_Dynamo_Path (To_String (Info.Name),
+                                                              To_String (Info.Path),
+                                                              Dir);
                Has_File : constant Boolean := Result.Contains (Dynamo);
                P        : Model.Projects.Project_Definition_Access;
             begin

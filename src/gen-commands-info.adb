@@ -117,6 +117,33 @@ package body Gen.Commands.Info is
       --  ------------------------------
       --  Print the list of Dynamo modules
       --  ------------------------------
+      procedure Print_Project_List (Project : in out Gen.Model.Projects.Project_Definition'Class;
+                                    Indent  : in Ada.Text_IO.Positive_Count;
+                                    List    : in Gen.Model.Projects.Project_Vectors.Vector) is
+         use Gen.Model.Projects;
+         use type Ada.Text_IO.Positive_Count;
+
+         Iter : Project_Vectors.Cursor := List.First;
+         Ref  : Model.Projects.Project_Reference;
+      begin
+         while Project_Vectors.Has_Element (Iter) loop
+            Ref := Project_Vectors.Element (Iter);
+            Ada.Text_IO.Set_Col (Indent);
+            Ada.Text_IO.Put ("   ");
+            Ada.Text_IO.Put (Ada.Strings.Unbounded.To_String (Ref.Name));
+            Ada.Text_IO.Set_Col (Indent + 30);
+            if Ref.Project /= null then
+               Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Ref.Project.Path));
+            else
+               Ada.Text_IO.Put_Line ("?");
+            end if;
+            Project_Vectors.Next (Iter);
+         end loop;
+      end Print_Project_List;
+
+      --  ------------------------------
+      --  Print the list of Dynamo modules
+      --  ------------------------------
       procedure Print_Modules (Project : in out Gen.Model.Projects.Project_Definition'Class;
                                Indent  : in Ada.Text_IO.Positive_Count) is
          use Gen.Model.Projects;
@@ -125,23 +152,12 @@ package body Gen.Commands.Info is
          Iter : Project_Vectors.Cursor := Project.Modules.First;
          Ref  : Model.Projects.Project_Reference;
       begin
-         if Project_Vectors.Has_Element (Iter) then
+         if not Project.Modules.Is_Empty then
             Ada.Text_IO.Set_Col (Indent);
             Ada.Text_IO.Put_Line ("Dynamo plugins:");
-            while Project_Vectors.Has_Element (Iter) loop
-               Ref := Project_Vectors.Element (Iter);
-               Ada.Text_IO.Set_Col (Indent);
-               Ada.Text_IO.Put ("   ");
-               Ada.Text_IO.Put (Ada.Strings.Unbounded.To_String (Ref.Name));
-               Ada.Text_IO.Set_Col (Indent + 30);
-               if Ref.Project /= null then
-                  Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Ref.Project.Path));
-               else
-                  Ada.Text_IO.Put_Line ("?");
-               end if;
-               Project_Vectors.Next (Iter);
-            end loop;
+            Print_Project_List (Project, Indent, Project.Modules);
 
+            Print_Project_List (Project, Indent, Project.Dependencies);
             Iter := Project.Modules.First;
             while Project_Vectors.Has_Element (Iter) loop
                Ref := Project_Vectors.Element (Iter);

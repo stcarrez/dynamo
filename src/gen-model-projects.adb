@@ -149,7 +149,7 @@ package body Gen.Model.Projects is
    begin
       while Project_Vectors.Has_Element (Iter) loop
          Result := Project_Vectors.Element (Iter);
-         if Result.Project.Get_Name = Name then
+         if Result.Name = Name then
             return Result;
          end if;
          Project_Vectors.Next (Iter);
@@ -169,14 +169,41 @@ package body Gen.Model.Projects is
 
       if Depend.Project = null then
          Depend.Project := Into.Find_Project_By_Name (Name);
-         if Depend.Project = null then
-            Depend.Project := new Project_Definition;
-            Depend.Project.Name := To_Unbounded_String (Name);
-            Project_Definition'Class (Into).Add_Project (Depend.Project);
-         end if;
          Depend.Kind := Kind;
          Into.Dependencies.Append (Depend);
       end if;
+   end Add_Dependency;
+
+   --  ------------------------------
+   --  Add a dependency to the plugin identified by <b>Project</b>.
+   --  ------------------------------
+   procedure Add_Dependency (Into    : in out Project_Definition;
+                             Project : in Project_Definition_Access;
+                             Kind    : in Dependency_Type) is
+      procedure Update (Ref : in out Project_Reference);
+
+      procedure Update (Ref : in out Project_Reference) is
+      begin
+         Ref.Project := Project;
+      end Update;
+
+      Iter   : Project_Vectors.Cursor := Into.Dependencies.First;
+      Result : Project_Reference;
+   begin
+      Log.Debug ("Adding dependency {0}", Project.Name);
+
+      while Project_Vectors.Has_Element (Iter) loop
+         Result := Project_Vectors.Element (Iter);
+         if Result.Name = Project.Name then
+            Into.Dependencies.Update_Element (Iter, Update'Access);
+            return;
+         end if;
+         Project_Vectors.Next (Iter);
+      end loop;
+      Result.Project := Project;
+      Result.Kind    := Kind;
+      Result.Name    := Project.Name;
+      Into.Dependencies.Append (Result);
    end Add_Dependency;
 
    --  ------------------------------
@@ -339,7 +366,7 @@ package body Gen.Model.Projects is
    begin
       Project.Root := Into'Unchecked_Access;
       Ref.Project  := Project;
-      Ref.Name     := To_Unbounded_String (Project.Get_Project_Name);
+      Ref.Name     := Project.Name;
       Into.Projects.Append (Ref);
    end Add_Project;
 
@@ -366,8 +393,11 @@ package body Gen.Model.Projects is
       return null;
    end Find_Project_By_Name;
 
-   procedure Update_Project (Root    : in out Root_Project_Definition;
-                             Project : in Project_Definition_Access) is
+   --  ------------------------------
+   --  Update the project references after a project is found and initialized.
+   --  ------------------------------
+   procedure Update_References (Root    : in out Root_Project_Definition;
+                                Project : in Project_Definition_Access) is
 
       procedure Update (Item : in out Project_Reference);
 
@@ -390,6 +420,7 @@ package body Gen.Model.Projects is
          if Item.Project /= null and then not Item.Project.Recursing then
             Item.Project.Recursing := True;
             Iterate (Item.Project.Modules, Update'Access);
+            Iterate (Item.Project.Dependencies, Update'Access);
             Item.Project.Recursing := False;
          end if;
       end Update;
@@ -398,7 +429,7 @@ package body Gen.Model.Projects is
       Root.Recursing := True;
       Iterate (Root.Projects, Update'Access);
       Root.Recursing := False;
-   end Update_Project;
+   end Update_References;
 
    --  ------------------------------
    --  Find the project definition associated with the dynamo XML file <b>Path</b>.
@@ -434,7 +465,7 @@ package body Gen.Model.Projects is
             Output.Write_String (ASCII.LF & "    ");
             Output.Start_Entity (Name => "depend");
             Output.Write_Attribute (Name  => "name",
-                                    Value => To_Object (Depend.Project.Get_Name));
+                                    Value => To_Object (Depend.Name));
             Output.End_Entity (Name => "depend");
          end if;
       end Save_Dependency;
@@ -600,7 +631,7 @@ package body Gen.Model.Projects is
 
       elsif Project.Root /= null then
          Root_Project_Definition'Class (Project.Root.all).
-           Update_Project (Project'Unchecked_Access);
+           Update_References (Project'Unchecked_Access);
 
       end if;
 
@@ -654,7 +685,7 @@ package body Gen.Model.Projects is
 
                      Project.Dynamo_Files.Append (File);
                      P.Read_Project;
-                     Project.Add_Module (P);
+                     Project.Add_Dependency (P, DIRECT);
                   end if;
                end;
             end if;
@@ -678,42 +709,6 @@ package body Gen.Model.Projects is
 
       procedure Collect_Dynamo_Files (List   : in Gen.Utils.GNAT.Project_Info_Vectors.Vector;
                                       Result : out Gen.Utils.String_List.Vector);
-      procedure Read_Dependencies (Def : in out Project_Definition'Class);
-
-      --  ------------------------------
-      --  Read the dynamo project dependencies and find the associated dynamo.xml file.
-      --  This is necessary for the plugins that don't have a GNAT project file associated.
-      --  Such plugin don't contain any Ada code but they could provide either database files
-      --  and web presentation pages (HTML, CSS, Javascript).
-      --  ------------------------------
-      procedure Read_Dependencies (Def : in out Project_Definition'Class) is
-         Iter   : Project_Vectors.Cursor := Def.Dependencies.First;
-         Result : Project_Reference;
-         Dir    : constant String := To_String (Project.Install_Dir);
-      begin
-         while Project_Vectors.Has_Element (Iter) loop
-            Result := Project_Vectors.Element (Iter);
-            declare
-               Path     : constant String := To_String (Result.Project.Path);
-               Dynamo   : constant String := Get_Dynamo_Path (Result.Project.Get_Name,
-                                                              Path,
-                                                              Dir);
-               Has_File : constant Boolean := Def.Dynamo_Files.Contains (Dynamo);
-            begin
-               Log.Info ("Project {0} depends on {1} found dynamo file {2}", Def.Get_Name,
-                         Result.Project.Get_Name, Dynamo);
-               if Dynamo /= "" then
-                  if Path = "" then
-                     Result.Project.Path := To_Unbounded_String (Dynamo);
-                  end if;
-                  if not Has_File then
-                     Def.Dynamo_Files.Append (Dynamo);
-                  end if;
-               end if;
-            end;
-            Project_Vectors.Next (Iter);
-         end loop;
-      end Read_Dependencies;
 
       --  ------------------------------
       --  Collect the <b>dynamo.xml</b> files used by the projects.
@@ -758,7 +753,7 @@ package body Gen.Model.Projects is
                   if P = null then
                      Project.Create_Project (Path => Dynamo, Name => "", Project => P);
                      P.Read_Project;
-                     Project.Add_Module (P);
+                     Project.Add_Dependency (P, DIRECT);
                   end if;
                end if;
             end;
@@ -772,7 +767,7 @@ package body Gen.Model.Projects is
       Project.Read_Project;
 
       --  When necessary, read the GNAT project files.  We get a list of absolute GNAT path
-      --  files that we can use known the project dependencies with other modules.
+      --  files that we can use to known the project dependencies with other modules.
       --  This is useful for database schema generation for example.
       if Recursive then
 
@@ -804,6 +799,48 @@ package body Gen.Model.Projects is
             Pending     : Project_Vectors.Vector;
 
             procedure Update (Item : in out Project_Reference);
+            procedure Read_Dependencies (Def : in out Project_Definition'Class);
+
+            --  ------------------------------
+            --  Read the dynamo project dependencies and find the associated dynamo.xml file.
+            --  This is necessary for the plugins that don't have a GNAT project file associated.
+            --  Such plugin don't contain any Ada code but they could provide either database files
+            --  and web presentation pages (HTML, CSS, Javascript).
+            --  ------------------------------
+            procedure Read_Dependencies (Def : in out Project_Definition'Class) is
+               Iter   : Project_Vectors.Cursor := Def.Dependencies.First;
+               Result : Project_Reference;
+               Dir    : constant String := To_String (Project.Install_Dir);
+            begin
+               while Project_Vectors.Has_Element (Iter) loop
+                  Result := Project_Vectors.Element (Iter);
+                  if Result.Project = null then
+                     Result.Project      := new Project_Definition;
+                     Result.Project.Path := To_Unbounded_String ("");
+                     Result.Project.Name := Result.Name;
+                     Pending.Append (Result);
+                  end if;
+                  declare
+                     Path     : constant String := To_String (Result.Project.Path);
+                     Dynamo   : constant String := Get_Dynamo_Path (Result.Project.Get_Name,
+                                                                    Path,
+                                                                    Dir);
+                     Has_File : constant Boolean := Def.Dynamo_Files.Contains (Dynamo);
+                  begin
+                     Log.Info ("Project {0} depends on {1} found dynamo file {2}", Def.Get_Name,
+                               Result.Project.Get_Name, Dynamo);
+                     if Dynamo /= "" then
+                        if Path = "" then
+                           Result.Project.Path := To_Unbounded_String (Dynamo);
+                        end if;
+                        if not Has_File then
+                           Def.Dynamo_Files.Append (Dynamo);
+                        end if;
+                     end if;
+                  end;
+                  Project_Vectors.Next (Iter);
+               end loop;
+            end Read_Dependencies;
 
             procedure Update (Item : in out Project_Reference) is
             begin

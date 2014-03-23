@@ -101,6 +101,11 @@ package Gen.Model.Projects is
                              Name : in String;
                              Kind : in Dependency_Type);
 
+   --  Add a dependency to the plugin identified by <b>Project</b>.
+   procedure Add_Dependency (Into    : in out Project_Definition;
+                             Project : in Project_Definition_Access;
+                             Kind    : in Dependency_Type);
+
    --  Create a project definition instance to record a project with the dynamo XML file path.
    procedure Create_Project (Into    : in out Project_Definition;
                              Name    : in String;
@@ -170,9 +175,6 @@ package Gen.Model.Projects is
    function Find_Project (From : in Root_Project_Definition;
                           Path : in String) return Project_Definition_Access;
 
-   procedure Update_Project (Root    : in out Root_Project_Definition;
-                             Project : in Project_Definition_Access);
-
    --  Read the XML project file.  When <b>Recursive</b> is set, read the GNAT project
    --  files used by the main project and load all the <b>dynamo.xml</b> files defined
    --  by these project.
@@ -182,6 +184,11 @@ package Gen.Model.Projects is
                            Recursive : in Boolean := False);
 
 private
+
+   --  Update the project references after a project is found and initialized.
+   procedure Update_References (Root    : in out Root_Project_Definition;
+                                Project : in Project_Definition_Access);
+
    --  Iterate over the project referenced in the list and execute the <b>Process</b> procedure.
    procedure Iterate (List    : in out Project_Vectors.Vector;
                       Process : access procedure (Item : in out Project_Reference));

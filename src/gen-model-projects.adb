@@ -725,7 +725,8 @@ package body Gen.Model.Projects is
          while Gen.Utils.GNAT.Project_Info_Vectors.Has_Element (Iter) loop
             declare
                Info     : constant Project_Info := Project_Info_Vectors.Element (Iter);
-               Dynamo   : constant String := Get_Dynamo_Path (To_String (Info.Name),
+               Name     : constant String := To_String (Info.Name);
+               Dynamo   : constant String := Get_Dynamo_Path (Name,
                                                               To_String (Info.Path),
                                                               Dir);
                Has_File : constant Boolean := Result.Contains (Dynamo);
@@ -751,7 +752,7 @@ package body Gen.Model.Projects is
                   --  Create it and load the XML if necessary.
                   P := Project.Find_Project (Dynamo);
                   if P = null then
-                     Project.Create_Project (Path => Dynamo, Name => "", Project => P);
+                     Project.Create_Project (Path => Dynamo, Name => Name, Project => P);
                      P.Read_Project;
                      Project.Add_Dependency (P, DIRECT);
                   end if;

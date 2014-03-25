@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils-gnat -- GNAT utilities
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,6 +70,7 @@ package body Gen.Utils.GNAT is
 
       function Get_Variable_Value (Proj : in Prj.Project_Id;
                                    Name : in String) return String;
+      function Get_Project_Name (Proj  : in Prj.Project_Id) return String;
 
 
       --  Get the variable value represented by the name <b>Name</b>.
@@ -96,6 +97,19 @@ package body Gen.Utils.GNAT is
       end Get_Variable_Value;
 
       --  ------------------------------
+      --  Get the project name from the GNAT project name or from the "name" project variable.
+      --  ------------------------------
+      function Get_Project_Name (Proj  : in Prj.Project_Id) return String is
+         Name    : constant String := Get_Variable_Value (Proj, "name");
+      begin
+         if Name'Length > 0 then
+            return Name;
+         else
+            return Namet.Get_Name_String (Proj.Name);
+         end if;
+      end Get_Project_Name;
+
+      --  ------------------------------
       --  Add the full path of the GNAT project in the project list.
       --  ------------------------------
       procedure Recursive_Add (Proj  : in Prj.Project_Id;
@@ -103,10 +117,10 @@ package body Gen.Utils.GNAT is
          pragma Unreferenced (Dummy);
 
          Path    : constant String := Namet.Get_Name_String (Proj.Path.Name);
-         Name    : constant String := Get_Variable_Value (Proj, "name");
+         Name    : constant String := Get_Project_Name (Proj);
          Project : Project_Info;
       begin
-         Log.Info ("Using GNAT project: {0}", Path);
+         Log.Info ("Using GNAT project: {0} - {1}", Path, Name);
 
          Project.Path := To_Unbounded_String (Path);
          Project.Name := To_Unbounded_String (Name);

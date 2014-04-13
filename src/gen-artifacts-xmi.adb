@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -1024,7 +1024,8 @@ package body Gen.Artifacts.XMI is
 --                 Iterate_For_Table (Table.all, Class.Operations, Prepare_Operation'Access);
             end;
 
-         elsif Item.Has_Stereotype (Handler.Bean_Stereotype) then
+         elsif Item.Has_Stereotype (Handler.Bean_Stereotype)
+           or Item.Has_Stereotype (Handler.Limited_Bean_Stereotype) then
             Log.Debug ("Class {0} recognized as a bean", Name);
             declare
                Bean : constant Bean_Definition_Access := Gen.Model.Beans.Create_Bean (Name);
@@ -1032,6 +1033,7 @@ package body Gen.Artifacts.XMI is
                Model.Register_Bean (Bean);
                Bean.Set_Comment (Item.Get_Comment);
                Bean.Target := Name;
+               Bean.Is_Limited := Item.Has_Stereotype (Handler.Limited_Bean_Stereotype);
                if Class.Parent_Class /= null then
                   Log.Info ("Bean {0} inherit from {1}", Name,
                             To_String (Class.Parent_Class.Name));
@@ -1188,6 +1190,10 @@ package body Gen.Artifacts.XMI is
                                                   "Dynamo.xmi",
                                                   "AWA.Bean",
                                                   Gen.Model.XMI.BY_NAME);
+      Handler.Limited_Bean_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                          "Dynamo.xmi",
+                                                          "AWA.Limited_Bean",
+                                                          Gen.Model.XMI.BY_NAME);
       Handler.Has_List_Tag := Find_Tag_Definition (Handler.Nodes,
                                                    "Dynamo.xmi",
                                                    "ADO.Table.@dynamo.table.hasList",

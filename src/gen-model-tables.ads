@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -158,6 +158,9 @@ package Gen.Model.Tables is
 
       --  Mark flag used by the dependency calculation.
       Has_Mark         : Boolean := False;
+
+      --  Whether the bean type is a limited type or not.
+      Is_Limited       : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

@@ -10,7 +10,7 @@
    --  <h:outputText value="#{g:comment(bean.comment)}" escape="false"/>
    --  --------------------
  </h:panelGroup>
-   type #{bean.type} is abstract#{not empty bean.parent ? ' new ' : ''}#{not empty bean.parent ? bean.parent.name : ''}#{not empty bean.parent ? '_Ref' : ''}
+   type #{bean.type} is abstract#{bean.isLimited ? ' limited' : ''}#{not empty bean.parent ? ' new ' : ''}#{not empty bean.parent ? bean.parent.name : ''}#{not empty bean.parent ? '_Ref' : ''}
      #{empty bean.parent.name ? 'new ' : 'and '}Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with #{empty bean.members ? 'null record;' : ' record'}
    <h:list value="#{bean.members}" var="attribute">
       #{fn:capitalize(attribute.name)} : #{g:adaType(attribute,0)};

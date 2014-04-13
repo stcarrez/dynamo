@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Dec 26 18:53:30 CET 2012'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Apr 13 21:46:58 CEST 2014'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
@@ -95,14 +95,14 @@ with the table and the generation of the List procedure.
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D50'
               name = 'PK' visibility = 'public' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'false'>
-              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F70'
               name = 'FK' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F83'
               name = 'DataModel' visibility = 'public' isSpecification = 'false' isRoot = 'false'
@@ -163,14 +163,14 @@ with the table and the generation of the List procedure.
             <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B43'
               name = 'Nullable' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B44'
               name = 'Not Null' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Package xmi.id = '127-0-1-1--67cacd78:13b9079e950:-8000:0000000000002C7E'
               name = 'Model' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
@@ -449,6 +449,42 @@ with the table and the generation of the List procedure.
                   <UML:TaggedValue.dataValue>1.0</UML:TaggedValue.dataValue>
                   <UML:TaggedValue.type>
                     <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F77'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+              </UML:ModelElement.taggedValue>
+            </UML:Stereotype>
+            <UML:Stereotype xmi.id = '127-0-1-1--51395fad:144adf1aa33:-8000:000000000000208C'
+              name = 'Limited_Bean' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Stereotype.baseClass>Class</UML:Stereotype.baseClass>
+              <UML:ModelElement.taggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--51395fad:144adf1aa33:-8000:000000000000208D'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1-416ec9ab:13b39addf6a:-8000:00000000000022C0'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--51395fad:144adf1aa33:-8000:000000000000208E'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>Stephane.Carrez</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F73'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--51395fad:144adf1aa33:-8000:000000000000208F'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>1.0</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F77'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--51395fad:144adf1aa33:-8000:0000000000002090'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>The bean stereotype indicates a class that exposes an Ada Bean interface and can be used in EL expressions.
+The Limited_Bean defines a limited type.</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
                   </UML:TaggedValue.type>
                 </UML:TaggedValue>
               </UML:ModelElement.taggedValue>

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,6 +69,9 @@ package Gen.Model.Projects is
 
       --  Whether we are doing a recursive operation on the project (prevent from cycles).
       Recursing      : Boolean := False;
+
+      --  Whether we did a recursive scan of Dynamo dependencies.
+      Depend_Scan    : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

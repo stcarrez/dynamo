@@ -832,8 +832,8 @@ package body Gen.Model.Projects is
                                                                           Dir);
                            Has_File : constant Boolean := Def.Dynamo_Files.Contains (Dynamo);
                         begin
-                           Log.Info ("Project {0} depends on {1} found dynamo file {2}", Def.Get_Name,
-                                     Result.Project.Get_Name, Dynamo);
+                           Log.Info ("Project {0} depends on {1} found dynamo file {2}",
+                                     Def.Get_Name, Result.Project.Get_Name, Dynamo);
                            if Dynamo /= "" then
                               if Path = "" then
                                  Result.Project.Path := To_Unbounded_String (Dynamo);

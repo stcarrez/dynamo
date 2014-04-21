@@ -3,7 +3,7 @@ Upstream-Name: dynamo
 Source: http://code.google.com/p/ada-gen/downloads
 
 Files: *
-Copyright: 2010, 2011, 2012, 2013 Stephane Carrez <Stephane.Carrez@gmail.com>
+Copyright: 2010, 2011, 2012, 2013, 2014 Stephane Carrez <Stephane.Carrez@gmail.com>
 License: Apache-2.0
 
 Files: src/gnat/*
@@ -11,7 +11,7 @@ Copyright: Copyright (C) 1992-2010, Free Software Foundation, Inc.
 License: GPL-3.0+
 
 Files: debian/*
-Copyright: 2013 Stephane Carrez <Stephane.Carrez@gmail.com>
+Copyright: 2013, 2014 Stephane Carrez <Stephane.Carrez@gmail.com>
 License: GPL-3.0+
 
 License: GPL-3.0+

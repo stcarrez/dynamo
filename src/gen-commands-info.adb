@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-info -- Collect and give information about the project
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +49,9 @@ package body Gen.Commands.Info is
                                Indent  : in Ada.Text_IO.Positive_Count);
 
       procedure Print_Project (Project : in out Gen.Model.Projects.Root_Project_Definition);
+
+      procedure Print_Project_List (Indent  : in Ada.Text_IO.Positive_Count;
+                                    List    : in Gen.Model.Projects.Project_Vectors.Vector);
 
       List  : Gen.Utils.String_List.Vector;
       Names : Util.Strings.Sets.Set;
@@ -117,8 +120,7 @@ package body Gen.Commands.Info is
       --  ------------------------------
       --  Print the list of Dynamo modules
       --  ------------------------------
-      procedure Print_Project_List (Project : in out Gen.Model.Projects.Project_Definition'Class;
-                                    Indent  : in Ada.Text_IO.Positive_Count;
+      procedure Print_Project_List (Indent  : in Ada.Text_IO.Positive_Count;
                                     List    : in Gen.Model.Projects.Project_Vectors.Vector) is
          use Gen.Model.Projects;
          use type Ada.Text_IO.Positive_Count;
@@ -155,9 +157,9 @@ package body Gen.Commands.Info is
          if not Project.Modules.Is_Empty then
             Ada.Text_IO.Set_Col (Indent);
             Ada.Text_IO.Put_Line ("Dynamo plugins:");
-            Print_Project_List (Project, Indent, Project.Modules);
+            Print_Project_List (Indent, Project.Modules);
 
-            Print_Project_List (Project, Indent, Project.Dependencies);
+            Print_Project_List (Indent, Project.Dependencies);
             Iter := Project.Modules.First;
             while Project_Vectors.Has_Element (Iter) loop
                Ref := Project_Vectors.Element (Iter);

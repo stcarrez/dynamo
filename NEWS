@@ -2,6 +2,7 @@ Version 0.7.0   -
   - New project template to generate Gtk Ada application
   - Register the new module in the application when they are added
   - Update the current testsuite when new tests are added
+  - New stereotype <<Limited_Bean>> for Ada bean generation
   - Support for the creation of Debian packages
 
 Version 0.6.0   - Feb 2013

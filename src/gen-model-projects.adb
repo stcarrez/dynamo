@@ -610,21 +610,23 @@ package body Gen.Model.Projects is
    begin
       Log.Info ("Reading project file '{0}'", Path);
 
-      --  Create the mapping to load the XML project file.
-      Mapper.Add_Mapping ("name", FIELD_PROJECT_NAME);
-      Mapper.Add_Mapping ("property/@name", FIELD_PROPERTY_NAME);
-      Mapper.Add_Mapping ("property", FIELD_PROPERTY_VALUE);
-      Mapper.Add_Mapping ("module/@name", FIELD_MODULE_NAME);
-      Mapper.Add_Mapping ("depend/@name", FIELD_DEPEND_NAME);
-      Reader.Add_Mapping ("project", Mapper'Unchecked_Access);
+      if Path /= "" and then Ada.Directories.Exists (Path) then
+         --  Create the mapping to load the XML project file.
+         Mapper.Add_Mapping ("name", FIELD_PROJECT_NAME);
+         Mapper.Add_Mapping ("property/@name", FIELD_PROPERTY_NAME);
+         Mapper.Add_Mapping ("property", FIELD_PROPERTY_VALUE);
+         Mapper.Add_Mapping ("module/@name", FIELD_MODULE_NAME);
+         Mapper.Add_Mapping ("depend/@name", FIELD_DEPEND_NAME);
+         Reader.Add_Mapping ("project", Mapper'Unchecked_Access);
 
-      --  Set the context for Set_Member.
-      Project_Mapper.Set_Context (Reader, Loader'Access);
+         --  Set the context for Set_Member.
+         Project_Mapper.Set_Context (Reader, Loader'Access);
 
-      Project.Name := Null_Unbounded_String;
+         Project.Name := Null_Unbounded_String;
 
-      --  Read the XML query file.
-      Reader.Parse (Path);
+         --  Read the XML query file.
+         Reader.Parse (Path);
+      end if;
 
       if Length (Project.Name) = 0 then
          Log.Error ("Project file {0} does not contain the project name.", Path);
@@ -636,11 +638,6 @@ package body Gen.Model.Projects is
       end if;
 
       Log.Info ("Project {0} is {1}", To_String (Project.Path), To_String (Project.Name));
-
-   exception
-      when Ada.IO_Exceptions.Name_Error =>
-         --           H.Error ("Project file {0} does not exist", Path);
-         Log.Error ("Project file {0} does not exist", Path);
    end Read_Project;
 
    --  ------------------------------
@@ -752,6 +749,7 @@ package body Gen.Model.Projects is
                   --  Create it and load the XML if necessary.
                   P := Project.Find_Project (Dynamo);
                   if P = null then
+                     Log.Debug ("Create dependency for {0} on {1}", Name, Dynamo);
                      Project.Create_Project (Path => Dynamo, Name => Name, Project => P);
                      P.Read_Project;
                      Project.Add_Dependency (P, DIRECT);
@@ -811,34 +809,42 @@ package body Gen.Model.Projects is
             procedure Read_Dependencies (Def : in out Project_Definition'Class) is
                Iter   : Project_Vectors.Cursor := Def.Dependencies.First;
                Result : Project_Reference;
+               Found  : Project_Reference;
                Dir    : constant String := To_String (Project.Install_Dir);
             begin
+               Log.Debug ("Read dependencies of {0}", Def.Name);
                while Project_Vectors.Has_Element (Iter) loop
                   Result := Project_Vectors.Element (Iter);
                   if Result.Project = null then
-                     Result.Project      := new Project_Definition;
-                     Result.Project.Path := To_Unbounded_String ("");
-                     Result.Project.Name := Result.Name;
-                     Pending.Append (Result);
-                  end if;
-                  declare
-                     Path     : constant String := To_String (Result.Project.Path);
-                     Dynamo   : constant String := Get_Dynamo_Path (Result.Project.Get_Name,
-                                                                    Path,
-                                                                    Dir);
-                     Has_File : constant Boolean := Def.Dynamo_Files.Contains (Dynamo);
-                  begin
-                     Log.Info ("Project {0} depends on {1} found dynamo file {2}", Def.Get_Name,
-                               Result.Project.Get_Name, Dynamo);
-                     if Dynamo /= "" then
-                        if Path = "" then
-                           Result.Project.Path := To_Unbounded_String (Dynamo);
+                     Found  := Find_Project (Pending, To_String (Result.Name));
+                     if Found.Kind = NONE then
+                        Result.Project := Def.Find_Project_By_Name (To_String (Result.Name));
+                        if Result.Project = null then
+                           Result.Project      := new Project_Definition;
+                           Result.Project.Path := To_Unbounded_String ("");
+                           Result.Project.Name := Result.Name;
+                           Pending.Append (Result);
                         end if;
-                        if not Has_File then
-                           Def.Dynamo_Files.Append (Dynamo);
-                        end if;
+                        declare
+                           Path     : constant String := To_String (Result.Project.Path);
+                           Dynamo   : constant String := Get_Dynamo_Path (Result.Project.Get_Name,
+                                                                          Path,
+                                                                          Dir);
+                           Has_File : constant Boolean := Def.Dynamo_Files.Contains (Dynamo);
+                        begin
+                           Log.Info ("Project {0} depends on {1} found dynamo file {2}", Def.Get_Name,
+                                     Result.Project.Get_Name, Dynamo);
+                           if Dynamo /= "" then
+                              if Path = "" then
+                                 Result.Project.Path := To_Unbounded_String (Dynamo);
+                              end if;
+                              if not Has_File then
+                                 Def.Dynamo_Files.Append (Dynamo);
+                              end if;
+                           end if;
+                        end;
                      end if;
-                  end;
+                  end if;
                   Project_Vectors.Next (Iter);
                end loop;
             end Read_Dependencies;
@@ -874,7 +880,8 @@ package body Gen.Model.Projects is
                   Item.Project.Recursive_Scan := True;
                   Iterate (Item.Project.Modules, Update'Access);
                end if;
-               if Item.Project /= null then
+               if Item.Project /= null and then not Item.Project.Depend_Scan then
+                  Item.Project.Depend_Scan := True;
                   Read_Dependencies (Item.Project.all);
                end if;
             end Update;
@@ -882,7 +889,7 @@ package body Gen.Model.Projects is
             Iter : Project_Vectors.Cursor;
          begin
             Iterate (Project.Modules, Update'Access);
-            for Pass in 1 .. 2 loop
+            for Pass in 1 .. 4 loop
                Iter := Project.Projects.First;
 
                Log.Info ("Checking {0} projects",

@@ -1,4 +1,4 @@
-Version 0.7.0   -
+Version 1.0.0   - Apr 2014
   - New project template to generate Gtk Ada application
   - Register the new module in the application when they are added
   - Update the current testsuite when new tests are added

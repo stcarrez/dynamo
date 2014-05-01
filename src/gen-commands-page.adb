@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-page -- Page creation command for dynamo
---  Copyright (C) 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ with Ada.Directories;
 with Ada.Text_IO;
 with Gen.Artifacts;
 with GNAT.Command_Line;
+with Util.Strings;
 
 package body Gen.Commands.Page is
 
@@ -32,9 +33,24 @@ package body Gen.Commands.Page is
       use Ada.Strings.Unbounded;
 
       function Get_Layout return String;
+      function Get_Name return String;
 
-      Name   : constant String := Get_Argument;
       Dir    : constant String := Generator.Get_Result_Directory & "web/";
+
+      function Get_Name return String is
+         Name : constant String := Get_Argument;
+         Pos  : constant Natural := Util.Strings.Rindex (Name, '.');
+      begin
+         if Pos = 0 then
+            return Name;
+         elsif Name (Pos .. Name'Last) = ".xhtml" then
+            return Name (Name'First .. Pos - 1);
+         elsif Name (Pos .. Name'Last) = ".html" then
+            return Name (Name'First .. Pos - 1);
+         else
+            return Name;
+         end if;
+      end Get_Name;
 
       function Get_Layout return String is
          Layout : constant String := Get_Argument;
@@ -50,6 +66,7 @@ package body Gen.Commands.Page is
          return "layout";
       end Get_Layout;
 
+      Name   : constant String := Get_Name;
       Layout : constant String := Get_Layout;
    begin
       if Name'Length = 0 then
@@ -81,6 +98,8 @@ package body Gen.Commands.Page is
       Put_Line ("add-page: Add a new web page to the application");
       Put_Line ("Usage: add-page NAME [LAYOUT]");
       New_Line;
+      Put_Line ("  The web page is an XHTML file created under the 'web' directory.");
+      Put_Line ("  The NAME can contain a directory that will be created if necessary.");
       Put_Line ("  The new web page can be configured to use the given layout.");
       Put_Line ("  The layout file must exist to be used.  The default layout is 'layout'.");
       Put_Line ("  You can create a new layout with 'add-layout' command.");
@@ -101,6 +120,9 @@ package body Gen.Commands.Page is
             end;
          end loop;
       end if;
+      New_Line;
+      Put_Line ("  The following files are generated:");
+      Put_Line ("    web/<name>.xhtml");
    end Help;
 
 end Gen.Commands.Page;

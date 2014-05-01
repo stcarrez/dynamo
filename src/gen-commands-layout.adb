@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-layout -- Layout creation command for dynamo
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ with Ada.Text_IO;
 with Gen.Artifacts;
 with GNAT.Command_Line;
 
+with Util.Strings;
 with Util.Files;
 package body Gen.Commands.Layout is
 
@@ -34,9 +35,23 @@ package body Gen.Commands.Layout is
 
       function Get_Layout return String;
 
-      Name       : constant String := Get_Argument;
       Dir        : constant String := Generator.Get_Result_Directory;
       Layout_Dir : constant String := Util.Files.Compose (Dir, "web/WEB-INF/layouts");
+
+      function Get_Name return String is
+         Name : constant String := Get_Argument;
+         Pos  : constant Natural := Util.Strings.Rindex (Name, '.');
+      begin
+         if Pos = 0 then
+            return Name;
+         elsif Name (Pos .. Name'Last) = ".xhtml" then
+            return Name (Name'First .. Pos - 1);
+         elsif Name (Pos .. Name'Last) = ".html" then
+            return Name (Name'First .. Pos - 1);
+         else
+            return Name;
+         end if;
+      end Get_Name;
 
       function Get_Layout return String is
          Layout : constant String := Get_Argument;
@@ -52,6 +67,7 @@ package body Gen.Commands.Layout is
          return "layout";
       end Get_Layout;
 
+      Name   : constant String := Get_Name;
       Layout : constant String := Get_Layout;
    begin
       if Name'Length = 0 then
@@ -82,6 +98,9 @@ package body Gen.Commands.Layout is
       Put_Line ("  You can create several layouts for your application.");
       Put_Line ("  Each layout can reference one or several building blocks that are defined");
       Put_Line ("  in the original page.");
+      New_Line;
+      Put_Line ("  The following files are generated:");
+      Put_Line ("    web/WEB-INF/layouts/<name>.xhtml");
    end Help;
 
 end Gen.Commands.Layout;

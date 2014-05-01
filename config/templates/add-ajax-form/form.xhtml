@@ -4,9 +4,13 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{moduleName}/forms/#{formName}-form.xhtml"><![CDATA[
-<div xmlns:f="http://java.sun.com/jsf/core"
-     xmlns:h="http://java.sun.com/jsf/html">
-
+<f:view contentType="text/html; charset=UTF-8"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:h="http://java.sun.com/jsf/html">
+  <f:metadata>
+    <f:viewParam id='id' value='\#{user.id}'/>
+  </f:metadata>
+  <div>
     <div class="ui-widget ui-widget-header">
         Compute the volume of a cylinder
     </div>
@@ -35,6 +39,6 @@
             </ul>
         </div>
     </h:form>
-
-</div>
+  </div>
+</f:view>
 ]]></f:view>

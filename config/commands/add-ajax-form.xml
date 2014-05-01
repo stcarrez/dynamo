@@ -4,10 +4,13 @@
       <title>Add an AJAX form to the module</title>
       <usage>add-ajax-form MODULE FORM-NAME</usage>
       <help><![CDATA[
-         This command adds a new AJAX form to the given module.
+  This command adds a new AJAX form to the given module.
+  The AJAX form contains an <f:view> component and is intended to be
+  retrieved and submitted by using some AJAX operation.  The associated
+  response is a JSON that allows to perform update operations.
 
-         web/<module>/forms/<form-name>-form.xhtml
-         web/<module>/forms/<form-name>-response.xhtml
+    web/<module>/forms/<form-name>-form.xhtml
+    web/<module>/forms/<form-name>-response.xhtml
 ]]>   </help>
       <param name='moduleName'/>
       <param name='formName'/>

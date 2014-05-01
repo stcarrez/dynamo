@@ -5,6 +5,8 @@
       <usage>add-permission MODULE ENTITY</usage>
       <help><![CDATA[
   This command adds several permissions for the a new module in the application.
+  The MODULE is the name of the module in the application and ENTITY is the name
+  of the entity or database table.  Three permissions are created for the entity.
   It creates the following permissions by instantiating the Security.Permissions.Definition
   package:
 

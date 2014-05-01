@@ -1,0 +1,20 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{moduleName}/forms/#{formName}-response.xhtml"><![CDATA[
+<f:view contentType="application/json"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:c="http://java.sun.com/jstl/core"
+        xmlns:util="http://code.google.com/p/ada-asf/util"
+        xmlns:h="http://java.sun.com/jsf/html">
+[
+ { "action": "update", "id": "#result", "data": "<util:escape>
+     <h:panelGroup rendered="#{not empty user.email}">
+         <h3>User email is #{user.email}</h3>
+     </h:panelGroup>
+    </util:escape>" }
+]
+</f:view>
+]]></f:view>

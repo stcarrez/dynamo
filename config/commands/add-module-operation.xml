@@ -23,6 +23,7 @@
       <param optional='false' name='operationName' arg='OPERATION'/>
       <basedir></basedir>
       <patch optional='true'>
+          <title>importing Models package</title>
           <template>add-module-operation/patch-module-spec-1.xhtml</template>
           <missing>with #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Models;</missing>
 		  <before>package *.*.Modules is</before>
@@ -35,11 +36,13 @@
 		  <before>private</before>
       </patch>
       <patch optional='true'>
+          <title>adding 'with ADO.Sessions'</title>
           <template>add-module-operation/patch-module-body-1.xhtml</template>
           <missing>with ADO.Sessions;</missing>
 		  <before>package body *.*.Modules is</before>
       </patch>
       <patch optional='true'>
+          <title>adding 'with AWA.Services.Contexts'</title>
           <template>add-module-operation/patch-module-body-2.xhtml</template>
           <missing>with AWA.Services.Contexts;</missing>
 		  <before>package body *.*.Modules is</before>

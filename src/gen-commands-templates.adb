@@ -26,6 +26,7 @@ with GNAT.Command_Line;
 with Gen.Artifacts;
 
 with EL.Beans;
+with EL.Utils;
 with EL.Contexts.Default;
 with EL.Functions.Namespaces;
 
@@ -53,6 +54,17 @@ package body Gen.Commands.Templates is
 
    function Match_Line (Line    : in String;
                         Pattern : in String) return Boolean;
+
+   --  Check that the line does not match any of the pattern defined in the missing list.
+   --  Returns True if the line matches one of the pattern and False if there is no match.
+   function Match_Missing (Line    : in String;
+                           Missing : in Util.Strings.Vectors.Vector) return Boolean;
+
+   --  Expand a vector of strings by evaluating the EL expressions against the EL context
+   --  and appending the result into the target list.
+   procedure Expand (Source  : in Util.Strings.Vectors.Vector;
+                     Into    : in out Util.Strings.Vectors.Vector;
+                     Context : in EL.Contexts.ELContext'Class);
 
    --  ------------------------------
    --  Check if the line matches the pseudo pattern.
@@ -90,6 +102,43 @@ package body Gen.Commands.Templates is
    end Match_Line;
 
    --  ------------------------------
+   --  Check that the line does not match any of the pattern defined in the missing list.
+   --  Returns True if the line matches one of the pattern and False if there is no match.
+   --  ------------------------------
+   function Match_Missing (Line    : in String;
+                           Missing : in Util.Strings.Vectors.Vector) return Boolean is
+      Iter  : Util.Strings.Vectors.Cursor := Missing.First;
+   begin
+      while Util.Strings.Vectors.Has_Element (Iter) loop
+         declare
+            Match : constant String := Util.Strings.Vectors.Element (Iter);
+         begin
+            if Match_Line (Line, Match) then
+               return True;
+            end if;
+            Log.Debug ("Check {0} - {1}", Match, Line);
+            Util.Strings.Vectors.Next (Iter);
+         end;
+      end loop;
+      return False;
+   end Match_Missing;
+
+   --  ------------------------------
+   --  Expand a vector of strings by evaluating the EL expressions against the EL context
+   --  and appending the result into the target list.
+   --  ------------------------------
+   procedure Expand (Source  : in Util.Strings.Vectors.Vector;
+                     Into    : in out Util.Strings.Vectors.Vector;
+                     Context : in EL.Contexts.ELContext'Class) is
+      Iter : Util.Strings.Vectors.Cursor := Source.First;
+   begin
+      while Util.Strings.Vectors.Has_Element (Iter) loop
+         Into.Append (EL.Utils.Eval (Util.Strings.Vectors.Element (Iter), Context));
+         Util.Strings.Vectors.Next (Iter);
+      end loop;
+   end Expand;
+
+   --  ------------------------------
    --  Apply the patch instruction
    --  ------------------------------
    procedure Patch_File (Generator : in out Gen.Generator.Handler;
@@ -112,47 +161,30 @@ package body Gen.Commands.Templates is
          Current_State : State := MATCH_AFTER;
          Tmp_Output    : aliased Util.Streams.Files.File_Stream;
          Output        : Util.Streams.Texts.Print_Stream;
-         Context       : aliased ASF.Contexts.Faces.Faces_Context;
-         ELContext     : aliased EL.Contexts.Default.Default_Context;
-         Missing       : EL.Beans.Param_Vectors.Vector;
+         Missing       : Util.Strings.Vectors.Vector;
+         After         : Util.Strings.Vectors.Vector;
+         Before        : Ada.Strings.Unbounded.Unbounded_String;
 
          procedure Process (Line : in String);
-         function Match_Missing (Line : in String) return Boolean;
-
-         function Match_Missing (Line : in String) return Boolean is
-            Iter  : EL.Beans.Param_Vectors.Cursor := Missing.First;
-            Value : Util.Beans.Objects.Object;
-         begin
-            while EL.Beans.Param_Vectors.Has_Element (Iter) loop
-               Value := EL.Beans.Param_Vectors.Element (Iter).
-                 Value.Get_Value (ELContext);
-               if Match_Line (Line, Util.Beans.Objects.To_String (Value)) then
-                  Log.Info ("Match missing at line {0}", Natural'Image (Line_Number));
-                  return True;
-               end if;
-               Log.Debug ("Check {0} - {1}", Util.Beans.Objects.To_String (Value), Line);
-               EL.Beans.Param_Vectors.Next (Iter);
-            end loop;
-            return False;
-         end Match_Missing;
 
          procedure Process (Line : in String) is
          begin
             Line_Number := Line_Number + 1;
             case Current_State is
             when MATCH_AFTER =>
-               if Match_Line (Line, Info.After.Element (After_Pos)) then
+               if Match_Line (Line, After.Element (After_Pos)) then
                   Log.Info ("Match after at line {0}", Natural'Image (Line_Number));
                   After_Pos := After_Pos + 1;
-                  if After_Pos > Natural (Info.After.Length) then
+                  if After_Pos > Natural (After.Length) then
                      Current_State := MATCH_BEFORE;
                   end if;
                end if;
 
             when MATCH_BEFORE =>
-               if Match_Missing (Line) then
+               if Match_Missing (Line, Missing) then
+                  Log.Info ("Match missing at line {0}", Natural'Image (Line_Number));
                   Current_State := MATCH_FAIL;
-               elsif Match_Line (Line, To_String (Info.Before)) then
+               elsif Match_Line (Line, To_String (Before)) then
                   H.Info ("Patching file {0} at line {1}", Path, Natural'Image (Line_Number));
                   Log.Info ("Add content {0}", Content);
                   Output.Write (Content);
@@ -167,36 +199,47 @@ package body Gen.Commands.Templates is
             Output.Write (ASCII.LF);
          end Process;
 
-         use type Ada.Containers.Count_Type;
-
-         Iter  : Util.Strings.Vectors.Cursor := Info.Missing.First;
-         NS_Mapper : aliased EL.Functions.Namespaces.NS_Function_Mapper;
-         Root_Resolver  : aliased ASF.Beans.Resolvers.ELResolver;
+         Context       : aliased ASF.Contexts.Faces.Faces_Context;
+         ELContext     : aliased EL.Contexts.Default.Default_Context;
+         NS_Mapper     : aliased EL.Functions.Namespaces.NS_Function_Mapper;
+         Root_Resolver : aliased ASF.Beans.Resolvers.ELResolver;
       begin
+         --  Build the EL context to evaluate the patterns that must be verified.
+         --  This allows a pattern to match the module name or application name for example.
          Root_Resolver.Initialize (Generator'Unchecked_Access, null);
          ELContext.Set_Resolver (Root_Resolver'Unchecked_Access);
          NS_Mapper.Set_Namespace (Prefix => "fn",
                                   URI    => ASF.Views.Nodes.Core.FN_URI);
+         NS_Mapper.Set_Namespace (Prefix => "g",
+                                  URI    => Gen.Generator.G_URI);
          Context.Set_ELContext (ELContext'Unchecked_Access);
          Generator.Set_Context (Context'Unchecked_Access);
          NS_Mapper.Set_Function_Mapper (ELContext.Get_Function_Mapper.all'Access);
          ELContext.Set_Function_Mapper (NS_Mapper'Unchecked_Access);
 
-         while Util.Strings.Vectors.Has_Element (Iter) loop
-            EL.Beans.Add_Parameter (Missing, "", Util.Strings.Vectors.Element (Iter),
-                                    ELContext);
-            Util.Strings.Vectors.Next (Iter);
-         end loop;
+         --  Expand the patterns.
+         Expand (Info.Missing, Missing, ELContext);
+         Expand (Info.After, After, ELContext);
+         Before := To_Unbounded_String (EL.Utils.Eval (To_String (Info.Before), ELContext));
+
          Tmp_Output.Create (Name => Tmp_File, Mode => Ada.Streams.Stream_IO.Out_File);
          Output.Initialize (Tmp_Output'Unchecked_Access);
-         if Info.After.Length = 0 then
+
+         --  If the after pattern list is empty, start the missing/before check.
+         if After.Is_Empty then
             Current_State := MATCH_BEFORE;
          end if;
+
+         --  Read the file line by line and check the after/missing/before patterns.
          Util.Files.Read_File (Path, Process'Access);
          Output.Close;
          if Current_State /= MATCH_DONE then
             if not Info.Optional then
-               H.Error ("Patch {0} failed", Path);
+               if Length (Info.Title) > 0 then
+                  H.Error ("Patch {0} on {1} failed", To_String (Info.Title), Path);
+               else
+                  H.Error ("Patch {0} failed", Path);
+               end if;
             end if;
             Ada.Directories.Delete_File (Tmp_File);
          else
@@ -297,6 +340,7 @@ package body Gen.Commands.Templates is
                            FIELD_PARAM_OPTIONAL,
                            FIELD_PARAM_ARG,
                            FIELD_PATCH_OPTIONAL,
+                           FIELD_PATCH_TITLE,
                            FIELD_TEMPLATE,
                            FIELD_PATCH,
                            FIELD_AFTER,
@@ -410,12 +454,16 @@ package body Gen.Commands.Templates is
             when FIELD_BEFORE =>
                Closure.Info.Before := To_Unbounded_String (Value);
 
+            when FIELD_PATCH_TITLE =>
+               Closure.Info.Title := To_Unbounded_String (Value);
+
             when FIELD_PATCH =>
                Closure.Command.Patches.Append (Closure.Info);
                Closure.Info.After.Clear;
                Closure.Info.Missing.Clear;
                Closure.Info.Optional := False;
                Closure.Info.Before := To_Unbounded_String ("");
+               Closure.Info.Title  := To_Unbounded_String ("");
 
          end case;
       end if;
@@ -495,6 +543,7 @@ begin
    Cmd_Mapper.Add_Mapping ("command/patch/missing", FIELD_MISSING);
    Cmd_Mapper.Add_Mapping ("command/patch/after", FIELD_AFTER);
    Cmd_Mapper.Add_Mapping ("command/patch/before", FIELD_BEFORE);
+   Cmd_Mapper.Add_Mapping ("command/patch/title", FIELD_PATCH_TITLE);
    Cmd_Mapper.Add_Mapping ("command/template", FIELD_TEMPLATE);
    Cmd_Mapper.Add_Mapping ("command/patch", FIELD_PATCH);
    Cmd_Mapper.Add_Mapping ("command", FIELD_COMMAND);

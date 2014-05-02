@@ -40,6 +40,8 @@ package Gen.Generator is
    --  A fatal error that prevents the generator to proceed has occurred.
    Fatal_Error : exception;
 
+   G_URI : constant String := "http://code.google.com/p/ada-ado/generator";
+
    type Package_Type is (PACKAGE_MODEL, PACKAGE_FORMS);
 
    type Mapping_File is record

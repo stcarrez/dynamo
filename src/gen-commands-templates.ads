@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011, 2013 Stephane Carrez
+--  Copyright (C) 2011, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,9 @@ private
    type Patch is record
       Template  : Ada.Strings.Unbounded.Unbounded_String;
       After     : Util.Strings.Vectors.Vector;
+      Missing   : Util.Strings.Vectors.Vector;
       Before    : Ada.Strings.Unbounded.Unbounded_String;
+      Optional  : Boolean := False;
    end record;
 
    package Patch_Vectors is

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-project -- Project creation command for dynamo
---  Copyright (C) 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,11 +99,15 @@ package body Gen.Commands.Project is
                   Generator.Set_Project_Property ("license", "apache");
                elsif L = "gpl" then
                   Generator.Set_Project_Property ("license", "gpl");
+               elsif L = "mit" then
+                  Generator.Set_Project_Property ("license", "mit");
+               elsif L = "bsd3" then
+                  Generator.Set_Project_Property ("license", "bsd3");
                elsif L = "proprietary" then
                   Generator.Set_Project_Property ("license", "proprietary");
                else
                   Generator.Error ("Invalid license: {0}", L);
-                  Generator.Error ("Valid licenses: apache, gpl, proprietary");
+                  Generator.Error ("Valid licenses: apache, gpl, mit, bsd3, proprietary");
                   return;
                end if;
             end;
@@ -192,14 +196,14 @@ package body Gen.Commands.Project is
       use Ada.Text_IO;
    begin
       Put_Line ("create-project: Create a new Ada Web Application project");
-      Put_Line ("Usage: create-project [-l apache|gpl|proprietary] [--web] [--tool] [--ado] "
-                & "[--gtk] NAME [AUTHOR] [EMAIL]");
+      Put_Line ("Usage: create-project [-l apache|gpl|mit|bsd3|proprietary] [--web] [--tool]"
+                & "[--ado] [--gtk] NAME [AUTHOR] [EMAIL]");
       New_Line;
       Put_Line ("  Creates a new AWA application with the name passed in NAME.");
       Put_Line ("  The application license is controlled with the -l option. ");
-      Put_Line ("  License headers can use either the Apache, the GNU license or");
-      Put_Line ("  a proprietary license. The author's name and email addresses");
-      Put_Line ("  are also reported in generated files.");
+      Put_Line ("  License headers can use either the Apache, the MIT license, the BSD 3 clauses");
+      Put_Line ("  license, the GNU license or a proprietary license.");
+      Put_Line ("  The author's name and email addresses are also reported in generated files.");
       New_Line;
       Put_Line ("  --web   Generate a Web application (the default)");
       Put_Line ("  --tool  Generate a command line tool");

@@ -69,7 +69,8 @@ package Gen.Generator is
    procedure Info (H : in out Handler;
                    Message : in String;
                    Arg1    : in String := "";
-                   Arg2    : in String := "");
+                   Arg2    : in String := "";
+                   Arg3    : in String := "");
 
    --  Read the XML package file
    procedure Read_Package (H    : in out Handler;

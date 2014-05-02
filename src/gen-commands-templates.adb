@@ -25,7 +25,6 @@ with GNAT.Command_Line;
 
 with Gen.Artifacts;
 
-with EL.Beans;
 with EL.Utils;
 with EL.Contexts.Default;
 with EL.Functions.Namespaces;
@@ -185,7 +184,12 @@ package body Gen.Commands.Templates is
                   Log.Info ("Match missing at line {0}", Natural'Image (Line_Number));
                   Current_State := MATCH_FAIL;
                elsif Match_Line (Line, To_String (Before)) then
-                  H.Info ("Patching file {0} at line {1}", Path, Natural'Image (Line_Number));
+                  if Length (Info.Title) > 0 then
+                     H.Info ("Patching file {0} at line {1} for {2}",
+                             Path, Natural'Image (Line_Number), To_String (Info.Title));
+                  else
+                     H.Info ("Patching file {0} at line {1}", Path, Natural'Image (Line_Number));
+                  end if;
                   Log.Info ("Add content {0}", Content);
                   Output.Write (Content);
                   Current_State := MATCH_DONE;

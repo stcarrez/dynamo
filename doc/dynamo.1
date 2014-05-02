@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Oct 13, 2013" "Ada Web Application"
+.TH DYNAMO 1 "May 2, 2014" "Ada Web Application"
 .SH NAME
 dynamo - Ada Application Generator
 .SH SYNOPSIS
@@ -294,6 +294,39 @@ Each Ada bean type must be registered in the
 .I Module
 package.  The generated files are intended to be modified to implement the
 module functionality.
+.\"
+.SS The add-module-operation command
+.RS 0
+dynamo \fBadd-module-operation \fImodule\fR \fIentity\fR \fIoperation\fR\fR
+.RE
+.PP
+Add an operation in a module to perform some action on a database entity.
+The
+.I module
+is the name of the module in the application and
+.I entity
+is the name of the database table. The
+.I operation
+is the name of the Ada procedure and must be a valid Ada identifier.
+The generated operation has the following signature:
+.\"
+.RS 0
+  procedure <operation>
+    (Module : in <module>_Module;
+.br
+     Entity : in out <project>.<module>.Models.<entity>_Ref'Class);
+.RE
+.PP
+where
+.I project
+is the project name.  The command modifies the module package specification
+to add the necessary Ada
+.I with
+clauses and declare the new operation.  It modifies the module package body
+to add some other necessary Ada
+.I with
+clauses and implement the new operation.  The default implementation creates
+a database transaction, saves the entity and commits the transaction.
 .\"
 .SS The build-doc command
 .RS 0

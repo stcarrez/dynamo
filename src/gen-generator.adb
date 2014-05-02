@@ -341,34 +341,33 @@ package body Gen.Generator is
    --  Register the generator EL functions
    --  ------------------------------
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class) is
-      URI : constant String := "http://code.google.com/p/ada-ado/generator";
    begin
       Mapper.Set_Function (Name      => "adaIdent",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => To_Ada_Ident'Access);
       Mapper.Set_Function (Name      => "adaType",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => To_Ada_Type'Access);
       Mapper.Set_Function (Name      => "indent",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => Indent'Access);
       Mapper.Set_Function (Name      => "keyEnum",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => To_Key_Enum'Access);
       Mapper.Set_Function (Name      => "comment",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => Comment'Access);
       Mapper.Set_Function (Name      => "singular",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => To_Singular'Access);
       Mapper.Set_Function (Name      => "replace",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => Replace'Access);
       Mapper.Set_Function (Name      => "exists",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => File_Exists'Access);
       Mapper.Set_Function (Name      => "concat",
-                           Namespace => URI,
+                           Namespace => G_URI,
                            Func      => Concat'Access);
    end Set_Functions;
 

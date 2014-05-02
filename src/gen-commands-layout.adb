@@ -34,6 +34,7 @@ package body Gen.Commands.Layout is
       use Ada.Strings.Unbounded;
 
       function Get_Layout return String;
+      function Get_Name return String;
 
       Dir        : constant String := Generator.Get_Result_Directory;
       Layout_Dir : constant String := Util.Files.Compose (Dir, "web/WEB-INF/layouts");

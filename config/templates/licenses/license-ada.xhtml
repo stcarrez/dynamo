@@ -12,19 +12,19 @@
 --
     <c:choose>
         <c:when test="#{project.license eq 'gpl'}">
-            <ui:include src="gpl-2_0.xhtml"/>
+            <ui:include src="gpl/gpl-2_0.xhtml"/>
         </c:when>
 
         <c:when test="#{project.license eq 'apache'}">
-            <ui:include src="apache-2_0.xhtml"/>
+            <ui:include src="apache2/apache-2_0.xhtml"/>
         </c:when>
 
         <c:when test="#{project.license eq 'mit'}">
-            <ui:include src="mit.xhtml"/>
+            <ui:include src="mit/mit.xhtml"/>
         </c:when>
 
         <c:when test="#{project.license eq 'bsd3'}">
-            <ui:include src="bsd3.xhtml"/>
+            <ui:include src="bsd3/bsd3.xhtml"/>
         </c:when>
 
         <c:when test="#{project.license eq 'proprietary'}">
@@ -32,7 +32,7 @@
         </c:when>
 
         <c:otherwise>
-            <ui:include src="apache-2_0.xhtml"/>
+            <ui:include src="apache2/apache-2_0.xhtml"/>
         </c:otherwise>
     </c:choose>
 </ui:composition>

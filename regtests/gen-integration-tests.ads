@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +52,12 @@ package Gen.Integration.Tests is
 
    --  Test add-module command.
    procedure Test_Add_Module (T : in out Test);
+
+   --  Test add-model command.
+   procedure Test_Add_Model (T : in out Test);
+
+   --  Test add-module-operation command.
+   procedure Test_Add_Module_Operation (T : in out Test);
 
    --  Test add-service command.
    procedure Test_Add_Service (T : in out Test);

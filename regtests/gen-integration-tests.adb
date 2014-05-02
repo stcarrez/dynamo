@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,6 +48,10 @@ package body Gen.Integration.Tests is
                        Test_Change_Property'Access);
       Caller.Add_Test (Suite, "Add Module",
                        Test_Add_Module'Access);
+      Caller.Add_Test (Suite, "Add Model",
+                       Test_Add_Model'Access);
+      Caller.Add_Test (Suite, "Add Module Operation",
+                       Test_Add_Module_Operation'Access);
       Caller.Add_Test (Suite, "Add Service",
                        Test_Add_Service'Access);
       Caller.Add_Test (Suite, "Add Query",
@@ -221,6 +225,42 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Matches (T, ".*Generating file.*test-tuser-beans.ads.*", Result,
                                  "Invalid add-module");
    end Test_Add_Module;
+
+   --  ------------------------------
+   --  Test add-model command.
+   --  ------------------------------
+   procedure Test_Add_Model (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " add-model tblog test_model", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test-tblog-models.ads.*", Result,
+                                 "Invalid add-model");
+
+      T.Execute (Dynamo & " add-model tblog test_second_model", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*test-tblog-models.ads.*", Result,
+                                 "Invalid add-model");
+   end Test_Add_Model;
+
+   --  ------------------------------
+   --  Test add-module-operation command.
+   --  ------------------------------
+   procedure Test_Add_Module_Operation (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " add-module-operation tblog test_model Save", Result);
+      Util.Tests.Assert_Matches (T, ".*Patching file.*tblog-modules.ads.*", Result,
+                                 "Invalid add-module-operation");
+      Util.Tests.Assert_Matches (T, ".*Patching file.*tblog.*procedure implementation.*", Result,
+                                 "Invalid add-module-operation");
+
+      T.Execute (Dynamo & " add-module-operation tblog test_model Delete", Result);
+      Util.Tests.Assert_Matches (T, ".*Patching file.*test-tblog-modules.adb.*", Result,
+                                 "Invalid add-module-operation");
+
+      T.Execute (Dynamo & " add-module-operation tblog test_second_model Delete", Result);
+      Util.Tests.Assert_Matches (T, ".*Patching file.*test-tblog-modules.adb.*", Result,
+                                 "Invalid add-module-operation");
+   end Test_Add_Module_Operation;
 
    --  ------------------------------
    --  Test add-service command.

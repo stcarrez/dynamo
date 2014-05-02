@@ -312,7 +312,7 @@ package body Gen.Integration.Tests is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
       T.Execute (Dynamo & " add-layout my-layout", Result);
-      Util.Tests.Assert_Matches (T, ".*Generating file.*web/WEB-INF/layout/my-layout.xhtml.*",
+      Util.Tests.Assert_Matches (T, ".*Generating file.*web/WEB-INF/layouts/my-layout.xhtml.*",
                                  Result,
                                  "Invalid add-layout");
    end Test_Add_Layout;

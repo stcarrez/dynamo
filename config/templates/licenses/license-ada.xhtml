@@ -1,23 +1,38 @@
 <ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:c="http://java.sun.com/jstl/core">
---  Copyright (C) 2013 #{empty project.copyright ? project.author : project.copyright}
---  Written by #{project.author} (#{project.author_email})
---
-  <c:choose>
-    <c:when test="#{project.license eq 'gpl'}">
-       <ui:include src="gpl-2_0.xhtml"/>
-    </c:when>
-
-    <c:when test="#{project.license eq 'apache'}">
-       <ui:include src="apache-2_0.xhtml"/>
-    </c:when>
-
-    <c:when test="#{project.license eq 'proprietary'}">
-       <ui:include src="proprietary.xhtml"/>
-    </c:when>
-
+--  Copyright (C) 2014 #{empty project.copyright ? project.author : project.copyright}
+<c:choose>
+    <c:when test="#{project.license eq 'bsd3'}">
+--  All rights reserved.
+</c:when>
     <c:otherwise>
-       <ui:include src="apache-2_0.xhtml"/>
-    </c:otherwise>
-  </c:choose>
+--  Written by #{project.author} (#{project.author_email})
+</c:otherwise>
+</c:choose>
+--
+    <c:choose>
+        <c:when test="#{project.license eq 'gpl'}">
+            <ui:include src="gpl-2_0.xhtml"/>
+        </c:when>
+
+        <c:when test="#{project.license eq 'apache'}">
+            <ui:include src="apache-2_0.xhtml"/>
+        </c:when>
+
+        <c:when test="#{project.license eq 'mit'}">
+            <ui:include src="mit.xhtml"/>
+        </c:when>
+
+        <c:when test="#{project.license eq 'bsd3'}">
+            <ui:include src="bsd3.xhtml"/>
+        </c:when>
+
+        <c:when test="#{project.license eq 'proprietary'}">
+            <ui:include src="proprietary.xhtml"/>
+        </c:when>
+
+        <c:otherwise>
+            <ui:include src="apache-2_0.xhtml"/>
+        </c:otherwise>
+    </c:choose>
 </ui:composition>

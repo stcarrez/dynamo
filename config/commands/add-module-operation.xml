@@ -28,9 +28,10 @@
 		  <before>package *.*.Modules is</before>
       </patch>
       <patch>
+          <title>'procedure declaration'</title>
           <template>add-module-operation/patch-module-spec-2.xhtml</template>
 		  <after>package *.*.Modules is</after>
-		  <after>type * is</after>
+		  <after> type #{fn:capitalize(g:singular(moduleName))}_Module is</after>
 		  <before>private</before>
       </patch>
       <patch optional='true'>
@@ -38,8 +39,14 @@
           <missing>with ADO.Sessions;</missing>
 		  <before>package body *.*.Modules is</before>
       </patch>
-      <patch>
+      <patch optional='true'>
           <template>add-module-operation/patch-module-body-2.xhtml</template>
+          <missing>with AWA.Services.Contexts;</missing>
+		  <before>package body *.*.Modules is</before>
+      </patch>
+      <patch>
+          <title>'procedure implementation'</title>
+          <template>add-module-operation/patch-module-body-3.xhtml</template>
 		  <after>package body *.*.Modules is</after>
 		  <before>end *.*.Modules;</before>
       </patch>

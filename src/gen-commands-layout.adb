@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Directories;
 with Ada.Text_IO;
 with Gen.Artifacts;
 with GNAT.Command_Line;
@@ -33,7 +32,6 @@ package body Gen.Commands.Layout is
       use GNAT.Command_Line;
       use Ada.Strings.Unbounded;
 
-      function Get_Layout return String;
       function Get_Name return String;
 
       Dir        : constant String := Generator.Get_Result_Directory;
@@ -54,22 +52,7 @@ package body Gen.Commands.Layout is
          end if;
       end Get_Name;
 
-      function Get_Layout return String is
-         Layout : constant String := Get_Argument;
-      begin
-         if Layout'Length = 0 then
-            return "layout";
-         end if;
-         if Ada.Directories.Exists (Dir & "WEB-INF/layouts/" & Layout & ".xhtml") then
-            return Layout;
-         end if;
-
-         Generator.Error ("Layout file {0} not found.  Using 'layout' instead.", Layout);
-         return "layout";
-      end Get_Layout;
-
       Name   : constant String := Get_Name;
-      Layout : constant String := Get_Layout;
    begin
       if Name'Length = 0 then
          Gen.Commands.Usage;
@@ -79,7 +62,6 @@ package body Gen.Commands.Layout is
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (Layout_Dir);
       Generator.Set_Global ("pageName", Name);
-      Generator.Set_Global ("layout", Layout);
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "layout");
    end Execute;
 
@@ -93,7 +75,7 @@ package body Gen.Commands.Layout is
 
    begin
       Put_Line ("add-layout: Add a new layout page to the application");
-      Put_Line ("Usage: add-layout NAME [FORM]");
+      Put_Line ("Usage: add-layout NAME");
       New_Line;
       Put_Line ("  The layout page allows to give a common look to a set of pages.");
       Put_Line ("  You can create several layouts for your application.");

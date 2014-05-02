@@ -93,7 +93,7 @@ templates provided by \fIdynamo\fR.
 .\"
 .SS The create-project command
 .RS 0
-dynamo \fBcreate-project\fR [-l \fI{apache|gpl|proprietary}\fR] [--web] [--gtk] [--tool] [--ado] \fIname\fR \fIauthor\fR \fIemail\fR
+dynamo \fBcreate-project\fR [-l \fI{apache|gpl|bsd3|mit|proprietary}\fR] [--web] [--gtk] [--tool] [--ado] \fIname\fR \fIauthor\fR \fIemail\fR
 .RE
 .PP
 Create a new project in the current working directory or in the
@@ -435,6 +435,8 @@ This property controls the license header in file headers.
 The following license names are recognized:
 .B gpl
 .B apache
+.B mit
+.B bsd3
 .\"
 .SS search_dirs
 This property is generated automatically by

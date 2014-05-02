@@ -4,6 +4,7 @@ Version 0.7.0   - Apr 2014
   - Update the current testsuite when new tests are added
   - New stereotype <<Limited_Bean>> for Ada bean generation
   - Support for the creation of Debian packages
+  - New command 'add-form' and 'add-module-operation'
 
 Version 0.6.0   - Feb 2013
   - New command 'build-doc' to extract some documentation from the sources

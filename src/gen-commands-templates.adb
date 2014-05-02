@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,14 @@ with Ada.Streams.Stream_IO;
 with GNAT.Command_Line;
 
 with Gen.Artifacts;
+
+with EL.Beans;
+with EL.Contexts.Default;
+with EL.Functions.Namespaces;
+
+with ASF.Contexts.Faces;
+with ASF.Views.Nodes.Core;
+with ASF.Beans.Resolvers;
 
 with Util.Log.Loggers;
 with Util.Files;
@@ -94,7 +102,7 @@ package body Gen.Commands.Templates is
                              File    : in String;
                              Content : in Ada.Strings.Unbounded.Unbounded_String) is
 
-         type State is (MATCH_AFTER, MATCH_BEFORE, MATCH_DONE);
+         type State is (MATCH_AFTER, MATCH_BEFORE, MATCH_DONE, MATCH_FAIL);
 
          Output_Dir    : constant String := H.Get_Result_Directory;
          Path          : constant String := Util.Files.Compose (Output_Dir, File);
@@ -104,8 +112,29 @@ package body Gen.Commands.Templates is
          Current_State : State := MATCH_AFTER;
          Tmp_Output    : aliased Util.Streams.Files.File_Stream;
          Output        : Util.Streams.Texts.Print_Stream;
+         Context       : aliased ASF.Contexts.Faces.Faces_Context;
+         ELContext     : aliased EL.Contexts.Default.Default_Context;
+         Missing       : EL.Beans.Param_Vectors.Vector;
 
          procedure Process (Line : in String);
+         function Match_Missing (Line : in String) return Boolean;
+
+         function Match_Missing (Line : in String) return Boolean is
+            Iter  : EL.Beans.Param_Vectors.Cursor := Missing.First;
+            Value : Util.Beans.Objects.Object;
+         begin
+            while EL.Beans.Param_Vectors.Has_Element (Iter) loop
+               Value := EL.Beans.Param_Vectors.Element (Iter).
+                 Value.Get_Value (ELContext);
+               if Match_Line (Line, Util.Beans.Objects.To_String (Value)) then
+                  Log.Info ("Match missing at line {0}", Natural'Image (Line_Number));
+                  return True;
+               end if;
+               Log.Debug ("Check {0} - {1}", Util.Beans.Objects.To_String (Value), Line);
+               EL.Beans.Param_Vectors.Next (Iter);
+            end loop;
+            return False;
+         end Match_Missing;
 
          procedure Process (Line : in String) is
          begin
@@ -121,14 +150,16 @@ package body Gen.Commands.Templates is
                end if;
 
             when MATCH_BEFORE =>
-               if Match_Line (Line, To_String (Info.Before)) then
+               if Match_Missing (Line) then
+                  Current_State := MATCH_FAIL;
+               elsif Match_Line (Line, To_String (Info.Before)) then
                   H.Info ("Patching file {0} at line {1}", Path, Natural'Image (Line_Number));
                   Log.Info ("Add content {0}", Content);
                   Output.Write (Content);
                   Current_State := MATCH_DONE;
                end if;
 
-            when MATCH_DONE =>
+            when MATCH_DONE | MATCH_FAIL =>
                null;
 
             end case;
@@ -136,13 +167,37 @@ package body Gen.Commands.Templates is
             Output.Write (ASCII.LF);
          end Process;
 
+         use type Ada.Containers.Count_Type;
+
+         Iter  : Util.Strings.Vectors.Cursor := Info.Missing.First;
+         NS_Mapper : aliased EL.Functions.Namespaces.NS_Function_Mapper;
+         Root_Resolver  : aliased ASF.Beans.Resolvers.ELResolver;
       begin
+         Root_Resolver.Initialize (Generator'Unchecked_Access, null);
+         ELContext.Set_Resolver (Root_Resolver'Unchecked_Access);
+         NS_Mapper.Set_Namespace (Prefix => "fn",
+                                  URI    => ASF.Views.Nodes.Core.FN_URI);
+         Context.Set_ELContext (ELContext'Unchecked_Access);
+         Generator.Set_Context (Context'Unchecked_Access);
+         NS_Mapper.Set_Function_Mapper (ELContext.Get_Function_Mapper.all'Access);
+         ELContext.Set_Function_Mapper (NS_Mapper'Unchecked_Access);
+
+         while Util.Strings.Vectors.Has_Element (Iter) loop
+            EL.Beans.Add_Parameter (Missing, "", Util.Strings.Vectors.Element (Iter),
+                                    ELContext);
+            Util.Strings.Vectors.Next (Iter);
+         end loop;
          Tmp_Output.Create (Name => Tmp_File, Mode => Ada.Streams.Stream_IO.Out_File);
          Output.Initialize (Tmp_Output'Unchecked_Access);
+         if Info.After.Length = 0 then
+            Current_State := MATCH_BEFORE;
+         end if;
          Util.Files.Read_File (Path, Process'Access);
          Output.Close;
          if Current_State /= MATCH_DONE then
-            H.Error ("Patch {0} failed", Path);
+            if not Info.Optional then
+               H.Error ("Patch {0} failed", Path);
+            end if;
             Ada.Directories.Delete_File (Tmp_File);
          else
             Ada.Directories.Delete_File (Path);
@@ -241,17 +296,19 @@ package body Gen.Commands.Templates is
                            FIELD_PARAM_NAME,
                            FIELD_PARAM_OPTIONAL,
                            FIELD_PARAM_ARG,
+                           FIELD_PATCH_OPTIONAL,
                            FIELD_TEMPLATE,
                            FIELD_PATCH,
                            FIELD_AFTER,
+                           FIELD_MISSING,
                            FIELD_BEFORE,
                            FIELD_INSERT_TEMPLATE,
                            FIELD_COMMAND);
 
    type Command_Loader is record
-      Command : Command_Access := null;
-      P       : Param;
-      Info    : Patch;
+      Command   : Command_Access := null;
+      P         : Param;
+      Info      : Patch;
    end record;
    type Command_Loader_Access is access all Command_Loader;
 
@@ -338,8 +395,14 @@ package body Gen.Commands.Templates is
             when FIELD_COMMAND =>
                null;
 
+            when FIELD_PATCH_OPTIONAL =>
+               Closure.Info.Optional := Util.Beans.Objects.To_Boolean (Value);
+
             when FIELD_INSERT_TEMPLATE =>
                Closure.Info.Template := To_Unbounded_String (Value);
+
+            when FIELD_MISSING =>
+            Closure.Info.Missing.Append (To_String (Value));
 
             when FIELD_AFTER =>
                Closure.Info.After.Append (To_String (Value));
@@ -350,6 +413,8 @@ package body Gen.Commands.Templates is
             when FIELD_PATCH =>
                Closure.Command.Patches.Append (Closure.Info);
                Closure.Info.After.Clear;
+               Closure.Info.Missing.Clear;
+               Closure.Info.Optional := False;
                Closure.Info.Before := To_Unbounded_String ("");
 
          end case;
@@ -425,7 +490,9 @@ begin
    Cmd_Mapper.Add_Mapping ("command/param/@name", FIELD_PARAM_NAME);
    Cmd_Mapper.Add_Mapping ("command/param/@optional", FIELD_PARAM_OPTIONAL);
    Cmd_Mapper.Add_Mapping ("command/param/@arg", FIELD_PARAM_ARG);
+   Cmd_Mapper.Add_Mapping ("command/patch/@optional", FIELD_PATCH_OPTIONAL);
    Cmd_Mapper.Add_Mapping ("command/patch/template", FIELD_INSERT_TEMPLATE);
+   Cmd_Mapper.Add_Mapping ("command/patch/missing", FIELD_MISSING);
    Cmd_Mapper.Add_Mapping ("command/patch/after", FIELD_AFTER);
    Cmd_Mapper.Add_Mapping ("command/patch/before", FIELD_BEFORE);
    Cmd_Mapper.Add_Mapping ("command/template", FIELD_TEMPLATE);

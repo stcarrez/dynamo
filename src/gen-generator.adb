@@ -630,10 +630,11 @@ package body Gen.Generator is
    procedure Info (H : in out Handler;
                    Message : in String;
                    Arg1    : in String := "";
-                   Arg2    : in String := "") is
+                   Arg2    : in String := "";
+                   Arg3    : in String := "") is
       pragma Unreferenced (H);
    begin
-      Log.Info (Message, Arg1, Arg2);
+      Log.Info (Message, Arg1, Arg2, Arg3);
    end Info;
 
    --  ------------------------------

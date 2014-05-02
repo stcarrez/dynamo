@@ -1,0 +1,45 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{pageName}.xhtml"><![CDATA[<f:view contentType="text/html; charset=UTF-8"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:util="http://code.google.com/p/ada-asf/util"
+        xmlns:f="http://java.sun.com/jsf/core"><h:doctype rootElement="html"/>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/grids/reset.css"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/grids/fluid_grid.css"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/redmond/jquery-ui-1.9.2.custom.css"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/awa.css"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/users.css"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/blogs.css"/>
+    <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/questions.css"/>
+    <ui:insert name="pageHeader"/>
+    <title>\#{title}</title>
+</head>
+<body class="\#{not empty pageStyle ? pageStyle : ''}">
+
+<!-- Top header with user account -->
+<ui:include src="top-bar.xhtml"/>
+<div id='awa-page' class='container_12'>
+    <ui:insert name="pageBody"/>
+    <div id="awa-clfooter"></div>
+</div>
+
+<ui:include src="footer.xhtml"/>
+
+<ui:insert name="pageScript"/>
+<util:flush/>
+
+<!--DEV_START-->
+<ui:debug/>
+<!--DEV_END-->
+</body>
+</html>
+</f:view>
+]]></f:view>

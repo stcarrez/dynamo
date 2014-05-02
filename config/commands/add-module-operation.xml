@@ -1,0 +1,47 @@
+<commands>
+   <command>
+      <name>add-module-operation</name>
+      <title>Add a module operation on a given database entity</title>
+      <usage>add-module-operation MODULE ENTITY OPERATION</usage>
+      <help><![CDATA[
+  This command adds an operation in a module to perform some action on
+  a database entity.  The MODULE is the name of the module in the application and
+  ENTITY is the name of the database table.  The OPERATION is the name of
+  the Ada procedure and must be a valid Ada identifier.  The generated operation
+  has the following signature:
+
+    procedure <operation> (Module : in <module>_Module;
+                           Entity : in out <project>.<module>.Models.<entity>_Ref'Class);
+
+  The following files are updated to register the new operation:
+
+    src/<project>-<module>-modules.ads
+    src/<project>-<module>-modules.adb
+]]>      </help>
+      <param optional='false' name='moduleName' arg='MODULE'/>
+      <param optional='false' name='entityName' arg='ENTITY'/>
+      <param optional='false' name='operationName' arg='OPERATION'/>
+      <basedir></basedir>
+      <patch optional='true'>
+          <template>add-module-operation/patch-module-spec-1.xhtml</template>
+          <missing>with #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Models;</missing>
+		  <before>package *.*.Modules is</before>
+      </patch>
+      <patch>
+          <template>add-module-operation/patch-module-spec-2.xhtml</template>
+		  <after>package *.*.Modules is</after>
+		  <after>type * is</after>
+		  <before>private</before>
+      </patch>
+      <patch optional='true'>
+          <template>add-module-operation/patch-module-body-1.xhtml</template>
+          <missing>with ADO.Sessions;</missing>
+		  <before>package body *.*.Modules is</before>
+      </patch>
+      <patch>
+          <template>add-module-operation/patch-module-body-2.xhtml</template>
+		  <after>package body *.*.Modules is</after>
+		  <before>end *.*.Modules;</before>
+      </patch>
+   </command>
+</commands>

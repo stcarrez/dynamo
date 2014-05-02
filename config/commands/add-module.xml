@@ -30,11 +30,13 @@
       <template>add-module/module-beans-spec.xhtml</template>
       <template>add-module/module-beans-body.xhtml</template>
       <patch>
+          <title>adding with clause for new module</title>
           <template>add-module/patch-application-spec-1.xhtml</template>
 		  <after>with AWA.Applications</after>
 		  <before>package *.Applications is</before>
       </patch>
       <patch>
+          <title>adding module instance in Application type</title>
           <template>add-module/patch-application-spec-2.xhtml</template>
 		  <after>package *.Applications is</after>
 		  <after>private</after>
@@ -42,6 +44,7 @@
 		  <before> end record;</before>
       </patch>
       <patch>
+          <title>registering the module instance in Initialize_Modules</title>
           <template>add-module/patch-application-body-1.xhtml</template>
 		  <after>package body *.Applications is</after>
 		  <after> procedure Initialize_Modules</after>

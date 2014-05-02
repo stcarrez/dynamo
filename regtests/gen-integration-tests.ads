@@ -68,6 +68,9 @@ package Gen.Integration.Tests is
    --  Test add-page command.
    procedure Test_Add_Page (T : in out Test);
 
+   --  Test add-layout command.
+   procedure Test_Add_Layout (T : in out Test);
+
    --  Test add-ajax-form command.
    procedure Test_Add_Ajax_Form (T : in out Test);
 

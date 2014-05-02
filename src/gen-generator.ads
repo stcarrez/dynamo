@@ -27,6 +27,7 @@ with Util.Properties;
 
 with ASF.Applications.Main;
 with ASF.Contexts.Faces;
+with ASF.Servlets.Files;
 
 with Gen.Model.Packages;
 with Gen.Model.Projects;
@@ -294,6 +295,9 @@ private
 
       --  Force the saving of a generated file, even if a file already exist.
       Force_Save : Boolean := True;
+
+      --  A fake servlet for template evaluation.
+      Servlet    : ASF.Servlets.Servlet_Access;
    end record;
 
    --  Execute the lifecycle phases on the faces context.

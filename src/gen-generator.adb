@@ -27,6 +27,7 @@ with DOM.Readers;
 with Sax.Readers;
 
 with ASF.Requests.Mockup;
+with ASF.Requests.Tools;
 with ASF.Responses.Mockup;
 with ASF.Components.Root;
 with ASF.Components.Base;
@@ -417,6 +418,8 @@ package body Gen.Generator is
       H.File   := new Util.Beans.Objects.Object;
       H.Mode   := new Util.Beans.Objects.Object;
       H.Ignore := new Util.Beans.Objects.Object;
+      H.Servlet := new ASF.Servlets.Files.File_Servlet;
+      H.Add_Servlet (Name => "file", Server => H.Servlet);
 
       begin
          Gen.Commands.Templates.Read_Commands (H);
@@ -951,15 +954,19 @@ package body Gen.Generator is
          H.Error ("Cannot generate file: '{0}' exists already.", Path);
       elsif not Util.Beans.Objects.Is_Null (H.File.all) and then
         not Util.Beans.Objects.To_Boolean (H.Ignore.all) then
-         Log.Info ("Generating file '{0}'", Path);
+         if Length (Content) = 0 and Mode = "remove-empty" then
+            Log.Debug ("File {0} skipped because it is empty", Path);
+         else
+            Log.Info ("Generating file '{0}'", Path);
 
-         if Exists then
-            Util.Files.Read_File (Path     => Path,
-                                  Into     => Old_Content,
-                                  Max_Size => Natural'Last);
-         end if;
-         if not Exists or else Content /= Old_Content then
-            Util.Files.Write_File (Path => Path, Content => Content);
+            if Exists then
+               Util.Files.Read_File (Path     => Path,
+                                     Into     => Old_Content,
+                                     Max_Size => Natural'Last);
+            end if;
+            if not Exists or else Content /= Old_Content then
+               Util.Files.Write_File (Path => Path, Content => Content);
+            end if;
          end if;
       end if;
    end Save_Content;
@@ -976,7 +983,7 @@ package body Gen.Generator is
       use Util.Beans.Objects;
 
       Req   : ASF.Requests.Mockup.Request;
-      Reply : ASF.Responses.Mockup.Response;
+      Reply : aliased ASF.Responses.Mockup.Response;
       Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := Model.all'Unchecked_Access;
       Bean  : constant Object := Util.Beans.Objects.To_Object (Ptr, Util.Beans.Objects.STATIC);
 
@@ -996,6 +1003,7 @@ package body Gen.Generator is
       Req.Set_Attribute (Name => "genRevision", Value => Util.Beans.Objects.To_Object (SVN_REV));
       Req.Set_Attribute (Name => "genURL", Value => Util.Beans.Objects.To_Object (SVN_URL));
 
+      ASF.Requests.Tools.Set_Context (Req, H.Servlet, Reply'Unchecked_Access);
       H.Dispatch (Page     => File,
                   Request  => Req,
                   Response => Reply);

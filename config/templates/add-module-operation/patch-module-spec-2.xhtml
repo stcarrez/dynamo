@@ -4,7 +4,9 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="src/#{projectAdaName}-#{moduleName}-modules.ads">
-   procedure #{operationName} (Model  : in #{fn:capitalize(g:singular(moduleName))};
-                               Entity : in out #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.#{fn:capitalize(entityName)}_Ref'Class);
+#{''}
+   --  #{operationName}
+   procedure #{operationName} (Model  : in #{fn:capitalize(g:singular(moduleName))}_Module;
+             #{g:indent(operationName)}  Entity : in out #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Models.#{fn:capitalize(entityName)}_Ref'Class);
 </f:view>
 

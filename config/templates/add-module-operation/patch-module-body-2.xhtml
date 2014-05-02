@@ -4,16 +4,6 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="src/#{projectAdaName}-#{moduleName}-modules.adb">
-   procedure #{operationName} (Model  : in #{fn:capitalize(g:singular(moduleName))};
-                               Entity : in out #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.#{fn:capitalize(entityName)}_Ref'Class) is
-      pragma Unreferenced (Model);
-
-      Ctx   : constant Services.Contexts.Service_Context_Access := AWA.Services.Contexts.Current;
-      DB    : ADO.Sessions.Master_Session := AWA.Services.Contexts.Get_Master_Session (Ctx);
-   begin
-      Ctx.Start;
-      Entity.Save (DB);
-      Ctx.Commit;
-   end #{operationName};
+with AWA.Services.Contexts;
 </f:view>
 

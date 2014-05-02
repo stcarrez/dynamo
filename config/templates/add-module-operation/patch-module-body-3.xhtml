@@ -1,0 +1,23 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="src/#{projectAdaName}-#{moduleName}-modules.adb">
+#{''}
+   --  ------------------------------
+   --  #{operationName}
+   --  ------------------------------
+   procedure #{operationName} (Model  : in #{fn:capitalize(g:singular(moduleName))}_Module;
+             #{g:indent(operationName)}  Entity : in out #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Models.#{fn:capitalize(entityName)}_Ref'Class) is
+      pragma Unreferenced (Model);
+#{''}
+      Ctx   : constant AWA.Services.Contexts.Service_Context_Access := AWA.Services.Contexts.Current;
+      DB    : ADO.Sessions.Master_Session := AWA.Services.Contexts.Get_Master_Session (Ctx);
+   begin
+      Ctx.Start;
+      Entity.Save (DB);
+      Ctx.Commit;
+   end #{operationName};
+</f:view>
+

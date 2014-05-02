@@ -57,6 +57,7 @@ private
       After     : Util.Strings.Vectors.Vector;
       Missing   : Util.Strings.Vectors.Vector;
       Before    : Ada.Strings.Unbounded.Unbounded_String;
+      Title     : Ada.Strings.Unbounded.Unbounded_String;
       Optional  : Boolean := False;
    end record;
 

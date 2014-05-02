@@ -22,6 +22,7 @@ with AWA.Users.Modules;
 with AWA.Mail.Modules;
 with AWA.Comments.Modules;
 with AWA.Blogs.Modules;
+with AWA.Tags.Modules;
 with AWA.Storages.Modules;
 with AWA.Applications;
 with AWA.Workspaces.Modules;
@@ -78,7 +79,9 @@ private
       Mail_Module       : aliased AWA.Mail.Modules.Mail_Module;
       Comment_Module    : aliased AWA.Comments.Modules.Comment_Module;
       Storage_Module    : aliased AWA.Storages.Modules.Storage_Module;
---      XXX_Module    : aliased #{fn:capitalize(projectName)}.XXX.Modules.XXX_Module;
+      Tag_Module        : aliased AWA.Tags.Modules.Tag_Module;
+#{''}
+      --  Add your modules here.
    end record;
 #{''}
 end #{fn:capitalize(projectName)}.Applications;

@@ -28,12 +28,15 @@
       <template>add-test/test-testsuite-body.xhtml</template>
       <template>add-test/test-harness.xhtml</template>
       <template>add-test/tests.gpr.in.xhtml</template>
-      <patch>
+      <patch optional='true'>
+          <title>adding with clause for new test</title>
           <template>add-test/patch-testsuite-body-1.xhtml</template>
+          <missing>with #{fn:capitalize(projectAdaName)}.#{fn:capitalize(moduleName)}.Tests</missing>
 		  <after>with *.*.Tests;</after>
 		  <before>package body *.Testsuite is</before>
       </patch>
       <patch>
+          <title>adding the test in the testsuite</title>
           <template>add-test/patch-testsuite-body-2.xhtml</template>
 		  <after>package body *.Testsuite is</after>
 		  <after> function Suite</after>

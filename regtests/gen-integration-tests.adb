@@ -58,6 +58,8 @@ package body Gen.Integration.Tests is
                        Test_Add_Query'Access);
       Caller.Add_Test (Suite, "Add Page",
                        Test_Add_Page'Access);
+      Caller.Add_Test (Suite, "Add Layout",
+                       Test_Add_Layout'Access);
       Caller.Add_Test (Suite, "Add Ajax Form",
                        Test_Add_Ajax_Form'Access);
       Caller.Add_Test (Suite, "Generate",
@@ -302,6 +304,18 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Matches (T, ".*Generating file.*web/main_page.xhtml.*", Result,
                                  "Invalid add-page");
    end Test_Add_Page;
+
+   --  ------------------------------
+   --  Test add-layout command.
+   --  ------------------------------
+   procedure Test_Add_Layout (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " add-layout my-layout", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*web/WEB-INF/layout/my-layout.xhtml.*",
+                                 Result,
+                                 "Invalid add-layout");
+   end Test_Add_Layout;
 
    --  ------------------------------
    --  Test add-ajax-form command.

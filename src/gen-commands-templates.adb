@@ -185,7 +185,7 @@ package body Gen.Commands.Templates is
                   Current_State := MATCH_FAIL;
                elsif Match_Line (Line, To_String (Before)) then
                   if Length (Info.Title) > 0 then
-                     H.Info ("Patching file {0} at line {1} for {2}",
+                     H.Info ("Patching file {0} at line {1}: {2}",
                              Path, Natural'Image (Line_Number), To_String (Info.Title));
                   else
                      H.Info ("Patching file {0} at line {1}", Path, Natural'Image (Line_Number));

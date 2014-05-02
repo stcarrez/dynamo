@@ -8,23 +8,18 @@ app_search_dirs=\#{empty dynamo_search_dirs ? '.' : dynamo_search_dirs}
 
 app.modules.dir=\#{fn:composePath(app_search_dirs,'config')}
 app.config=awa.xml;#{projectName}.xml
-
 contextPath=/#{fn:toLowerCase(projectName)}
 
 web.dir=\#{fn:composePath(app_search_dirs,'web')}
 view.dir=\#{fn:composePath(app_search_dirs,'web')}
 bundle.dir=\#{fn:composePath(app_search_dirs,'bundles')}
 
+awa_dispatcher_count=0
+
 view.debug=true
 view.ignore_spaces=false
 view.escape_unknown_tags=true
 view.ext=.html
-
-content-type.default=text/plain
-ado.queries.load=true
-
-ado.queries.paths=\#{fn:composePath(app_search_dirs,'db')}
-ado.queries.load=true
 #{''}
 
 # Login page
@@ -36,20 +31,25 @@ app_base_url=http://localhost:8080#{contextPath}
 #{''}
 
 # The application name
-app_name=#{fn:capitalize(projectName)}
-#{''}
+app_name=\#{fn:capitalize(projectName)}
 
-# Redirect to a page if the access key is invalid.
-user.verify-filter.redirect=#{contextPath}/auth/login.html
 #{''}
 bundle.var.samplesMsg=samples
 openid.realm=http://localhost:8080\#{contextPath}/auth
 openid.callback_url=http://localhost:8080\#{contextPath}/auth/verify
-openid.success_url=http://localhost:8080\#{contextPath}/auth/success.html
 openid.provider.orange=http://openid.orange.fr
 openid.provider.google=https://www.google.com/accounts/o8/id
 openid.provider.yahoo=http://open.login.yahooapis.com/openid20/www.yahoo.com/xrds
 openid.provider.myopenid=http://www.myopenid.com/server
+#{''}
+# Facebook API
+facebook.client_id=PUT-HERE-YOUR-FACEBOOK-CLIENT-ID
+facebook.secret=PUT-HERE-YOUR-FACEBOOK-API-SECRET
+facebook.scope=email
+
+# Get an account on Google+
+google-plus.client_id=PUT-HERE-GOOGLE-CLIENT-ID.apps.googleusercontent.com
+google-plus.secret=PUT-HERE_GOOGLE-SECRET
 #{''}
 # Configuration for log4j
 log4j.rootCategory=DEBUG,console,result

@@ -99,6 +99,8 @@ package body Gen.Commands.Project is
                   Generator.Set_Project_Property ("license", "apache");
                elsif L = "gpl" then
                   Generator.Set_Project_Property ("license", "gpl");
+               elsif L = "gpl3" then
+                  Generator.Set_Project_Property ("license", "gpl3");
                elsif L = "mit" then
                   Generator.Set_Project_Property ("license", "mit");
                elsif L = "bsd3" then
@@ -107,7 +109,7 @@ package body Gen.Commands.Project is
                   Generator.Set_Project_Property ("license", "proprietary");
                else
                   Generator.Error ("Invalid license: {0}", L);
-                  Generator.Error ("Valid licenses: apache, gpl, mit, bsd3, proprietary");
+                  Generator.Error ("Valid licenses: apache, gpl, gpl3, mit, bsd3, proprietary");
                   return;
                end if;
             end;
@@ -196,13 +198,13 @@ package body Gen.Commands.Project is
       use Ada.Text_IO;
    begin
       Put_Line ("create-project: Create a new Ada Web Application project");
-      Put_Line ("Usage: create-project [-l apache|gpl|mit|bsd3|proprietary] [--web] [--tool]"
+      Put_Line ("Usage: create-project [-l apache|gpl|gpl3|mit|bsd3|proprietary] [--web] [--tool]"
                 & "[--ado] [--gtk] NAME [AUTHOR] [EMAIL]");
       New_Line;
       Put_Line ("  Creates a new AWA application with the name passed in NAME.");
       Put_Line ("  The application license is controlled with the -l option. ");
       Put_Line ("  License headers can use either the Apache, the MIT license, the BSD 3 clauses");
-      Put_Line ("  license, the GNU license or a proprietary license.");
+      Put_Line ("  license, the GNU licenses or a proprietary license.");
       Put_Line ("  The author's name and email addresses are also reported in generated files.");
       New_Line;
       Put_Line ("  --web   Generate a Web application (the default)");

@@ -9,13 +9,22 @@
   a <ui:include> directive (it does not contain the <f:view> component).
   The associated response is a JSON that allows to perform update operations.
 
+    web/<module>/<form-name>.xhtml
     web/<module>/forms/<form-name>-form.xhtml
     web/<module>/forms/<form-name>-response.xhtml
+
+  And the following files are updated to setup the form navigation rules:
+    config/<module>.xml
 ]]>   </help>
       <param name='moduleName'/>
       <param name='formName'/>
-      <basedir>web</basedir>
+      <template>add-form/page.xhtml</template>
       <template>add-form/form.xhtml</template>
       <template>add-form/form-response.xhtml</template>
+       <patch>
+           <template>add-form/patch-form-navigation.xhtml</template>
+           <after>&lt;module version=</after>
+           <before>&lt;/module&gt;</before>
+       </patch>
    </command>
 </commands>

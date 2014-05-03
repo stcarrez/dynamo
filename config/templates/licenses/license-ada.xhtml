@@ -11,8 +11,12 @@
 </c:choose>
 --
     <c:choose>
-        <c:when test="#{project.license eq 'gpl'}">
+        <c:when test="#{project.license eq 'gpl' or project.license eq 'gpl2'}">
             <ui:include src="gpl/gpl-2_0.xhtml"/>
+        </c:when>
+
+        <c:when test="#{project.license eq 'gpl3'}">
+            <ui:include src="gpl/gpl-3_0.xhtml"/>
         </c:when>
 
         <c:when test="#{project.license eq 'apache'}">

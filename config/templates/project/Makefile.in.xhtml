@@ -13,6 +13,11 @@ PLUGINS=
 include rules.mk
 
 #{''}
+# Model generation arguments with Dynamo
+# --package XXX.XXX.Models db uml/xxx.zargo
+DYNAMO_ARGS=db
+
+#{''}
 post-build:
 	for i in ${PLUGINS} ; do \
 	   $(MAKE) -C plugins/$$i ; \

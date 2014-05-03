@@ -6,6 +6,10 @@
         file="config/#{moduleName}.xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <module version="1.0">
 #{''}
+  <application>
+    <message-bundle var='#{moduleName}Msg'>#{moduleName}</message-bundle>
+  </application>
+#{''}
   <managed-bean>
     <description>An example of a bean (change description and bean name)</description>
     <managed-bean-name>#{g:singular(moduleName)}</managed-bean-name>

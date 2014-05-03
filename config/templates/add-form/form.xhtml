@@ -17,7 +17,7 @@
             </div>
             <w:inputText styleClass="awa-required"
                          id='title' size='50' required='true' value='\#{#{g:singular(moduleName)}.title}'
-                         title='\#{#{g:singular(moduleName)}Msg.edit_title_label}'/>
+                         title='\#{#{g:singular(moduleName)}Msg.#{moduleName}_edit_title_label}'/>
             <ul class='awa-buttons'>
                 <li>
                     <h:commandButton id='save' value='Save' action="\#{#{g:singular(moduleName)}.save}"

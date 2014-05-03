@@ -1,0 +1,26 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="web/#{moduleName}/#{formName}.xhtml"><![CDATA[
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jstl/core"
+                template="/WEB-INF/layouts/#{layout}.xhtml">
+    <ui:param name="title" value="\#{#{g:singular(moduleName)}Msg.homePageTitle}" />
+    <ui:param name="pageStyle" value="awa"/>
+#{''}
+    <!-- Main page body -->
+    <ui:define name="pageBody">
+        <f:metadata>
+            <f:viewParam id='id' value='\#{#{g:singular(moduleName)}.id}'/>
+        </f:metadata>
+        <div id='awa-content'>
+            <ui:include src="forms/#{formName}-form.xhtml"/>
+        </div>
+    </ui:define>
+#{''}
+</ui:composition>
+]]></f:view>

@@ -1,0 +1,15 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="config/#{moduleName}.xml"><![CDATA[
+    <navigation-rule>
+        <from-view-id>/#{moduleName}/#{formName}.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>success</from-outcome>
+            <to-view-id>/#{moduleName}/forms/#{formName}-response.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+#{''}
+]]></f:view>

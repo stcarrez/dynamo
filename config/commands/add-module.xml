@@ -9,13 +9,14 @@
   the AWA application.  It is configured by using an XML file which defines
   the beans, servlets, filters that it provides.
   The following files are created:
-  
+
     src/<project>-<module>.ads
     src/<project>-<module>-modules.ads
     src/<project>-<module>-modules.adb
     src/<project>-<module>-beans.ads
     src/<project>-<module>-beans.adb
     config/<module>.xml
+    bundles/<module>.properties
 
   And the following files are updated to register the new module:
     src/<project>-applications.ads
@@ -23,6 +24,7 @@
 ]]>      </help>
       <param optional='false' name='moduleName' arg='NAME'/>
       <basedir></basedir>
+      <template>add-module/module-bundles.xhtml</template>
       <template>add-module/module-config.xhtml</template>
       <template>add-module/module-spec.xhtml</template>
       <template>add-module/module-module-spec.xhtml</template>

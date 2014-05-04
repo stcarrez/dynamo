@@ -2,12 +2,15 @@
    <command>
       <name>add-form</name>
       <title>Add a form to the module</title>
-      <usage>add-form MODULE FORM-NAME</usage>
+      <usage>add-form MODULE/FORM-NAME [LAYOUT]</usage>
       <help><![CDATA[
-  This command adds a new form to the given module.
-  The form is intended to be included from another XHTML file by using
-  a <ui:include> directive (it does not contain the <f:view> component).
-  The associated response is a JSON that allows to perform update operations.
+  This command adds the form page FORM-NAME in the module MODULE under
+  the 'web' directory.  The form is intended to be included from another
+  XHTML file by using a <ui:include> directive (it does not contain the
+  <f:view> component).  The associated response is a JSON that allows to
+  perform update operations.  The optional LAYOUT parameter defines the
+  layout to be used for the for page. The default will use the 'layout'
+  presentation.  The following files are created:
 
     web/<module>/<form-name>.xhtml
     web/<module>/forms/<form-name>-form.xhtml

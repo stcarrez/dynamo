@@ -16,11 +16,13 @@
   And the following files are updated to setup the form navigation rules:
     config/<module>.xml
 ]]>   </help>
-      <param name='moduleName'/>
-      <param name='formName'/>
-      <template>add-form/page.xhtml</template>
-      <template>add-form/form.xhtml</template>
-      <template>add-form/form-response.xhtml</template>
+       <param name='ARG1' optional='false'/>
+       <param name='layout' optional='true'/>
+       <param name='moduleName'>#{fn:substringBefore(ARG1,'/')}</param>
+       <param name='formName'>#{fn:substringAfter(ARG1,'/')}</param>
+       <template>add-form/page.xhtml</template>
+       <template>add-form/form.xhtml</template>
+       <template>add-form/form-response.xhtml</template>
        <patch>
            <template>add-form/patch-form-navigation.xhtml</template>
            <after>&lt;module version=</after>

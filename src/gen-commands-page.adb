@@ -62,8 +62,8 @@ package body Gen.Commands.Page is
             return Layout;
          end if;
 
-         Generator.Error ("Layout file {0} not found.  Using 'layout' instead.", Layout);
-         return "layout";
+         Generator.Info ("Layout file {0} not found.", Layout);
+         return Layout;
       end Get_Layout;
 
       Name   : constant String := Get_Name;

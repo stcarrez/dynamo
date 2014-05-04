@@ -65,6 +65,11 @@ package body Gen.Commands.Templates is
                      Into    : in out Util.Strings.Vectors.Vector;
                      Context : in EL.Contexts.ELContext'Class);
 
+   --  Setup the EL context to evaluate some EL expression by using the generator's
+   --  context and evaluate a number of EL expression by using the Process procedure.
+   procedure Evaluate (Generator : in out Gen.Generator.Handler;
+                       Process   : access procedure (Context : in EL.Contexts.ELContext'Class));
+
    --  ------------------------------
    --  Check if the line matches the pseudo pattern.
    --  ------------------------------
@@ -138,6 +143,32 @@ package body Gen.Commands.Templates is
    end Expand;
 
    --  ------------------------------
+   --  Setup the EL context to evaluate some EL expression by using the generator's
+   --  context and evaluate a number of EL expression by using the Process procedure.
+   --  ------------------------------
+   procedure Evaluate (Generator : in out Gen.Generator.Handler;
+                       Process   : access procedure (Context : in EL.Contexts.ELContext'Class)) is
+      Context       : aliased ASF.Contexts.Faces.Faces_Context;
+      ELContext     : aliased EL.Contexts.Default.Default_Context;
+      NS_Mapper     : aliased EL.Functions.Namespaces.NS_Function_Mapper;
+      Root_Resolver : aliased ASF.Beans.Resolvers.ELResolver;
+   begin
+      --  Build the EL context to evaluate the patterns that must be verified.
+      --  This allows a pattern to match the module name or application name for example.
+      Root_Resolver.Initialize (Generator'Unchecked_Access, null);
+      ELContext.Set_Resolver (Root_Resolver'Unchecked_Access);
+      NS_Mapper.Set_Namespace (Prefix => "fn",
+                               URI    => ASF.Views.Nodes.Core.FN_URI);
+      NS_Mapper.Set_Namespace (Prefix => "g",
+                               URI    => Gen.Generator.G_URI);
+      Context.Set_ELContext (ELContext'Unchecked_Access);
+      Generator.Set_Context (Context'Unchecked_Access);
+      NS_Mapper.Set_Function_Mapper (ELContext.Get_Function_Mapper.all'Access);
+      ELContext.Set_Function_Mapper (NS_Mapper'Unchecked_Access);
+      Process (ELContext);
+   end Evaluate;
+
+   --  ------------------------------
    --  Apply the patch instruction
    --  ------------------------------
    procedure Patch_File (Generator : in out Gen.Generator.Handler;
@@ -152,6 +183,9 @@ package body Gen.Commands.Templates is
 
          type State is (MATCH_AFTER, MATCH_BEFORE, MATCH_DONE, MATCH_FAIL);
 
+         procedure Process (Line : in String);
+         procedure Expand (Context : in EL.Contexts.ELContext'Class);
+
          Output_Dir    : constant String := H.Get_Result_Directory;
          Path          : constant String := Util.Files.Compose (Output_Dir, File);
          Tmp_File      : constant String := Path & ".tmp";
@@ -163,8 +197,6 @@ package body Gen.Commands.Templates is
          Missing       : Util.Strings.Vectors.Vector;
          After         : Util.Strings.Vectors.Vector;
          Before        : Ada.Strings.Unbounded.Unbounded_String;
-
-         procedure Process (Line : in String);
 
          procedure Process (Line : in String) is
          begin
@@ -203,28 +235,18 @@ package body Gen.Commands.Templates is
             Output.Write (ASCII.LF);
          end Process;
 
-         Context       : aliased ASF.Contexts.Faces.Faces_Context;
-         ELContext     : aliased EL.Contexts.Default.Default_Context;
-         NS_Mapper     : aliased EL.Functions.Namespaces.NS_Function_Mapper;
-         Root_Resolver : aliased ASF.Beans.Resolvers.ELResolver;
-      begin
-         --  Build the EL context to evaluate the patterns that must be verified.
-         --  This allows a pattern to match the module name or application name for example.
-         Root_Resolver.Initialize (Generator'Unchecked_Access, null);
-         ELContext.Set_Resolver (Root_Resolver'Unchecked_Access);
-         NS_Mapper.Set_Namespace (Prefix => "fn",
-                                  URI    => ASF.Views.Nodes.Core.FN_URI);
-         NS_Mapper.Set_Namespace (Prefix => "g",
-                                  URI    => Gen.Generator.G_URI);
-         Context.Set_ELContext (ELContext'Unchecked_Access);
-         Generator.Set_Context (Context'Unchecked_Access);
-         NS_Mapper.Set_Function_Mapper (ELContext.Get_Function_Mapper.all'Access);
-         ELContext.Set_Function_Mapper (NS_Mapper'Unchecked_Access);
-
+         --  ------------------------------
          --  Expand the patterns.
-         Expand (Info.Missing, Missing, ELContext);
-         Expand (Info.After, After, ELContext);
-         Before := To_Unbounded_String (EL.Utils.Eval (To_String (Info.Before), ELContext));
+         --  ------------------------------
+         procedure Expand (Context : in EL.Contexts.ELContext'Class) is
+         begin
+            Expand (Info.Missing, Missing, Context);
+            Expand (Info.After, After, Context);
+            Before := To_Unbounded_String (EL.Utils.Eval (To_String (Info.Before), Context));
+         end Expand;
+
+      begin
+         Evaluate (Generator, Expand'Access);
 
          Tmp_Output.Create (Name => Tmp_File, Mode => Ada.Streams.Stream_IO.Out_File);
          Output.Initialize (Tmp_Output'Unchecked_Access);
@@ -262,10 +284,15 @@ package body Gen.Commands.Templates is
                               To_String (Info.Template), Save_Output'Access);
    end Patch_File;
 
+   --  ------------------------------
    --  Execute the command with the arguments.
+   --  ------------------------------
    procedure Execute (Cmd       : in Command;
                       Generator : in out Gen.Generator.Handler) is
       function Get_Output_Dir return String;
+      procedure Expand_Arguments (Context : in EL.Contexts.ELContext'Class);
+
+      PARAM_ERROR : exception;
 
       function Get_Output_Dir return String is
          Dir        : constant String := Generator.Get_Result_Directory;
@@ -277,23 +304,41 @@ package body Gen.Commands.Templates is
          end if;
       end Get_Output_Dir;
 
+      --  ------------------------------
+      --  Expand the command line arguments and setup the template global variables
+      --  before processing the template expansion.  The parameters are evaluated in
+      --  the order defined in the XML file.  By setting a global variable with Set_Global
+      --  the context is changed and the new variable is made available for further evaluations.
+      --  ------------------------------
+      procedure Expand_Arguments (Context : in EL.Contexts.ELContext'Class) is
+         Iter    : Param_Vectors.Cursor := Cmd.Params.First;
+      begin
+         while Param_Vectors.Has_Element (Iter) loop
+            declare
+               P      : constant Param := Param_Vectors.Element (Iter);
+               Value  : constant String := Get_Argument;
+               Result : Util.Beans.Objects.Object;
+            begin
+               if P.Value /= Null_Unbounded_String then
+                  Result := EL.Utils.Eval (To_String (P.Value), Context);
+               elsif not P.Is_Optional and Value'Length = 0 then
+                  Generator.Error ("Missing argument for {0}", To_String (P.Argument));
+                  raise PARAM_ERROR;
+               elsif Value'Length /= 0 then
+                  Result := Util.Beans.Objects.To_Object (Value);
+               end if;
+               if not P.Is_Optional and not Util.Beans.Objects.Is_Null (Result) then
+                  Generator.Set_Global (To_String (P.Name), Result);
+               end if;
+            end;
+            Param_Vectors.Next (Iter);
+         end loop;
+      end Expand_Arguments;
+
       Out_Dir : constant String := Get_Output_Dir;
-      Iter    : Param_Vectors.Cursor := Cmd.Params.First;
    begin
       Generator.Read_Project ("dynamo.xml", False);
-      while Param_Vectors.Has_Element (Iter) loop
-         declare
-            P     : constant Param := Param_Vectors.Element (Iter);
-            Value : constant String := Get_Argument;
-         begin
-            if not P.Is_Optional and Value'Length = 0 then
-               Generator.Error ("Missing argument for {0}", To_String (P.Argument));
-               return;
-            end if;
-            Generator.Set_Global (To_String (P.Name), Value);
-         end;
-         Param_Vectors.Next (Iter);
-      end loop;
+      Evaluate (Generator, Expand_Arguments'Access);
 
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (Out_Dir);
@@ -317,6 +362,10 @@ package body Gen.Commands.Templates is
             Patch_Vectors.Next (Iter);
          end loop;
       end;
+
+   exception
+      when PARAM_ERROR =>
+         return;
    end Execute;
 
    --  ------------------------------
@@ -435,6 +484,7 @@ package body Gen.Commands.Templates is
                Closure.Command.Params.Append (Closure.P);
                Closure.P.Name        := Ada.Strings.Unbounded.Null_Unbounded_String;
                Closure.P.Argument    := Ada.Strings.Unbounded.Null_Unbounded_String;
+               Closure.P.Value       := Ada.Strings.Unbounded.Null_Unbounded_String;
                Closure.P.Is_Optional := False;
 
             when FIELD_BASEDIR =>

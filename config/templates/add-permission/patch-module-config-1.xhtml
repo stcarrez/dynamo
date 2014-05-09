@@ -4,23 +4,17 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="config/#{moduleName}.xml"><![CDATA[
-  <entity-permission>
+  <auth-permission>
     <name>#{entityName}-create</name>
-    <entity-type>#{entityName}</entity-type>
-    <sql>
-       select ACL.ID from ACL
-       where ACL.ENTITY_TYPE = :entity_type
-       and ACL.USER_ID = :user_id   
-    </sql>
-  </entity-permission>
+  </auth-permission>
 
   <entity-permission>
     <name>#{entityName}-update</name>
     <entity-type>#{entityName}</entity-type>
     <sql>
-       select ACL.ID from ACL
-       where ACL.ENTITY_TYPE = :entity_type
-       and ACL.USER_ID = :user_id   
+       SELECT acl.id FROM awa_acl AS acl
+       WHERE acl.entity_type = :entity_type
+       AND acl.user_id = :user_id
     </sql>
   </entity-permission>
 
@@ -28,9 +22,9 @@
     <name>#{entityName}-delete</name>
     <entity-type>#{entityName}</entity-type>
     <sql>
-       select ACL.ID from ACL
-       where ACL.ENTITY_TYPE = :entity_type
-       and ACL.USER_ID = :user_id   
+       SELECT acl.id FROM awa_acl AS acl
+       WHERE acl.entity_type = :entity_type
+       AND acl.user_id = :user_id
     </sql>
   </entity-permission>
 

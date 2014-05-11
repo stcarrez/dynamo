@@ -33,10 +33,17 @@
       blog.name,
       blog.uid,
       blog.create_date
-    FROM blog AS blog
-    INNER JOIN acl ON acl.entity_id = blog.id AND acl.entity_type = :table AND acl.user_id = :user_id
+    FROM blog AS awa_blog AS blog
+    INNER JOIN awa_acl AS acl ON acl.entity_id = blog.id AND acl.entity_type = :table AND acl.user_id = :user_id
     ORDER BY blog.create_date DESC
+    LIMIT :first, :last
        </sql>
+       <sql-count>
+    SELECT
+      count(blog.id)
+    FROM awa_blog AS blog
+    INNER JOIN awa_acl AS acl ON acl.entity_id = blog.id AND acl.entity_type = :table AND acl.user_id = :user_id
+       </sql-count>
     </query>
 
 </query-mapping>

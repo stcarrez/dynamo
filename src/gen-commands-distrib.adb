@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-distrib -- Distrib command for dynamo
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,11 +68,17 @@ package body Gen.Commands.Distrib is
       pragma Unreferenced (Cmd, Generator);
       use Ada.Text_IO;
    begin
-      Put_Line ("distrib: Generate the Ada files for the database model or queries");
-      Put_Line ("Usage: distrib target-dir [package.xml]");
+      Put_Line ("dist: Build the distribution files to prepare the server installation");
+      Put_Line ("Usage: dist target-dir [package.xml]");
       New_Line;
-      Put_Line ("  Read the XML package description and build the distribution tree");
-      Put_Line ("  and create the distribution in the target directory.");
+      Put_Line ("  The dist command reads the XML package description to build the"
+                & " distribution tree.");
+      Put_Line ("  This command is intended to be used after the project is built.  It prepares");
+      Put_Line ("  the files for their installation on the target server in a "
+                & "production environment.");
+      Put_Line ("  The package.xml describes what files are necessary on the server.");
+      Put_Line ("  It allows to make transformations such as compressing Javascript, CSS and "
+                & "images");
    end Help;
 
 end Gen.Commands.Distrib;

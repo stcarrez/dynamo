@@ -7,7 +7,7 @@
   <auth-permission>
     <name>#{entityName}-create</name>
   </auth-permission>
-
+#{''}
   <entity-permission>
     <name>#{entityName}-update</name>
     <entity-type>#{entityName}</entity-type>
@@ -17,7 +17,7 @@
        AND acl.user_id = :user_id
     </sql>
   </entity-permission>
-
+#{''}
   <entity-permission>
     <name>#{entityName}-delete</name>
     <entity-type>#{entityName}</entity-type>
@@ -27,6 +27,6 @@
        AND acl.user_id = :user_id
     </sql>
   </entity-permission>
-
+#{''}
 ]]></f:view>
 

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO;
 with Ada.Characters.Handling;
 with Ada.Strings.Maps;
+with Ada.Exceptions;
 
 with Gen.Utils;
 package body Gen.Artifacts.Docs is
@@ -276,7 +277,8 @@ package body Gen.Artifacts.Docs is
             Name      : constant String := Simple_Name (Ent);
          begin
             if not Gen.Utils.Is_File_Ignored (Name)
-              and Name /= "regtests" then
+              and Name /= "regtests"
+            then
                Handler.Scan_Files (Ada.Directories.Full_Name (Ent), Docs);
             end if;
          end;
@@ -400,7 +402,8 @@ package body Gen.Artifacts.Docs is
          when IN_CODE_SEPARATOR =>
             if Line'Length > 0 and
             then (Ada.Characters.Handling.Is_Letter (Line (Line'First))
-                  or Line (Line'First) = '=') then
+                  or Line (Line'First) = '=')
+            then
                Append_Line (Doc, "}}}");
                Append_Line (Doc, "");
                Doc.State := IN_PARA;
@@ -576,6 +579,10 @@ package body Gen.Artifacts.Docs is
       if Is_Empty then
          Line_Vectors.Clear (Result.Lines);
       end if;
+
+   exception
+      when E : Util.Processes.Process_Error =>
+         Log.Error ("Command {0} failed: {1}", Command, Ada.Exceptions.Exception_Message (E));
    end Read_Xml_File;
 
 end Gen.Artifacts.Docs;

@@ -1,3 +1,6 @@
+Version 0.7.1   - Jul 2014
+  - Fix minor configuration issue with GNAT 2014
+
 Version 0.7.0   - May 2014
   - New project template to generate Gtk Ada application
   - Register the new module in the application when they are added

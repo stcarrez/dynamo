@@ -1,3 +1,9 @@
+dynamo (0.7.1) testing; urgency=low
+
+  * Fix build for XmlAda 2014
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sat, 19 Jul 2014 10:33:06 +0200
+
 dynamo (0.7.0) unstable; urgency=low
 
   * Initial Release.

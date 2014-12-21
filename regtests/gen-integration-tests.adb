@@ -150,6 +150,7 @@ package body Gen.Integration.Tests is
       P       : aliased Util.Streams.Pipes.Pipe_Stream;
       Buffer  : Util.Streams.Buffered.Buffered_Stream;
    begin
+      Log.Info ("Execute: {0}", Command);
       P.Open (Command, Util.Processes.READ);
 
       --  Write on the process input stream.
@@ -600,6 +601,7 @@ package body Gen.Integration.Tests is
 
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
+      T.Test_Configure;
       T.Execute ("make", Result);
 
       pragma Warnings (Off, "condition is always False");

@@ -45,7 +45,7 @@ CP=cp
 
 # Build executables for all mains defined by the project.
 build:	src/gen-configs.ads
-	$(GNATMAKE) -P "$(GPRPATH)" $(MAKE_ARGS)
+	$(GNATMAKE) -p -P "$(GPRPATH)" $(MAKE_ARGS)
 
 # Not intended for manual invocation.
 # Invoked if automatic builds are enabled.

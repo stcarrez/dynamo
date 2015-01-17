@@ -756,7 +756,7 @@ private
    --  detected, the file being written is deleted, and a fatal error is
    --  signalled.
 
-   File_Attributes_Size : constant Natural := 24;
+   File_Attributes_Size : constant Natural := 32;
    --  This should be big enough to fit a "struct file_attributes" on any
    --  system. It doesn't cause any malfunction if it is too big (which avoids
    --  the need for either mapping the struct exactly or importing the sizeof

@@ -1,5 +1,5 @@
 dnl Autoconf configure script for Dynamo
-dnl Copyright (C) 2001, 2002, 2003, 2009, 2010, 2011, 2012, 2013 Stephane Carrez
+dnl Copyright (C) 2001, 2002, 2003, 2009, 2010, 2011, 2012, 2013, 2015 Stephane Carrez
 dnl Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 dnl
 dnl  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,13 +24,15 @@ AC_EXEEXT
 # Current release settings
 GEN_MAJOR_VERSION=0
 GEN_MINOR_VERSION=7
-GEN_MICRO_VERSION=1
+GEN_MICRO_VERSION=2
 GEN_VERSION=$GEN_MAJOR_VERSION.$GEN_MINOR_VERSION.$GEN_MICRO_VERSION
 
 AC_MSG_CHECKING([number of processors])
 NR_CPUS=`getconf _NPROCESSORS_CONF 2>/dev/null || getconf _NPROCESSORS_CONF 2>/dev/null || echo 1`
 AC_MSG_RESULT($NR_CPUS)
 AC_SUBST(NR_CPUS)
+
+AC_CHECK_PROGS(GNATMAKE, gnatmake, "")
 
 # checking for local tools
 AC_PROG_CC
@@ -58,118 +60,46 @@ AC_SUBST(GEN_LIBDIR)
 ##########################################
 # Ada Util library
 ##########################################
-
-AC_MSG_CHECKING([Ada Utility library (code.google.com/p/ada-util)])
-AC_ARG_WITH(ada-util,
-AS_HELP_STRING([--with-ada-util=x], [Path for the Ada Utility library (code.google.com/p/ada-util)]),
-[
-  UTIL_DIR=${withval}/
-],
-[
-  echo "with \"util\"; project t is for Source_Dirs use (); end t;" > t.gpr
-  gnatmake -p -Pt >/dev/null 2>/dev/null
-  if test $? -eq 0; then
-    UTIL_DIR=
-  else
-    UTIL_DIR=../util/
-  fi;
-  rm -f t.gpr
-])
-echo "with \"${UTIL_DIR}util\"; project t is for Source_Dirs use (); end t;" > t.gpr
-gnatmake -p -Pt >/dev/null 2>/dev/null
-if test $? -ne 0 ; then
-   rm -f t.gpr
-   AC_MSG_ERROR([Ada Utility library not found in ${UTIL_DIR}])
-fi
-rm -f t.gpr
-AC_MSG_RESULT(ok ${UTIL_DIR})
+AM_GNAT_FIND_PROJECT([ada-util],[Ada Utility Library],[util],
+  [git@github.com:stcarrez/ada-util.git],
+  [Building Ada EL requires the Ada Utility Library.],
+  [
+    UTIL_DIR=${gnat_project_dir_util}
+  ])
 AC_SUBST(UTIL_DIR)
+
 
 ##########################################
 # Ada Expression Language library
 ##########################################
-AC_MSG_CHECKING([Ada Expression Language library (code.google.com/p/ada-el)])
-AC_ARG_WITH(ada-el,
-AS_HELP_STRING([--with-ada-el=x], [Path for the Ada Expression Language library (code.google.com/p/ada-el)]),
-[
-  EL_DIR=${withval}/
-],
-[
-  echo "with \"el\"; project t is for Source_Dirs use (); end t;" > t.gpr
-  gnatmake -p -Pt >/dev/null 2>/dev/null
-  if test $? -eq 0; then
-    EL_DIR=
-  else
-    EL_DIR=../el/
-  fi;
-  rm -f t.gpr
-])
-echo "with \"${EL_DIR}el\"; project t is for Source_Dirs use (); end t;" > t.gpr
-gnatmake -p -Pt >/dev/null 2>/dev/null
-if test $? -ne 0 ; then
-   rm -f t.gpr
-   AC_MSG_ERROR([Ada Expression Language library not found in ${EL_DIR}])
-fi
-rm -f t.gpr
-AC_MSG_RESULT(ok ${EL_DIR})
+AM_GNAT_FIND_PROJECT([ada-el],[Ada Expression Language Library],[el],
+  [git@github.com:stcarrez/ada-el.git],
+  [Building Ada Server Faces requires the Ada EL Library.],
+  [
+    EL_DIR=${gnat_project_dir_el}
+  ])
 AC_SUBST(EL_DIR)
 
 ##########################################
 # Ada Server Faces library
 ##########################################
-AC_MSG_CHECKING([Ada Server Faces library (code.google.com/p/ada-asf)])
-AC_ARG_WITH(ada-asf,
-AS_HELP_STRING([--with-ada-asf=x], [Path for the Ada Server Faces library (code.google.com/p/ada-asf)]),
-[
-  ASF_DIR=${withval}/
-],
-[
-  echo "with \"asf\"; project t is for Source_Dirs use (); end t;" > t.gpr
-  gnatmake -p -Pt >/dev/null 2>/dev/null
-  if test $? -eq 0; then
-    ASF_DIR=
-  else
-    ASF_DIR=../asf/
-  fi;
-  rm -f t.gpr
-])
-echo "with \"${ASF_DIR}asf\"; project t is for Source_Dirs use (); end t;" > t.gpr
-gnatmake -p -Pt >/dev/null 2>/dev/null
-if test $? -ne 0 ; then
-   rm -f t.gpr
-   AC_MSG_ERROR([Ada Server Faces library not found in ${ASF_DIR}])
-fi
-rm -f t.gpr
-AC_MSG_RESULT(ok ${ASF_DIR})
+AM_GNAT_FIND_PROJECT([ada-asf],[Ada Server Faces],[asf],
+  [git@github.com:stcarrez/ada-asf.git],
+  [Building Dynamo requires the Ada Server Faces Library.],
+  [
+    ASF_DIR=${gnat_project_dir_asf}
+  ])
 AC_SUBST(ASF_DIR)
 
 ##########################################
 # Ada Database Objects library
 ##########################################
-AC_MSG_CHECKING([Ada Database Objects library (code.google.com/p/ada-ado)])
-AC_ARG_WITH(ada-ado,
-AS_HELP_STRING([--with-ada-ado=x], [Path for the Ada Database Objects library (code.google.com/p/ada-ado)]),
-[
-  ADO_DIR=${withval}/
-],
-[
-  echo "with \"ado\"; project t is for Source_Dirs use (); end t;" > t.gpr
-  gnatmake -p -Pt >/dev/null 2>/dev/null
-  if test $? -eq 0; then
-    ADO_DIR=
-  else
-    ADO_DIR=../ado/
-  fi;
-  rm -f t.gpr
-])
-echo "with \"${ADO_DIR}ado\"; project t is for Source_Dirs use (); end t;" > t.gpr
-gnatmake -p -Pt >/dev/null 2>/dev/null
-if test $? -ne 0 ; then
-   rm -f t.gpr
-   AC_MSG_ERROR([Ada Database Objects library not found in ${ADO_DIR}])
-fi
-rm -f t.gpr
-AC_MSG_RESULT(ok ${ADO_DIR})
+AM_GNAT_FIND_PROJECT([ada-ado],[Ada Database Objects],[ado],
+  [git@github.com:stcarrez/ada-ado.git],
+  [Building Dynamo requires the Ada Database Objects Library.],
+  [
+    ADO_DIR=${gnat_project_dir_ado}
+  ])
 AC_SUBST(ADO_DIR)
 
 AC_SUBST(mkdir_p)

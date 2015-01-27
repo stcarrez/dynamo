@@ -72,7 +72,7 @@ rebuild: clean build
 
 
 bin/dynamo_harness:  bin/dynamo
-	$(GNATMAKE) -p -Ptests $(MAKE_ARGS)
+	$(GNATMAKE) -p -Pdynamo_tests $(MAKE_ARGS)
 
 check test:	 build bin/dynamo_harness
 	-rm -rf test-app
@@ -87,7 +87,7 @@ generate:
 # Files to package in source distribution
 DISTFILES=README NEWS LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess configure config.sub \
 configure.in Makefile.in install-sh ChangeLog \
-dynamo.gpr.in config.gpr tests.gpr.in \
+dynamo.gpr.in config.gpr dynamo_tests.gpr.in \
 src \
 bin obj config doc regtests debian
 

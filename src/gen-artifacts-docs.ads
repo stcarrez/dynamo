@@ -101,6 +101,9 @@ private
 
    type Doc_State is (IN_PARA, IN_SEPARATOR, IN_CODE, IN_CODE_SEPARATOR, IN_LIST);
 
+   type Document_Formatter is abstract tagged null record;
+   type Document_Formatter_Access is access all Document_Formatter'Class;
+
    type File_Document is record
       Name         : Ada.Strings.Unbounded.Unbounded_String;
       Title        : Ada.Strings.Unbounded.Unbounded_String;
@@ -108,7 +111,12 @@ private
       Line_Number  : Natural := 0;
       Lines        : Line_Vectors.Vector;
       Was_Included : Boolean := False;
+      Formatter    : Document_Formatter_Access;
    end record;
+
+   --  Get the document name from the file document (ex: <name>.wiki or <name>.md).
+   function Get_Document_Name (Formatter : in Document_Formatter;
+                               Document  : in File_Document) return String is abstract;
 
    package Doc_Maps is
      new Ada.Containers.Indefinite_Hashed_Maps (Key_Type        => String,

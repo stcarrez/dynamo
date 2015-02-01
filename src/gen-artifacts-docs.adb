@@ -370,7 +370,7 @@ package body Gen.Artifacts.Docs is
       if Line'Length >= 1 and then Line (Line'First) = TAG_CHAR then
          --  Force a close of the code extract if we see some @xxx command.
          if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
-            Append_Line (Doc, "}}}");
+            Doc.Lines.Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
             Append_Line (Doc, "");
          end if;
          Doc.State := IN_PARA;
@@ -394,7 +394,7 @@ package body Gen.Artifacts.Docs is
 
             elsif Is_Code (Line) then
                Doc.State := IN_CODE;
-               Append_Line (Doc, "{{{");
+               Doc.Lines.Append (Line_Type '(Len => 0, Kind => L_START_CODE, Content => ""));
             end if;
             Append_Line (Doc, Line);
 
@@ -410,7 +410,7 @@ package body Gen.Artifacts.Docs is
             then (Ada.Characters.Handling.Is_Letter (Line (Line'First))
                   or Line (Line'First) = '=')
             then
-               Append_Line (Doc, "}}}");
+               Doc.Lines.Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
                Append_Line (Doc, "");
                Doc.State := IN_PARA;
             end if;
@@ -439,7 +439,7 @@ package body Gen.Artifacts.Docs is
    procedure Finish (Doc : in out File_Document) is
    begin
       if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
-         Append_Line (Doc, "}}}");
+         Doc.Lines.Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
          Doc.State := IN_PARA;
       end if;
    end Finish;

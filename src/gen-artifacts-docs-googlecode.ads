@@ -40,4 +40,11 @@ private package Gen.Artifacts.Docs.Googlecode is
                          File      : in Ada.Text_IO.File_Type;
                          Line      : in Line_Type);
 
+   --  Finish the document.
+   overriding
+   procedure Finish_Document (Formatter : in out Document_Formatter;
+                              Document  : in File_Document;
+                              File      : in Ada.Text_IO.File_Type;
+                              Source    : in String);
+
 end Gen.Artifacts.Docs.Googlecode;

@@ -205,6 +205,7 @@ private
    type Artifact is new Gen.Artifacts.Artifact with record
       Xslt_Command : Ada.Strings.Unbounded.Unbounded_String;
       Format       : Doc_Format := DOC_WIKI_GOOGLE;
+      Formatter    : Document_Formatter_Access;
    end record;
 
 end Gen.Artifacts.Docs;

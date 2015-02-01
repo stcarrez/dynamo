@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,6 +68,8 @@ package Gen.Artifacts.Docs is
    TAG_INCLUDE  : constant String := "include";
    TAG_SEE      : constant String := "see";
 
+   type Doc_Format is (DOC_MARKDOWN, DOC_WIKI_GOOGLE);
+
    --  ------------------------------
    --  Documentation artifact
    --  ------------------------------
@@ -79,6 +81,10 @@ package Gen.Artifacts.Docs is
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class);
+
+   --  Set the output document format to generate.
+   procedure Set_Format (Handler : in out Artifact;
+                         Format  : in Doc_Format);
 
 private
 
@@ -173,6 +179,7 @@ private
 
    type Artifact is new Gen.Artifacts.Artifact with record
       Xslt_Command : Ada.Strings.Unbounded.Unbounded_String;
+      Format       : Doc_Format := DOC_WIKI_GOOGLE;
    end record;
 
 end Gen.Artifacts.Docs;

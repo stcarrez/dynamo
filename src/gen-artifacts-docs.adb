@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,6 +66,15 @@ package body Gen.Artifacts.Docs is
       Handler.Scan_Files ("plugins", Docs);
       Generate (Docs, Context.Get_Result_Directory);
    end Prepare;
+
+   --  ------------------------------
+   --  Set the output document format to generate.
+   --  ------------------------------
+   procedure Set_Format (Handler : in out Artifact;
+                         Format  : in Doc_Format) is
+   begin
+      Handler.Format := Format;
+   end Set_Format;
 
    --  ------------------------------
    --  Include the document extract represented by <b>Name</b> into the document <b>Into</b>.

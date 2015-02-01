@@ -57,6 +57,13 @@ package body Gen.Artifacts.Docs.Markdown is
          Ada.Text_IO.Put (File, Line.Content);
          Formatter.Need_Newline := True;
 
+      elsif Line.Kind = L_START_CODE or Line.Kind = L_END_CODE then
+         if Formatter.Need_NewLine then
+            Ada.Text_IO.New_Line (File);
+            Formatter.Need_Newline := False;
+         end if;
+         Ada.Text_IO.Put_Line (File, "```");
+
       else
          if Formatter.Need_Newline then
             Ada.Text_IO.New_Line (File);

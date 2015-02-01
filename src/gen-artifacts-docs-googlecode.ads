@@ -28,6 +28,12 @@ private package Gen.Artifacts.Docs.Googlecode is
    function Get_Document_Name (Formatter : in Document_Formatter;
                                Document  : in File_Document) return String;
 
+   --  Start a new document.
+   overriding
+   procedure Start_Document (Formatter : in out Document_Formatter;
+                             Document  : in File_Document;
+                             File      : in Ada.Text_IO.File_Type);
+
    --  Write a line in the target document formatting the line if necessary.
    overriding
    procedure Write_Line (Formatter : in out Document_Formatter;

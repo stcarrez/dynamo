@@ -159,7 +159,7 @@ package body Gen.Artifacts.Docs is
 
          procedure Write (Line : in Line_Type);
 
-         Name : constant String := Ada.Strings.Unbounded.To_String (Doc.Name) & ".wiki";
+         Name : constant String := Doc.Formatter.Get_Document_Name (Doc);
          Path : constant String := Util.Files.Compose (Dir, Name);
          File : Ada.Text_IO.File_Type;
          Iter : Line_Vectors.Cursor := Doc.Lines.First;

@@ -29,6 +29,18 @@ package body Gen.Artifacts.Docs.Googlecode is
    end Get_Document_Name;
 
    --  ------------------------------
+   --  Start a new document.
+   --  ------------------------------
+   overriding
+   procedure Start_Document (Formatter : in out Document_Formatter;
+                             Document  : in File_Document;
+                             File      : in Ada.Text_IO.File_Type) is
+   begin
+      Ada.Text_IO.Put_Line (File, "#summary " & Ada.Strings.Unbounded.To_String (Document.Title));
+      Ada.Text_IO.New_Line (File);
+   end Start_Document;
+
+   --  ------------------------------
    --  Write a line in the target document formatting the line if necessary.
    --  ------------------------------
    overriding

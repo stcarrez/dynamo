@@ -167,22 +167,8 @@ package body Gen.Artifacts.Docs is
 
          procedure Write (Line : in Line_Type) is
          begin
-            if Line.Kind = L_LIST then
-               Ada.Text_IO.New_Line (File);
-               Ada.Text_IO.Put (File, Line.Content);
-               Need_Newline := True;
-
-            elsif Line.Kind = L_LIST_ITEM then
-               Ada.Text_IO.Put (File, Line.Content);
-               Need_Newline := True;
-
-            else
-               if Need_Newline then
-                  Ada.Text_IO.New_Line (File);
-                  Need_Newline := False;
-               end if;
-               Ada.Text_IO.Put_Line (File, Line.Content);
-            end if;
+            Doc.Formatter.Write_Line (File => File,
+                                      Line => Line);
          end Write;
 
       begin

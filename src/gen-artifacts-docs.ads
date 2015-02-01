@@ -129,6 +129,12 @@ private
                          File      : in Ada.Text_IO.File_Type;
                          Line      : in Line_Type) is abstract;
 
+   --  Finish the document.
+   procedure Finish_Document (Formatter : in out Document_Formatter;
+                              Document  : in File_Document;
+                              File      : in Ada.Text_IO.File_Type;
+                              Source    : in String) is abstract;
+
    package Doc_Maps is
      new Ada.Containers.Indefinite_Hashed_Maps (Key_Type        => String,
                                                 Element_Type    => File_Document,

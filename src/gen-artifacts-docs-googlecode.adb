@@ -28,4 +28,30 @@ package body Gen.Artifacts.Docs.Googlecode is
       return Ada.Strings.Unbounded.To_String (Document.Name) & ".wiki";
    end Get_Document_Name;
 
+   --  ------------------------------
+   --  Write a line in the target document formatting the line if necessary.
+   --  ------------------------------
+   overriding
+   procedure Write_Line (Formatter : in out Document_Formatter;
+                         File      : in Ada.Text_IO.File_Type;
+                         Line      : in Line_Type) is
+   begin
+      if Line.Kind = L_LIST then
+         Ada.Text_IO.New_Line (File);
+         Ada.Text_IO.Put (File, Line.Content);
+         Formatter.Need_Newline := True;
+
+      elsif Line.Kind = L_LIST_ITEM then
+         Ada.Text_IO.Put (File, Line.Content);
+         Formatter.Need_Newline := True;
+
+      else
+         if Formatter.Need_Newline then
+            Ada.Text_IO.New_Line (File);
+            Formatter.Need_Newline := False;
+         end if;
+         Ada.Text_IO.Put_Line (File, Line.Content);
+      end if;
+   end Write_Line;
+
 end Gen.Artifacts.Docs.Googlecode;

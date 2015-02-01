@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-docs -- Extract and generate documentation for the project
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,22 +33,40 @@ package body Gen.Commands.Docs is
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
 
-      Doc : Gen.Artifacts.Docs.Artifact;
-      M   : Gen.Model.Packages.Model_Definition;
+      Doc  : Gen.Artifacts.Docs.Artifact;
+      M    : Gen.Model.Packages.Model_Definition;
+      Arg1 : constant String := Get_Argument;
+      Arg2 : constant String := Get_Argument;
+      Fmt  : Gen.Artifacts.Docs.Doc_Format := Gen.Artifacts.Docs.DOC_WIKI_GOOGLE;
    begin
       Generator.Read_Project ("dynamo.xml", False);
 
-      --  Setup the target directory where the distribution is created.
-      declare
-         Target_Dir : constant String := Get_Argument;
-      begin
-         if Target_Dir'Length = 0 then
+      if Arg1'Length = 0 then
+         Generator.Error ("Missing target directory");
+         return;
+      elsif Arg1 (Arg1'First) /= '-' then
+         if Arg2'Length /= 0 then
+            Generator.Error ("Invalid markup option " & Arg1);
+            return;
+         end if;
+         --  Setup the target directory where the distribution is created.
+         Generator.Set_Result_Directory (Arg1);
+      else
+         if Arg1 = "-markdown" then
+            Fmt := Gen.Artifacts.Docs.DOC_MARKDOWN;
+         elsif Arg1 = "-google" then
+            Fmt := Gen.Artifacts.Docs.DOC_WIKI_GOOGLE;
+         else
+            Generator.Error ("Invalid markup option " & Arg1);
+            return;
+         end if;
+         if Arg2'Length = 0 then
             Generator.Error ("Missing target directory");
             return;
          end if;
-         Generator.Set_Result_Directory (Target_Dir);
-      end;
-
+         Generator.Set_Result_Directory (Arg2);
+      end if;
+      Doc.Set_Format (Fmt);
       Doc.Prepare (M, Generator);
    end Execute;
 
@@ -61,7 +79,7 @@ package body Gen.Commands.Docs is
       use Ada.Text_IO;
    begin
       Put_Line ("build-doc: Extract and generate the project documentation");
-      Put_Line ("Usage: build-doc");
+      Put_Line ("Usage: build-doc [-markdown|-google] target-dir");
       New_Line;
       Put_Line ("  Extract the documentation from the project source files and generate the");
       Put_Line ("  project documentation.  The following files are scanned:");

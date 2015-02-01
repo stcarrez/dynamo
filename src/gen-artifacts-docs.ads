@@ -119,6 +119,11 @@ private
    function Get_Document_Name (Formatter : in Document_Formatter;
                                Document  : in File_Document) return String is abstract;
 
+   --  Start a new document.
+   procedure Start_Document (Formatter : in out Document_Formatter;
+                             Document  : in File_Document;
+                             File      : in Ada.Text_IO.File_Type) is abstract;
+
    --  Write a line in the target document formatting the line if necessary.
    procedure Write_Line (Formatter : in out Document_Formatter;
                          File      : in Ada.Text_IO.File_Type;

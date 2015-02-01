@@ -19,6 +19,7 @@ with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
 with Ada.Strings.Unbounded;
+with Ada.Text_IO;
 
 with Gen.Model.Packages;
 
@@ -117,6 +118,11 @@ private
    --  Get the document name from the file document (ex: <name>.wiki or <name>.md).
    function Get_Document_Name (Formatter : in Document_Formatter;
                                Document  : in File_Document) return String is abstract;
+
+   --  Write a line in the target document formatting the line if necessary.
+   procedure Write_Line (Formatter : in out Document_Formatter;
+                         File      : in Ada.Text_IO.File_Type;
+                         Line      : in Line_Type) is abstract;
 
    package Doc_Maps is
      new Ada.Containers.Indefinite_Hashed_Maps (Key_Type        => String,

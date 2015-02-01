@@ -182,8 +182,8 @@ package body Gen.Artifacts.Docs is
          Ada.Text_IO.Create (File => File,
                              Mode => Ada.Text_IO.Out_File,
                              Name => Path);
-         Ada.Text_IO.Put_Line (File, "#summary " & Ada.Strings.Unbounded.To_String (Doc.Title));
-         Ada.Text_IO.New_Line (File);
+         Doc.Formatter.Start_Document (Document => Doc,
+                                       File     => File);
 
          while Line_Vectors.Has_Element (Iter) loop
             Line_Vectors.Query_Element (Iter, Write'Access);

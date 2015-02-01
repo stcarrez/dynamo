@@ -29,6 +29,8 @@ with Ada.Strings.Maps;
 with Ada.Exceptions;
 
 with Gen.Utils;
+
+with Gen.Artifacts.Docs.Googlecode;
 package body Gen.Artifacts.Docs is
 
    use Util.Log;
@@ -42,6 +44,8 @@ package body Gen.Artifacts.Docs is
      or Ada.Strings.Maps.To_Set (ASCII.VT)
      or Ada.Strings.Maps.To_Set (ASCII.CR)
      or Ada.Strings.Maps.To_Set (ASCII.LF);
+
+   Google_Formatter : aliased Gen.Artifacts.Docs.Googlecode.Document_Formatter;
 
    --  ------------------------------
    --  Prepare the model after all the configuration files have been read and before
@@ -73,6 +77,13 @@ package body Gen.Artifacts.Docs is
                          Format  : in Doc_Format) is
    begin
       Handler.Format := Format;
+      case Format is
+         when DOC_WIKI_GOOGLE =>
+            Handler.Formatter := Google_Formatter'Access;
+
+         when DOC_MARKDOWN =>
+            null;
+      end case;
    end Set_Format;
 
    --  ------------------------------
@@ -247,6 +258,7 @@ package body Gen.Artifacts.Docs is
             else
                Log.Debug ("Collect {0}", Full_Path);
 
+               Doc.Formatter := Handler.Formatter;
                if Name (Pos .. Name'Last) = ".ads" then
                   Handler.Read_Ada_File (Full_Path, Doc);
 

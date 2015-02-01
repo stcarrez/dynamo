@@ -47,4 +47,9 @@ private package Gen.Artifacts.Docs.Markdown is
                               File      : in Ada.Text_IO.File_Type;
                               Source    : in String);
 
+   --  Write a line in the document.
+   procedure Write_Line (Formatter : in out Document_Formatter;
+                         File      : in Ada.Text_IO.File_Type;
+                         Line      : in String);
+
 end Gen.Artifacts.Docs.Markdown;

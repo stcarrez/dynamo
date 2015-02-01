@@ -19,11 +19,19 @@
 private package Gen.Artifacts.Docs.Googlecode is
 
    --  Format documentation for Google Wiki syntax.
-   type Document_Formatter is new Gen.Artifacts.Docs.Document_Formatter with null record;
+   type Document_Formatter is new Gen.Artifacts.Docs.Document_Formatter with record
+      Need_Newline : Boolean := False;
+   end record;
 
    --  Get the document name from the file document (ex: <name>.wiki or <name>.md).
    overriding
    function Get_Document_Name (Formatter : in Document_Formatter;
                                Document  : in File_Document) return String;
+
+   --  Write a line in the target document formatting the line if necessary.
+   overriding
+   procedure Write_Line (Formatter : in out Document_Formatter;
+                         File      : in Ada.Text_IO.File_Type;
+                         Line      : in Line_Type);
 
 end Gen.Artifacts.Docs.Googlecode;

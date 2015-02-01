@@ -31,6 +31,7 @@ with Ada.Exceptions;
 with Gen.Utils;
 
 with Gen.Artifacts.Docs.Googlecode;
+with Gen.Artifacts.Docs.Markdown;
 package body Gen.Artifacts.Docs is
 
    use Util.Log;
@@ -45,7 +46,8 @@ package body Gen.Artifacts.Docs is
      or Ada.Strings.Maps.To_Set (ASCII.CR)
      or Ada.Strings.Maps.To_Set (ASCII.LF);
 
-   Google_Formatter : aliased Gen.Artifacts.Docs.Googlecode.Document_Formatter;
+   Google_Formatter   : aliased Gen.Artifacts.Docs.Googlecode.Document_Formatter;
+   Markdown_Formatter : aliased Gen.Artifacts.Docs.Markdown.Document_Formatter;
 
    --  ------------------------------
    --  Prepare the model after all the configuration files have been read and before
@@ -82,7 +84,8 @@ package body Gen.Artifacts.Docs is
             Handler.Formatter := Google_Formatter'Access;
 
          when DOC_MARKDOWN =>
-            null;
+            Handler.Formatter := Markdown_Formatter'Access;
+
       end case;
    end Set_Format;
 

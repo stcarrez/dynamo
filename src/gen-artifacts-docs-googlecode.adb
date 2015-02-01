@@ -41,6 +41,20 @@ package body Gen.Artifacts.Docs.Googlecode is
    end Start_Document;
 
    --  ------------------------------
+   --  Write a line in the document.
+   --  ------------------------------
+   procedure Write_Line (Formatter : in out Document_Formatter;
+                         File      : in Ada.Text_IO.File_Type;
+                         Line      : in String) is
+   begin
+      if Formatter.Need_NewLine then
+         Ada.Text_IO.New_Line (File);
+         Formatter.Need_Newline := False;
+      end if;
+      Ada.Text_IO.Put_Line (File, Line);
+   end Write_Line;
+
+   --  ------------------------------
    --  Write a line in the target document formatting the line if necessary.
    --  ------------------------------
    overriding
@@ -48,36 +62,41 @@ package body Gen.Artifacts.Docs.Googlecode is
                          File      : in Ada.Text_IO.File_Type;
                          Line      : in Line_Type) is
    begin
-      if Line.Kind = L_LIST then
-         Ada.Text_IO.New_Line (File);
-         Ada.Text_IO.Put (File, Line.Content);
-         Formatter.Need_Newline := True;
-
-      elsif Line.Kind = L_LIST_ITEM then
-         Ada.Text_IO.Put (File, Line.Content);
-         Formatter.Need_Newline := True;
-
-      elsif Line.Kind = L_START_CODE then
-         if Formatter.Need_NewLine then
+      case Line.Kind is
+         when L_LIST =>
             Ada.Text_IO.New_Line (File);
-            Formatter.Need_Newline := False;
-         end if;
-         Ada.Text_IO.Put_Line (File, "{{{");
+            Ada.Text_IO.Put (File, Line.Content);
+            Formatter.Need_Newline := True;
 
-      elsif Line.Kind = L_END_CODE then
-         if Formatter.Need_NewLine then
-            Ada.Text_IO.New_Line (File);
-            Formatter.Need_Newline := False;
-         end if;
-         Ada.Text_IO.Put_Line (File, "}}}");
+         when L_LIST_ITEM =>
+            Ada.Text_IO.Put (File, Line.Content);
+            Formatter.Need_Newline := True;
 
-      else
-         if Formatter.Need_Newline then
-            Ada.Text_IO.New_Line (File);
-            Formatter.Need_Newline := False;
-         end if;
-         Ada.Text_IO.Put_Line (File, Line.Content);
-      end if;
+         when L_START_CODE =>
+            Formatter.Write_Line (File, "{{{");
+
+         when L_END_CODE =>
+            Formatter.Write_Line (File, "}}}");
+
+         when L_TEXT =>
+            Formatter.Write_Line (File, Line.Content);
+
+         when L_HEADER_1 =>
+            Formatter.Write_Line (File, "= " & Line.Content & " =");
+
+         when L_HEADER_2 =>
+            Formatter.Write_Line (File, "== " & Line.Content & " ==");
+
+         when L_HEADER_3 =>
+            Formatter.Write_Line (File, "=== " & Line.Content & " ===");
+
+         when L_HEADER_4 =>
+            Formatter.Write_Line (File, "==== " & Line.Content & " ====");
+
+         when others =>
+            null;
+
+      end case;
    end Write_Line;
 
    --  ------------------------------

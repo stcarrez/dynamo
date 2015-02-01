@@ -24,7 +24,6 @@ with Util.Processes;
 
 with Ada.Directories;
 with Ada.Strings.Fixed;
-with Ada.Text_IO;
 with Ada.Characters.Handling;
 with Ada.Strings.Maps;
 with Ada.Exceptions;
@@ -163,7 +162,6 @@ package body Gen.Artifacts.Docs is
          Path : constant String := Util.Files.Compose (Dir, Name);
          File : Ada.Text_IO.File_Type;
          Iter : Line_Vectors.Cursor := Doc.Lines.First;
-         Need_Newline : Boolean := False;
 
          procedure Write (Line : in Line_Type) is
          begin

@@ -49,6 +49,13 @@ package body Gen.Artifacts.Docs is
    Google_Formatter   : aliased Gen.Artifacts.Docs.Googlecode.Document_Formatter;
    Markdown_Formatter : aliased Gen.Artifacts.Docs.Markdown.Document_Formatter;
 
+   --  Get the header level of the line if the line is a header.
+   --  Returns 0 if the line is not a header.
+   function Get_Header_Level (Line : in String) return Natural;
+
+   --  Get the header from the line, removing any markup.
+   function Get_Header (Line : in String) return String;
+
    --  ------------------------------
    --  Prepare the model after all the configuration files have been read and before
    --  actually invoking the generation.
@@ -316,15 +323,70 @@ package body Gen.Artifacts.Docs is
    end Is_Code;
 
    --  ------------------------------
+   --  Get the header level of the line if the line is a header.
+   --  Returns 0 if the line is not a header.
+   --  ------------------------------
+   function Get_Header_Level (Line : in String) return Natural is
+      Result : Natural := 0;
+   begin
+      for I in Line'Range loop
+         exit when Line (I) /= '=';
+         Result := Result + 1;
+         exit when Result >= 4;
+      end loop;
+      return Result;
+   end Get_Header_Level;
+
+   --  ------------------------------
+   --  Get the header from the line, removing any markup.
+   --  ------------------------------
+   function Get_Header (Line : in String) return String is
+      Start  : Natural := Line'First;
+      Finish : Natural := Line'Last;
+   begin
+      while Start < Finish and (Line (Start) = '=' or Line (Start) = ' ') loop
+         Start := Start + 1;
+      end loop;
+      while Start < Finish and (Line (Finish) = '=' or Line (Finish) = ' ') loop
+         Finish := Finish - 1;
+      end loop;
+      return Line (Start .. Finish);
+   end Get_Header;
+
+   --  ------------------------------
    --  Append a raw text line to the document.
    --  ------------------------------
    procedure Append_Line (Doc  : in out File_Document;
                           Line : in String) is
+      Level : Natural;
    begin
       if Doc.State = IN_LIST then
          Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_LIST_ITEM, Content => Line));
       else
-         Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_TEXT, Content => Line));
+         Level := Get_Header_Level (Line);
+         if Level = 0 then
+            Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_TEXT, Content => Line));
+         else
+            declare
+               Header : constant String := Get_Header (Line);
+            begin
+               case Level is
+                  when 1 =>
+                     Doc.Lines.Append (Line_Type '(Len => Header'Length, Kind => L_HEADER_1,
+                                                   Content => Header));
+
+                  when 2 =>
+                     Doc.Lines.Append (Line_Type '(Len => Header'Length, Kind => L_HEADER_2,
+                                                   Content => Header));
+                  when 3 =>
+                     Doc.Lines.Append (Line_Type '(Len => Header'Length, Kind => L_HEADER_3,
+                                                   Content => Header));
+                  when others =>
+                     Doc.Lines.Append (Line_Type '(Len => Header'Length, Kind => L_HEADER_4,
+                                                   Content => Header));
+               end case;
+            end;
+         end if;
       end if;
    end Append_Line;
 

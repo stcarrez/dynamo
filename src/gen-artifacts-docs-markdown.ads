@@ -15,12 +15,12 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
 private package Gen.Artifacts.Docs.Markdown is
 
-   --  Format documentation for Google Wiki syntax.
+   --  Format documentation for GitHub Markdown syntax.
    type Document_Formatter is new Gen.Artifacts.Docs.Document_Formatter with record
       Need_Newline : Boolean := False;
+      Mode         : Line_Kind := L_TEXT;
    end record;
 
    --  Get the document name from the file document (ex: <name>.wiki or <name>.md).
@@ -51,5 +51,10 @@ private package Gen.Artifacts.Docs.Markdown is
    procedure Write_Line (Formatter : in out Document_Formatter;
                          File      : in Ada.Text_IO.File_Type;
                          Line      : in String);
+
+   --  Write a line doing some link transformation for Markdown.
+   procedure Write_Text (Formatter : in out Document_Formatter;
+                         File      : in Ada.Text_IO.File_Type;
+                         Text      : in String);
 
 end Gen.Artifacts.Docs.Markdown;

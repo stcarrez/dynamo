@@ -88,7 +88,7 @@ package body Gen.Artifacts.Docs.Markdown is
          else
             Pos := Pos + 1;
             End_Pos := Pos;
-            while End_Pos < Text'Last and Text (End_Pos) /= ' ' loop
+            while End_Pos < Text'Last and Text (End_Pos) /= ' ' and Text (End_Pos) /= ']' loop
                End_Pos := End_Pos + 1;
             end loop;
             Last_Pos := End_Pos;
@@ -169,18 +169,22 @@ package body Gen.Artifacts.Docs.Markdown is
          when L_HEADER_1 =>
             Formatter.Mode := Line.Kind;
             Formatter.Write_Line (File, "# " & Line.Content);
+            Formatter.Mode := L_TEXT;
 
          when L_HEADER_2 =>
             Formatter.Mode := Line.Kind;
             Formatter.Write_Line (File, "## " & Line.Content);
+            Formatter.Mode := L_TEXT;
 
          when L_HEADER_3 =>
             Formatter.Mode := Line.Kind;
             Formatter.Write_Line (File, "### " & Line.Content);
+            Formatter.Mode := L_TEXT;
 
          when L_HEADER_4 =>
             Formatter.Mode := Line.Kind;
             Formatter.Write_Line (File, "#### " & Line.Content);
+            Formatter.Mode := L_TEXT;
 
          when others =>
             null;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-generate -- Generate command for dynamo
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,7 +63,8 @@ package body Gen.Commands.Generate is
             exit when Model_File'Length = 0;
             File_Count := File_Count + 1;
             if Ada.Directories.Exists (Model_File)
-              and then Ada.Directories.Kind (Model_File) = Ada.Directories.Directory then
+              and then Ada.Directories.Kind (Model_File) = Ada.Directories.Directory
+            then
                Gen.Generator.Read_Models (Generator, Model_File);
             else
                Gen.Generator.Read_Model (Generator, Model_File, False);

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-info -- Collect and give information about the project
---  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,8 +66,7 @@ package body Gen.Commands.Info is
                                   Dir : in String) is
             Path : constant String := Util.Files.Compose (Base_Dir, Dir);
          begin
-            if not Result.Contains (Path)
-              and then Ada.Directories.Exists (Path) then
+            if not Result.Contains (Path) and then Ada.Directories.Exists (Path) then
                Result.Append (Path);
             end if;
          end Add_Model_Dir;

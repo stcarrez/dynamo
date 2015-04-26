@@ -86,7 +86,7 @@ generate:
 
 # Files to package in source distribution
 DISTFILES=README NEWS LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess configure config.sub \
-configure.in Makefile.in install-sh ChangeLog \
+configure.in Makefile.in install-sh aclocal.m4 ChangeLog \
 dynamo.gpr.in config.gpr dynamo_tests.gpr.in \
 src \
 bin obj config doc regtests debian
@@ -111,7 +111,7 @@ dist:
 	-rm -rf $(distdir)/src/asis
 	-rm -f $(distdir)/bin/*
 	-rm -f $(distdir)/obj/*
-	tar --exclude=.svn --exclude="*~" --exclude="*.o" --exclude="*.ali" \
+	tar --exclude=.svn --exclude=.git --exclude="*~" --exclude="*.o" --exclude="*.ali" \
 	    --exclude="*.log" --exclude="*.a" \
 	    -cvzf $(DIST_FILE) $(distdir)
 

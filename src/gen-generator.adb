@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,7 @@ with ASF.Requests.Tools;
 with ASF.Responses.Mockup;
 with ASF.Components.Root;
 with ASF.Components.Base;
+with ASF.Servlets.Files;
 
 with Util.Beans.Basic;
 with Util.Strings.Vectors;
@@ -199,7 +200,8 @@ package body Gen.Generator is
       Value : constant String := Util.Beans.Objects.To_String (Name);
    begin
       if Value = "Integer" or Value = "int" or Value = "Identifier"
-         or Value = "ADO.Identifier" then
+        or Value = "ADO.Identifier"
+      then
          return Util.Beans.Objects.To_Object (KEY_INTEGER_LABEL);
       else
          return Util.Beans.Objects.To_Object (KEY_STRING_LABEL);
@@ -317,7 +319,8 @@ package body Gen.Generator is
             else
                Append (Result, "  ");
                if not Util.Beans.Objects.Is_Null (Prefix)
-                 and not Util.Beans.Objects.Is_Empty (Prefix) then
+                 and not Util.Beans.Objects.Is_Empty (Prefix)
+               then
                   Append (Result, Util.Beans.Objects.To_String (Prefix));
                end if;
             end if;
@@ -545,7 +548,8 @@ package body Gen.Generator is
    begin
       if not Gen.Utils.Is_Valid_Name (Name)
         and then (Pos <= Name'First
-                  or else not Gen.Utils.Is_Valid_Name (Name (Name'First .. Pos - 1))) then
+                  or else not Gen.Utils.Is_Valid_Name (Name (Name'First .. Pos - 1)))
+      then
          H.Error ("The project name should be a valid Ada identifier ([A-Za-z][A-Za-z0-9_]*).");
          raise Fatal_Error with "Invalid project name: " & Name;
       end if;
@@ -952,8 +956,9 @@ package body Gen.Generator is
          Log.Info ("File {0} exists, generation skipped.", Path);
       elsif Exists and not (H.Force_Save or Mode = "force") then
          H.Error ("Cannot generate file: '{0}' exists already.", Path);
-      elsif not Util.Beans.Objects.Is_Null (H.File.all) and then
-        not Util.Beans.Objects.To_Boolean (H.Ignore.all) then
+      elsif not Util.Beans.Objects.Is_Null (H.File.all) and
+      then not Util.Beans.Objects.To_Boolean (H.Ignore.all)
+      then
          if Length (Content) = 0 and Mode = "remove-empty" then
             Log.Debug ("File {0} skipped because it is empty", Path);
          else

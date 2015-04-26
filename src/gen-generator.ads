@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-generator -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ with Util.Properties;
 
 with ASF.Applications.Main;
 with ASF.Contexts.Faces;
-with ASF.Servlets.Files;
+with ASF.Servlets;
 
 with Gen.Model.Packages;
 with Gen.Model.Projects;

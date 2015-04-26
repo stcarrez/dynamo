@@ -24,6 +24,7 @@ package body Gen.Artifacts.Docs.Googlecode is
    overriding
    function Get_Document_Name (Formatter : in Document_Formatter;
                                Document  : in File_Document) return String is
+      pragma Unreferenced (Formatter);
    begin
       return Ada.Strings.Unbounded.To_String (Document.Name) & ".wiki";
    end Get_Document_Name;
@@ -35,6 +36,7 @@ package body Gen.Artifacts.Docs.Googlecode is
    procedure Start_Document (Formatter : in out Document_Formatter;
                              Document  : in File_Document;
                              File      : in Ada.Text_IO.File_Type) is
+      pragma Unreferenced (Formatter);
    begin
       Ada.Text_IO.Put_Line (File, "#summary " & Ada.Strings.Unbounded.To_String (Document.Title));
       Ada.Text_IO.New_Line (File);
@@ -47,7 +49,7 @@ package body Gen.Artifacts.Docs.Googlecode is
                          File      : in Ada.Text_IO.File_Type;
                          Line      : in String) is
    begin
-      if Formatter.Need_NewLine then
+      if Formatter.Need_Newline then
          Ada.Text_IO.New_Line (File);
          Formatter.Need_Newline := False;
       end if;
@@ -107,6 +109,7 @@ package body Gen.Artifacts.Docs.Googlecode is
                               Document  : in File_Document;
                               File      : in Ada.Text_IO.File_Type;
                               Source    : in String) is
+      pragma Unreferenced (Formatter, Document);
    begin
       Ada.Text_IO.New_Line (File);
       Ada.Text_IO.Put_Line (File, "----");

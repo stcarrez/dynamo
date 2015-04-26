@@ -4,6 +4,7 @@ with "@UTIL_DIR@util";
 with "@EL_DIR@el";
 with "@ASF_DIR@asf_core";
 with "@ADO_DIR@ado";
+with "@ADO_DIR@ado_mysql";
 
 project Dynamo is
 

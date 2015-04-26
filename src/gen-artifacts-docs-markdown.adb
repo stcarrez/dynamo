@@ -26,6 +26,7 @@ package body Gen.Artifacts.Docs.Markdown is
    overriding
    function Get_Document_Name (Formatter : in Document_Formatter;
                                Document  : in File_Document) return String is
+      pragma Unreferenced (Formatter);
    begin
       return Ada.Strings.Unbounded.To_String (Document.Name) & ".md";
    end Get_Document_Name;
@@ -37,6 +38,7 @@ package body Gen.Artifacts.Docs.Markdown is
    procedure Start_Document (Formatter : in out Document_Formatter;
                              Document  : in File_Document;
                              File      : in Ada.Text_IO.File_Type) is
+      pragma Unreferenced (Formatter);
    begin
       Ada.Text_IO.Put_Line (File, "# " & Ada.Strings.Unbounded.To_String (Document.Title));
       Ada.Text_IO.New_Line (File);
@@ -64,6 +66,7 @@ package body Gen.Artifacts.Docs.Markdown is
    procedure Write_Text (Formatter : in out Document_Formatter;
                          File      : in Ada.Text_IO.File_Type;
                          Text      : in String) is
+      pragma Unreferenced (Formatter);
       Pos      : Natural;
       Start    : Natural := Text'First;
       End_Pos  : Natural;
@@ -200,6 +203,7 @@ package body Gen.Artifacts.Docs.Markdown is
                               Document  : in File_Document;
                               File      : in Ada.Text_IO.File_Type;
                               Source    : in String) is
+      pragma Unreferenced (Formatter, Document);
    begin
       Ada.Text_IO.New_Line (File);
       Ada.Text_IO.Put_Line (File, "----");

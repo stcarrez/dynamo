@@ -29,6 +29,7 @@ with Ada.Environment_Variables;
 
 with Util.Files;
 with Util.Log.Loggers;
+with Util.Systems.Os;
 with Gen.Utils.GNAT;
 with Gen.Generator;
 with Gen.Commands;
@@ -86,7 +87,7 @@ procedure Dynamo is
       end if;
       if Ada.Environment_Variables.Exists (Gen.Utils.GNAT.ADA_PROJECT_PATH_NAME) then
          Ada.Text_IO.Put (Ada.Environment_Variables.Value (Gen.Utils.GNAT.ADA_PROJECT_PATH_NAME));
-         --  Ada.Text_IO.Put (
+         Ada.Text_IO.Put (Util.Systems.Os.Path_Separator);
       end if;
       Ada.Text_IO.Put_Line (Generator.Get_Parameter (Gen.Configs.GEN_GNAT_PROJECT_DIRS) & """");
    end Print_Environment;

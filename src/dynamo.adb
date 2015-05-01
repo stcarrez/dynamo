@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  dynamo -- Ada Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,9 +25,11 @@ with Ada.Strings.Unbounded;
 with Ada.Exceptions;
 with Ada.Directories;
 with Ada.Command_Line;
+with Ada.Environment_Variables;
 
 with Util.Files;
 with Util.Log.Loggers;
+with Gen.Utils.GNAT;
 with Gen.Generator;
 with Gen.Commands;
 with Gen.Configs;
@@ -43,12 +45,18 @@ procedure Dynamo is
 
    procedure Print_Configuration (Generator : in Gen.Generator.Handler);
 
+   --  Print environment variable setup
+   procedure Print_Environment (Generator : in Gen.Generator.Handler;
+                                C_Env     : in Boolean := False);
+
    Out_Dir      : Unbounded_String;
    Config_Dir   : Unbounded_String;
    Template_Dir : Unbounded_String;
    Status       : Exit_Status := Success;
    Debug        : Boolean := False;
-   Print_Config  : Boolean := False;
+   Print_Config : Boolean := False;
+   Print_Env    : Boolean := False;
+   Print_CEnv   : Boolean := False;
 
    --  ------------------------------
    --  Print information about dynamo configuration
@@ -64,6 +72,24 @@ procedure Dynamo is
       Ada.Text_IO.Put_Line ("GNAT project directory  : "
                             & Generator.Get_Parameter (Gen.Configs.GEN_GNAT_PROJECT_DIRS));
    end Print_Configuration;
+
+   --  ------------------------------
+   --  Print environment variable setup
+   --  ------------------------------
+   procedure Print_Environment (Generator : in Gen.Generator.Handler;
+                                C_Env     : in Boolean := False) is
+   begin
+      if C_Env then
+         Ada.Text_IO.Put ("setenv " & Gen.Utils.GNAT.ADA_PROJECT_PATH_NAME & " """);
+      else
+         Ada.Text_IO.Put ("export " & Gen.Utils.GNAT.ADA_PROJECT_PATH_NAME & "=""");
+      end if;
+      if Ada.Environment_Variables.Exists (Gen.Utils.GNAT.ADA_PROJECT_PATH_NAME) then
+         Ada.Text_IO.Put (Ada.Environment_Variables.Value (Gen.Utils.GNAT.ADA_PROJECT_PATH_NAME));
+         --  Ada.Text_IO.Put (
+      end if;
+      Ada.Text_IO.Put_Line (Generator.Get_Parameter (Gen.Configs.GEN_GNAT_PROJECT_DIRS) & """");
+   end Print_Environment;
 
    --  ------------------------------
    --  Verify and set the configuration path
@@ -95,7 +121,7 @@ begin
    Initialize_Option_Scan (Stop_At_First_Non_Switch => True, Section_Delimiters => "targs");
    --  Parse the command line
    loop
-      case Getopt ("* v d o: t: c:") is
+      case Getopt ("* v d e E o: t: c:") is
          when ASCII.NUL => exit;
 
          when 'o' =>
@@ -106,6 +132,12 @@ begin
 
          when 'c' =>
             Set_Config_Directory (Parameter);
+
+         when 'e' =>
+            Print_Env := True;
+
+         when 'E' =>
+            Print_CEnv := True;
 
          when 'd' =>
             Debug := True;
@@ -159,6 +191,12 @@ begin
       Gen.Generator.Initialize (Generator, Config_Dir, Debug);
       if Print_Config then
          Print_Configuration (Generator);
+         return;
+      elsif Print_Env then
+         Print_Environment (Generator, False);
+         return;
+      elsif Print_CEnv then
+         Print_Environment (Generator, True);
          return;
       end if;
 

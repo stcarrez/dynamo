@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils-gnat -- GNAT utilities
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,8 @@ package Gen.Utils.GNAT is
    --  Directory which contains the GNAT project files installed on the system.
    --  This is overriden by the configuration property 'generator.gnat.projects.dir'.
    DEFAULT_GNAT_PROJECT_DIR : constant String := "/usr/lib/gnat";
+
+   ADA_PROJECT_PATH_NAME    : constant String := "ADA_PROJECT_PATH";
 
    type Project_Info is record
       Path : Ada.Strings.Unbounded.Unbounded_String;

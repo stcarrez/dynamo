@@ -1,6 +1,7 @@
 <ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:util="http://code.google.com/p/ada-asf/util"
                 xmlns:c="http://java.sun.com/jstl/core">
---  Copyright (C) 2014 #{empty project.copyright ? project.author : project.copyright}
+--  Copyright (C) #{util:formatDate(date,"%Y")} #{empty project.copyright ? project.author : project.copyright}
 <c:choose>
     <c:when test="#{project.license eq 'bsd3'}">
 --  All rights reserved.

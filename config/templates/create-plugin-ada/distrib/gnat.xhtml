@@ -5,18 +5,19 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{g:replace(pluginName,'-','_')}.gpr">
 with "#{projectName}";
+with "util_config";
 
 project #{g:replace(pluginName,'-','_')} is
 
    Version      := #{projectName}.Version;
-   Name         := "#{pluginName}";
+   Name         := "#{g:replace(pluginName,'-','_')}";
 
    for Library_Name use Name;
-   for Library_Dir use "INSTALL/lib";
+   for Library_Dir use Util_Config.Libdir;
    for Library_Kind use "LIBRARY_TYPE";
 
-   for Source_Dirs use ("INSTALL/share/ada/adainclude/" &amp; Name);
-   for Library_ALI_Dir use "INSTALL/lib/ada/adalib/" &amp; Name &amp; "/" &amp; Project'Library_Kind;
+   for Source_Dirs use (Util_Config.Includedir &amp; "/" &amp; Name);
+   for Library_ALI_Dir use Util_Config.Alidir &amp; Name &amp; "/" &amp;
    for Externally_Built use "true";
 
 end #{g:replace(pluginName,'-','_')};

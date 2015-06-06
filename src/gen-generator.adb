@@ -18,6 +18,7 @@
 with Ada.Directories;
 with Ada.IO_Exceptions;
 with Ada.Strings.Fixed;
+with Ada.Calendar;
 
 with Input_Sources.File;
 
@@ -49,6 +50,7 @@ with Gen.Commands.Templates;
 with Util.Strings;
 with Util.Files;
 with Util.Log.Loggers;
+with Util.Beans.Objects.Time;
 
 package body Gen.Generator is
 
@@ -1007,6 +1009,8 @@ package body Gen.Generator is
       Req.Set_Attribute (Name => "model", Value => Model_Bean);
       Req.Set_Attribute (Name => "genRevision", Value => Util.Beans.Objects.To_Object (SVN_REV));
       Req.Set_Attribute (Name => "genURL", Value => Util.Beans.Objects.To_Object (SVN_URL));
+      Req.Set_Attribute (Name => "date",
+                         Value => Util.Beans.Objects.Time.To_Object (Ada.Calendar.Clock));
 
       ASF.Requests.Tools.Set_Context (Req, H.Servlet, Reply'Unchecked_Access);
       H.Dispatch (Page     => File,

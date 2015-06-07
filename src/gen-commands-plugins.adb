@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-plugins -- Plugin creation and management commands for dynamo
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,23 @@ package body Gen.Commands.Plugins is
       pragma Unreferenced (Cmd);
       use GNAT.Command_Line;
 
+      function Get_Directory_Name (Name     : in String;
+                                   Name_Dir : in Ada.Strings.Unbounded.Unbounded_String)
+        return String;
+
+      function Get_Directory_Name (Name     : in String;
+                                   Name_Dir : in Ada.Strings.Unbounded.Unbounded_String)
+                                   return String is
+      begin
+         if Ada.Strings.Unbounded.Length (Name_Dir) = 0 then
+            return Name;
+         else
+            return Ada.Strings.Unbounded.To_String (Name_Dir);
+         end if;
+      end Get_Directory_Name;
+
       Result_Dir : constant String := Generator.Get_Result_Directory;
+      Name_Dir   : Ada.Strings.Unbounded.Unbounded_String;
    begin
       --  If a dynamo.xml file exists, read it.
       if Ada.Directories.Exists ("dynamo.xml") then
@@ -50,8 +66,11 @@ package body Gen.Commands.Plugins is
       end if;
       --  Parse the command line
       loop
-         case Getopt ("l:") is
+         case Getopt ("l: d:") is
          when ASCII.NUL => exit;
+
+         when 'd' =>
+            Name_Dir := Ada.Strings.Unbounded.To_Unbounded_String (Parameter);
 
          when 'l' =>
             declare
@@ -63,11 +82,17 @@ package body Gen.Commands.Plugins is
                   Generator.Set_Project_Property ("license", "apache");
                elsif L = "gpl" then
                   Generator.Set_Project_Property ("license", "gpl");
+               elsif L = "gpl3" then
+                  Generator.Set_Project_Property ("license", "gpl3");
+               elsif L = "mit" then
+                  Generator.Set_Project_Property ("license", "mit");
+               elsif L = "bsd3" then
+                  Generator.Set_Project_Property ("license", "bsd3");
                elsif L = "proprietary" then
                   Generator.Set_Project_Property ("license", "proprietary");
                else
                   Generator.Error ("Invalid license: {0}", L);
-                  Generator.Error ("Valid licenses: apache, gpl, proprietary");
+                  Generator.Error ("Valid licenses: apache, gpl, gpl3, mit, bsd3, proprietary");
                   return;
                end if;
             end;
@@ -80,14 +105,14 @@ package body Gen.Commands.Plugins is
          Name  : constant String := Get_Argument;
          Kind  : constant String := Get_Argument;
          Dir   : constant String := Generator.Get_Plugin_Directory;
-         Path  : constant String := Util.Files.Compose (Dir, Name);
+         Path  : constant String := Util.Files.Compose (Dir, Get_Directory_Name (Name, Name_Dir));
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing plugin name");
             Gen.Commands.Usage;
             return;
          end if;
-         if Kind /= "ada" and Kind /= "web" and Kind /= "" then
+         if Kind /= "ada" and Kind /= "web" then
             Generator.Error ("Invalid plugin type (must be 'ada' or 'web')");
             return;
          end if;
@@ -131,11 +156,7 @@ package body Gen.Commands.Plugins is
          Generator.Set_Force_Save (False);
          Generator.Set_Global ("pluginName", Name);
          Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE,
-                                     "create-plugin");
-         if Kind /= "" then
-            Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE,
-                                        "create-plugin-" & Kind);
-         end if;
+                                     "create-plugin-" & Kind);
 
          --  And save the project dynamo.xml file which now refers to the new plugin.
          Generator.Set_Result_Directory (Result_Dir);
@@ -152,16 +173,25 @@ package body Gen.Commands.Plugins is
       use Ada.Text_IO;
    begin
       Put_Line ("create-plugin: Create a new plugin for the current project");
-      Put_Line ("Usage: create-plugin NAME [ada | web]");
+      Put_Line ("Usage: create-plugin [-l apache|gpl|gpl3|mit|bsd3|proprietary] "
+                & "[-d DIR] NAME [ada | web]");
       New_Line;
       Put_Line ("  Creates a new AWA plugin for the application with the name passed in NAME.");
+      Put_Line ("  The plugin license is controlled by the -l option.");
       Put_Line ("  The plugin type is specified as the last argument which can be one of:");
       New_Line;
       Put_Line ("    ada  the plugin contains Ada code and a GNAT project is created");
       Put_Line ("    web  the plugin contains XHTML, CSS, Javascript files only");
       New_Line;
-      Put_Line ("  The plugin is created in the directory:");
-      Put_Line ("    plugins/NAME");
+      Put_Line ("  The -d option allows to control the plugin directory name.  The plugin NAME");
+      Put_Line ("  is used by default.  The plugin is created in the directory:");
+      Put_Line ("    plugins/NAME or plugins/DIR");
+      New_Line;
+      Put_Line ("  For the Ada plugin, the command generates the following files"
+                & " in the plugin directory:");
+      Put_Line ("    src/<project>-<plugin>.ads");
+      Put_Line ("    src/<project>-<plugin>-<module>.ads");
+      Put_Line ("    src/<project>-<plugin>-<module>.adb");
    end Help;
 
 end Gen.Commands.Plugins;

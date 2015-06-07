@@ -3,14 +3,14 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="#{g:replace(pluginName,'-','_')}.gpr">
+        file="#{projectName}_#{g:replace(pluginName,'-','_')}.gpr">
 with "#{projectName}";
 with "util_config";
 
-project #{g:replace(pluginName,'-','_')} is
+project #{projectName}_#{g:replace(pluginName,'-','_')} is
 
    Version      := #{projectName}.Version;
-   Name         := "#{g:replace(pluginName,'-','_')}";
+   Name         := "#{projectName}_#{g:replace(pluginName,'-','_')}";
 
    for Library_Name use Name;
    for Library_Dir use Util_Config.Libdir;
@@ -20,5 +20,5 @@ project #{g:replace(pluginName,'-','_')} is
    for Library_ALI_Dir use Util_Config.Alidir &amp; Name &amp; "/" &amp;
    for Externally_Built use "true";
 
-end #{g:replace(pluginName,'-','_')};
+end #{projectName}_#{g:replace(pluginName,'-','_')};
 </f:view>

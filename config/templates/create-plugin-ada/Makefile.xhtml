@@ -4,7 +4,7 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="Makefile">
-NAME=#{g:replace(pluginName,'-','_')}
+NAME=#{projectName}_#{g:replace(pluginName,'-','_')}
 #{''}
 
 LIBNAME=lib\${NAME}
@@ -13,5 +13,5 @@ LIBNAME=lib\${NAME}
 include ../../rules.mk
 #{''}
 
-GPRPATH=#{g:replace(pluginName,'-','_')}.gpr
+GPRPATH=#{projectName}_#{g:replace(pluginName,'-','_')}.gpr
 </f:view>

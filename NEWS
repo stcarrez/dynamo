@@ -1,3 +1,6 @@
+Version 0.8     -
+  - Support to generate Markdown documentation
+
 Version 0.7.1   - Jul 2014
   - Fix minor configuration issue with GNAT 2014
 

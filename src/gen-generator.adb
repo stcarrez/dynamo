@@ -28,11 +28,10 @@ with DOM.Readers;
 with Sax.Readers;
 
 with ASF.Requests.Mockup;
-with ASF.Requests.Tools;
 with ASF.Responses.Mockup;
 with ASF.Components.Root;
 with ASF.Components.Base;
-with ASF.Servlets.Files;
+with ASF.Servlets.Faces;
 
 with Util.Beans.Basic;
 with Util.Strings.Vectors;
@@ -423,8 +422,9 @@ package body Gen.Generator is
       H.File   := new Util.Beans.Objects.Object;
       H.Mode   := new Util.Beans.Objects.Object;
       H.Ignore := new Util.Beans.Objects.Object;
-      H.Servlet := new ASF.Servlets.Files.File_Servlet;
+      H.Servlet := new ASF.Servlets.Faces.Faces_Servlet;
       H.Add_Servlet (Name => "file", Server => H.Servlet);
+      H.Add_Mapping ("*.xhtml", "file");
 
       begin
          Gen.Commands.Templates.Read_Commands (H);
@@ -999,10 +999,10 @@ package body Gen.Generator is
 
       Prj_Ptr  : constant Util.Beans.Basic.Readonly_Bean_Access := H.Project'Unchecked_Access;
       Prj_Bean : constant Object := To_Object (Prj_Ptr, Util.Beans.Objects.STATIC);
+      Dispatcher : constant ASF.Servlets.Request_Dispatcher := H.Get_Request_Dispatcher (File);
    begin
       Log.Debug ("With template '{0}'", File);
 
-      Req.Set_Path_Info (File);
       Req.Set_Method ("GET");
       Req.Set_Attribute (Name => "project", Value => Prj_Bean);
       Req.Set_Attribute (Name => "package", Value => Bean);
@@ -1012,10 +1012,7 @@ package body Gen.Generator is
       Req.Set_Attribute (Name => "date",
                          Value => Util.Beans.Objects.Time.To_Object (Ada.Calendar.Clock));
 
-      ASF.Requests.Tools.Set_Context (Req, H.Servlet, Reply'Unchecked_Access);
-      H.Dispatch (Page     => File,
-                  Request  => Req,
-                  Response => Reply);
+      ASF.Servlets.Forward (Dispatcher, Req, Reply);
 
       declare
          Content  : Unbounded_String;

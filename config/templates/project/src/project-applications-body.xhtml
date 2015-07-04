@@ -84,9 +84,9 @@ package body #{fn:capitalize(projectName)}.Applications is
       Log.Info ("Initializing application filters...");
 #{''}
       AWA.Applications.Application (App).Initialize_Filters;
-      App.Add_Filter (Name => "dump", Filter => App.Dump'Access);
-      App.Add_Filter (Name => "measures", Filter => App.Measures'Access);
-      App.Add_Filter (Name => "service", Filter => App.Service_Filter'Access);
+      App.Add_Filter (Name => "dump", Filter => App.Self.Dump'Access);
+      App.Add_Filter (Name => "measures", Filter => App.Self.Measures'Access);
+      App.Add_Filter (Name => "service", Filter => App.Self.Service_Filter'Access);
    end Initialize_Filters;
 #{''}
    --  ------------------------------

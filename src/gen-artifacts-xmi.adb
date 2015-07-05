@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -455,7 +455,8 @@ package body Gen.Artifacts.XMI is
          when FIELD_GENERALIZATION_END =>
             if not Util.Beans.Objects.Is_Null (P.Child_Id)
               and not Util.Beans.Objects.Is_Null (P.Parent_Id)
-              and not Util.Beans.Objects.Is_Null (P.Generalization_Id) then
+              and not Util.Beans.Objects.Is_Null (P.Generalization_Id)
+            then
                P.Generalization := new Gen.Model.XMI.Generalization_Element (P.Model);
                P.Generalization.Set_XMI_Id (P.Generalization_Id);
                P.Model.Insert (P.Generalization.XMI_Id, P.Generalization.all'Access);
@@ -1025,7 +1026,8 @@ package body Gen.Artifacts.XMI is
             end;
 
          elsif Item.Has_Stereotype (Handler.Bean_Stereotype)
-           or Item.Has_Stereotype (Handler.Limited_Bean_Stereotype) then
+           or Item.Has_Stereotype (Handler.Limited_Bean_Stereotype)
+         then
             Log.Debug ("Class {0} recognized as a bean", Name);
             declare
                Bean : constant Bean_Definition_Access := Gen.Model.Beans.Create_Bean (Name);
@@ -1302,7 +1304,8 @@ package body Gen.Artifacts.XMI is
                           Message : in String) is
          begin
             if Ada.Strings.Fixed.Index (Message, "Invalid absolute IRI") > 0
-              and then Ada.Strings.Fixed.Index (Message, "org.omg.xmi.namespace.UML") > 0 then
+              and then Ada.Strings.Fixed.Index (Message, "org.omg.xmi.namespace.UML") > 0
+            then
                return;
             end if;
             Context.Error ("{0}: {1}",

@@ -18,8 +18,4 @@ project Check_Build is
    for Object_Dir use "./" & Util'Object_Dir & "/obj/check-code/" & Project'Library_Kind;
    for Exec_Dir use "./" & Util'Exec_Dir & "/bin";
 
-   package Binder renames Util.Binder;
-   package Builder renames Util.Builder;
-   package Compiler renames Util.Compiler;
-
 end Check_Build;

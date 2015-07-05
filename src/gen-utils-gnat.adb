@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils-gnat -- GNAT utilities
---  Copyright (C) 2011, 2012, 2014 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -131,14 +131,21 @@ package body Gen.Utils.GNAT is
         new Prj.For_Every_Project_Imported (Boolean, Recursive_Add);
 
       use type Prj.Project_Id;
+      Flags : Prj.Processing_Flags;
    begin
       Log.Info ("Reading GNAT project {0}", Project_File_Name);
+
+      Flags := Prj.Create_Flags (Report_Error               => null,
+                                 When_No_Sources            => Prj.Error,
+                                 Require_Obj_Dirs           => Prj.Silent,
+                                 Allow_Invalid_External     => Prj.Silent,
+                                 Missing_Source_Files       => Prj.Silent);
 
       --  Parse the GNAT project files and build the tree.
       Prj.Pars.Parse (Project           => Main_Project,
                       In_Tree           => Makeutl.Project_Tree,
                       Project_File_Name => Project_File_Name,
-                      Flags             => Prj.Gnatmake_Flags,
+                      Flags             => Flags,
                       In_Node_Tree      => Project_Node_Tree);
 
       if Main_Project /= Prj.No_Project then

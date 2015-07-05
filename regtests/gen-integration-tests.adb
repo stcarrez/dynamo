@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -151,7 +151,7 @@ package body Gen.Integration.Tests is
       Buffer  : Util.Streams.Buffered.Buffered_Stream;
    begin
       Log.Info ("Execute: {0}", Command);
-      P.Open (Command, Util.Processes.READ);
+      P.Open (Command, Util.Processes.READ_ALL);
 
       --  Write on the process input stream.
       Buffer.Initialize (null, P'Unchecked_Access, 8192);

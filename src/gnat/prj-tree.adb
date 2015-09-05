@@ -1628,7 +1628,8 @@ package body Prj.Tree is
                --  a Previous_Line or a Previous_End node), if any.
 
                if Comments.Last > 0 and then
-                 not Comments.Table (1).Follows_Empty_Line then
+                 not Comments.Table (1).Follows_Empty_Line
+               then
                   if Present (Previous_Line_Node) then
                      Add_Comments
                        (To      => Previous_Line_Node,

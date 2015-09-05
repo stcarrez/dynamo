@@ -5512,6 +5512,7 @@ package body Prj.Nmsc is
       Project   : Project_Processing_Data;
       In_Tree   : Project_Tree_Ref)
    is
+      pragma Unreferenced (In_Tree);
       Filename : constant String  := Get_Name_String (File_Name);
       Last     : Integer          := Filename'Last;
       Sep_Len  : Integer;

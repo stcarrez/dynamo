@@ -3245,7 +3245,7 @@ package Atree is
       end record;
 
       pragma Pack (Node_Record);
-      for Node_Record'Size use 8*32;
+      for Node_Record'Size use 8 * 32;
       for Node_Record'Alignment use 4;
 
       function E_To_N is new Unchecked_Conversion (Entity_Kind, Node_Kind);

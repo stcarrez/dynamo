@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -295,7 +295,8 @@ package body Gen.Model.Packages is
 
                      when others =>
                         if T.Kind /= Model.Mappings.T_DATE
-                          and (Name = "Date" or Name = "DateTime" or Name = "Time") then
+                          and (Name = "Date" or Name = "DateTime" or Name = "Time")
+                        then
                            Log.Error ("Date type {0} is invalid in table {1} - type is name {2}",
                                       Model.Mappings.Basic_Type'Image (T.Kind), Table.Get_Name,
                                       Name);

@@ -738,6 +738,7 @@ package body Prj.Part is
       Is_Config_File    : Boolean;
       Flags             : Processing_Flags)
    is
+      pragma Unreferenced (In_Limited);
       Current_With_Clause : With_Id := Context_Clause;
 
       Current_Project  : Project_Node_Id := Imported_Projects;

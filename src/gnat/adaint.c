@@ -219,6 +219,14 @@ extern int LIB$GETSYI (int *, unsigned int *);
 # define GNAT_MAX_PATH_LEN 256
 #endif
 
+/* This variable is used in hostparm.ads to say whether the host is a VMS
+   system.  */
+#ifdef VMS
+int __gnat_vmsp = 1;
+#else
+int __gnat_vmsp = 0;
+#endif
+
 #if 0 // SCz
 
 /* Reset the file attributes as if no system call had been performed */

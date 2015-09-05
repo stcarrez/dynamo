@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -423,7 +423,8 @@ package body Gen.Model.XMI is
       while Model_Vectors.Has_Element (Pos) loop
          Tag := Model_Vectors.Element (Pos);
          if Tag.all in Tagged_Value_Element'Class and then
-           Tagged_Value_Element'Class (Tag.all).Tag_Def = Definition then
+           Tagged_Value_Element'Class (Tag.all).Tag_Def = Definition
+         then
             return Ada.Strings.Unbounded.To_String (Tagged_Value_Element'Class (Tag.all).Value);
          end if;
          Model_Vectors.Next (Pos);

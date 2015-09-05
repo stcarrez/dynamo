@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,7 +74,8 @@ package body Gen.Model.Tables is
                return Util.Beans.Objects.Null_Object;
                --  If this is an association to another table, use the primary key of that table.
             elsif T.all in Table_Definition'Class
-              and then Table_Definition'Class (T.all).Id_Column /= null  then
+              and then Table_Definition'Class (T.all).Id_Column /= null
+            then
                return Table_Definition'Class (T.all).Id_Column.Get_Value (Name);
             elsif T.all in Enums.Enum_Definition'Class then
                return T.Get_Value ("sqlType");
@@ -186,7 +187,8 @@ package body Gen.Model.Tables is
       end if;
       if Result /= null and then From.Use_Foreign_Key_Type
         and then Result.all in Table_Definition'Class
-        and then Table_Definition'Class (Result.all).Id_Column /= null then
+        and then Table_Definition'Class (Result.all).Id_Column /= null
+      then
          return Table_Definition'Class (Result.all).Id_Column.Get_Type_Mapping;
       end if;
       return Result;
@@ -385,7 +387,8 @@ package body Gen.Model.Tables is
 
       elsif Name = "isVersion" or Name = "isPrimaryKey" or Name = "isBean"
         or Name = "isPrimitiveType" or Name = "isEnum" or Name = "isIdentifier"
-        or Name = "isBoolean" or Name = "isBlob" or Name = "isDate" or Name = "isString" then
+        or Name = "isBoolean" or Name = "isBlob" or Name = "isDate" or Name = "isString"
+      then
          return Util.Beans.Objects.To_Object (False);
 
       elsif Name = "isReadable" or Name = "isObject" then

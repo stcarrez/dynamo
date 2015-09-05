@@ -280,7 +280,8 @@ package body Prj.PP is
       procedure Write_Empty_Line (Always : Boolean := False) is
       begin
          if (Always or else not Minimize_Empty_Lines)
-           and then not Last_Line_Is_Empty then
+           and then not Last_Line_Is_Empty
+         then
             Write_Eol.all;
             Column := 0;
             Last_Line_Is_Empty := True;

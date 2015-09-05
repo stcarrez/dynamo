@@ -224,7 +224,7 @@ extern int LIB$GETSYI (int *, unsigned int *);
 #ifdef VMS
 int __gnat_vmsp = 1;
 #else
-int __gnat_vmsp = 0;
+int __attribute__((weak)) __gnat_vmsp = 0;
 #endif
 
 #if 0 // SCz

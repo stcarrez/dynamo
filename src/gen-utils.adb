@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils -- Utilities for model generator
---  Copyright (C) 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2010, 2011, 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -212,7 +212,8 @@ package body Gen.Utils is
       for I in Name'First + 1 .. Name'Last loop
          C := Name (I);
          if not (C >= 'a' and C <= 'z') and not (C >= 'A' and C <= 'Z')
-           and not (C >= '0' and C <= '9') and C /= '_' then
+           and not (C >= '0' and C <= '9') and C /= '_'
+         then
             return False;
          end if;
       end loop;

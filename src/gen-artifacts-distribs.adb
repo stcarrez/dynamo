@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs -- Artifact for distributions
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -426,7 +426,8 @@ package body Gen.Artifacts.Distribs is
                             Path : in String) return String is
    begin
       if Base /= "." and then Path (Path'First) = '/'
-        and then Path (Path'First + 1 .. Path'First + Base'Length) = Base then
+        and then Path (Path'First + 1 .. Path'First + Base'Length) = Base
+      then
          return Path (Path'First + Base'Length + 1 .. Path'Last);
       else
          return Path;

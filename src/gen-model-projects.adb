@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -672,7 +672,8 @@ package body Gen.Model.Projects is
             File     : constant String := Compose (Dir, "dynamo.xml");
          begin
             if Dir_Name /= "." and then Dir_Name /= ".." and then Dir_Name /= ".svn" and then
-              Exists (File) then
+              Exists (File)
+            then
                declare
                   P : Project_Definition_Access;
                begin
@@ -737,7 +738,8 @@ package body Gen.Model.Projects is
                --  appears last in the list.
                if (not Has_File or else not Project_Info_Vectors.Has_Element (Iter))
                --  Insert only if there is a file.
-                 and Dynamo'Length > 0 then
+                 and Dynamo'Length > 0
+               then
 
                   Log.Debug ("Dynamo file {0} is used", Dynamo);
                   if Has_File then

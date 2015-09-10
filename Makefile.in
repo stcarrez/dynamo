@@ -3,6 +3,7 @@
 MODE=debug
 GNATMAKE=gprbuild
 GNATCLEAN=gprclean
+GPRINSTALL=@GPRINSTALL@
 GPRPATH=dynamo.gpr
 SVN=svn
 
@@ -89,7 +90,7 @@ DISTFILES=README NEWS LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess confi
 configure.in Makefile.in install-sh aclocal.m4 ChangeLog \
 dynamo.gpr.in config.gpr dynamo_tests.gpr.in \
 src \
-bin obj config doc regtests debian
+bin obj config doc regtests
 
 dist:
 	-rm -rf $(distdir)

@@ -32,7 +32,7 @@ NR_CPUS=`getconf _NPROCESSORS_CONF 2>/dev/null || getconf _NPROCESSORS_CONF 2>/d
 AC_MSG_RESULT($NR_CPUS)
 AC_SUBST(NR_CPUS)
 
-AC_CHECK_PROGS(GNATMAKE, gnatmake, "")
+AM_GNAT_CHECK_GPRBUILD
 
 # checking for local tools
 AC_PROG_CC

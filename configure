@@ -585,6 +585,10 @@ ac_unique_file="src/gen.ads"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 mkdir_p
+WITH_ADO_SQLITE
+DYNAMO_HAVE_SQLITE
+WITH_ADO_MYSQL
+DYNAMO_HAVE_MYSQL
 ADO_DIR
 SECURITY_DIR
 ASF_DIR
@@ -3512,6 +3516,60 @@ $as_echo "no" >&6; }
 " "$LINENO" 5
     fi
   fi
+
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ado_mysql project exists" >&5
+$as_echo_n "checking whether ado_mysql project exists... " >&6; }
+  echo "with \"${ADO_DIR}ado_mysql\"; project t is for Source_Dirs use (); end t;" > t.gpr
+  $GNATMAKE -p -Pt >/dev/null 2>/dev/null
+  if test $? -eq 0; then
+    gnat_project_ado_mysql=yes
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, using ${ADO_DIR}ado_mysql" >&5
+$as_echo "yes, using ${ADO_DIR}ado_mysql" >&6; }
+    gnat_project_with_ado_mysql="with \"${ADO_DIR}ado_mysql\";";
+  else
+    gnat_project_ado_mysql=no
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+  fi;
+  rm -f t.gpr
+
+if test T$gnat_project_ado_mysql = Tno; then
+  WITH_ADO_MYSQL='';
+  DYNAMO_HAVE_MYSQL='no';
+else
+  WITH_ADO_MYSQL="with \"${ADO_DIR}ado_mysql\";";
+  DYNAMO_HAVE_MYSQL='yes';
+fi
+
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ado_sqlite project exists" >&5
+$as_echo_n "checking whether ado_sqlite project exists... " >&6; }
+  echo "with \"${ADO_DIR}ado_sqlite\"; project t is for Source_Dirs use (); end t;" > t.gpr
+  $GNATMAKE -p -Pt >/dev/null 2>/dev/null
+  if test $? -eq 0; then
+    gnat_project_ado_sqlite=yes
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, using ${ADO_DIR}ado_sqlite" >&5
+$as_echo "yes, using ${ADO_DIR}ado_sqlite" >&6; }
+    gnat_project_with_ado_sqlite="with \"${ADO_DIR}ado_sqlite\";";
+  else
+    gnat_project_ado_sqlite=no
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+  fi;
+  rm -f t.gpr
+
+if test T$gnat_project_ado_sqlite = Tno; then
+  WITH_ADO_SQLITE='';
+  DYNAMO_HAVE_SQLITE='no';
+else
+  WITH_ADO_SQLITE="with \"${ADO_DIR}ado_sqlite\";";
+  DYNAMO_HAVE_SQLITE='yes';
+fi
 
 
 

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-query -- Query artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ with Gen.Utils;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
 with Gen.Model.Mappings;
+with Gen.Model.Operations;
 
 with Util.Log.Loggers;
 with Util.Encoders.HMAC.SHA1;
@@ -64,6 +65,12 @@ package body Gen.Artifacts.Query is
       procedure Register_Columns (Table : in out Query_Definition;
                                   Node  : in DOM.Core.Node);
 
+      procedure Register_Operation (Table : in out Query_Definition;
+                                    Node  : in DOM.Core.Node);
+
+      procedure Register_Operations (Table : in out Query_Definition;
+                                     Node  : in DOM.Core.Node);
+
       procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_File_Definition;
                                   Node  : in DOM.Core.Node);
 
@@ -74,6 +81,30 @@ package body Gen.Artifacts.Query is
                                 Node  : in DOM.Core.Node);
 
       Hash : Unbounded_String;
+
+      --  ------------------------------
+      --  Register the method definition in the table
+      --  ------------------------------
+      procedure Register_Operation (Table  : in out Query_Definition;
+                                    Node   : in DOM.Core.Node) is
+         Name      : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Operation : Gen.Model.Operations.Operation_Definition_Access;
+      begin
+         Table.Add_Operation (Name, Operation);
+      end Register_Operation;
+
+      --  ------------------------------
+      --  Register all the operations defined in the table
+      --  ------------------------------
+      procedure Register_Operations (Table : in out Query_Definition;
+                                     Node  : in DOM.Core.Node) is
+         procedure Iterate is new Gen.Utils.Iterate_Nodes (T       => Query_Definition,
+                                                           Process => Register_Operation);
+      begin
+         Log.Debug ("Register operations from bean {0}", Table.Name);
+
+         Iterate (Table, Node, "method");
+      end Register_Operations;
 
       --  ------------------------------
       --  Register the column definition in the table
@@ -159,6 +190,7 @@ package body Gen.Artifacts.Query is
 
          Log.Debug ("Register query {0} with type {1}", Query.Name, Query.Type_Name);
          Register_Columns (Query_Definition (Query), Node);
+         Register_Operations (Query_Definition (Query), Node);
       end Register_Mapping;
 
       --  ------------------------------

@@ -990,7 +990,7 @@ package body Gen.Artifacts.XMI is
          if Msg'Length /= 0 then
             Context.Error (To_String (Op.Location) & ": " & Msg);
          end if;
-            Table.Add_Operation (Op.Name, Operation);
+         Table.Add_Operation (Op.Name, Operation);
       end Prepare_Operation;
 
       --  ------------------------------

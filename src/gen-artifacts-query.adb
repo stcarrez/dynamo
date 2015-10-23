@@ -120,8 +120,8 @@ package body Gen.Artifacts.Query is
          C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (Column, "type"));
 
          C.Is_Inserted := False;
-         C.Is_Updated  := False;
-         C.Not_Null    := False;
+         C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
+         C.Not_Null    := Gen.Utils.Get_Attribute (Column, "not-null", False);
          C.Unique      := False;
 
          --  Construct the hash for this column mapping.

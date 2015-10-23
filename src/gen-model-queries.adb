@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-queries -- XML Mapped Database queries representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,6 +47,9 @@ package body Gen.Model.Queries is
    begin
       if Name = "sorts" then
          return From.Sorts_Bean;
+
+      elsif Name = "isBean" then
+         return Util.Beans.Objects.To_Object (True);
 
       else
          return Tables.Table_Definition (From).Get_Value (Name);
@@ -102,7 +105,7 @@ package body Gen.Model.Queries is
          return Util.Beans.Objects.To_Object (From.Sha1);
 
       else
-         return Tables.Table_Definition (From).Get_Value (Name);
+         return Query_Definition (From).Get_Value (Name);
       end if;
    end Get_Value;
 

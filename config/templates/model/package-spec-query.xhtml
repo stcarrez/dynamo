@@ -4,28 +4,14 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core">
 <h:list value="#{package.queries}" var="query">
-  <h:panelGroup rendered="#{not empty query.type}">
-   --  --------------------
-   --  #{query.comment}
-   --  --------------------
-<h:panelGroup rendered="#{query.bean eq 'yes'}">
-   type #{query.type} is new Util.Beans.Basic.Readonly_Bean with record
-</h:panelGroup>
-<h:panelGroup rendered="#{query.bean ne 'yes'}">
-   type #{query.type} is tagged record
-</h:panelGroup>
-   <h:list value="#{query.columns}" var="column">
-      --  #{column.comment}
-      #{fn:capitalize(column.name)} : #{g:adaType(column,0)};
+  <h:panelGroup rendered="#{not empty query.operations or not empty query.members}">
+    <ui:include src="../beans/package-spec-bean-decl.xhtml">
+      <ui:param name="bean" value="#{query}"/>
+    </ui:include>
+  </h:panelGroup>
 #{''}
-   </h:list>
-   end record;
-#{''}
-<h:panelGroup rendered="#{query.bean eq 'yes'}">
-   --  Get the bean attribute identified by the given name.
-   overriding
-   function Get_Value (From : in #{query.type};
-                       Name : in String) return Util.Beans.Objects.Object;
+<h:panelGroup rendered="#{empty query.operations and not empty query.members}">
+  <h:panelGroup rendered="#{query.bean eq 'yes'}">
 #{''}
 
    package #{fn:capitalize(query.type)}_Beans is
@@ -39,13 +25,13 @@
    procedure List (Object  : in out #{fn:capitalize(query.type)}_List_Bean'Class;
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class);
-</h:panelGroup>
-<h:panelGroup rendered="#{query.bean ne 'yes'}">
+  </h:panelGroup>
+  <h:panelGroup rendered="#{query.bean ne 'yes'}">
    package #{fn:capitalize(query.type)}_Vectors is
       new Ada.Containers.Vectors (Index_Type   => Natural,
                                   Element_Type => #{fn:capitalize(query.type)},
                                   "="          => "=");
-</h:panelGroup>
+  </h:panelGroup>
 #{''}
    subtype #{fn:capitalize(query.type)}_Vector is #{fn:capitalize(query.type)}_Vectors.Vector;
 #{''}
@@ -54,7 +40,7 @@
    procedure List (Object  : in out #{fn:capitalize(query.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Context : in out ADO.Queries.Context'Class);
-   </h:panelGroup>
+</h:panelGroup>
 
    <h:list value="#{query.queries}" var="basic_query">
 #{''}

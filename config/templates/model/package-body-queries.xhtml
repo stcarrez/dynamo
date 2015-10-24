@@ -5,8 +5,12 @@
         xmlns:f="http://java.sun.com/jsf/core">
 <h:list value="#{package.queries}" var="query">
   <h:panelGroup rendered="#{not empty query.type}">
-<h:panelGroup rendered="#{query.bean eq 'yes'}">
+    <h:panelGroup rendered="#{query.bean eq 'yes'}">
+      <ui:include src="../beans/package-body-bean-impl.xhtml">
+        <ui:param name="bean" value="#{query}"/>
+      </ui:include>
 #{''}
+<h:panelGroup rendered="#{empty query}">
    --  --------------------
    --  Get the bean attribute identified by the given name.
    --  --------------------
@@ -40,7 +44,10 @@
       return Util.Beans.Objects.Null_Object;
    end Get_Value;
 #{''}
+</h:panelGroup>
+</h:panelGroup>
 
+<h:panelGroup rendered="#{empty query.operations}">
    --  --------------------
    --  Run the query controlled by &lt;b&gt;Context&lt;/b> and append the list in &lt;b>Object&lt;/b>.
    --  --------------------
@@ -50,8 +57,7 @@
    begin
       List (Object.List, Session, Context);
    end List;
-</h:panelGroup>
-
+#{''}
    --  --------------------
    --  #{query.comment}
    --  --------------------
@@ -92,8 +98,9 @@
          Stmt.Next;
       end loop;
    end List;
-  </h:panelGroup>
 #{''}
+    </h:panelGroup>
+  </h:panelGroup>
 </h:list>
 
 #{''}

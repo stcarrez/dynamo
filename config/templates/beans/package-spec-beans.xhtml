@@ -5,42 +5,8 @@
         xmlns:f="http://java.sun.com/jsf/core">
 
 <h:list value="#{package.beans}" var="bean">
- <h:panelGroup rendered="#{not empty bean.comment}">
-   --  --------------------
-   --  <h:outputText value="#{g:comment(bean.comment)}" escape="false"/>
-   --  --------------------
- </h:panelGroup>
-   type #{bean.type} is abstract#{bean.isLimited ? ' limited' : ''}#{not empty bean.parent ? ' new ' : ''}#{not empty bean.parent ? bean.parent.name : ''}#{not empty bean.parent ? '_Ref' : ''}
-     #{empty bean.parent.name ? 'new ' : 'and '}Util.Beans.Basic.Bean and Util.Beans.Methods.Method_Bean with #{empty bean.members ? 'null record;' : ' record'}
-   <h:list value="#{bean.members}" var="attribute">
-      #{fn:capitalize(attribute.name)} : #{g:adaType(attribute,0)};
-   </h:list>
-#{not empty bean.members ? '   end record;' : ''}
-
-#{''}
-   --  This bean provides some methods that can be used in a Method_Expression.
-   overriding
-   function Get_Method_Bindings (From : in #{bean.type})
-                                 return Util.Beans.Methods.Method_Binding_Array_Access;
-#{''}
-<h:panelGroup rendered="#{empty bean.parent or bean.members.size gt 0}">
-   --  Get the value identified by the name.
-   overriding
-   function Get_Value (From : in #{bean.type};
-                       Name : in String) return Util.Beans.Objects.Object;
-</h:panelGroup>
-#{''}
-   --  Set the value identified by the name.
-   overriding
-   procedure Set_Value (Item  : in out #{bean.type};
-                        Name  : in String;
-                        Value : in Util.Beans.Objects.Object);
-<h:list value="#{bean.operations}" var="operation">
-#{''}
-   procedure #{fn:capitalize(operation.name)} (Bean : in out #{bean.type};
-              #{g:indent(operation.name)}Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
-</h:list>
-#{''}
+  <ui:include src="package-spec-bean-decl.xhtml">
+  </ui:include>
 </h:list>
 #{''}
 

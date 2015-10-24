@@ -1,0 +1,49 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core">
+
+ <h:panelGroup rendered="#{not empty bean.comment}">
+   --  --------------------
+   --  <h:outputText value="#{g:comment(bean.comment)}" escape="false"/>
+   --  --------------------
+ </h:panelGroup>
+   type #{bean.type} is#{not empty bean.operations ? ' abstract' : ''}#{bean.isLimited ? ' limited' : ''}#{not empty bean.parent ? ' new ' : ''}#{not empty bean.parent ? bean.parent.name : ''}#{not empty bean.parent ? '_Ref' : ''}
+     #{empty bean.parent.name ? 'new ' : 'and '}Util.Beans.Basic.Bean#{not empty bean.operations ? ' and Util.Beans.Methods.Method_Bean' : ''} with #{empty bean.members ? 'null record;' : ' record'}
+   <h:list value="#{bean.members}" var="attribute">
+<h:panelGroup rendered="#{not empty attribute.comment}">
+#{''}
+      --  #{attribute.comment}
+</h:panelGroup>
+      #{fn:capitalize(attribute.name)} : #{g:adaType(attribute,0)};
+   </h:list>
+#{not empty bean.members ? '   end record;' : ''}
+<h:panelGroup rendered="#{not empty bean.operations}">
+#{''}
+   --  This bean provides some methods that can be used in a Method_Expression.
+   overriding
+   function Get_Method_Bindings (From : in #{bean.type})
+                                 return Util.Beans.Methods.Method_Binding_Array_Access;
+</h:panelGroup>
+#{''}
+<h:panelGroup rendered="#{empty bean.parent or bean.members.size gt 0}">
+   --  Get the bean attribute identified by the name.
+   overriding
+   function Get_Value (From : in #{bean.type};
+                       Name : in String) return Util.Beans.Objects.Object;
+</h:panelGroup>
+#{''}
+   --  Set the bean attribute identified by the name.
+   overriding
+   procedure Set_Value (Item  : in out #{bean.type};
+                        Name  : in String;
+                        Value : in Util.Beans.Objects.Object);
+<h:list value="#{bean.operations}" var="operation">
+#{''}
+   procedure #{fn:capitalize(operation.name)} (Bean : in out #{bean.type};
+              #{g:indent(operation.name)}Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
+</h:list>
+#{''}
+
+</ui:composition>

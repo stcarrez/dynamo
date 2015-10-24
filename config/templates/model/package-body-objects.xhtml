@@ -450,14 +450,12 @@
       Stmt.Add_Param (Value => Object.Get_Key);
       Stmt.Execute;
    end Delete;
-#{''}
 
    <ui:include src="../beans/package-bean-operations.xhtml">
      <ui:param name="bean" value="#{table}"/>
    </ui:include>
 
 <h:panelGroup rendered="#{table.hasList}">
-#{''}
    procedure List (Object  : in out #{fn:capitalize(table.type)}_Vector;
                    Session : in out ADO.Sessions.Session'Class;
                    Query   : in ADO.SQL.Query'Class) is

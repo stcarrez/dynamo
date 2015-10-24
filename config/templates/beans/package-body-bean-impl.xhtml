@@ -1,0 +1,35 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core">
+
+<h:panelGroup rendered="#{empty bean.operations}">
+   <h:list value="#{bean.operations}" var="operation">
+   procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
+                #{g:indent(operation.name)}  Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+
+   procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
+                #{g:indent(operation.name)}  Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      #{bean.type}'Class (Bean).#{fn:capitalize(operation.name)} (Outcome);
+   end Op_#{fn:capitalize(operation.name)};
+
+   package Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex} is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => #{bean.type},
+                                                      Method => Op_#{fn:capitalize(operation.name)},
+                                                      Name   => "#{operation.name}");
+   </h:list>
+   <h:panelGroup rendered="#{not empty bean.operations}">
+#{''}
+   Binding_#{bean.type}_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
+     := (<h:list value="#{bean.operations}" var="operation">#{operation.rowIndex ne 1 ? '         ' : ''}#{operation.rowIndex} =&gt; Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex}.Proxy'Access#{operation.rowIndex ne bean.operations.size ? ',' : ''}
+</h:list>     );
+</h:panelGroup>
+
+#{''}
+</h:panelGroup>
+   <ui:include src="../beans/package-bean-operations.xhtml"/>
+#{''}
+
+</ui:composition>

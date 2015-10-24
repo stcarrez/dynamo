@@ -4,93 +4,76 @@
 		xmlns:g="http://code.google.com/p/ada-ado/generator"
                 xmlns:u="http://code.google.com/p/ada-asf/util"
 		xmlns:f="http://java.sun.com/jsf/core">
+   <h:list value="#{bean.operations}" var="operation">
+   procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
+                #{g:indent(operation.name)}  Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
+
+   procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
+                #{g:indent(operation.name)}  Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      #{bean.type}'Class (Bean).#{fn:capitalize(operation.name)} (Outcome);
+   end Op_#{fn:capitalize(operation.name)};
+
+   package Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex} is
+     new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => #{bean.type},
+                                                      Method => Op_#{fn:capitalize(operation.name)},
+                                                      Name   => "#{operation.name}");
+   </h:list>
+#{''}
+<h:panelGroup rendered="#{not empty bean.operations}">
+   Binding_#{bean.type}_Array : aliased constant Util.Beans.Methods.Method_Binding_Array
+     := (<h:list value="#{bean.operations}" var="operation">#{operation.rowIndex ne 1 ? '         ' : ''}#{operation.rowIndex} =&gt; Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex}.Proxy'Access#{operation.rowIndex ne bean.operations.size ? ',' : ''}
+</h:list>     );
+</h:panelGroup>
+
+<h:panelGroup rendered="#{not empty bean.operations}">
+#{''}
+   --  ------------------------------
+   --  This bean provides some methods that can be used in a Method_Expression.
+   --  ------------------------------
+   overriding
+   function Get_Method_Bindings (From : in #{bean.type})
+                                 return Util.Beans.Methods.Method_Binding_Array_Access is
+      pragma Unreferenced (From);
+   begin
+<h:panelGroup rendered="#{not empty bean.operations}">
+      return Binding_#{bean.type}_Array'Access;
+</h:panelGroup>
+<h:panelGroup rendered="#{empty bean.operations}">
+      return null;
+</h:panelGroup>
+   end Get_Method_Bindings;
+</h:panelGroup>
+
 <h:panelGroup rendered="#{empty bean.parent or bean.members.size gt 0}">
   <ui:include src="package-bean-get_impl.xhtml">
     <ui:param name="impl" value="#{bean.isBean ? 'From' : 'Impl'}"/>
   </ui:include>
 </h:panelGroup>
 
+#{''}
 <h:panelGroup rendered="#{bean.isBean}">
-#{''}
+   --  ------------------------------
    --  Set the value identified by the name
-   overriding 
-   procedure Set_Value (Item  : in out #{fn:capitalize(bean.type)};
+   --  ------------------------------
+   overriding
+   procedure Set_Value (Item  : in out #{fn:capitalize(bean.type)}#{bean.isBean ? '' : '_Ref'};
                         Name  : in String;
                         Value : in Util.Beans.Objects.Object) is
    begin
-<h:list value="#{bean.members}" var="column">
-  <h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType and column.isUpdated and column.name ne bean.id.name }">
-      #{column.rowIndex ge 2 ? 'els' : ''}if Name = "#{column.name}" then
-      <h:panelGroup rendered="#{column.type.isIdentifier}">
-         Item.#{fn:capitalize(column.name)} := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isInteger}">
-         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Integer (Value);
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
-         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.Time.To_Time (Value);
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-         if Util.Beans.Objects.Is_Null (Value) then
-            Item.#{fn:capitalize(column.name)} := ADO.Nullable_Time '(Is_Null => True, others => &lt;&gt;);
-         else
-            Item.#{fn:capitalize(column.name)} := ADO.Nullable_Time '(Is_Null => False,
-								        Value   => Util.Beans.Objects.Time.To_Time (Value));
-         end if;
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isEnum}">
-         Item.#{fn:capitalize(column.name)} := #{fn:capitalize(column.type.name)}_Objects.To_Value (Value);
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isBoolean}">
-         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Boolean (Value);
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isString}">
-         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Unbounded_String (Value);
-      </h:panelGroup>
-</h:panelGroup></h:list>
-      #{bean.members.size ge 1 ? 'end if;' : 'null;'}
-   end Set_Value;
-#{''}
+<u:set var="counter" value="0"/>
+<ui:include src="package-bean-operations-set-member.xhtml">
+  <ui:param name="list" value="#{bean}"/>
+  <ui:param name="is_attribute" value="#{bean.isBean}"/>
+</ui:include>
+<h:panelGroup rendered="#{not empty bean.parent}">
+  <ui:include src="package-bean-operations-set-member.xhtml">
+    <ui:param name="list" value="#{bean.parent}"/>
+    <ui:param name="is_attribute" value="#{0}"/>
+  </ui:include>
 </h:panelGroup>
-
-<h:panelGroup rendered="#{bean.bean eq 'yes'}">
-#{''}
-   --  Set the value identified by the name
-   overriding 
-   procedure Set_Value (Item  : in out #{fn:capitalize(bean.type)}_Ref;
-                        Name  : in String;
-                        Value : in Util.Beans.Objects.Object) is
-   begin
-<h:list value="#{bean.members}" var="column">
-  <h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType and column.isUpdated and column.name ne bean.id.name }">
-      #{column.rowIndex ge 2 ? 'els' : ''}if Name = "#{column.name}" then
-      <h:panelGroup rendered="#{column.type.isIdentifier}">
-         Item.Set_#{fn:capitalize(column.name)} (ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value)));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isInteger}">
-         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.To_Integer (Value));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
-         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.Time.To_Time (Value));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-         if Util.Beans.Objects.Is_Null (Value) then
-            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => True, others => &lt;&gt;));
-         else
-            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => False,
-								        Value   => Util.Beans.Objects.Time.To_Time (Value)));
-         end if;
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isEnum}">
-         Item.Set_#{fn:capitalize(column.name)} (#{fn:capitalize(column.type.name)}_Objects.To_Value (Value));
-      </h:panelGroup>
-      <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate}">
-         Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.To_String (Value));
-      </h:panelGroup>
-</h:panelGroup></h:list>
-      end if;
+      #{counter ge 1 ? 'end if;' : 'null;'}
    end Set_Value;
 </h:panelGroup>
-#{''}
 
 </ui:composition>

@@ -4,6 +4,10 @@
 		xmlns:g="http://code.google.com/p/ada-ado/generator"
                 xmlns:u="http://code.google.com/p/ada-asf/util"
 		xmlns:f="http://java.sun.com/jsf/core">
+   --  ------------------------------
+   --  Get the bean attribute identified by the name.
+   --  ------------------------------
+   overriding
    function Get_Value (From : in #{fn:capitalize(bean.type)}#{bean.isBean ? '' : '_Ref'};
                        Name : in String) return Util.Beans.Objects.Object is
 <h:panelGroup rendered="#{not bean.isBean}">
@@ -25,7 +29,7 @@
          return ADO.Objects.To_Object (#{impl}.Get_Key);
     </h:panelGroup>
     <h:panelGroup rendered="#{column.type.isEnum}">
-         return #{column.type.name}_Objects.To_Object (#{impl}.#{fn:capitalize(column.name)});
+         return #{g:adaType(column,0)}_Objects.To_Object (#{impl}.#{fn:capitalize(column.name)});
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name ne bean.id.name}">
       <h:panelGroup rendered="#{column.type.isInteger or column.type.isIdentifier}">

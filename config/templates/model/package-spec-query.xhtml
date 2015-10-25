@@ -9,7 +9,17 @@
       <ui:param name="bean" value="#{query}"/>
     </ui:include>
   </h:panelGroup>
+  <h:panelGroup rendered="#{not empty query.operations and not empty query.members}">
+   --  Read in the object the data from the query result and prepare to read the next row.
+   --  If there is no row, raise the ADO.NOT_FOUND exception.
+   procedure Read (Into : in out #{fn:capitalize(query.type)};
+                   Stmt : in out ADO.Statements.Query_Statement'Class);
 #{''}
+   --  Run the query controlled by &lt;b&gt;Context&lt;/b> and load the result in &lt;b>Object&lt;/b>.
+   procedure Load (Object  : in out #{fn:capitalize(query.type)}'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class);
+  </h:panelGroup>
 <h:panelGroup rendered="#{empty query.operations and not empty query.members}">
   <h:panelGroup rendered="#{query.bean eq 'yes'}">
 #{''}

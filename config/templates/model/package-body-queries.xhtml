@@ -47,6 +47,49 @@
 </h:panelGroup>
 </h:panelGroup>
 
+<h:panelGroup rendered="#{not empty query.operations}">
+   --  --------------------
+   --  Read in the object the data from the query result and prepare to read the next row.
+   --  If there is no row, raise the ADO.NOT_FOUND exception.
+   --  --------------------
+   procedure Read (Into : in out #{fn:capitalize(query.type)};
+                   Stmt : in out ADO.Statements.Query_Statement'Class) is
+   begin
+      if not Stmt.Has_Elements then
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+<h:list value="#{query.members}" var="column">
+  <h:panelGroup rendered="#{column.type.isIdentifier}">
+      Into.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isString}">
+      Into.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isEnum}">
+      Into.#{fn:capitalize(column.name)} := #{g:adaType(column)}'Val (Stmt.Get_Integer (#{column.index}));
+  </h:panelGroup>
+  <h:panelGroup rendered="#{not column.type.isIdentifier and not column.type.isString and not column.type.isEnum}">
+      Into.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
+  </h:panelGroup>
+</h:list>
+      Stmt.Next;
+   end Read;
+#{''}
+   --  --------------------
+   --  Run the query controlled by &lt;b&gt;Context&lt;/b> and load the result in &lt;b>Object&lt;/b>.
+   --  --------------------
+   procedure Load (Object  : in out #{fn:capitalize(query.type)}'Class;
+                   Session : in out ADO.Sessions.Session'Class;
+                   Context : in out ADO.Queries.Context'Class) is
+      Stmt : ADO.Statements.Query_Statement := Session.Create_Statement (Context);
+   begin
+      Stmt.Execute;
+      Read (Object, Stmt);
+      if Stmt.Has_Elements then
+         raise ADO.Objects.NOT_FOUND;
+      end if;
+   end Load;
+</h:panelGroup>
 <h:panelGroup rendered="#{empty query.operations}">
    --  --------------------
    --  Run the query controlled by &lt;b&gt;Context&lt;/b> and append the list in &lt;b>Object&lt;/b>.

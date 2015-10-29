@@ -1,5 +1,7 @@
 Version 0.8     -
   - Support to generate Markdown documentation
+  - Support to generate query Ada bean operations
+  - Better code generation and support for UML Ada beans
 
 Version 0.7.1   - Jul 2014
   - Fix minor configuration issue with GNAT 2014

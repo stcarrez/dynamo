@@ -161,6 +161,10 @@ package body Gen.Commands.Plugins is
          --  And save the project dynamo.xml file which now refers to the new plugin.
          Generator.Set_Result_Directory (Result_Dir);
          Generator.Save_Project;
+
+      exception
+         when Ada.Directories.Name_Error | Ada.Directories.Use_Error =>
+            Generator.Error ("Cannot create directory {0}", Path);
       end;
    end Execute;
 

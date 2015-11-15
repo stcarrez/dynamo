@@ -183,7 +183,7 @@ package body Gen.Model.Tables is
          Result := From.Table.Package_Def.Find_Type (From.Type_Name);
       end if;
       if Result = null then
-         Result := Gen.Model.Mappings.Find_Type (From.Type_Name);
+         Result := Gen.Model.Mappings.Find_Type (From.Type_Name, not From.Not_Null);
       end if;
       if Result /= null and then From.Use_Foreign_Key_Type
         and then Result.all in Table_Definition'Class

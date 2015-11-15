@@ -889,6 +889,8 @@ package body Gen.Artifacts.XMI is
                end if;
                if C.Type_Name = "DateTime" and not C.Not_Null then
                   C.Type_Name := To_Unbounded_String ("Nullable_DateTime");
+               elsif C.Type_Name = "Time" and not C.Not_Null then
+                  C.Type_Name := To_Unbounded_String ("Nullable_DateTime");
                elsif C.Type_Name = "Integer" and not C.Not_Null then
                   C.Type_Name := To_Unbounded_String ("Nullable_Integer");
                elsif C.Type_Name = "String" and not C.Not_Null then

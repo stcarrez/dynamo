@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-mappings -- Type mapping artifact for Code Generator
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,17 +27,13 @@ with Gen.Model.Mappings;
 package body Gen.Artifacts.Mappings is
 
    use type DOM.Core.Node;
-   use Util.Log;
 
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Query");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Query");
 
    --  ------------------------------
-   --  Mappings artifact
-   --  ------------------------------
-
-
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
+   --  ------------------------------
    overriding
    procedure Initialize (Handler : in out Artifact;
                          Path    : in String;
@@ -62,11 +58,11 @@ package body Gen.Artifacts.Mappings is
          procedure Register_Type (O    : in out Gen.Model.Packages.Model_Definition;
                                   Node : in DOM.Core.Node);
 
-         N    : constant DOM.Core.Node := Gen.Utils.Get_Child (Node, "to");
-         To   : constant String := Gen.Utils.Get_Data_Content (N);
-         Kind : constant String := To_String (Gen.Utils.Get_Attribute (Node, "type"));
-
-         Kind_Type     : Gen.Model.Mappings.Basic_Type;
+         N          : constant DOM.Core.Node := Gen.Utils.Get_Child (Node, "to");
+         To         : constant String := Gen.Utils.Get_Data_Content (N);
+         Kind       : constant String := To_String (Gen.Utils.Get_Attribute (Node, "type"));
+         Allow_Null : constant Boolean := Gen.Utils.Get_Attribute (Node, "allow-null", False);
+         Kind_Type  : Gen.Model.Mappings.Basic_Type;
 
          procedure Register_Type (O    : in out Gen.Model.Packages.Model_Definition;
                                   Node : in DOM.Core.Node) is
@@ -76,7 +72,8 @@ package body Gen.Artifacts.Mappings is
          begin
             Gen.Model.Mappings.Register_Type (Target => To,
                                               From   => From,
-                                              Kind   => Kind_Type);
+                                              Kind   => Kind_Type,
+                                              Allow_Null => Allow_Null);
          end Register_Type;
 
          procedure Iterate is

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,11 +37,14 @@ package Gen.Model.Mappings is
    --  ------------------------------
    --  Mapping Definition
    --  ------------------------------
+   type Mapping_Definition;
+   type Mapping_Definition_Access is access all Mapping_Definition'Class;
+
    type Mapping_Definition is new Definition with record
       Target        : Ada.Strings.Unbounded.Unbounded_String;
       Kind          : Basic_Type := T_INTEGER;
+      Allow_Null    : Mapping_Definition_Access;
    end record;
-   type Mapping_Definition_Access is access all Mapping_Definition'Class;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
@@ -50,7 +53,8 @@ package Gen.Model.Mappings is
                        Name : String) return Util.Beans.Objects.Object;
 
    --  Find the mapping for the given type name.
-   function Find_Type (Name : in Ada.Strings.Unbounded.Unbounded_String)
+   function Find_Type (Name       : in Ada.Strings.Unbounded.Unbounded_String;
+                       Allow_Null : in Boolean)
                        return Mapping_Definition_Access;
 
    procedure Register_Type (Name    : in String;
@@ -60,7 +64,8 @@ package Gen.Model.Mappings is
    --  Register a type mapping <b>From</b> that is mapped to <b>Target</b>.
    procedure Register_Type (Target        : in String;
                             From          : in String;
-                            Kind          : in Basic_Type);
+                            Kind          : in Basic_Type;
+                            Allow_Null    : in Boolean);
 
    --  Setup the type mapping for the language identified by the given name.
    procedure Set_Mapping_Name (Name : in String);

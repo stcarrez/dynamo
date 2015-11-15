@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,16 +23,12 @@ with Util.Log.Loggers;
 package body Gen.Model.Mappings is
 
    use Ada.Strings.Unbounded;
-   use Util.Log;
 
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Model.Mappings");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Mappings");
 
    Types : Mapping_Maps.Map;
 
    Mapping_Name : Unbounded_String;
-
-   --  ------------------------------
-   --  Mapping Definition
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -68,16 +64,24 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    --  Find the mapping for the given type name.
    --  ------------------------------
-   function Find_Type (Name : in Ada.Strings.Unbounded.Unbounded_String)
+   function Find_Type (Name       : in Ada.Strings.Unbounded.Unbounded_String;
+                       Allow_Null : in Boolean)
                        return Mapping_Definition_Access is
       Pos : constant Mapping_Maps.Cursor := Types.Find (Mapping_Name & Name);
    begin
-      if Mapping_Maps.Has_Element (Pos) then
-         return Mapping_Maps.Element (Pos);
-      else
+      if not Mapping_Maps.Has_Element (Pos) then
          Log.Info ("Type '{0}' not found in mapping table '{1}'",
                    To_String (Name), To_String (Mapping_Name));
          return null;
+      elsif Allow_Null then
+         if Mapping_Maps.Element (Pos).Allow_Null = null then
+            Log.Info ("Type '{0}' does not allow a null value in mapping table '{1}'",
+                       To_String (Name), To_String (Mapping_Name));
+            return Mapping_Maps.Element (Pos);
+         end if;
+         return Mapping_Maps.Element (Pos).Allow_Null;
+      else
+         return Mapping_Maps.Element (Pos);
       end if;
    end Find_Type;
 
@@ -98,24 +102,37 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    --  Register a type mapping <b>From</b> that is mapped to <b>Target</b>.
    --  ------------------------------
-   procedure Register_Type (Target : in String;
-                            From   : in String;
-                            Kind   : in Basic_Type) is
+   procedure Register_Type (Target     : in String;
+                            From       : in String;
+                            Kind       : in Basic_Type;
+                            Allow_Null : in Boolean) is
       Name    : constant Unbounded_String := Mapping_Name & To_Unbounded_String (From);
       Pos     : constant Mapping_Maps.Cursor := Types.Find (Name);
       Mapping : Mapping_Definition_Access;
+      Found   : Boolean;
    begin
       Log.Debug ("Register type '{0}' mapped to '{1}' type {2}",
                  From, Target, Basic_Type'Image (Kind));
 
-      if Mapping_Maps.Has_Element (Pos) then
+      Found := Mapping_Maps.Has_Element (Pos);
+      if Found then
          Mapping := Mapping_Maps.Element (Pos);
       else
          Mapping := new Mapping_Definition;
          Types.Insert (Name, Mapping);
       end if;
-      Mapping.Target := To_Unbounded_String (Target);
-      Mapping.Kind   := Kind;
+      if Allow_Null then
+         Mapping.Allow_Null := new Mapping_Definition;
+         Mapping.Allow_Null.Target := To_Unbounded_String (Target);
+         Mapping.Allow_Null.Kind := Kind;
+         if not Found then
+            Mapping.Target := To_Unbounded_String (Target);
+            Mapping.Kind   := Kind;
+         end if;
+      else
+         Mapping.Target := To_Unbounded_String (Target);
+         Mapping.Kind   := Kind;
+      end if;
    end Register_Type;
 
    --  ------------------------------

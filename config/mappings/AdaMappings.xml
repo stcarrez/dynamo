@@ -8,7 +8,7 @@
   under default namespace properties languageMappingsUri.
   See http://docs.andromda.org/mappings.html -->
 <mappings name="Ada05">
-    <mapping type="date">
+    <mapping type="date" allow-null='true'>
         <from>Nullable_Time</from>
         <from>Nullable_Date</from>
         <from>Nullable_DateTime</from>
@@ -67,6 +67,14 @@
         <from>PrimitiveTypes::Entity_Type</from>
         <from>datatype::Entity_Type</from>
         <to>ADO.Entity_Type</to>
+    </mapping>
+    <mapping type='integer' allow-null='true'>
+        <from>ADO.Entity_Type</from>
+        <from>ADO.Model.Entity_Type</from>
+        <from>Entity_Type</from>
+        <from>PrimitiveTypes::Entity_Type</from>
+        <from>datatype::Entity_Type</from>
+        <to>ADO.Nullable_Entity_Type</to>
     </mapping>
     <mapping type='boolean'>
         <from>bool</from>

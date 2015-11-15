@@ -893,6 +893,11 @@ package body Gen.Artifacts.XMI is
                   C.Type_Name := To_Unbounded_String ("Nullable_Integer");
                elsif C.Type_Name = "String" and not C.Not_Null then
                   C.Type_Name := To_Unbounded_String ("Nullable_String");
+               elsif not C.Not_Null then
+                  Context.Error (To_String (Column.Location) &
+                                   ": In table " & To_String (Table.Name) &
+                                   ", column '{1}' uses not nullable type '{0}'",
+                                 To_String (C.Type_Name), To_String (Column.Name));
                end if;
                if C.Is_Key then
                   C.Generator := To_Object (Column.Find_Tag_Value (Handler.Generator_Tag, ""));

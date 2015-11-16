@@ -32,7 +32,7 @@
          return #{g:adaType(column,0)}_Objects.To_Object (#{impl}.#{fn:capitalize(column.name)});
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name ne bean.id.name}">
-      <h:panelGroup rendered="#{(column.type.isInteger or column.type.isIdentifier) and column.type.name ne 'ADO.Nullable_Entity_Type'}">
+      <h:panelGroup rendered="#{(column.type.isInteger or column.type.isIdentifier) and column.type.name ne 'ADO.Nullable_Entity_Type' and column.type.name ne 'ADO.Nullable_Integer'}">
          return Util.Beans.Objects.To_Object (Long_Long_Integer (#{impl}.#{fn:capitalize(column.name)}));
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
@@ -43,6 +43,13 @@
             return Util.Beans.Objects.Null_Object;
          else
             return Util.Beans.Objects.Time.To_Object (#{impl}.#{fn:capitalize(column.name)}.Value);
+         end if;
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isInteger and g:adaType(column,1) eq 'ADO.Nullable_Integer'}">
+         if #{impl}.#{fn:capitalize(column.name)}.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            return Util.Beans.Objects.To_Object (Long_Long_Integer (#{impl}.#{fn:capitalize(column.name)}.Value));
          end if;
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.name eq 'ADO.Nullable_Entity_Type'}">

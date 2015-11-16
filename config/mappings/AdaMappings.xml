@@ -37,7 +37,11 @@
         <from>datatype::Integer</from>
         <to>Integer</to>
     </mapping>
-    <mapping type="integer">
+    <mapping type="integer" allow-null='true'>
+        <from>int</from>
+        <from>Integer</from>
+        <from>PrimitiveTypes::Integer</from>
+        <from>datatype::Integer</from>
         <from>Nullable_Integer</from>
         <to>ADO.Nullable_Integer</to>
     </mapping>

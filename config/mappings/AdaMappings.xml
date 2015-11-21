@@ -37,6 +37,12 @@
         <from>datatype::Integer</from>
         <to>Integer</to>
     </mapping>
+    <mapping type="integer">
+        <from>Positive</from>
+        <from>PrimitiveTypes::Positive</from>
+        <from>datatype::Positive</from>
+        <to>Positive</to>
+    </mapping>
     <mapping type="integer" allow-null='true'>
         <from>int</from>
         <from>Integer</from>
@@ -86,7 +92,7 @@
         <from>Boolean</from>
         <to>Boolean</to>
     </mapping>
-    <mapping type='blob'>
+    <mapping type='blob' allow-null='true'>
         <from>blob</from>
         <from>Blob</from>
         <from>java.sql.Blob</from>

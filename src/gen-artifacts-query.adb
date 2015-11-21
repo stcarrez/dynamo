@@ -121,7 +121,7 @@ package body Gen.Artifacts.Query is
 
          C.Is_Inserted := False;
          C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
-         C.Not_Null    := Gen.Utils.Get_Attribute (Column, "not-null", False);
+         C.Not_Null    := Gen.Utils.Get_Attribute (Column, "not-null", True);
          C.Unique      := False;
 
          --  Construct the hash for this column mapping.

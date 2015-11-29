@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---          Copyright (C) 1992-2009, Free Software Foundation, Inc.         --
+--          Copyright (C) 1992-2014, Free Software Foundation, Inc.         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -172,6 +172,7 @@ package body Table is
 
       procedure Reallocate is
          New_Size   : Memory.size_t;
+         New_Length : Long_Long_Integer;
 
       begin
          if Max < Last_Val then
@@ -186,11 +187,14 @@ package body Table is
             --  the increment value or 10, which ever is larger (the reason
             --  for the use of 10 here is to ensure that the table does really
             --  increase in size (which would not be the case for a table of
-            --  length 10 increased by 3% for instance).
+            --  length 10 increased by 3% for instance). Do the intermediate
+            --  calculation in Long_Long_Integer to avoid overflow.
 
             while Max < Last_Val loop
-               Length := Int'Max (Length * (100 + Table_Increment) / 100,
-                                  Length + 10);
+               New_Length :=
+                 Long_Long_Integer (Length) *
+                    (100 + Long_Long_Integer (Table_Increment)) / 100;
+               Length := Int'Max (Int (New_Length), Length + 10);
                Max := Min + Length - 1;
             end loop;
 
@@ -395,7 +399,11 @@ package body Table is
          Tree_Read_Data
            (Tree_Get_Table_Address,
              (Last_Val - Int (First) + 1) *
-               Table_Type'Component_Size / Storage_Unit);
+
+               --  Note the importance of parenthesizing the following division
+               --  to avoid the possibility of intermediate overflow.
+
+               (Table_Type'Component_Size / Storage_Unit));
       end Tree_Read;
 
       ----------------
@@ -411,7 +419,7 @@ package body Table is
          Tree_Write_Data
            (Tree_Get_Table_Address,
             (Last_Val - Int (First) + 1) *
-              Table_Type'Component_Size / Storage_Unit);
+              (Table_Type'Component_Size / Storage_Unit));
       end Tree_Write;
 
    begin

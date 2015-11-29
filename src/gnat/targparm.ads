@@ -6,23 +6,17 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---          Copyright (C) 1999-2009, Free Software Foundation, Inc.         --
+--          Copyright (C) 1999-2014, Free Software Foundation, Inc.         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
 -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
 -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
 -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
--- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
---                                                                          --
--- As a special exception under Section 7 of GPL version 3, you are granted --
--- additional permissions described in the GCC Runtime Library Exception,   --
--- version 3.1, as published by the Free Software Foundation.               --
---                                                                          --
--- You should have received a copy of the GNU General Public License and    --
--- a copy of the GCC Runtime Library Exception along with this program;     --
--- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
--- <http://www.gnu.org/licenses/>.                                          --
+-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
+-- for  more details.  You should have  received  a copy of the GNU General --
+-- Public License  distributed with GNAT; see file COPYING3.  If not, go to --
+-- http://www.gnu.org/licenses for a complete copy of the license.          --
 --                                                                          --
 -- GNAT was originally developed  by the GNAT team at  New York University. --
 -- Extensive contributions were provided by Ada Core Technologies Inc.      --
@@ -31,8 +25,6 @@
 
 --  This package obtains parameters from the target runtime version of System,
 --  to indicate parameters relevant to the target environment.
-
---  Is it right for this to be modified GPL???
 
 --  Conceptually, these parameters could be obtained using rtsfind, but
 --  we do not do this for four reasons:
@@ -187,13 +179,13 @@ package Targparm is
 
    --  The default values here are used if no value is found in system.ads.
    --  This should normally happen if the special version of system.ads used
-   --  by the compiler itself is in use or if the value is only relevant to
-   --  a particular target (e.g. OpenVMS, AAMP). The default values are
-   --  suitable for use in normal environments. This approach allows the
-   --  possibility of new versions of the compiler (possibly with new system
-   --  parameters added) being used to compile older versions of the compiler
-   --  sources, as well as avoiding duplicating values in all system-*.ads
-   --  files for flags that are used on a few platforms only.
+   --  by the compiler itself is in use or if the value is only relevant to a
+   --  particular target (e.g. AAMP). The default values are suitable for use
+   --  in normal environments. This approach allows the possibility of new
+   --  versions of the compiler (possibly with new system parameters added)
+   --  being used to compile older versions of the compiler sources, as well as
+   --  avoiding duplicating values in all system-*.ads files for flags that are
+   --  used on a few platforms only.
 
    --  All these parameters should be regarded as read only by all clients
    --  of the package. The only way they get modified is by calling the
@@ -205,17 +197,11 @@ package Targparm is
    ----------------------------
 
    --  The great majority of GNAT ports are based on GCC. The switches in
-   --  This section indicate the use of some non-standard target back end
+   --  this section indicate the use of some non-standard target back end
    --  or other special targetting requirements.
 
    AAMP_On_Target : Boolean := False;
    --  Set to True if target is AAMP
-
-   OpenVMS_On_Target : Boolean := False;
-   --  Set to True if target is OpenVMS
-
-   RTX_RTSS_Kernel_Module_On_Target : Boolean := False;
-   --  Set to True if target is RTSS module for RTX
 
    type Virtual_Machine_Kind is (No_VM, JVM_Target, CLI_Target);
    VM_Target : Virtual_Machine_Kind := No_VM;
@@ -316,9 +302,6 @@ package Targparm is
    --  front-end setjmp/longjmp approach, and this is the default. If
    --  this variable is True, then GCC ZCX is used.
 
-   GCC_ZCX_Support_On_Target  : Boolean := False;
-   --  Indicates that the target supports GCC Exceptions
-
    ------------------------------------
    -- Run-Time Library Configuration --
    ------------------------------------
@@ -366,8 +349,6 @@ package Targparm is
    --    The calls to __gnat_initialize and __gnat_finalize are omitted
    --
    --    All finalization and initialization (controlled types) is omitted
-   --
-   --    The routine __gnat_handler_installed is not imported
 
    Preallocated_Stacks_On_Target : Boolean := False;
    --  If this flag is True, then the expander preallocates all task stacks
@@ -399,13 +380,18 @@ package Targparm is
    --  used at the source level, and the corresponding flag is false, then an
    --  error message will be issued saying the feature is not supported.
 
-   Support_64_Bit_Divides_On_Target : Boolean := True;
-   --  If True, the back end supports 64-bit divide operations. If False, then
-   --  the source program may not contain 64-bit divide operations. This is
-   --  specifically useful in the zero foot-print case, where the issue is
-   --  whether there is a hardware divide instruction for 64-bits so that
-   --  no run-time support is required. It should always be set True if the
-   --  necessary run-time support is present.
+   Atomic_Sync_Default_On_Target : Boolean := True;
+   --  Access to atomic variables requires memory barrier synchronization in
+   --  the general case to ensure proper behavior when such accesses are used
+   --  on a multi-processor to synchronize tasks (e.g. by using spin locks).
+   --  The setting of this flag determines the default behavior. Normally this
+   --  is True, which will mean that appropriate synchronization instructions
+   --  are generated by default. If it is False, then the default will be that
+   --  these synchronization instructions are not generated. This may be a more
+   --  appropriate default in some cases, e.g. on embedded targets which do not
+   --  allow the possibility of multi-processors. The default can be overridden
+   --  using pragmas Enable/Disable_Atomic_Synchronization and also by use of
+   --  the corresponding debug flags -gnatd.e and -gnatd.d.
 
    Support_Aggregates_On_Target : Boolean := True;
    --  In the general case, the use of aggregates may generate calls
@@ -413,6 +399,14 @@ package Targparm is
    --  memmove, and bcopy. This flag is set to True if these routines
    --  are available. If any of these routines is not available, then
    --  this flag is False, and the use of aggregates is not permitted.
+
+   Support_Atomic_Primitives_On_Target : Boolean := False;
+   --  If this flag is True, then the back-end support GCC built-in atomic
+   --  operations for memory model such as atomic load or atomic compare
+   --  exchange (see the GCC manual for more information). If the flag is
+   --  False, then the back-end doesn't provide this support. Note this flag is
+   --  set to True only if the target supports all atomic primitives up to 64
+   --  bits. ??? To be modified.
 
    Support_Composite_Assign_On_Target : Boolean := True;
    --  The assignment of composite objects other than small records and
@@ -433,6 +427,11 @@ package Targparm is
    --  If True, the back end supports 64-bit shift operations. If False, then
    --  the source program may not contain explicit 64-bit shifts. In addition,
    --  the code generated for packed arrays will avoid the use of long shifts.
+
+   Support_Nondefault_SSO_On_Target : Boolean := True;
+   --  If True, the back end supports the non-default Scalar_Storage_Order
+   --  (i.e. allows non-confirming Scalar_Storage_Order attribute definition
+   --  clauses).
 
    --------------------
    -- Indirect Calls --
@@ -602,17 +601,42 @@ package Targparm is
    --  These subprograms are used to initialize the target parameter values
    --  from the system.ads file. Note that this is only done once, so if more
    --  than one call is made to either routine, the second and subsequent
-   --  calls are ignored.
+   --  calls are ignored. It also reads restriction pragmas from system.ads
+   --  and records them, though as further detailed below, the caller has some
+   --  control over the handling of No_Dependence restrictions.
+
+   type Make_Id_Type is access function (Str : Text_Buffer) return Node_Id;
+   --  Parameter type for Get_Target_Parameters for function that creates an
+   --  identifier node with Sloc value System_Location and given string as the
+   --  Chars value.
+
+   type Make_SC_Type is access function (Pre, Sel : Node_Id) return Node_Id;
+   --  Parameter type for Get_Target_Parameters for function that creates a
+   --  selected component with Sloc value System_Location and given Prefix
+   --  (Pre) and Selector (Sel) values.
+
+   type Set_RND_Type is access procedure (Unit : Node_Id);
+   --  Parameter type for Get_Target_Parameters that records a Restriction
+   --  No_Dependence for the given unit (identifier or selected component).
 
    procedure Get_Target_Parameters
      (System_Text  : Source_Buffer_Ptr;
       Source_First : Source_Ptr;
-      Source_Last  : Source_Ptr);
+      Source_Last  : Source_Ptr;
+      Make_Id      : Make_Id_Type := null;
+      Make_SC      : Make_SC_Type := null;
+      Set_RND      : Set_RND_Type := null);
    --  Called at the start of execution to obtain target parameters from
    --  the source of package System. The parameters provide the source
    --  text to be scanned (in System_Text (Source_First .. Source_Last)).
+   --  if the three subprograms are left at their default value of null,
+   --  Get_Target_Parameters will ignore pragma Restrictions No_Dependence
+   --  lines, otherwise it will use these three subprograms to record them.
 
-   procedure Get_Target_Parameters;
+   procedure Get_Target_Parameters
+     (Make_Id : Make_Id_Type := null;
+      Make_SC : Make_SC_Type := null;
+      Set_RND : Set_RND_Type := null);
    --  This version reads in system.ads using Osint. The idea is that the
    --  caller uses the first version if they have to read system.ads anyway
    --  (e.g. the compiler) and uses this simpler interface if system.ads is

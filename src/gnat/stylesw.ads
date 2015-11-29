@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---          Copyright (C) 1992-2010, Free Software Foundation, Inc.         --
+--          Copyright (C) 1992-2013, Free Software Foundation, Inc.         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -40,10 +40,10 @@ package Stylesw is
    --  options. The default values shown here correspond to no style checking.
 
    --  If any of these values is set to a non-default value, then
-   --  Opt.Style_Check is set True to active calls to this package.
+   --  Opt.Style_Check is set True to activate calls to this package.
 
    --  The actual mechanism for setting these switches to other than default
-   --  values is via the Set_Style_Check_Option procedure or through a call to
+   --  values is via the Set_Style_Check_Options procedure or through a call to
    --  Set_Default_Style_Check_Options. They should not be set directly in any
    --  other manner.
 
@@ -94,7 +94,8 @@ package Stylesw is
    --      The comment characters are followed by an exclamation point (the
    --      sequence --! is used by gnatprep for marking deleted lines).
    --
-   --      The comment characters are followed by two space characters
+   --      The comment characters are followed by two space characters if
+   --      Comment_Spacing = 2, else by one character if Comment_Spacing = 1.
    --
    --      The line consists entirely of minus signs
    --
@@ -103,6 +104,9 @@ package Stylesw is
    --
    --  Note: the reason for the last two conditions is to allow "boxed"
    --  comments where only a single space separates the comment characters.
+
+   Style_Check_Comments_Spacing : Nat range 1 .. 2;
+   --  Spacing required for comments, valid only if Style_Check_Comments true.
 
    Style_Check_DOS_Line_Terminator : Boolean := False;
    --  This can be set true by using the -gnatyd switch. If it is True, then
@@ -123,8 +127,8 @@ package Stylesw is
 
    Style_Check_If_Then_Layout : Boolean := False;
    --  This can be set True by using the -gnatyi switch. If it is True, then a
-   --  THEN keyword may not appear on the line that immediately follows the
-   --  line containing the corresponding IF.
+   --  THEN keyword must either appear on the same line as the IF, or on a line
+   --  all on its own.
    --
    --  This permits one of two styles for IF-THEN layout. Either the IF and
    --  THEN keywords are on the same line, where the condition is short enough,
@@ -137,15 +141,18 @@ package Stylesw is
    --      and then Y < Z
    --    then
    --
+   --    if X > Y and then Z > 0
+   --    then
+   --
    --  are allowed, but
    --
    --    if X > Y
-   --    then
+   --      and then B > C then
    --
    --  is not allowed.
 
    Style_Check_Indentation : Column_Number range 0 .. 9 := 0;
-   --  This can be set non-zero by using the -gnatyn (n a digit) switch. If
+   --  This can be set non-zero by using the -gnaty? (? a digit) switch. If
    --  it is non-zero it activates indentation checking with the indicated
    --  indentation value. A value of zero turns off checking. The requirement
    --  is that any new statement, line comment, declaration or keyword such
@@ -174,8 +181,8 @@ package Stylesw is
 
    Style_Check_Missing_Overriding : Boolean := False;
    --  This can be set True by using the -gnatyO switch. If it is True, then
-   --  "[not] overriding" is required in subprogram declarations and bodies
-   --  where appropriate.
+   --  "overriding" is required in subprogram declarations and bodies where
+   --  appropriate. Note that "not overriding" is never required.
 
    Style_Check_Mode_In : Boolean := False;
    --  This can be set True by using -gnatyI. If True, it activates checking
@@ -213,8 +220,9 @@ package Stylesw is
 
    Style_Check_Standard : Boolean := False;
    --  This can be set True by using the -gnatyn switch. If it is True, then
-   --  any references to names in Standard have to be in mixed case mode (e.g.
-   --  Integer, Boolean).
+   --  any references to names in Standard have to be cased in a manner that
+   --  is consistent with the Ada RM (usually Mixed case, as in Long_Integer)
+   --  but there are some exceptions (e.g. NUL, ASCII).
 
    Style_Check_Tokens : Boolean := False;
    --  This can be set True by using the -gnatyt switch. If it is True, then
@@ -251,6 +259,8 @@ package Stylesw is
    --
    --    A unary plus or minus may not be followed by a space
    --
+   --    There must be one blank (and no other white space) between NOT and IN
+   --
    --    A vertical bar must be surrounded by spaces
    --
    --  Note that a requirement that a token be preceded by a space is met by
@@ -262,8 +272,8 @@ package Stylesw is
 
    Style_Check_Xtra_Parens : Boolean := False;
    --  This can be set True by using the -gnatyx switch. If true, then it is
-   --  not allowed to enclose entire conditional expressions in parentheses
-   --  (C style).
+   --  not allowed to enclose entire expressions in tests in parentheses
+   --  (C style), e.g. if (x = y) then ... is not allowed.
 
    Style_Max_Line_Length : Int := 0;
    --  Value used to check maximum line length. Gets reset as a result of
@@ -315,8 +325,8 @@ package Stylesw is
 
    procedure Set_Style_Check_Options (Options : String);
    --  Like the above procedure, but used when the Options string is known to
-   --  be valid. This is for example appropriate for calls where the string ==
-   --  was obtained by Save_Style_Check_Options.
+   --  be valid. This is for example appropriate for calls where the string was
+   --  obtained by Save_Style_Check_Options.
 
    procedure Reset_Style_Check_Options;
    --  Sets all style check options to off

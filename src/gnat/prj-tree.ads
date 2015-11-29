@@ -2,11 +2,11 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                              P R J . T R E E                             --
+--                             P R J . T R E E                              --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---          Copyright (C) 2001-2010, Free Software Foundation, Inc.         --
+--          Copyright (C) 2001-2014, Free Software Foundation, Inc.         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -32,8 +32,57 @@ with Table;
 
 with Prj.Attr; use Prj.Attr;
 with Prj.Env;
+with Prj.Ext;
 
 package Prj.Tree is
+
+   -----------------
+   -- Environment --
+   -----------------
+
+   --  The following record contains the context in which projects are parsed
+   --  and processed (finding importing project, resolving external values,..).
+
+   type Environment is record
+      External : Prj.Ext.External_References;
+      --  External references are stored in this hash table (and manipulated
+      --  through subprograms in prj-ext.ads). External references are
+      --  project-tree specific so that one can load the same tree twice but
+      --  have two views of it, for instance.
+
+      Project_Path : aliased Prj.Env.Project_Search_Path;
+      --  The project path is tree specific, since we might want to load
+      --  simultaneously multiple projects, each with its own search path, in
+      --  particular when using different compilers with different default
+      --  search directories.
+
+      Flags : Prj.Processing_Flags;
+      --  Configure errors and warnings
+   end record;
+
+   procedure Initialize
+     (Self  : out Environment;
+      Flags : Processing_Flags);
+   --  Initialize a new environment
+
+   procedure Initialize_And_Copy
+     (Self      : out Environment;
+      Copy_From : Environment);
+   --  Initialize a new environment, copying its values from Copy_From
+
+   procedure Free (Self : in out Environment);
+   --  Free the memory used by Self
+
+   procedure Override_Flags
+     (Self : in out Environment; Flags : Prj.Processing_Flags);
+   --  Override the subprogram called in case there are parsing errors. This
+   --  is needed in applications that do their own error handling, since the
+   --  error handler is likely to be a local subprogram in this case (which
+   --  can't be stored when the flags are created).
+
+   -------------------
+   -- Project nodes --
+   -------------------
 
    type Project_Node_Tree_Data;
    type Project_Node_Tree_Ref is access all Project_Node_Tree_Data;
@@ -219,6 +268,12 @@ package Prj.Tree is
    pragma Inline (Name_Of);
    --  Valid for all non empty nodes. May return No_Name for nodes that have
    --  no names.
+
+   function Display_Name_Of
+     (Node    : Project_Node_Id;
+      In_Tree : Project_Node_Tree_Ref) return Name_Id;
+   pragma Inline (Display_Name_Of);
+   --  Valid only for N_Project node. Returns the display name of the project.
 
    function Kind_Of
      (Node    : Project_Node_Id;
@@ -541,6 +596,12 @@ package Prj.Tree is
    --  Only valid for N_Variable_Reference or N_Attribute_Reference nodes.
    --  May return Empty_Node.
 
+   function Default_Of
+     (Node    : Project_Node_Id;
+      In_Tree : Project_Node_Tree_Ref) return Attribute_Default_Value;
+   pragma Inline (Default_Of);
+   --  Only valid for N_Attribute_Reference nodes
+
    function String_Type_Of
      (Node    : Project_Node_Id;
       In_Tree : Project_Node_Tree_Ref) return Project_Node_Id;
@@ -683,7 +744,14 @@ package Prj.Tree is
       In_Tree : Project_Node_Tree_Ref;
       To      : Name_Id);
    pragma Inline (Set_Name_Of);
-   --  Valid for all non empty nodes.
+   --  Valid for all non empty nodes
+
+   procedure Set_Display_Name_Of
+     (Node    : Project_Node_Id;
+      In_Tree : Project_Node_Tree_Ref;
+      To      : Name_Id);
+   pragma Inline (Set_Display_Name_Of);
+   --  Valid only for N_Project nodes
 
    procedure Set_Kind_Of
      (Node    : Project_Node_Id;
@@ -1019,7 +1087,14 @@ package Prj.Tree is
       In_Tree : Project_Node_Tree_Ref;
       To      : Project_Node_Id);
    pragma Inline (Set_Package_Node_Of);
-   --  Only valid for N_Variable_Reference or N_Attribute_Reference nodes.
+   --  Only valid for N_Variable_Reference or N_Attribute_Reference nodes
+
+   procedure Set_Default_Of
+     (Node    : Project_Node_Id;
+      In_Tree : Project_Node_Tree_Ref;
+      To      : Attribute_Default_Value);
+   pragma Inline (Set_Default_Of);
+   --  Only valid for N_Attribute_Reference nodes
 
    procedure Set_String_Type_Of
      (Node    : Project_Node_Id;
@@ -1097,6 +1172,9 @@ package Prj.Tree is
          Directory : Path_Name_Type := No_Path;
          --  Only for N_Project
 
+         Display_Name : Name_Id := No_Name;
+         --  Only for N_Project
+
          Expr_Kind : Variable_Kind := Undefined;
          --  See below for what Project_Node_Kind it is used
 
@@ -1129,6 +1207,9 @@ package Prj.Tree is
 
          Value : Name_Id := No_Name;
          --  See below for what Project_Node_Kind it is used
+
+         Default : Attribute_Default_Value := Empty_Value;
+         --  Only used in N_Attribute_Reference
 
          Field1 : Project_Node_Id := Empty_Node;
          --  See below the meaning for each Project_Node_Kind
@@ -1414,18 +1495,19 @@ package Prj.Tree is
          Name : Name_Id;
          --  Name of the project
 
-         Display_Name : Name_Id;
-         --  The name of the project as it appears in the .gpr file
-
          Node : Project_Node_Id;
          --  Node of the project in table Project_Nodes
 
-         Canonical_Path : Path_Name_Type;
+         Resolved_Path : Path_Name_Type;
          --  Resolved and canonical path of a real project file.
          --  No_Name in case of virtual projects.
 
          Extended : Boolean;
          --  True when the project is being extended by another project
+
+         From_Extended : Boolean;
+         --  True when the project is only imported by projects that are
+         --  extended.
 
          Proj_Qualifier : Project_Qualifier;
          --  The project qualifier of the project, if any
@@ -1433,10 +1515,10 @@ package Prj.Tree is
 
       No_Project_Name_And_Node : constant Project_Name_And_Node :=
         (Name           => No_Name,
-         Display_Name   => No_Name,
          Node           => Empty_Node,
-         Canonical_Path => No_Path,
+         Resolved_Path  => No_Path,
          Extended       => True,
+         From_Extended  => False,
          Proj_Qualifier => Unspecified);
 
       package Projects_Htable is new GNAT.Dynamic_HTables.Simple_HTable
@@ -1453,35 +1535,14 @@ package Prj.Tree is
 
    end Tree_Private_Part;
 
-   package Name_To_Name_HTable is new GNAT.Dynamic_HTables.Simple_HTable
-     (Header_Num => Header_Num,
-      Element    => Name_Id,
-      No_Element => No_Name,
-      Key        => Name_Id,
-      Hash       => Hash,
-      Equal      => "=");
-   --  General type for htables associating name_id to name_id. This is in
-   --  particular used to store the values of external references.
-
    type Project_Node_Tree_Data is record
       Project_Nodes : Tree_Private_Part.Project_Node_Table.Instance;
       Projects_HT   : Tree_Private_Part.Projects_Htable.Instance;
 
-      External_References : Name_To_Name_HTable.Instance;
-      --  External references are stored in this hash table (and manipulated
-      --  through subprograms in prj-ext.ads). External references are
-      --  project-tree specific so that one can load the same tree twice but
-      --  have two views of it, for instance.
-
-      Target_Name : String_Access := null;
-      --  The target name, if any, specified with the gprbuild or gprclean
-      --  switch --target=.
-
-      Project_Path : aliased Prj.Env.Project_Search_Path;
-      --  The project path is tree specific, since we might want to load
-      --  simultaneously multiple projects, each with its own search path, in
-      --  particular when using different compilers with different default
-      --  search directories.
+      Incomplete_With : Boolean := False;
+      --  Set to True if the projects were loaded with the flag
+      --  Ignore_Missing_With set to True, and there were indeed some with
+      --  statements that could not be resolved
    end record;
 
    procedure Free (Proj : in out Project_Node_Tree_Ref);

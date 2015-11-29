@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---          Copyright (C) 1992-2010, Free Software Foundation, Inc.         --
+--          Copyright (C) 1992-2015, Free Software Foundation, Inc.         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -33,16 +33,19 @@ pragma Style_Checks (All_Checks);
 --  Subprogram ordering not enforced in this unit
 --  (because of some logical groupings).
 
-with Atree;   use Atree;
-with Einfo;   use Einfo;
-with Fname;   use Fname;
-with Output;  use Output;
-with Sinfo;   use Sinfo;
-with Sinput;  use Sinput;
-with Stand;   use Stand;
-with Stringt; use Stringt;
-with Tree_IO; use Tree_IO;
-with Uname;   use Uname;
+with Atree;    use Atree;
+with Csets;    use Csets;
+with Einfo;    use Einfo;
+with Fname;    use Fname;
+with Nlists;   use Nlists;
+with Output;   use Output;
+with Sinfo;    use Sinfo;
+with Sinput;   use Sinput;
+with Stand;    use Stand;
+with Stringt;  use Stringt;
+with Tree_IO;  use Tree_IO;
+with Uname;    use Uname;
+with Widechar; use Widechar;
 
 package body Lib is
 
@@ -103,7 +106,7 @@ package body Lib is
       return Units.Table (U).Expected_Unit;
    end Expected_Unit;
 
-   function Fatal_Error (U : Unit_Number_Type) return Boolean is
+   function Fatal_Error (U : Unit_Number_Type) return Fatal_Type is
    begin
       return Units.Table (U).Fatal_Error;
    end Fatal_Error;
@@ -113,20 +116,10 @@ package body Lib is
       return Units.Table (U).Generate_Code;
    end Generate_Code;
 
-   function Has_Allocator (U : Unit_Number_Type) return Boolean is
-   begin
-      return Units.Table (U).Has_Allocator;
-   end Has_Allocator;
-
    function Has_RACW (U : Unit_Number_Type) return Boolean is
    begin
       return Units.Table (U).Has_RACW;
    end Has_RACW;
-
-   function Is_Compiler_Unit (U : Unit_Number_Type) return Boolean is
-   begin
-      return Units.Table (U).Is_Compiler_Unit;
-   end Is_Compiler_Unit;
 
    function Ident_String (U : Unit_Number_Type) return Node_Id is
    begin
@@ -152,6 +145,11 @@ package body Lib is
    begin
       return Units.Table (U).Munit_Index;
    end Munit_Index;
+
+   function No_Elab_Code_All (U : Unit_Number_Type) return Boolean is
+   begin
+      return Units.Table (U).No_Elab_Code_All;
+   end No_Elab_Code_All;
 
    function OA_Setting (U : Unit_Number_Type) return Character is
    begin
@@ -198,9 +196,9 @@ package body Lib is
       Units.Table (U).Error_Location := W;
    end Set_Error_Location;
 
-   procedure Set_Fatal_Error (U : Unit_Number_Type; B : Boolean := True) is
+   procedure Set_Fatal_Error (U : Unit_Number_Type; V : Fatal_Type) is
    begin
-      Units.Table (U).Fatal_Error := B;
+      Units.Table (U).Fatal_Error := V;
    end Set_Fatal_Error;
 
    procedure Set_Generate_Code (U : Unit_Number_Type; B : Boolean := True) is
@@ -208,23 +206,10 @@ package body Lib is
       Units.Table (U).Generate_Code := B;
    end Set_Generate_Code;
 
-   procedure Set_Has_Allocator (U : Unit_Number_Type; B : Boolean := True) is
-   begin
-      Units.Table (U).Has_Allocator := B;
-   end Set_Has_Allocator;
-
    procedure Set_Has_RACW (U : Unit_Number_Type; B : Boolean := True) is
    begin
       Units.Table (U).Has_RACW := B;
    end Set_Has_RACW;
-
-   procedure Set_Is_Compiler_Unit
-     (U : Unit_Number_Type;
-      B : Boolean := True)
-   is
-   begin
-      Units.Table (U).Is_Compiler_Unit := B;
-   end Set_Is_Compiler_Unit;
 
    procedure Set_Ident_String (U : Unit_Number_Type; N : Node_Id) is
    begin
@@ -245,6 +230,14 @@ package body Lib is
    begin
       Units.Table (U).Main_Priority := P;
    end Set_Main_Priority;
+
+   procedure Set_No_Elab_Code_All
+     (U : Unit_Number_Type;
+      B : Boolean := True)
+   is
+   begin
+      Units.Table (U).No_Elab_Code_All := B;
+   end Set_No_Elab_Code_All;
 
    procedure Set_OA_Setting (U : Unit_Number_Type; C : Character) is
    begin
@@ -291,10 +284,14 @@ package body Lib is
 
       Sloc1 := S1;
       Sloc2 := S2;
-      Unum1 := Get_Code_Unit (Sloc1);
-      Unum2 := Get_Code_Unit (Sloc2);
+
+      Unum1 := Get_Source_Unit (Sloc1);
+      Unum2 := Get_Source_Unit (Sloc2);
 
       loop
+         --  Step 1: Check whether the two locations are in the same source
+         --  file.
+
          Sind1 := Get_Source_File_Index (Sloc1);
          Sind2 := Get_Source_File_Index (Sloc2);
 
@@ -308,28 +305,27 @@ package body Lib is
             end if;
          end if;
 
-         --  OK, the two nodes are in separate source elements, but this is not
-         --  decisive, because of the issue of subunits and instantiations.
-
-         --  First we deal with subunits, since if the subunit is in an
-         --  instantiation, we know that the parent is in the corresponding
-         --  instantiation, since that is the only way we can have a subunit
-         --  that is part of an instantiation.
+         --  Step 2: Check subunits. If a subunit is instantiated, follow the
+         --  instantiation chain rather than the stub chain.
 
          Unit1 := Unit (Cunit (Unum1));
          Unit2 := Unit (Cunit (Unum2));
+         Inst1 := Instantiation (Sind1);
+         Inst2 := Instantiation (Sind2);
 
          if Nkind (Unit1) = N_Subunit
            and then Present (Corresponding_Stub (Unit1))
+           and then Inst1 = No_Location
          then
-            --  Both in subunits. They could have a common ancestor. If they
-            --  do, then the deeper one must have a longer unit name. Replace
-            --  the deeper one with its corresponding stub, in order to find
-            --  nearest common ancestor, if any.
-
             if Nkind (Unit2) = N_Subunit
               and then Present (Corresponding_Stub (Unit2))
+              and then Inst2 = No_Location
             then
+               --  Both locations refer to subunits which may have a common
+               --  ancestor. If they do, the deeper subunit must have a longer
+               --  unit name. Replace the deeper one with its corresponding
+               --  stub in order to find the nearest ancestor.
+
                if Length_Of_Name (Unit_Name (Unum1)) <
                   Length_Of_Name (Unit_Name (Unum2))
                then
@@ -343,7 +339,7 @@ package body Lib is
                   goto Continue;
                end if;
 
-            --  Nod1 in subunit, Nod2 not
+            --  Sloc1 in subunit, Sloc2 not
 
             else
                Sloc1 := Sloc (Corresponding_Stub (Unit1));
@@ -351,27 +347,24 @@ package body Lib is
                goto Continue;
             end if;
 
-         --  Nod2 in subunit, Nod1 not
+         --  Sloc2 in subunit, Sloc1 not
 
          elsif Nkind (Unit2) = N_Subunit
            and then Present (Corresponding_Stub (Unit2))
+           and then Inst2 = No_Location
          then
             Sloc2 := Sloc (Corresponding_Stub (Unit2));
             Unum2 := Get_Source_Unit (Sloc2);
             goto Continue;
          end if;
 
-         --  At this stage we know that neither is a subunit, so we deal
-         --  with instantiations, since we could have a common ancestor
-
-         Inst1 := Instantiation (Sind1);
-         Inst2 := Instantiation (Sind2);
+         --  Step 3: Check instances. The two locations may yield a common
+         --  ancestor.
 
          if Inst1 /= No_Location then
-
-            --  Both are instantiations
-
             if Inst2 /= No_Location then
+
+               --  Both locations denote instantiations
 
                Depth1 := Instantiation_Depth (Sloc1);
                Depth2 := Instantiation_Depth (Sloc2);
@@ -394,7 +387,7 @@ package body Lib is
                   goto Continue;
                end if;
 
-            --  Only first node is in instantiation
+            --  Sloc1 is an instantiation
 
             else
                Sloc1 := Inst1;
@@ -402,7 +395,7 @@ package body Lib is
                goto Continue;
             end if;
 
-         --  Only second node is instantiation
+         --  Sloc2 is an instantiation
 
          elsif Inst2 /= No_Location then
             Sloc2 := Inst2;
@@ -410,10 +403,9 @@ package body Lib is
             goto Continue;
          end if;
 
-         --  No instantiations involved, so we are not in the same unit
-         --  However, there is one case still to check, namely the case
-         --  where one location is in the spec, and the other in the
-         --  corresponding body (the spec location is earlier).
+         --  Step 4: One location in the spec, the other in the corresponding
+         --  body of the same unit. The location in the spec is considered
+         --  earlier.
 
          if Nkind (Unit1) = N_Subprogram_Body
               or else
@@ -432,8 +424,8 @@ package body Lib is
             end if;
          end if;
 
-         --  If that special case does not occur, then we are certain that
-         --  the two locations are really in separate units.
+         --  At this point it is certain that the two locations denote two
+         --  entirely separate units.
 
          return No;
 
@@ -477,6 +469,62 @@ package body Lib is
    begin
       return Check_Same_Extended_Unit (S1, S2) = Yes_Before;
    end Earlier_In_Extended_Unit;
+
+   -----------------------
+   -- Exact_Source_Name --
+   -----------------------
+
+   function Exact_Source_Name (Loc : Source_Ptr) return String is
+      U    : constant Unit_Number_Type  := Get_Source_Unit (Loc);
+      Buf  : constant Source_Buffer_Ptr := Source_Text (Source_Index (U));
+      Orig : constant Source_Ptr        := Original_Location (Loc);
+      P    : Source_Ptr;
+
+      WC   : Char_Code;
+      Err  : Boolean;
+      pragma Warnings (Off, WC);
+      pragma Warnings (Off, Err);
+
+   begin
+      --  Entity is character literal
+
+      if Buf (Orig) = ''' then
+         return String (Buf (Orig .. Orig + 2));
+
+      --  Entity is operator symbol
+
+      elsif Buf (Orig) = '"' or else Buf (Orig) = '%' then
+         P := Orig;
+
+         loop
+            P := P + 1;
+            exit when Buf (P) = Buf (Orig);
+         end loop;
+
+         return String (Buf (Orig .. P));
+
+      --  Entity is identifier
+
+      else
+         P := Orig;
+
+         loop
+            if Is_Start_Of_Wide_Char (Buf, P) then
+               Scan_Wide (Buf, P, WC, Err);
+            elsif not Identifier_Char (Buf (P)) then
+               exit;
+            else
+               P := P + 1;
+            end if;
+         end loop;
+
+         --  Write out the identifier by copying the exact source characters
+         --  used in its declaration. Note that this means wide characters will
+         --  be in their original encoded form.
+
+         return String (Buf (Orig .. P - 1));
+      end if;
+   end Exact_Source_Name;
 
    ----------------------------
    -- Entity_Is_In_Main_Unit --
@@ -660,7 +708,7 @@ package body Lib is
    is
    begin
       if Sloc (N) = Standard_Location then
-         return True;
+         return False;
 
       elsif Sloc (N) = No_Location then
          return False;
@@ -692,7 +740,7 @@ package body Lib is
    function In_Extended_Main_Code_Unit (Loc : Source_Ptr) return Boolean is
    begin
       if Loc = Standard_Location then
-         return True;
+         return False;
 
       elsif Loc = No_Location then
          return False;
@@ -729,7 +777,7 @@ package body Lib is
       --  Special value cases
 
       elsif Nloc = Standard_Location then
-         return True;
+         return False;
 
       elsif Nloc = No_Location then
          return False;
@@ -768,7 +816,7 @@ package body Lib is
       --  Special value cases
 
       elsif Loc = Standard_Location then
-         return True;
+         return False;
 
       elsif Loc = No_Location then
          return False;
@@ -1011,8 +1059,17 @@ package body Lib is
    ----------------
 
    procedure Store_Note (N : Node_Id) is
+      Sfile : constant Source_File_Index := Get_Source_File_Index (Sloc (N));
+
    begin
-      Notes.Append ((Pragma_Node => N, Unit => Current_Sem_Unit));
+      --  Notes for a generic are emitted when processing the template, never
+      --  in instances.
+
+      if In_Extended_Main_Code_Unit (N)
+        and then Instance (Sfile) = No_Instance_Id
+      then
+         Notes.Append (N);
+      end if;
    end Store_Note;
 
    -------------------------------
@@ -1097,5 +1154,83 @@ package body Lib is
    begin
       Version_Ref.Append (S);
    end Version_Referenced;
+
+   ---------------------
+   -- Write_Unit_Info --
+   ---------------------
+
+   procedure Write_Unit_Info
+     (Unit_Num : Unit_Number_Type;
+      Item     : Node_Id;
+      Prefix   : String := "";
+      Withs    : Boolean := False)
+   is
+   begin
+      Write_Str (Prefix);
+      Write_Unit_Name (Unit_Name (Unit_Num));
+      Write_Str (", unit ");
+      Write_Int (Int (Unit_Num));
+      Write_Str (", ");
+      Write_Int (Int (Item));
+      Write_Str ("=");
+      Write_Str (Node_Kind'Image (Nkind (Item)));
+
+      if Item /= Original_Node (Item) then
+         Write_Str (", orig = ");
+         Write_Int (Int (Original_Node (Item)));
+         Write_Str ("=");
+         Write_Str (Node_Kind'Image (Nkind (Original_Node (Item))));
+      end if;
+
+      Write_Eol;
+
+      --  Skip the rest if we're not supposed to print the withs
+
+      if not Withs then
+         return;
+      end if;
+
+      declare
+         Context_Item : Node_Id;
+
+      begin
+         Context_Item := First (Context_Items (Cunit (Unit_Num)));
+         while Present (Context_Item)
+           and then (Nkind (Context_Item) /= N_With_Clause
+                      or else Limited_Present (Context_Item))
+         loop
+            Context_Item := Next (Context_Item);
+         end loop;
+
+         if Present (Context_Item) then
+            Indent;
+            Write_Line ("withs:");
+            Indent;
+
+            while Present (Context_Item) loop
+               if Nkind (Context_Item) = N_With_Clause
+                 and then not Limited_Present (Context_Item)
+               then
+                  pragma Assert (Present (Library_Unit (Context_Item)));
+                  Write_Unit_Name
+                    (Unit_Name
+                       (Get_Cunit_Unit_Number (Library_Unit (Context_Item))));
+
+                  if Implicit_With (Context_Item) then
+                     Write_Str (" -- implicit");
+                  end if;
+
+                  Write_Eol;
+               end if;
+
+               Context_Item := Next (Context_Item);
+            end loop;
+
+            Outdent;
+            Write_Line ("end withs");
+            Outdent;
+         end if;
+      end;
+   end Write_Unit_Info;
 
 end Lib;

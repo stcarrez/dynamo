@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---          Copyright (C) 2001-2010, Free Software Foundation, Inc.         --
+--          Copyright (C) 2001-2014, Free Software Foundation, Inc.         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,15 +23,17 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Debug;
+with Opt;
 with Osint;    use Osint;
 with Output;   use Output;
 with Prj.Attr;
+with Prj.Com;
 with Prj.Err;  use Prj.Err;
 with Snames;   use Snames;
 with Uintp;    use Uintp;
 
 with Ada.Characters.Handling;    use Ada.Characters.Handling;
+with Ada.Containers.Ordered_Sets;
 with Ada.Unchecked_Deallocation;
 
 with GNAT.Case_Util;            use GNAT.Case_Util;
@@ -40,6 +42,17 @@ with GNAT.HTable;
 
 package body Prj is
 
+   type Restricted_Lang;
+   type Restricted_Lang_Access is access Restricted_Lang;
+   type Restricted_Lang is record
+      Name : Name_Id;
+      Next : Restricted_Lang_Access;
+   end record;
+
+   Restricted_Languages : Restricted_Lang_Access := null;
+   --  When null, all languages are allowed, otherwise only the languages in
+   --  the list are allowed.
+
    Object_Suffix : constant String := Get_Target_Object_Suffix.all;
    --  File suffix for object files
 
@@ -47,6 +60,10 @@ package body Prj is
    --  Initial size for extensible buffer used in Add_To_Buffer
 
    The_Empty_String : Name_Id := No_Name;
+   The_Dot_String   : Name_Id := No_Name;
+
+   Debug_Level : Integer := 0;
+   --  Current indentation level for debug traces
 
    type Cst_String_Access is access constant String;
 
@@ -59,55 +76,6 @@ package body Prj is
                           All_Upper_Case => All_Upper_Case_Image'Access,
                           Mixed_Case     => Mixed_Case_Image'Access);
 
-   Project_Empty : constant Project_Data :=
-                     (Qualifier                      => Unspecified,
-                      Externally_Built               => False,
-                      Config                         => Default_Project_Config,
-                      Name                           => No_Name,
-                      Display_Name                   => No_Name,
-                      Path                           => No_Path_Information,
-                      Virtual                        => False,
-                      Location                       => No_Location,
-                      Mains                          => Nil_String,
-                      Directory                      => No_Path_Information,
-                      Library                        => False,
-                      Library_Dir                    => No_Path_Information,
-                      Library_Src_Dir                => No_Path_Information,
-                      Library_ALI_Dir                => No_Path_Information,
-                      Library_Name                   => No_Name,
-                      Library_Kind                   => Static,
-                      Lib_Internal_Name              => No_Name,
-                      Standalone_Library             => False,
-                      Lib_Interface_ALIs             => Nil_String,
-                      Lib_Auto_Init                  => False,
-                      Libgnarl_Needed                => Unknown,
-                      Symbol_Data                    => No_Symbols,
-                      Interfaces_Defined             => False,
-                      Source_Dirs                    => Nil_String,
-                      Source_Dir_Ranks               => No_Number_List,
-                      Object_Directory               => No_Path_Information,
-                      Library_TS                     => Empty_Time_Stamp,
-                      Exec_Directory                 => No_Path_Information,
-                      Extends                        => No_Project,
-                      Extended_By                    => No_Project,
-                      Languages                      => No_Language_Index,
-                      Decl                           => No_Declarations,
-                      Imported_Projects              => null,
-                      Include_Path_File              => No_Path,
-                      All_Imported_Projects          => null,
-                      Ada_Include_Path               => null,
-                      Ada_Objects_Path               => null,
-                      Objects_Path                   => null,
-                      Objects_Path_File_With_Libs    => No_Path,
-                      Objects_Path_File_Without_Libs => No_Path,
-                      Config_File_Name               => No_Path,
-                      Config_File_Temp               => False,
-                      Config_Checked                 => False,
-                      Need_To_Build_Lib              => False,
-                      Has_Multi_Unit_Sources         => False,
-                      Depth                          => 0,
-                      Unkept_Comments                => False);
-
    procedure Free (Project : in out Project_Id);
    --  Free memory allocated for Project
 
@@ -115,6 +83,10 @@ package body Prj is
    procedure Free_List (Source : in out Source_Id);
    procedure Free_List (Languages : in out Language_List);
    --  Free memory allocated for the list of languages or sources
+
+   procedure Reset_Units_In_Table (Table : in out Units_Htable.Instance);
+   --  Resets all Units to No_Unit_Index Unit.File_Names (Spec).Unit &
+   --  Unit.File_Names (Impl).Unit in the given table.
 
    procedure Free_Units (Table : in out Units_Htable.Instance);
    --  Free memory allocated for unit information in the project
@@ -125,6 +97,29 @@ package body Prj is
 
    function Contains_ALI_Files (Dir : Path_Name_Type) return Boolean;
    --  Return True if there is at least one ALI file in the directory Dir
+
+   -----------------------------
+   -- Add_Restricted_Language --
+   -----------------------------
+
+   procedure Add_Restricted_Language (Name : String) is
+      N : String (1 .. Name'Length) := Name;
+   begin
+      To_Lower (N);
+      Name_Len := 0;
+      Add_Str_To_Name_Buffer (N);
+      Restricted_Languages :=
+        new Restricted_Lang'(Name => Name_Find, Next => Restricted_Languages);
+   end Add_Restricted_Language;
+
+   -------------------------------------
+   -- Remove_All_Restricted_Languages --
+   -------------------------------------
+
+   procedure Remove_All_Restricted_Languages is
+   begin
+      Restricted_Languages := null;
+   end Remove_All_Restricted_Languages;
 
    -------------------
    -- Add_To_Buffer --
@@ -146,8 +141,7 @@ package body Prj is
       while Last + S'Length > To'Last loop
          declare
             New_Buffer : constant  String_Access :=
-                           new String (1 .. 2 * Last);
-
+                           new String (1 .. 2 * To'Length);
          begin
             New_Buffer (1 .. Last) := To (1 .. Last);
             Free (To);
@@ -159,51 +153,112 @@ package body Prj is
       Last := Last + S'Length;
    end Add_To_Buffer;
 
+   ---------------------------------
+   -- Current_Object_Path_File_Of --
+   ---------------------------------
+
+   function Current_Object_Path_File_Of
+     (Shared : Shared_Project_Tree_Data_Access) return Path_Name_Type
+   is
+   begin
+      return Shared.Private_Part.Current_Object_Path_File;
+   end Current_Object_Path_File_Of;
+
+   ---------------------------------
+   -- Current_Source_Path_File_Of --
+   ---------------------------------
+
+   function Current_Source_Path_File_Of
+     (Shared : Shared_Project_Tree_Data_Access)
+      return Path_Name_Type is
+   begin
+      return Shared.Private_Part.Current_Source_Path_File;
+   end Current_Source_Path_File_Of;
+
    ---------------------------
    -- Delete_Temporary_File --
    ---------------------------
 
    procedure Delete_Temporary_File
-     (Tree : Project_Tree_Ref;
-      Path : Path_Name_Type)
+     (Shared : Shared_Project_Tree_Data_Access := null;
+      Path   : Path_Name_Type)
    is
       Dont_Care : Boolean;
       pragma Warnings (Off, Dont_Care);
 
    begin
-      if not Debug.Debug_Flag_N then
+      if not Opt.Keep_Temporary_Files  then
          if Current_Verbosity = High then
             Write_Line ("Removing temp file: " & Get_Name_String (Path));
          end if;
 
          Delete_File (Get_Name_String (Path), Dont_Care);
 
-         for Index in
-           1 .. Temp_Files_Table.Last (Tree.Private_Part.Temp_Files)
-         loop
-            if Tree.Private_Part.Temp_Files.Table (Index) = Path then
-               Tree.Private_Part.Temp_Files.Table (Index) := No_Path;
-            end if;
-         end loop;
+         if Shared /= null then
+            for Index in
+              1 .. Temp_Files_Table.Last (Shared.Private_Part.Temp_Files)
+            loop
+               if Shared.Private_Part.Temp_Files.Table (Index) = Path then
+                  Shared.Private_Part.Temp_Files.Table (Index) := No_Path;
+               end if;
+            end loop;
+         end if;
       end if;
    end Delete_Temporary_File;
+
+   ------------------------------
+   -- Delete_Temp_Config_Files --
+   ------------------------------
+
+   procedure Delete_Temp_Config_Files (Project_Tree : Project_Tree_Ref) is
+      Success : Boolean;
+      pragma Warnings (Off, Success);
+
+      Proj : Project_List;
+
+   begin
+      if not Opt.Keep_Temporary_Files then
+         if Project_Tree /= null then
+            Proj := Project_Tree.Projects;
+            while Proj /= null loop
+               if Proj.Project.Config_File_Temp then
+                  Delete_Temporary_File
+                    (Project_Tree.Shared, Proj.Project.Config_File_Name);
+
+                  --  Make sure that we don't have a config file for this
+                  --  project, in case there are several mains. In this case,
+                  --  we will recreate another config file: we cannot reuse the
+                  --  one that we just deleted.
+
+                  Proj.Project.Config_Checked   := False;
+                  Proj.Project.Config_File_Name := No_Path;
+                  Proj.Project.Config_File_Temp := False;
+               end if;
+
+               Proj := Proj.Next;
+            end loop;
+         end if;
+      end if;
+   end Delete_Temp_Config_Files;
 
    ---------------------------
    -- Delete_All_Temp_Files --
    ---------------------------
 
-   procedure Delete_All_Temp_Files (Tree : Project_Tree_Ref) is
+   procedure Delete_All_Temp_Files
+     (Shared : Shared_Project_Tree_Data_Access)
+   is
       Dont_Care : Boolean;
       pragma Warnings (Off, Dont_Care);
 
       Path : Path_Name_Type;
 
    begin
-      if not Debug.Debug_Flag_N then
+      if not Opt.Keep_Temporary_Files then
          for Index in
-           1 .. Temp_Files_Table.Last (Tree.Private_Part.Temp_Files)
+           1 .. Temp_Files_Table.Last (Shared.Private_Part.Temp_Files)
          loop
-            Path := Tree.Private_Part.Temp_Files.Table (Index);
+            Path := Shared.Private_Part.Temp_Files.Table (Index);
 
             if Path /= No_Path then
                if Current_Verbosity = High then
@@ -215,20 +270,19 @@ package body Prj is
             end if;
          end loop;
 
-         Temp_Files_Table.Free (Tree.Private_Part.Temp_Files);
-         Temp_Files_Table.Init (Tree.Private_Part.Temp_Files);
+         Temp_Files_Table.Free (Shared.Private_Part.Temp_Files);
+         Temp_Files_Table.Init (Shared.Private_Part.Temp_Files);
       end if;
 
       --  If any of the environment variables ADA_PRJ_INCLUDE_FILE or
       --  ADA_PRJ_OBJECTS_FILE has been set, then reset their value to
-      --  the empty string. On VMS, this has the effect of deassigning
-      --  the logical names.
+      --  the empty string.
 
-      if Tree.Private_Part.Current_Source_Path_File /= No_Path then
+      if Shared.Private_Part.Current_Source_Path_File /= No_Path then
          Setenv (Project_Include_Path_File, "");
       end if;
 
-      if Tree.Private_Part.Current_Object_Path_File /= No_Path then
+      if Shared.Private_Part.Current_Object_Path_File /= No_Path then
          Setenv (Project_Objects_Path_File, "");
       end if;
    end Delete_All_Temp_Files;
@@ -249,10 +303,19 @@ package body Prj is
          when Makefile =>
             return Extend_Name (Source_File_Name, Makefile_Dependency_Suffix);
 
-         when ALI_File =>
+         when ALI_File | ALI_Closure =>
             return Extend_Name (Source_File_Name, ALI_Dependency_Suffix);
       end case;
    end Dependency_Name;
+
+   ----------------
+   -- Dot_String --
+   ----------------
+
+   function Dot_String return Name_Id is
+   begin
+      return The_Dot_String;
+   end Dot_String;
 
    ----------------
    -- Empty_File --
@@ -267,10 +330,22 @@ package body Prj is
    -- Empty_Project --
    -------------------
 
-   function Empty_Project return Project_Data is
+   function Empty_Project
+     (Qualifier : Project_Qualifier) return Project_Data
+   is
    begin
       Prj.Initialize (Tree => No_Project_Tree);
-      return Project_Empty;
+
+      declare
+         Data : Project_Data (Qualifier => Qualifier);
+
+      begin
+         --  Only the fields for which no default value could be provided in
+         --  prj.ads are initialized below.
+
+         Data.Config := Default_Project_Config;
+         return Data;
+      end;
    end Empty_Project;
 
    ------------------
@@ -289,7 +364,9 @@ package body Prj is
    procedure Expect (The_Token : Token_Type; Token_Image : String) is
    begin
       if Token /= The_Token then
+
          --  ??? Should pass user flags here instead
+
          Error_Msg (Gnatmake_Flags, Token_Image & " expected", Token_Ptr);
       end if;
    end Expect;
@@ -323,8 +400,32 @@ package body Prj is
 
       Name_Len := Name_Len - 1;
       return Name_Find;
-
    end Extend_Name;
+
+   -------------------------
+   -- Is_Allowed_Language --
+   -------------------------
+
+   function Is_Allowed_Language (Name : Name_Id) return Boolean is
+      R    : Restricted_Lang_Access := Restricted_Languages;
+      Lang : constant String := Get_Name_String (Name);
+
+   begin
+      if R = null then
+         return True;
+
+      else
+         while R /= null loop
+            if Get_Name_String (R.Name) = Lang then
+               return True;
+            end if;
+
+            R := R.Next;
+         end loop;
+
+         return False;
+      end if;
+   end Is_Allowed_Language;
 
    ---------------------
    -- Project_Changed --
@@ -332,8 +433,10 @@ package body Prj is
 
    procedure Project_Changed (Iter : in out Source_Iterator) is
    begin
-      Iter.Language := Iter.Project.Project.Languages;
-      Language_Changed (Iter);
+      if Iter.Project /= null then
+         Iter.Language := Iter.Project.Project.Languages;
+         Language_Changed (Iter);
+      end if;
    end Project_Changed;
 
    ----------------------
@@ -342,7 +445,7 @@ package body Prj is
 
    procedure Language_Changed (Iter : in out Source_Iterator) is
    begin
-      Iter.Current  := No_Source;
+      Iter.Current := No_Source;
 
       if Iter.Language_Name /= No_Name then
          while Iter.Language /= null
@@ -356,12 +459,14 @@ package body Prj is
 
       if Iter.Language = No_Language_Index then
          if Iter.All_Projects then
-            Iter.Project := Iter.Project.Next;
+            loop
+               Iter.Project := Iter.Project.Next;
+               exit when Iter.Project = null
+                 or else Iter.Encapsulated_Libs
+                 or else not Iter.Project.From_Encapsulated_Lib;
+            end loop;
 
-            if Iter.Project /= null then
-               Project_Changed (Iter);
-            end if;
-
+            Project_Changed (Iter);
          else
             Iter.Project := null;
          end if;
@@ -372,6 +477,11 @@ package body Prj is
          if Iter.Current = No_Source then
             Iter.Language := Iter.Language.Next;
             Language_Changed (Iter);
+
+         elsif not Iter.Locally_Removed
+           and then Iter.Current.Locally_Removed
+         then
+            Next (Iter);
          end if;
       end if;
    end Language_Changed;
@@ -381,23 +491,34 @@ package body Prj is
    ---------------------
 
    function For_Each_Source
-     (In_Tree  : Project_Tree_Ref;
-      Project  : Project_Id := No_Project;
-      Language : Name_Id := No_Name) return Source_Iterator
+     (In_Tree           : Project_Tree_Ref;
+      Project           : Project_Id := No_Project;
+      Language          : Name_Id := No_Name;
+      Encapsulated_Libs : Boolean := True;
+      Locally_Removed   : Boolean := True) return Source_Iterator
    is
       Iter : Source_Iterator;
    begin
       Iter := Source_Iterator'
-        (In_Tree       => In_Tree,
-         Project       => In_Tree.Projects,
-         All_Projects  => Project = No_Project,
-         Language_Name => Language,
-         Language      => No_Language_Index,
-         Current       => No_Source);
+        (In_Tree           => In_Tree,
+         Project           => In_Tree.Projects,
+         All_Projects      => Project = No_Project,
+         Language_Name     => Language,
+         Language          => No_Language_Index,
+         Current           => No_Source,
+         Encapsulated_Libs => Encapsulated_Libs,
+         Locally_Removed   => Locally_Removed);
 
       if Project /= null then
          while Iter.Project /= null
            and then Iter.Project.Project /= Project
+         loop
+            Iter.Project := Iter.Project.Next;
+         end loop;
+
+      else
+         while not Iter.Encapsulated_Libs
+           and then Iter.Project.From_Encapsulated_Lib
          loop
             Iter.Project := Iter.Project.Next;
          end loop;
@@ -423,7 +544,14 @@ package body Prj is
 
    procedure Next (Iter : in out Source_Iterator) is
    begin
-      Iter.Current := Iter.Current.Next_In_Lang;
+      loop
+         Iter.Current := Iter.Current.Next_In_Lang;
+
+         exit when Iter.Locally_Removed
+           or else Iter.Current = No_Source
+           or else not Iter.Current.Locally_Removed;
+      end loop;
+
       if Iter.Current = No_Source then
          Iter.Language := Iter.Language.Next;
          Language_Changed (Iter);
@@ -434,58 +562,251 @@ package body Prj is
    -- For_Every_Project_Imported --
    --------------------------------
 
-   procedure For_Every_Project_Imported
-     (By             : Project_Id;
-      With_State     : in out State;
-      Imported_First : Boolean := False)
+   procedure For_Every_Project_Imported_Context
+     (By                 : Project_Id;
+      Tree               : Project_Tree_Ref;
+      With_State         : in out State;
+      Include_Aggregated : Boolean := True;
+      Imported_First     : Boolean := False)
    is
       use Project_Boolean_Htable;
-      Seen : Project_Boolean_Htable.Instance := Project_Boolean_Htable.Nil;
 
-      procedure Recursive_Check (Project : Project_Id);
-      --  Check if a project has already been seen. If not seen, mark it as
-      --  Seen, Call Action, and check all its imported projects.
+      procedure Recursive_Check_Context
+        (Project               : Project_Id;
+         Tree                  : Project_Tree_Ref;
+         In_Aggregate_Lib      : Boolean;
+         From_Encapsulated_Lib : Boolean);
+      --  Recursively handle the project tree creating a new context for
+      --  keeping track about already handled projects.
 
-      ---------------------
-      -- Recursive_Check --
-      ---------------------
+      -----------------------------
+      -- Recursive_Check_Context --
+      -----------------------------
 
-      procedure Recursive_Check (Project : Project_Id) is
-         List : Project_List;
+      procedure Recursive_Check_Context
+        (Project               : Project_Id;
+         Tree                  : Project_Tree_Ref;
+         In_Aggregate_Lib      : Boolean;
+         From_Encapsulated_Lib : Boolean)
+      is
+         package Name_Id_Set is
+           new Ada.Containers.Ordered_Sets (Element_Type => Name_Id);
+
+         Seen_Name : Name_Id_Set.Set;
+         --  This set is needed to ensure that we do not handle the same
+         --  project twice in the context of aggregate libraries.
+
+         procedure Recursive_Check
+           (Project               : Project_Id;
+            Tree                  : Project_Tree_Ref;
+            In_Aggregate_Lib      : Boolean;
+            From_Encapsulated_Lib : Boolean);
+         --  Check if project has already been seen. If not, mark it as Seen,
+         --  Call Action, and check all its imported and aggregated projects.
+
+         ---------------------
+         -- Recursive_Check --
+         ---------------------
+
+         procedure Recursive_Check
+           (Project               : Project_Id;
+            Tree                  : Project_Tree_Ref;
+            In_Aggregate_Lib      : Boolean;
+            From_Encapsulated_Lib : Boolean)
+         is
+
+            function Has_Sources (P : Project_Id) return Boolean;
+            --  Returns True if P has sources
+
+            function Get_From_Tree (P : Project_Id) return Project_Id;
+            --  Get project P from Tree. If P has no sources get another
+            --  instance of this project with sources. If P has sources,
+            --  returns it.
+
+            -----------------
+            -- Has_Sources --
+            -----------------
+
+            function Has_Sources (P : Project_Id) return Boolean is
+               Lang : Language_Ptr;
+
+            begin
+               Lang := P.Languages;
+               while Lang /= No_Language_Index loop
+                  if Lang.First_Source /= No_Source then
+                     return True;
+                  end if;
+
+                  Lang := Lang.Next;
+               end loop;
+
+               return False;
+            end Has_Sources;
+
+            -------------------
+            -- Get_From_Tree --
+            -------------------
+
+            function Get_From_Tree (P : Project_Id) return Project_Id is
+               List : Project_List := Tree.Projects;
+
+            begin
+               if not Has_Sources (P) then
+                  while List /= null loop
+                     if List.Project.Name = P.Name
+                       and then Has_Sources (List.Project)
+                     then
+                        return List.Project;
+                     end if;
+
+                     List := List.Next;
+                  end loop;
+               end if;
+
+               return P;
+            end Get_From_Tree;
+
+            --  Local variables
+
+            List : Project_List;
+
+         --  Start of processing for Recursive_Check
+
+         begin
+            if not Seen_Name.Contains (Project.Name) then
+
+               --  Even if a project is aggregated multiple times in an
+               --  aggregated library, we will only return it once.
+
+               Seen_Name.Include (Project.Name);
+
+               if not Imported_First then
+                  Action
+                    (Get_From_Tree (Project),
+                     Tree,
+                     Project_Context'(In_Aggregate_Lib, From_Encapsulated_Lib),
+                     With_State);
+               end if;
+
+               --  Visit all extended projects
+
+               if Project.Extends /= No_Project then
+                  Recursive_Check
+                    (Project.Extends, Tree,
+                     In_Aggregate_Lib, From_Encapsulated_Lib);
+               end if;
+
+               --  Visit all imported projects
+
+               List := Project.Imported_Projects;
+               while List /= null loop
+                  Recursive_Check
+                    (List.Project, Tree,
+                     In_Aggregate_Lib,
+                     From_Encapsulated_Lib
+                       or else Project.Standalone_Library = Encapsulated);
+                  List := List.Next;
+               end loop;
+
+               --  Visit all aggregated projects
+
+               if Include_Aggregated
+                 and then Project.Qualifier in Aggregate_Project
+               then
+                  declare
+                     Agg : Aggregated_Project_List;
+
+                  begin
+                     Agg := Project.Aggregated_Projects;
+                     while Agg /= null loop
+                        pragma Assert (Agg.Project /= No_Project);
+
+                        --  For aggregated libraries, the tree must be the one
+                        --  of the aggregate library.
+
+                        if Project.Qualifier = Aggregate_Library then
+                           Recursive_Check
+                             (Agg.Project, Tree,
+                              True,
+                              From_Encapsulated_Lib
+                                or else
+                                  Project.Standalone_Library = Encapsulated);
+
+                        else
+                           --  Use a new context as we want to returns the same
+                           --  project in different project tree for aggregated
+                           --  projects.
+
+                           Recursive_Check_Context
+                             (Agg.Project, Agg.Tree, False, False);
+                        end if;
+
+                        Agg := Agg.Next;
+                     end loop;
+                  end;
+               end if;
+
+               if Imported_First then
+                  Action
+                    (Get_From_Tree (Project),
+                     Tree,
+                     Project_Context'(In_Aggregate_Lib, From_Encapsulated_Lib),
+                     With_State);
+               end if;
+            end if;
+         end Recursive_Check;
+
+      --  Start of processing for Recursive_Check_Context
 
       begin
-         if not Get (Seen, Project) then
-            Set (Seen, Project, True);
-
-            if not Imported_First then
-               Action (Project, With_State);
-            end if;
-
-            --  Visited all extended projects
-
-            if Project.Extends /= No_Project then
-               Recursive_Check (Project.Extends);
-            end if;
-
-            --  Visited all imported projects
-
-            List := Project.Imported_Projects;
-            while List /= null loop
-               Recursive_Check (List.Project);
-               List := List.Next;
-            end loop;
-
-            if Imported_First then
-               Action (Project, With_State);
-            end if;
-         end if;
-      end Recursive_Check;
+         Recursive_Check
+           (Project, Tree, In_Aggregate_Lib, From_Encapsulated_Lib);
+      end Recursive_Check_Context;
 
    --  Start of processing for For_Every_Project_Imported
 
    begin
-      Recursive_Check (Project => By);
-      Reset (Seen);
+      Recursive_Check_Context
+        (Project               => By,
+         Tree                  => Tree,
+         In_Aggregate_Lib      => False,
+         From_Encapsulated_Lib => False);
+   end For_Every_Project_Imported_Context;
+
+   procedure For_Every_Project_Imported
+     (By                 : Project_Id;
+      Tree               : Project_Tree_Ref;
+      With_State         : in out State;
+      Include_Aggregated : Boolean := True;
+      Imported_First     : Boolean := False)
+   is
+      procedure Internal
+        (Project    : Project_Id;
+         Tree       : Project_Tree_Ref;
+         Context    : Project_Context;
+         With_State : in out State);
+      --  Action wrapper for handling the context
+
+      --------------
+      -- Internal --
+      --------------
+
+      procedure Internal
+        (Project    : Project_Id;
+         Tree       : Project_Tree_Ref;
+         Context    : Project_Context;
+         With_State : in out State)
+      is
+         pragma Unreferenced (Context);
+      begin
+         Action (Project, Tree, With_State);
+      end Internal;
+
+      procedure For_Projects is
+        new For_Every_Project_Imported_Context (State, Internal);
+
+   begin
+      For_Projects (By, Tree, With_State, Include_Aggregated, Imported_First);
    end For_Every_Project_Imported;
 
    -----------------
@@ -497,26 +818,43 @@ package body Prj is
       Project          : Project_Id;
       In_Imported_Only : Boolean := False;
       In_Extended_Only : Boolean := False;
-      Base_Name        : File_Name_Type) return Source_Id
+      Base_Name        : File_Name_Type;
+      Index            : Int := 0) return Source_Id
    is
       Result : Source_Id  := No_Source;
 
-      procedure Look_For_Sources (Proj : Project_Id; Src : in out Source_Id);
+      procedure Look_For_Sources
+        (Proj : Project_Id;
+         Tree : Project_Tree_Ref;
+         Src  : in out Source_Id);
       --  Look for Base_Name in the sources of Proj
 
       ----------------------
       -- Look_For_Sources --
       ----------------------
 
-      procedure Look_For_Sources (Proj : Project_Id; Src : in out Source_Id) is
+      procedure Look_For_Sources
+        (Proj : Project_Id;
+         Tree : Project_Tree_Ref;
+         Src  : in out Source_Id)
+      is
          Iterator : Source_Iterator;
 
       begin
-         Iterator := For_Each_Source (In_Tree => In_Tree, Project => Proj);
+         Iterator := For_Each_Source (In_Tree => Tree, Project => Proj);
          while Element (Iterator) /= No_Source loop
-            if Element (Iterator).File = Base_Name then
+            if Element (Iterator).File = Base_Name
+              and then (Index = 0 or else Element (Iterator).Index = Index)
+            then
                Src := Element (Iterator);
-               return;
+
+               --  If the source has been excluded, continue looking. We will
+               --  get the excluded source only if there is no other source
+               --  with the same base name that is not locally removed.
+
+               if not Element (Iterator).Locally_Removed then
+                  return;
+               end if;
             end if;
 
             Next (Iterator);
@@ -534,26 +872,132 @@ package body Prj is
       if In_Extended_Only then
          Proj := Project;
          while Proj /= No_Project loop
-            Look_For_Sources (Proj, Result);
+            Look_For_Sources (Proj, In_Tree, Result);
             exit when Result /= No_Source;
 
             Proj := Proj.Extends;
          end loop;
 
       elsif In_Imported_Only then
-         Look_For_Sources (Project, Result);
+         Look_For_Sources (Project, In_Tree, Result);
 
          if Result = No_Source then
             For_Imported_Projects
-              (By         => Project,
-               With_State => Result);
+              (By                 => Project,
+               Tree               => In_Tree,
+               Include_Aggregated => False,
+               With_State         => Result);
          end if;
+
       else
-         Look_For_Sources (No_Project, Result);
+         Look_For_Sources (No_Project, In_Tree, Result);
       end if;
 
       return Result;
    end Find_Source;
+
+   ----------------------
+   -- Find_All_Sources --
+   ----------------------
+
+   function Find_All_Sources
+     (In_Tree          : Project_Tree_Ref;
+      Project          : Project_Id;
+      In_Imported_Only : Boolean := False;
+      In_Extended_Only : Boolean := False;
+      Base_Name        : File_Name_Type;
+      Index            : Int := 0) return Source_Ids
+   is
+      Result : Source_Ids (1 .. 1_000);
+      Last   : Natural := 0;
+
+      type Empty_State is null record;
+      No_State : Empty_State;
+      --  This is needed for the State parameter of procedure Look_For_Sources
+      --  below, because of the instantiation For_Imported_Projects of generic
+      --  procedure For_Every_Project_Imported. As procedure Look_For_Sources
+      --  does not modify parameter State, there is no need to give its type
+      --  more than one value.
+
+      procedure Look_For_Sources
+        (Proj  : Project_Id;
+         Tree  : Project_Tree_Ref;
+         State : in out Empty_State);
+      --  Look for Base_Name in the sources of Proj
+
+      ----------------------
+      -- Look_For_Sources --
+      ----------------------
+
+      procedure Look_For_Sources
+        (Proj  : Project_Id;
+         Tree  : Project_Tree_Ref;
+         State : in out Empty_State)
+      is
+         Iterator : Source_Iterator;
+         Src : Source_Id;
+
+      begin
+         State := No_State;
+
+         Iterator := For_Each_Source (In_Tree => Tree, Project => Proj);
+         while Element (Iterator) /= No_Source loop
+            if Element (Iterator).File = Base_Name
+              and then (Index = 0
+                        or else
+                          (Element (Iterator).Unit /= No_Unit_Index
+                           and then
+                           Element (Iterator).Index = Index))
+            then
+               Src := Element (Iterator);
+
+               --  If the source has been excluded, continue looking. We will
+               --  get the excluded source only if there is no other source
+               --  with the same base name that is not locally removed.
+
+               if not Element (Iterator).Locally_Removed then
+                  Last := Last + 1;
+                  Result (Last) := Src;
+               end if;
+            end if;
+
+            Next (Iterator);
+         end loop;
+      end Look_For_Sources;
+
+      procedure For_Imported_Projects is new For_Every_Project_Imported
+        (State => Empty_State, Action => Look_For_Sources);
+
+      Proj : Project_Id;
+
+   --  Start of processing for Find_All_Sources
+
+   begin
+      if In_Extended_Only then
+         Proj := Project;
+         while Proj /= No_Project loop
+            Look_For_Sources (Proj, In_Tree, No_State);
+            exit when Last > 0;
+            Proj := Proj.Extends;
+         end loop;
+
+      elsif In_Imported_Only then
+         Look_For_Sources (Project, In_Tree, No_State);
+
+         if Last = 0 then
+            For_Imported_Projects
+              (By                 => Project,
+               Tree               => In_Tree,
+               Include_Aggregated => False,
+               With_State         => No_State);
+         end if;
+
+      else
+         Look_For_Sources (No_Project, In_Tree, No_State);
+      end if;
+
+      return Result (1 .. Last);
+   end Find_All_Sources;
 
    ----------
    -- Hash --
@@ -561,6 +1005,10 @@ package body Prj is
 
    function Hash is new GNAT.HTable.Hash (Header_Num => Header_Num);
    --  Used in implementation of other functions Hash below
+
+   ----------
+   -- Hash --
+   ----------
 
    function Hash (Name : File_Name_Type) return Header_Num is
    begin
@@ -619,14 +1067,21 @@ package body Prj is
          Name_Len := 0;
          The_Empty_String := Name_Find;
 
+         Name_Len := 1;
+         Name_Buffer (1) := '.';
+         The_Dot_String := Name_Find;
+
          Prj.Attr.Initialize;
 
-         Set_Name_Table_Byte
-           (Name_Project,          Token_Type'Pos (Tok_Project));
-         Set_Name_Table_Byte
-           (Name_Extends,          Token_Type'Pos (Tok_Extends));
-         Set_Name_Table_Byte
-           (Name_External,         Token_Type'Pos (Tok_External));
+         --  Make sure that new reserved words after Ada 95 may be used as
+         --  identifiers.
+
+         Opt.Ada_Version := Opt.Ada_95;
+         Opt.Ada_Version_Pragma := Empty;
+
+         Set_Name_Table_Byte (Name_Project,  Token_Type'Pos (Tok_Project));
+         Set_Name_Table_Byte (Name_Extends,  Token_Type'Pos (Tok_Extends));
+         Set_Name_Table_Byte (Name_External, Token_Type'Pos (Tok_External));
          Set_Name_Table_Byte
            (Name_External_As_List, Token_Type'Pos (Tok_External_As_List));
       end if;
@@ -715,12 +1170,61 @@ package body Prj is
    ----------------------
 
    procedure Record_Temp_File
-     (Tree : Project_Tree_Ref;
-      Path : Path_Name_Type)
+     (Shared : Shared_Project_Tree_Data_Access;
+      Path   : Path_Name_Type)
    is
    begin
-      Temp_Files_Table.Append (Tree.Private_Part.Temp_Files, Path);
+      Temp_Files_Table.Append (Shared.Private_Part.Temp_Files, Path);
    end Record_Temp_File;
+
+   ----------
+   -- Free --
+   ----------
+
+   procedure Free (List : in out Aggregated_Project_List) is
+      procedure Unchecked_Free is new Ada.Unchecked_Deallocation
+        (Aggregated_Project, Aggregated_Project_List);
+      Tmp : Aggregated_Project_List;
+   begin
+      while List /= null loop
+         Tmp := List.Next;
+
+         Free (List.Tree);
+
+         Unchecked_Free (List);
+         List := Tmp;
+      end loop;
+   end Free;
+
+   ----------------------------
+   -- Add_Aggregated_Project --
+   ----------------------------
+
+   procedure Add_Aggregated_Project
+     (Project : Project_Id;
+      Path    : Path_Name_Type)
+   is
+      Aggregated : Aggregated_Project_List;
+
+   begin
+      --  Check if the project is already in the aggregated project list. If it
+      --  is, do not add it again.
+
+      Aggregated := Project.Aggregated_Projects;
+      while Aggregated /= null loop
+         if Path = Aggregated.Path then
+            return;
+         else
+            Aggregated := Aggregated.Next;
+         end if;
+      end loop;
+
+      Project.Aggregated_Projects := new Aggregated_Project'
+        (Path    => Path,
+         Project => No_Project,
+         Tree    => null,
+         Next    => Project.Aggregated_Projects);
+   end Add_Aggregated_Project;
 
    ----------
    -- Free --
@@ -735,9 +1239,18 @@ package body Prj is
          Free (Project.Ada_Include_Path);
          Free (Project.Objects_Path);
          Free (Project.Ada_Objects_Path);
+         Free (Project.Ada_Objects_Path_No_Libs);
          Free_List (Project.Imported_Projects, Free_Project => False);
          Free_List (Project.All_Imported_Projects, Free_Project => False);
          Free_List (Project.Languages);
+
+         case Project.Qualifier is
+            when Aggregate | Aggregate_Library =>
+               Free (Project.Aggregated_Projects);
+
+            when others =>
+               null;
+         end case;
 
          Unchecked_Free (Project);
       end if;
@@ -830,6 +1343,28 @@ package body Prj is
       end loop;
    end Free_List;
 
+   --------------------------
+   -- Reset_Units_In_Table --
+   --------------------------
+
+   procedure Reset_Units_In_Table (Table : in out Units_Htable.Instance) is
+      Unit : Unit_Index;
+
+   begin
+      Unit := Units_Htable.Get_First (Table);
+      while Unit /= No_Unit_Index loop
+         if Unit.File_Names (Spec) /= null then
+            Unit.File_Names (Spec).Unit := No_Unit_Index;
+         end if;
+
+         if Unit.File_Names (Impl) /= null then
+            Unit.File_Names (Impl).Unit := No_Unit_Index;
+         end if;
+
+         Unit := Units_Htable.Get_Next (Table);
+      end loop;
+   end Reset_Units_In_Table;
+
    ----------------
    -- Free_Units --
    ----------------
@@ -843,13 +1378,10 @@ package body Prj is
    begin
       Unit := Units_Htable.Get_First (Table);
       while Unit /= No_Unit_Index loop
-         if Unit.File_Names (Spec) /= null then
-            Unit.File_Names (Spec).Unit := No_Unit_Index;
-         end if;
 
-         if Unit.File_Names (Impl) /= null then
-            Unit.File_Names (Impl).Unit := No_Unit_Index;
-         end if;
+         --  We cannot reset Unit.File_Names (Impl or Spec).Unit here as
+         --  Source_Data buffer is freed by the following instruction
+         --  Free_List (Tree.Projects, Free_Project => True);
 
          Unchecked_Free (Unit);
          Unit := Units_Htable.Get_Next (Table);
@@ -864,26 +1396,37 @@ package body Prj is
 
    procedure Free (Tree : in out Project_Tree_Ref) is
       procedure Unchecked_Free is new
-        Ada.Unchecked_Deallocation (Project_Tree_Data, Project_Tree_Ref);
+        Ada.Unchecked_Deallocation
+          (Project_Tree_Data, Project_Tree_Ref);
+
+      procedure Unchecked_Free is new
+        Ada.Unchecked_Deallocation
+          (Project_Tree_Appdata'Class, Project_Tree_Appdata_Access);
 
    begin
       if Tree /= null then
-         Name_List_Table.Free (Tree.Name_Lists);
-         Number_List_Table.Free (Tree.Number_Lists);
-         String_Element_Table.Free (Tree.String_Elements);
-         Variable_Element_Table.Free (Tree.Variable_Elements);
-         Array_Element_Table.Free (Tree.Array_Elements);
-         Array_Table.Free (Tree.Arrays);
-         Package_Table.Free (Tree.Packages);
+         if Tree.Is_Root_Tree then
+            Name_List_Table.Free        (Tree.Shared.Name_Lists);
+            Number_List_Table.Free      (Tree.Shared.Number_Lists);
+            String_Element_Table.Free   (Tree.Shared.String_Elements);
+            Variable_Element_Table.Free (Tree.Shared.Variable_Elements);
+            Array_Element_Table.Free    (Tree.Shared.Array_Elements);
+            Array_Table.Free            (Tree.Shared.Arrays);
+            Package_Table.Free          (Tree.Shared.Packages);
+            Temp_Files_Table.Free       (Tree.Shared.Private_Part.Temp_Files);
+         end if;
+
+         if Tree.Appdata /= null then
+            Free (Tree.Appdata.all);
+            Unchecked_Free (Tree.Appdata);
+         end if;
+
          Source_Paths_Htable.Reset (Tree.Source_Paths_HT);
          Source_Files_Htable.Reset (Tree.Source_Files_HT);
 
+         Reset_Units_In_Table (Tree.Units_HT);
          Free_List (Tree.Projects, Free_Project => True);
          Free_Units (Tree.Units_HT);
-
-         --  Private part
-
-         Temp_Files_Table.Free  (Tree.Private_Part.Temp_Files);
 
          Unchecked_Free (Tree);
       end if;
@@ -897,29 +1440,94 @@ package body Prj is
    begin
       --  Visible tables
 
-      Name_List_Table.Init          (Tree.Name_Lists);
-      Number_List_Table.Init        (Tree.Number_Lists);
-      String_Element_Table.Init     (Tree.String_Elements);
-      Variable_Element_Table.Init   (Tree.Variable_Elements);
-      Array_Element_Table.Init      (Tree.Array_Elements);
-      Array_Table.Init              (Tree.Arrays);
-      Package_Table.Init            (Tree.Packages);
-      Source_Paths_Htable.Reset     (Tree.Source_Paths_HT);
-      Source_Files_Htable.Reset     (Tree.Source_Files_HT);
-      Replaced_Source_HTable.Reset  (Tree.Replaced_Sources);
+      if Tree.Is_Root_Tree then
+
+         --  We cannot use 'Access here:
+         --    "illegal attribute for discriminant-dependent component"
+         --  However, we know this is valid since Shared and Shared_Data have
+         --  the same lifetime and will always exist concurrently.
+
+         Tree.Shared := Tree.Shared_Data'Unrestricted_Access;
+         Name_List_Table.Init        (Tree.Shared.Name_Lists);
+         Number_List_Table.Init      (Tree.Shared.Number_Lists);
+         String_Element_Table.Init   (Tree.Shared.String_Elements);
+         Variable_Element_Table.Init (Tree.Shared.Variable_Elements);
+         Array_Element_Table.Init    (Tree.Shared.Array_Elements);
+         Array_Table.Init            (Tree.Shared.Arrays);
+         Package_Table.Init          (Tree.Shared.Packages);
+
+         --  Create Dot_String_List
+
+         String_Element_Table.Append
+           (Tree.Shared.String_Elements,
+            String_Element'
+              (Value         => The_Dot_String,
+               Index         => 0,
+               Display_Value => The_Dot_String,
+               Location      => No_Location,
+               Flag          => False,
+               Next          => Nil_String));
+         Tree.Shared.Dot_String_List :=
+           String_Element_Table.Last (Tree.Shared.String_Elements);
+
+         --  Private part table
+
+         Temp_Files_Table.Init (Tree.Shared.Private_Part.Temp_Files);
+
+         Tree.Shared.Private_Part.Current_Source_Path_File := No_Path;
+         Tree.Shared.Private_Part.Current_Object_Path_File := No_Path;
+      end if;
+
+      Source_Paths_Htable.Reset    (Tree.Source_Paths_HT);
+      Source_Files_Htable.Reset    (Tree.Source_Files_HT);
+      Replaced_Source_HTable.Reset (Tree.Replaced_Sources);
 
       Tree.Replaced_Source_Number := 0;
 
+      Reset_Units_In_Table (Tree.Units_HT);
       Free_List (Tree.Projects, Free_Project => True);
       Free_Units (Tree.Units_HT);
-
-      --  Private part table
-
-      Temp_Files_Table.Init       (Tree.Private_Part.Temp_Files);
-
-      Tree.Private_Part.Current_Source_Path_File := No_Path;
-      Tree.Private_Part.Current_Object_Path_File := No_Path;
    end Reset;
+
+   -------------------------------------
+   -- Set_Current_Object_Path_File_Of --
+   -------------------------------------
+
+   procedure Set_Current_Object_Path_File_Of
+     (Shared : Shared_Project_Tree_Data_Access;
+      To     : Path_Name_Type)
+   is
+   begin
+      Shared.Private_Part.Current_Object_Path_File := To;
+   end Set_Current_Object_Path_File_Of;
+
+   -------------------------------------
+   -- Set_Current_Source_Path_File_Of --
+   -------------------------------------
+
+   procedure Set_Current_Source_Path_File_Of
+     (Shared : Shared_Project_Tree_Data_Access;
+      To     : Path_Name_Type)
+   is
+   begin
+      Shared.Private_Part.Current_Source_Path_File := To;
+   end Set_Current_Source_Path_File_Of;
+
+   -----------------------
+   -- Set_Path_File_Var --
+   -----------------------
+
+   procedure Set_Path_File_Var (Name : String; Value : String) is
+      Host_Spec : String_Access := To_Host_File_Spec (Value);
+   begin
+      if Host_Spec = null then
+         Prj.Com.Fail
+           ("could not convert file name """ & Value & """ to host spec");
+      else
+         Setenv (Name, Host_Spec.all);
+         Free (Host_Spec);
+      end if;
+   end Set_Path_File_Var;
 
    -------------------
    -- Switches_Name --
@@ -1026,7 +1634,10 @@ package body Prj is
 
          if Project.Library then
             if Project.Object_Directory = No_Path_Information
-              or else Contains_ALI_Files (Project.Library_ALI_Dir.Display_Name)
+              or else
+                (Including_Libraries
+                  and then
+                    Contains_ALI_Files (Project.Library_ALI_Dir.Display_Name))
             then
                return Project.Library_ALI_Dir.Display_Name;
             else
@@ -1087,65 +1698,110 @@ package body Prj is
    -- Compute_All_Imported_Projects --
    -----------------------------------
 
-   procedure Compute_All_Imported_Projects (Tree : Project_Tree_Ref) is
-      Project : Project_Id;
+   procedure Compute_All_Imported_Projects
+     (Root_Project : Project_Id;
+      Tree         : Project_Tree_Ref)
+   is
+      procedure Analyze_Tree
+        (Local_Root : Project_Id;
+         Local_Tree : Project_Tree_Ref;
+         Context    : Project_Context);
+      --  Process Project and all its aggregated project to analyze their own
+      --  imported projects.
 
-      procedure Recursive_Add (Prj : Project_Id; Dummy : in out Boolean);
-      --  Recursively add the projects imported by project Project, but not
-      --  those that are extended.
+      ------------------
+      -- Analyze_Tree --
+      ------------------
 
-      -------------------
-      -- Recursive_Add --
-      -------------------
+      procedure Analyze_Tree
+        (Local_Root : Project_Id;
+         Local_Tree : Project_Tree_Ref;
+         Context    : Project_Context)
+      is
+         pragma Unreferenced (Local_Root);
 
-      procedure Recursive_Add (Prj : Project_Id; Dummy : in out Boolean) is
-         pragma Unreferenced (Dummy);
-         List    : Project_List;
-         Prj2    : Project_Id;
+         Project : Project_Id;
+
+         procedure Recursive_Add
+           (Prj     : Project_Id;
+            Tree    : Project_Tree_Ref;
+            Context : Project_Context;
+            Dummy   : in out Boolean);
+         --  Recursively add the projects imported by project Project, but not
+         --  those that are extended.
+
+         -------------------
+         -- Recursive_Add --
+         -------------------
+
+         procedure Recursive_Add
+           (Prj     : Project_Id;
+            Tree    : Project_Tree_Ref;
+            Context : Project_Context;
+            Dummy   : in out Boolean)
+         is
+            pragma Unreferenced (Tree);
+
+            List : Project_List;
+            Prj2 : Project_Id;
+
+         begin
+            --  A project is not importing itself
+
+            Prj2 := Ultimate_Extending_Project_Of (Prj);
+
+            if Project /= Prj2 then
+
+               --  Check that the project is not already in the list. We know
+               --  the one passed to Recursive_Add have never been visited
+               --  before, but the one passed it are the extended projects.
+
+               List := Project.All_Imported_Projects;
+               while List /= null loop
+                  if List.Project = Prj2 then
+                     return;
+                  end if;
+
+                  List := List.Next;
+               end loop;
+
+               --  Add it to the list
+
+               Project.All_Imported_Projects :=
+                 new Project_List_Element'
+                   (Project               => Prj2,
+                    From_Encapsulated_Lib =>
+                      Context.From_Encapsulated_Lib
+                        or else Analyze_Tree.Context.From_Encapsulated_Lib,
+                    Next                  => Project.All_Imported_Projects);
+            end if;
+         end Recursive_Add;
+
+         procedure For_All_Projects is
+           new For_Every_Project_Imported_Context (Boolean, Recursive_Add);
+
+         Dummy : Boolean := False;
+         List  : Project_List;
 
       begin
-         --  A project is not importing itself
+         List := Local_Tree.Projects;
+         while List /= null loop
+            Project := List.Project;
+            Free_List
+              (Project.All_Imported_Projects, Free_Project => False);
+            For_All_Projects
+              (Project, Local_Tree, Dummy, Include_Aggregated => False);
+            List := List.Next;
+         end loop;
+      end Analyze_Tree;
 
-         Prj2 := Ultimate_Extending_Project_Of (Prj);
+      procedure For_Aggregates is
+        new For_Project_And_Aggregated_Context (Analyze_Tree);
 
-         if Project /= Prj2 then
-
-            --  Check that the project is not already in the list. We know the
-            --  one passed to Recursive_Add have never been visited before, but
-            --  the one passed it are the extended projects.
-
-            List := Project.All_Imported_Projects;
-            while List /= null loop
-               if List.Project = Prj2 then
-                  return;
-               end if;
-
-               List := List.Next;
-            end loop;
-
-            --  Add it to the list
-
-            Project.All_Imported_Projects :=
-              new Project_List_Element'
-                (Project => Prj2,
-                 Next    => Project.All_Imported_Projects);
-         end if;
-      end Recursive_Add;
-
-      procedure For_All_Projects is
-        new For_Every_Project_Imported (Boolean, Recursive_Add);
-
-      Dummy : Boolean := False;
-      List  : Project_List;
+   --  Start of processing for Compute_All_Imported_Projects
 
    begin
-      List := Tree.Projects;
-      while List /= null loop
-         Project := List.Project;
-         Free_List (Project.All_Imported_Projects, Free_Project => False);
-         For_All_Projects (Project, Dummy);
-         List := List.Next;
-      end loop;
+      For_Aggregates (Root_Project, Tree);
    end Compute_All_Imported_Projects;
 
    -------------------
@@ -1263,7 +1919,8 @@ package body Prj is
       Error_On_Unknown_Language  : Boolean       := True;
       Require_Obj_Dirs           : Error_Warning := Error;
       Allow_Invalid_External     : Error_Warning := Error;
-      Missing_Source_Files       : Error_Warning := Error)
+      Missing_Source_Files       : Error_Warning := Error;
+      Ignore_Missing_With        : Boolean       := False)
       return Processing_Flags
    is
    begin
@@ -1276,7 +1933,9 @@ package body Prj is
          Compiler_Driver_Mandatory  => Compiler_Driver_Mandatory,
          Require_Obj_Dirs           => Require_Obj_Dirs,
          Allow_Invalid_External     => Allow_Invalid_External,
-         Missing_Source_Files       => Missing_Source_Files);
+         Missing_Source_Files       => Missing_Source_Files,
+         Ignore_Missing_With        => Ignore_Missing_With,
+         Incomplete_Withs           => False);
    end Create_Flags;
 
    ------------
@@ -1299,6 +1958,209 @@ package body Prj is
 
       return Count;
    end Length;
+
+   ------------------
+   -- Debug_Output --
+   ------------------
+
+   procedure Debug_Output (Str : String) is
+   begin
+      if Current_Verbosity > Default then
+         Set_Standard_Error;
+         Write_Line ((1 .. Debug_Level * 2 => ' ') & Str);
+         Set_Standard_Output;
+      end if;
+   end Debug_Output;
+
+   ------------------
+   -- Debug_Indent --
+   ------------------
+
+   procedure Debug_Indent is
+   begin
+      if Current_Verbosity = High then
+         Set_Standard_Error;
+         Write_Str ((1 .. Debug_Level * 2 => ' '));
+         Set_Standard_Output;
+      end if;
+   end Debug_Indent;
+
+   ------------------
+   -- Debug_Output --
+   ------------------
+
+   procedure Debug_Output (Str : String; Str2 : Name_Id) is
+   begin
+      if Current_Verbosity > Default then
+         Debug_Indent;
+         Set_Standard_Error;
+         Write_Str (Str);
+
+         if Str2 = No_Name then
+            Write_Line (" <no_name>");
+         else
+            Write_Line (" """ & Get_Name_String (Str2) & '"');
+         end if;
+
+         Set_Standard_Output;
+      end if;
+   end Debug_Output;
+
+   ---------------------------
+   -- Debug_Increase_Indent --
+   ---------------------------
+
+   procedure Debug_Increase_Indent
+     (Str : String := ""; Str2 : Name_Id := No_Name)
+   is
+   begin
+      if Str2 /= No_Name then
+         Debug_Output (Str, Str2);
+      else
+         Debug_Output (Str);
+      end if;
+      Debug_Level := Debug_Level + 1;
+   end Debug_Increase_Indent;
+
+   ---------------------------
+   -- Debug_Decrease_Indent --
+   ---------------------------
+
+   procedure Debug_Decrease_Indent (Str : String := "") is
+   begin
+      if Debug_Level > 0 then
+         Debug_Level := Debug_Level - 1;
+      end if;
+
+      if Str /= "" then
+         Debug_Output (Str);
+      end if;
+   end Debug_Decrease_Indent;
+
+   ----------------
+   -- Debug_Name --
+   ----------------
+
+   function Debug_Name (Tree : Project_Tree_Ref) return Name_Id is
+      P : Project_List;
+
+   begin
+      Name_Len := 0;
+      Add_Str_To_Name_Buffer ("Tree [");
+
+      P := Tree.Projects;
+      while P /= null loop
+         if P /= Tree.Projects then
+            Add_Char_To_Name_Buffer (',');
+         end if;
+
+         Add_Str_To_Name_Buffer (Get_Name_String (P.Project.Name));
+
+         P := P.Next;
+      end loop;
+
+      Add_Char_To_Name_Buffer (']');
+
+      return Name_Find;
+   end Debug_Name;
+
+   ----------
+   -- Free --
+   ----------
+
+   procedure Free (Tree : in out Project_Tree_Appdata) is
+      pragma Unreferenced (Tree);
+   begin
+      null;
+   end Free;
+
+   --------------------------------
+   -- For_Project_And_Aggregated --
+   --------------------------------
+
+   procedure For_Project_And_Aggregated
+     (Root_Project : Project_Id;
+      Root_Tree    : Project_Tree_Ref)
+   is
+      Agg : Aggregated_Project_List;
+
+   begin
+      Action (Root_Project, Root_Tree);
+
+      if Root_Project.Qualifier in Aggregate_Project then
+         Agg := Root_Project.Aggregated_Projects;
+         while Agg /= null loop
+            For_Project_And_Aggregated (Agg.Project, Agg.Tree);
+            Agg := Agg.Next;
+         end loop;
+      end if;
+   end For_Project_And_Aggregated;
+
+   ----------------------------------------
+   -- For_Project_And_Aggregated_Context --
+   ----------------------------------------
+
+   procedure For_Project_And_Aggregated_Context
+     (Root_Project : Project_Id;
+      Root_Tree    : Project_Tree_Ref)
+   is
+
+      procedure Recursive_Process
+        (Project : Project_Id;
+         Tree    : Project_Tree_Ref;
+         Context : Project_Context);
+      --  Process Project and all aggregated projects recursively
+
+      -----------------------
+      -- Recursive_Process --
+      -----------------------
+
+      procedure Recursive_Process
+        (Project : Project_Id;
+         Tree    : Project_Tree_Ref;
+         Context : Project_Context)
+      is
+         Agg : Aggregated_Project_List;
+         Ctx : Project_Context;
+
+      begin
+         Action (Project, Tree, Context);
+
+         if Project.Qualifier in Aggregate_Project then
+            Ctx :=
+              (In_Aggregate_Lib      => Project.Qualifier = Aggregate_Library,
+               From_Encapsulated_Lib =>
+                 Context.From_Encapsulated_Lib
+                   or else Project.Standalone_Library = Encapsulated);
+
+            Agg := Project.Aggregated_Projects;
+            while Agg /= null loop
+               Recursive_Process (Agg.Project, Agg.Tree, Ctx);
+               Agg := Agg.Next;
+            end loop;
+         end if;
+      end Recursive_Process;
+
+   --  Start of processing for For_Project_And_Aggregated_Context
+
+   begin
+      Recursive_Process
+        (Root_Project, Root_Tree, Project_Context'(False, False));
+   end For_Project_And_Aggregated_Context;
+
+   -----------------------------
+   -- Set_Ignore_Missing_With --
+   -----------------------------
+
+   procedure Set_Ignore_Missing_With
+     (Flags : in out Processing_Flags;
+      Value : Boolean)
+   is
+   begin
+      Flags.Ignore_Missing_With := Value;
+   end Set_Ignore_Missing_With;
+
+--  Package initialization for Prj
 
 begin
    --  Make sure that the standard config and user project file extensions are

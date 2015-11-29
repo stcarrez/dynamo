@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---          Copyright (C) 2001-2009, Free Software Foundation, Inc.         --
+--          Copyright (C) 2001-2014, Free Software Foundation, Inc.         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -43,10 +43,10 @@ package body Prj.Pars is
      (In_Tree           : Project_Tree_Ref;
       Project           : out Project_Id;
       Project_File_Name : String;
-      Packages_To_Check : String_List_Access := All_Packages;
-      Flags             : Processing_Flags;
+      Packages_To_Check : String_List_Access;
       Reset_Tree        : Boolean := True;
-      In_Node_Tree      : Prj.Tree.Project_Node_Tree_Ref := null)
+      In_Node_Tree      : Prj.Tree.Project_Node_Tree_Ref := null;
+      Env               : in out Prj.Tree.Environment)
    is
       Project_Node            : Project_Node_Id := Empty_Node;
       The_Project             : Project_Id      := No_Project;
@@ -69,10 +69,10 @@ package body Prj.Pars is
         (In_Tree                => Project_Node_Tree,
          Project                => Project_Node,
          Project_File_Name      => Project_File_Name,
-         Always_Errout_Finalize => False,
+         Errout_Handling        => Prj.Part.Finalize_If_Error,
          Packages_To_Check      => Packages_To_Check,
          Current_Directory      => Current_Dir,
-         Flags                  => Flags,
+         Env                    => Env,
          Is_Config_File         => False);
 
       --  If there were no error, process the tree
@@ -80,13 +80,13 @@ package body Prj.Pars is
       if Project_Node /= Empty_Node then
          begin
             --  No config file should be read from the disk for gnatmake.
-            --  However, we will simulate one that only contains the
-            --  default GNAT naming scheme.
+            --  However, we will simulate one that only contains the default
+            --  GNAT naming scheme.
 
             Process_Project_And_Apply_Config
               (Main_Project               => The_Project,
                User_Project_Node          => Project_Node,
-               Config_File_Name           => "",
+               Config_File_Name           => No_Configuration_File,
                Autoconf_Specified         => False,
                Project_Tree               => In_Tree,
                Project_Node_Tree          => Project_Node_Tree,
@@ -94,7 +94,7 @@ package body Prj.Pars is
                Allow_Automatic_Generation => False,
                Automatically_Generated    => Automatically_Generated,
                Config_File_Path           => Config_File_Path,
-               Flags                      => Flags,
+               Env                        => Env,
                Normalized_Hostname        => "",
                On_Load_Config             =>
                  Add_Default_GNAT_Naming_Scheme'Access,
@@ -103,8 +103,8 @@ package body Prj.Pars is
             Success := The_Project /= No_Project;
 
          exception
-            when Invalid_Config =>
-               Success := False;
+            when E : Invalid_Config =>
+               Osint.Fail (Exception_Message (E));
          end;
 
          Prj.Err.Finalize;

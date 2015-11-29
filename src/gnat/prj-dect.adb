@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---          Copyright (C) 2001-2010, Free Software Foundation, Inc.         --
+--          Copyright (C) 2001-2015, Free Software Foundation, Inc.         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,11 +23,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Err_Vars; use Err_Vars;
-
-with GNAT.Case_Util;        use GNAT.Case_Util;
-with GNAT.Spelling_Checker; use GNAT.Spelling_Checker;
-
+with Err_Vars;    use Err_Vars;
 with Opt;         use Opt;
 with Prj.Attr;    use Prj.Attr;
 with Prj.Attr.PM; use Prj.Attr.PM;
@@ -37,34 +33,34 @@ with Prj.Tree;    use Prj.Tree;
 with Snames;
 with Uintp;       use Uintp;
 
+with GNAT;                  use GNAT;
+with GNAT.Case_Util;        use GNAT.Case_Util;
+with GNAT.Spelling_Checker; use GNAT.Spelling_Checker;
 with GNAT.Strings;
 
 package body Prj.Dect is
 
-   use GNAT;
-
    type Zone is (In_Project, In_Package, In_Case_Construction);
-   --  Used to indicate if we are parsing a package (In_Package),
-   --  a case construction (In_Case_Construction) or none of those two
-   --  (In_Project).
+   --  Used to indicate if we are parsing a package (In_Package), a case
+   --  construction (In_Case_Construction) or none of those two (In_Project).
 
    procedure Rename_Obsolescent_Attributes
      (In_Tree         : Project_Node_Tree_Ref;
       Attribute       : Project_Node_Id;
       Current_Package : Project_Node_Id);
-   --  Rename obsolescent attributes in the tree.
-   --  When the attribute has been renamed since its initial introduction in
-   --  the design of projects, we replace the old name in the tree with the
-   --  new name, so that the code does not have to check both names forever.
+   --  Rename obsolescent attributes in the tree. When the attribute has been
+   --  renamed since its initial introduction in the design of projects, we
+   --  replace the old name in the tree with the new name, so that the code
+   --  does not have to check both names forever.
 
    procedure Check_Attribute_Allowed
-     (In_Tree         : Project_Node_Tree_Ref;
-      Project         : Project_Node_Id;
-      Attribute       : Project_Node_Id;
-      Flags           : Processing_Flags);
-   --  Check whether the attribute is valid in this project.
-   --  In particular, depending on the type of project (qualifier), some
-   --  attributes might be disabled.
+     (In_Tree   : Project_Node_Tree_Ref;
+      Project   : Project_Node_Id;
+      Attribute : Project_Node_Id;
+      Flags     : Processing_Flags);
+   --  Check whether the attribute is valid in this project. In particular,
+   --  depending on the type of project (qualifier), some attributes might
+   --  be disabled.
 
    procedure Check_Package_Allowed
      (In_Tree         : Project_Node_Tree_Ref;
@@ -186,20 +182,20 @@ package body Prj.Dect is
         and then Expression_Kind_Of (Current_Package, In_Tree) /= Ignored
       then
          case Name_Of (Attribute, In_Tree) is
-         when Snames.Name_Specification =>
-            Set_Name_Of (Attribute, In_Tree, To => Snames.Name_Spec);
+            when Snames.Name_Specification =>
+               Set_Name_Of (Attribute, In_Tree, To => Snames.Name_Spec);
 
-         when Snames.Name_Specification_Suffix =>
-            Set_Name_Of (Attribute, In_Tree, To => Snames.Name_Spec_Suffix);
+            when Snames.Name_Specification_Suffix =>
+               Set_Name_Of (Attribute, In_Tree, To => Snames.Name_Spec_Suffix);
 
-         when Snames.Name_Implementation =>
-            Set_Name_Of (Attribute, In_Tree, To => Snames.Name_Body);
+            when Snames.Name_Implementation =>
+               Set_Name_Of (Attribute, In_Tree, To => Snames.Name_Body);
 
-         when Snames.Name_Implementation_Suffix =>
-            Set_Name_Of (Attribute, In_Tree, To => Snames.Name_Body_Suffix);
+            when Snames.Name_Implementation_Suffix =>
+               Set_Name_Of (Attribute, In_Tree, To => Snames.Name_Body_Suffix);
 
-         when others =>
-            null;
+            when others =>
+               null;
          end case;
       end if;
    end Rename_Obsolescent_Attributes;
@@ -218,8 +214,12 @@ package body Prj.Dect is
                  Project_Qualifier_Of (Project, In_Tree);
       Name   : constant Name_Id := Name_Of (Current_Package, In_Tree);
    begin
-      if Qualif = Aggregate
-        and then Name /= Snames.Name_Builder
+      if Name /= Snames.Name_Ide
+        and then
+          ((Qualif = Aggregate         and then Name /= Snames.Name_Builder)
+              or else
+           (Qualif = Aggregate_Library and then Name /= Snames.Name_Builder
+                                       and then Name /= Snames.Name_Install))
       then
          Error_Msg_Name_1 := Name;
          Error_Msg
@@ -234,10 +234,10 @@ package body Prj.Dect is
    -----------------------------
 
    procedure Check_Attribute_Allowed
-     (In_Tree         : Project_Node_Tree_Ref;
-      Project         : Project_Node_Id;
-      Attribute       : Project_Node_Id;
-      Flags           : Processing_Flags)
+     (In_Tree   : Project_Node_Tree_Ref;
+      Project   : Project_Node_Id;
+      Attribute : Project_Node_Id;
+      Flags     : Processing_Flags)
    is
       Qualif : constant Project_Qualifier :=
                  Project_Qualifier_Of (Project, In_Tree);
@@ -245,8 +245,8 @@ package body Prj.Dect is
 
    begin
       case Qualif is
-         when Aggregate =>
-            if Name = Snames.Name_Languages
+         when Aggregate | Aggregate_Library =>
+            if        Name = Snames.Name_Languages
               or else Name = Snames.Name_Source_Files
               or else Name = Snames.Name_Source_List_File
               or else Name = Snames.Name_Locally_Removed_Files
@@ -257,6 +257,16 @@ package body Prj.Dect is
               or else Name = Snames.Name_Exec_Dir
               or else Name = Snames.Name_Source_Dirs
               or else Name = Snames.Name_Inherit_Source_Path
+              or else
+                (Qualif = Aggregate and then Name = Snames.Name_Library_Dir)
+              or else
+                (Qualif = Aggregate and then Name = Snames.Name_Library_Name)
+              or else Name = Snames.Name_Main
+              or else Name = Snames.Name_Roots
+              or else Name = Snames.Name_Externally_Built
+              or else Name = Snames.Name_Executable
+              or else Name = Snames.Name_Executable_Suffix
+              or else Name = Snames.Name_Default_Switches
             then
                Error_Msg_Name_1 := Name;
                Error_Msg
@@ -494,11 +504,16 @@ package body Prj.Dect is
 
       Scan (In_Tree);
 
-      --  Body may be an attribute name
+      --  Body or External may be an attribute name
 
       if Token = Tok_Body then
          Token := Tok_Identifier;
          Token_Name := Snames.Name_Body;
+      end if;
+
+      if Token = Tok_External then
+         Token := Tok_Identifier;
+         Token_Name := Snames.Name_External;
       end if;
 
       Expect (Tok_Identifier, "identifier");
@@ -567,7 +582,7 @@ package body Prj.Dect is
                   The_Project := Imported_Or_Extended_Project_Of
                                    (Current_Project, In_Tree, Token_Name);
 
-                  if No (The_Project) then
+                  if No (The_Project) and then not In_Tree.Incomplete_With then
                      Error_Msg (Flags, "unknown project", Location);
                      Scan (In_Tree); --  past the project name
 
@@ -602,33 +617,36 @@ package body Prj.Dect is
                                  Get_Name_String
                                    (Name_Of (Current_Package, In_Tree)),
                                  Token_Ptr);
+                              Scan (In_Tree); --  past the package name
 
                            else
-                              The_Package :=
-                                First_Package_Of (The_Project, In_Tree);
-
-                              --  Look for the package node
-
-                              while Present (The_Package)
-                                and then
-                                Name_Of (The_Package, In_Tree) /= Token_Name
-                              loop
+                              if Present (The_Project) then
                                  The_Package :=
-                                   Next_Package_In_Project
-                                     (The_Package, In_Tree);
-                              end loop;
+                                   First_Package_Of (The_Project, In_Tree);
 
-                              --  If the package cannot be found in the
-                              --  project, issue an error.
+                                 --  Look for the package node
 
-                              if No (The_Package) then
-                                 The_Project := Empty_Node;
-                                 Error_Msg_Name_2 := Project_Name;
-                                 Error_Msg_Name_1 := Token_Name;
-                                 Error_Msg
-                                   (Flags,
-                                    "package % not declared in project %",
-                                    Token_Ptr);
+                                 while Present (The_Package)
+                                   and then Name_Of (The_Package, In_Tree) /=
+                                                                    Token_Name
+                                 loop
+                                    The_Package :=
+                                      Next_Package_In_Project
+                                        (The_Package, In_Tree);
+                                 end loop;
+
+                                 --  If the package cannot be found in the
+                                 --  project, issue an error.
+
+                                 if No (The_Package) then
+                                    The_Project := Empty_Node;
+                                    Error_Msg_Name_2 := Project_Name;
+                                    Error_Msg_Name_1 := Token_Name;
+                                    Error_Msg
+                                      (Flags,
+                                       "package % not declared in project %",
+                                       Token_Ptr);
+                                 end if;
                               end if;
 
                               Scan (In_Tree); --  past the package name
@@ -638,7 +656,7 @@ package body Prj.Dect is
                   end if;
                end if;
 
-               if Present (The_Project) then
+               if Present (The_Project) or else In_Tree.Incomplete_With then
 
                   --  Looking for '<same attribute name>
 
@@ -812,11 +830,11 @@ package body Prj.Dect is
       if Present (Case_Variable) then
          String_Type := String_Type_Of (Case_Variable, In_Tree);
 
-         if No (String_Type) then
+         if Expression_Kind_Of (Case_Variable, In_Tree) /= Single then
             Error_Msg (Flags,
                        "variable """ &
                        Get_Name_String (Name_Of (Case_Variable, In_Tree)) &
-                       """ is not typed",
+                       """ is not a single string",
                        Variable_Location);
          end if;
       end if;
@@ -899,7 +917,8 @@ package body Prj.Dect is
             Parse_Choice_List
               (In_Tree      => In_Tree,
                First_Choice => First_Choice,
-               Flags        => Flags);
+               Flags        => Flags,
+               String_Type  => Present (String_Type));
             Set_First_Choice_Of (Current_Item, In_Tree, To => First_Choice);
 
             Expect (Tok_Arrow, "`=>`");
@@ -926,7 +945,8 @@ package body Prj.Dect is
       End_Case_Construction
         (Check_All_Labels => not When_Others and not Quiet_Output,
          Case_Location    => Location_Of (Case_Construction, In_Tree),
-         Flags            => Flags);
+         Flags            => Flags,
+         String_Type      => Present (String_Type));
 
       Expect (Tok_End, "`END CASE`");
       Remove_Next_End_Node;
@@ -1545,7 +1565,6 @@ package body Prj.Dect is
       if Token = Tok_Right_Paren then
          Scan (In_Tree);
       end if;
-
    end Parse_String_Type_Declaration;
 
    --------------------------------

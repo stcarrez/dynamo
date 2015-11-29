@@ -29,6 +29,8 @@ with Prj.Env;
 with Prj.Util;
 with Makeutl;
 with Output;
+with GNAT.OS_Lib; use GNAT.OS_Lib;
+
 package body Gen.Utils.GNAT is
    use Util.Log;
 
@@ -37,6 +39,10 @@ package body Gen.Utils.GNAT is
    Project_Node_Tree : Prj.Tree.Project_Node_Tree_Ref;
    Main_Project      : Prj.Project_Id;
 
+   Project_Tree : constant Prj.Project_Tree_Ref :=
+                    new Prj.Project_Tree_Data (Is_Root_Tree => True);
+
+   --  The project tree
    --  ------------------------------
    --  Initialize the GNAT project runtime for reading the GNAT project tree.
    --  Configure it according to the dynamo configuration properties.
@@ -52,9 +58,9 @@ package body Gen.Utils.GNAT is
       Output.Set_Standard_Error;
       Csets.Initialize;
       Snames.Initialize;
-      Prj.Initialize (Makeutl.Project_Tree);
+      Prj.Initialize (Project_Tree);
 
-      Prj.Env.Add_Directories (Project_Node_Tree.Project_Path, Project_Dirs);
+      Prj.Env.Add_Directories (Makeutl.Root_Environment.Project_Path, Project_Dirs);
    end Initialize;
 
    --  ------------------------------
@@ -65,7 +71,8 @@ package body Gen.Utils.GNAT is
    procedure Read_GNAT_Project_List (Project_File_Name : in String;
                                      Project_List      : out Project_Info_Vectors.Vector) is
 
-      procedure Recursive_Add (Proj : in Prj.Project_Id;
+      procedure Recursive_Add (Proj  : in Prj.Project_Id;
+                               Tree  : in Prj.Project_Tree_Ref;
                                Dummy : in out Boolean);
 
       function Get_Variable_Value (Proj : in Prj.Project_Id;
@@ -81,11 +88,10 @@ package body Gen.Utils.GNAT is
 
          Current      : Prj.Variable_Id;
          The_Variable : Prj.Variable;
-         In_Tree      : constant Prj.Project_Tree_Ref := Makeutl.Project_Tree;
       begin
          Current := Proj.Decl.Variables;
          while Current /= Prj.No_Variable loop
-            The_Variable := In_Tree.Variable_Elements.Table (Current);
+            The_Variable := Project_Tree.Shared.Variable_Elements.Table (Current);
 
             if Namet.Get_Name_String (The_Variable.Name) = Name then
                return Prj.Util.Value_Of (The_Variable.Value, "");
@@ -113,8 +119,9 @@ package body Gen.Utils.GNAT is
       --  Add the full path of the GNAT project in the project list.
       --  ------------------------------
       procedure Recursive_Add (Proj  : in Prj.Project_Id;
+                               Tree  : in Prj.Project_Tree_Ref;
                                Dummy : in out Boolean) is
-         pragma Unreferenced (Dummy);
+         pragma Unreferenced (Tree, Dummy);
 
          Path    : constant String := Namet.Get_Name_String (Proj.Path.Name);
          Name    : constant String := Get_Project_Name (Proj);
@@ -131,21 +138,16 @@ package body Gen.Utils.GNAT is
         new Prj.For_Every_Project_Imported (Boolean, Recursive_Add);
 
       use type Prj.Project_Id;
-      Flags : Prj.Processing_Flags;
+
    begin
       Log.Info ("Reading GNAT project {0}", Project_File_Name);
 
-      Flags := Prj.Create_Flags (Report_Error               => null,
-                                 When_No_Sources            => Prj.Error,
-                                 Require_Obj_Dirs           => Prj.Silent,
-                                 Allow_Invalid_External     => Prj.Silent,
-                                 Missing_Source_Files       => Prj.Silent);
-
       --  Parse the GNAT project files and build the tree.
       Prj.Pars.Parse (Project           => Main_Project,
-                      In_Tree           => Makeutl.Project_Tree,
+                      In_Tree           => Project_Tree,
                       Project_File_Name => Project_File_Name,
-                      Flags             => Flags,
+                      Packages_To_Check => null,
+                      Env               => Makeutl.Root_Environment,
                       In_Node_Tree      => Project_Node_Tree);
 
       if Main_Project /= Prj.No_Project then
@@ -153,7 +155,8 @@ package body Gen.Utils.GNAT is
             Dummy : Boolean := False;
          begin
             --  Scan the tree to get the list of projects (in dependency order).
-            For_All_Projects (Main_Project, Dummy, Imported_First => True);
+            For_All_Projects (Main_Project, Project_Tree,
+                              Imported_First => True, With_State => Dummy);
          end;
       end if;
    end Read_GNAT_Project_List;

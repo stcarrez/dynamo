@@ -15,6 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
+with Ada.Strings.Fixed;
 with Util.Strings;
 with Util.Log.Loggers;
 package body Gen.Artifacts.Docs.Markdown is
@@ -93,6 +94,12 @@ package body Gen.Artifacts.Docs.Markdown is
       End_Pos  : Natural;
       Last_Pos : Natural;
    begin
+      --  Transform links
+      --  [Link]   -> [[Link]]
+      --  [Link Title] -> [[Title|Link]]
+      --
+      --  Do not change the following links:
+      --  [[Link|Title]]
       loop
          Pos := Util.Strings.Index (Text, '[', Start);
          if Pos = 0 or else Pos = Text'Last then
@@ -100,25 +107,28 @@ package body Gen.Artifacts.Docs.Markdown is
             return;
          end if;
          Ada.Text_IO.Put (File, Text (Start .. Pos - 1));
+
+         --  Parse a markdown link format.
          if Text (Pos + 1) = '[' then
-            Start := Pos + 1;
+            Start := Pos + 2;
             Pos := Util.Strings.Index (Text, ']', Pos + 2);
             if Pos = 0 then
-               if Is_Image (Text (Start - 1 .. Text'Last)) then
-                  Ada.Text_IO.Put (File, Text (Start - 1 .. Text'Last));
+               if Is_Image (Text (Start .. Text'Last)) then
+                  Ada.Text_IO.Put (File, Text (Start - 2 .. Text'Last));
                else
-                  Ada.Text_IO.Put (File, Text (Start - 1 .. Text'Last));
+                  Ada.Text_IO.Put (File, Text (Start - 2 .. Text'Last));
                end if;
                return;
             end if;
             if Is_Image (Text (Start .. Pos - 1)) then
                Ada.Text_IO.Put (File, "![](");
-               Ada.Text_IO.Put (File, Text (Start - 1 .. Pos - 1));
-               Ada.Text_IO.Put (")");
+               Ada.Text_IO.Put (File, Text (Start .. Pos - 1));
+               Ada.Text_IO.Put (File, ")");
+               Start := Pos + 2;
             else
-               Ada.Text_IO.Put (File, Text (Start - 1 .. Pos));
+               Ada.Text_IO.Put (File, Text (Start .. Pos));
+               Start := Pos + 1;
             end if;
-            Start := Pos + 1;
          else
             Pos := Pos + 1;
             End_Pos := Pos;
@@ -143,9 +153,11 @@ package body Gen.Artifacts.Docs.Markdown is
                Ada.Text_IO.Put (File, Text (Pos .. End_Pos));
                Ada.Text_IO.Put (File, ")");
             elsif Has_Scheme (Text (Pos .. End_Pos)) then
+               Ada.Text_IO.Put (File, "[");
                Ada.Text_IO.Put (File, Text (End_Pos + 1 .. Last_Pos));
                Ada.Text_IO.Put (File, "(");
-               Ada.Text_IO.Put (File, Text (Pos .. End_Pos));
+               Ada.Text_IO.Put (File,
+                                Ada.Strings.Fixed.Trim (Text (Pos .. End_Pos), Ada.Strings.Both));
                Ada.Text_IO.Put (File, ")");
             else
                Last_Pos := Last_Pos - 1;

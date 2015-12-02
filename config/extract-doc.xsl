@@ -99,7 +99,7 @@
       <tr>
         <td><xsl:value-of select="column/@sql-type"/></td>
         <td><xsl:value-of select="@type"/></td>
-        <td><xsl:value-of select="column/@name"/></td>
+        <td><xsl:value-of select="@name"/><xsl:value-of select="column/@name"/></td>
         <td><xsl:value-of select="comment"/></td>
       </tr>
     </xsl:template>

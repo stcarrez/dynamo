@@ -16,9 +16,14 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Util.Strings;
+with Util.Log.Loggers;
 package body Gen.Artifacts.Docs.Markdown is
 
    function Has_Scheme (Link : in String) return Boolean;
+   use Util.Log;
+
+
+   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Docs.Mark");
 
    --  ------------------------------
    --  Get the document name from the file document (ex: <name>.wiki or <name>.md).
@@ -60,6 +65,22 @@ package body Gen.Artifacts.Docs.Markdown is
       end if;
    end Has_Scheme;
 
+   function Is_Image (Link : in String) return Boolean is
+   begin
+      if Link'Length < 4 then
+         return False;
+      elsif Link (Link'Last - 3 .. Link'Last) = ".png" then
+         return True;
+      elsif Link (Link'Last - 3 .. Link'Last) = ".jpg" then
+         return True;
+      elsif Link (Link'Last - 3 .. Link'Last) = ".gif" then
+         return True;
+      else
+         Log.Info ("Link {0} not an image", Link);
+         return False;
+      end if;
+   end Is_Image;
+
    --  ------------------------------
    --  Write a line doing some link transformation for Markdown.
    --  ------------------------------
@@ -78,15 +99,25 @@ package body Gen.Artifacts.Docs.Markdown is
             Ada.Text_IO.Put (File, Text (Start .. Text'Last));
             return;
          end if;
-         Ada.Text_IO.Put (File, Text (Start .. Pos));
+         Ada.Text_IO.Put (File, Text (Start .. Pos - 1));
          if Text (Pos + 1) = '[' then
             Start := Pos + 1;
             Pos := Util.Strings.Index (Text, ']', Pos + 2);
             if Pos = 0 then
-               Ada.Text_IO.Put (File, Text (Start .. Text'Last));
+               if Is_Image (Text (Start - 1 .. Text'Last)) then
+                  Ada.Text_IO.Put (File, Text (Start - 1 .. Text'Last));
+               else
+                  Ada.Text_IO.Put (File, Text (Start - 1 .. Text'Last));
+               end if;
                return;
             end if;
-            Ada.Text_IO.Put (File, Text (Start .. Pos));
+            if Is_Image (Text (Start .. Pos - 1)) then
+               Ada.Text_IO.Put (File, "![](");
+               Ada.Text_IO.Put (File, Text (Start - 1 .. Pos - 1));
+               Ada.Text_IO.Put (")");
+            else
+               Ada.Text_IO.Put (File, Text (Start - 1 .. Pos));
+            end if;
             Start := Pos + 1;
          else
             Pos := Pos + 1;
@@ -98,14 +129,27 @@ package body Gen.Artifacts.Docs.Markdown is
             while Last_Pos < Text'Last and Text (Last_Pos) /= ']' loop
                Last_Pos := Last_Pos + 1;
             end loop;
-            if Has_Scheme (Text (Pos .. End_Pos)) then
+            if Is_Image (Text (Pos .. Last_Pos - 1)) then
+               Ada.Text_IO.Put (File, "![");
+               --  Ada.Text_IO.Put (File, Text (Pos .. End_Pos));
+               Ada.Text_IO.Put (File, "](");
+               Ada.Text_IO.Put (File, Text (Pos .. Last_Pos - 1));
+               Ada.Text_IO.Put (File, ")");
+            elsif Is_Image (Text (Pos .. End_Pos)) then
+               Last_Pos := Last_Pos - 1;
+               Ada.Text_IO.Put (File, "![");
+               Ada.Text_IO.Put (File, Text (Pos .. End_Pos));
+               Ada.Text_IO.Put (File, "](");
+               Ada.Text_IO.Put (File, Text (Pos .. End_Pos));
+               Ada.Text_IO.Put (File, ")");
+            elsif Has_Scheme (Text (Pos .. End_Pos)) then
                Ada.Text_IO.Put (File, Text (End_Pos + 1 .. Last_Pos));
                Ada.Text_IO.Put (File, "(");
                Ada.Text_IO.Put (File, Text (Pos .. End_Pos));
                Ada.Text_IO.Put (File, ")");
             else
                Last_Pos := Last_Pos - 1;
-               Ada.Text_IO.Put (File, "[");
+               Ada.Text_IO.Put (File, "[[");
                Ada.Text_IO.Put (File, Text (End_Pos + 1 .. Last_Pos));
                Ada.Text_IO.Put (File, "|");
                Ada.Text_IO.Put (File, Text (Pos .. End_Pos));

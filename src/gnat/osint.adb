@@ -1083,7 +1083,7 @@ package body Osint is
       function Internal
         (F : Integer;
          N : C_File_Name;
-         A : System.Address) return CRTL.int64;
+         A : System.Address) return Long_Integer;
       pragma Import (C, Internal, "__gnat_file_length_attr");
 
    begin

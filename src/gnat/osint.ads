@@ -730,9 +730,9 @@ private
    --  parameter is set to either Text or Binary (for details see description
    --  of System.OS_Lib.Create_File).
 
-   procedure Open_File_To_Append_And_Check
-     (Fdesc : out File_Descriptor;
-      Fmode : Mode);
+--     procedure Open_File_To_Append_And_Check
+--       (Fdesc : out File_Descriptor;
+--        Fmode : Mode);
    --  Opens the file whose name (NUL terminated) is in Name_Buffer (with the
    --  length in Name_Len), and place the resulting descriptor in Fdesc. Issue
    --  message and exit with fatal error if file cannot be opened. The Fmode

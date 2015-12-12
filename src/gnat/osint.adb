@@ -727,18 +727,18 @@ package body Osint is
    -- Open_File_To_Append_And_Check --
    -----------------------------------
 
-   procedure Open_File_To_Append_And_Check
-     (Fdesc : out File_Descriptor;
-      Fmode : Mode)
-   is
-   begin
-      Output_File_Name := Name_Enter;
-      Fdesc := Open_Append (Name_Buffer'Address, Fmode);
-
-      if Fdesc = Invalid_FD then
-         Fail ("Cannot create: " & Name_Buffer (1 .. Name_Len));
-      end if;
-   end Open_File_To_Append_And_Check;
+--     procedure Open_File_To_Append_And_Check
+--       (Fdesc : out File_Descriptor;
+--        Fmode : Mode)
+--     is
+--     begin
+--        Output_File_Name := Name_Enter;
+--        Fdesc := Open_Append (Name_Buffer'Address, Fmode);
+--
+--        if Fdesc = Invalid_FD then
+--           Fail ("Cannot create: " & Name_Buffer (1 .. Name_Len));
+--        end if;
+--     end Open_File_To_Append_And_Check;
 
    ------------------------
    -- Current_File_Index --
@@ -1083,7 +1083,7 @@ package body Osint is
       function Internal
         (F : Integer;
          N : C_File_Name;
-         A : System.Address) return CRTL.int64;
+         A : System.Address) return Long_Integer;
       pragma Import (C, Internal, "__gnat_file_length_attr");
 
    begin

@@ -30,7 +30,8 @@ package body #{package.name} is
    use type ADO.Objects.Object_Record;
 </h:panelGroup>
 #{''}
-
+   pragma Warnings (Off, "formal parameter * is not referenced");
+#{''}
   <ui:include src="package-body-objects.xhtml"/>
 
   <ui:include src="package-body-queries.xhtml"/>

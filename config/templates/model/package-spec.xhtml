@@ -13,7 +13,7 @@
 -----------------------------------------------------------------------
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
-pragma Warnings (Off, "unit * is not referenced");
+pragma Warnings (Off);
 <h:panelGroup rendered="#{not empty package.queries or not empty package.tables}">
 with ADO.Sessions;
 with ADO.Objects;
@@ -44,8 +44,11 @@ with #{type};
 <h:panelGroup rendered="#{not empty package.beans}">
 with Util.Beans.Methods;
 </h:panelGroup>
-pragma Warnings (On, "unit * is not referenced");
+pragma Warnings (On);
 package #{package.name} is
+#{''}
+   pragma Style_Checks ("-mr");
+#{''}
 
   <!--  Declare model objects -->
   <ui:include src="package-spec-enums.xhtml"/>

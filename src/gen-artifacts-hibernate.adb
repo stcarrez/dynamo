@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-hibernate -- Hibernate artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -116,7 +116,11 @@ package body Gen.Artifacts.Hibernate is
             C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
             C.Sql_Type := C.Type_Name;
          end if;
-         C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
+         if C.Is_Version then
+            C.Not_Null := True;
+         else
+            C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
+         end if;
          C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
       end;
    end Register_Column;

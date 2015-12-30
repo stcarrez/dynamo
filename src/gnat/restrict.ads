@@ -120,7 +120,7 @@ package Restrict is
       No_Exception_Propagation           => True,
       No_Exception_Registration          => True,
       No_Finalization                    => True,
-      No_Fixed_IO                        => True,
+      --  No_Fixed_IO                        => True,
       No_Implementation_Attributes       => True,
       No_Implementation_Pragmas          => True,
       No_Implicit_Conditionals           => True,
@@ -129,8 +129,8 @@ package Restrict is
       No_Implicit_Loops                  => True,
       No_Initialize_Scalars              => True,
       No_Local_Protected_Objects         => True,
-      No_Long_Long_Integers              => True,
-      No_Multiple_Elaboration            => True,
+      --  No_Long_Long_Integers              => True,
+      --  No_Multiple_Elaboration            => True,
       No_Protected_Type_Allocators       => True,
       No_Relative_Delay                  => True,
       No_Requeue_Statements              => True,
@@ -145,7 +145,7 @@ package Restrict is
       No_Wide_Characters                 => True,
       Static_Priorities                  => True,
       Static_Storage_Size                => True,
-      SPARK_05                           => True,
+      --  SPARK_05                           => True,
       others                             => False);
 
    --------------------------

@@ -1,4 +1,4 @@
-Version 0.8     -
+Version 0.8     - Dec 2015
   - Support to generate Markdown documentation
   - Support to generate query Ada bean operations
   - Better code generation and support for UML Ada beans

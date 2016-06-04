@@ -5,6 +5,7 @@
                 xmlns:u="http://code.google.com/p/ada-asf/util"
 		xmlns:f="http://java.sun.com/jsf/core">
    <h:list value="#{bean.operations}" var="operation">
+   <h:panelGroup rendered="#{operation.type == 'ASF_ACTION'}">
    procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
                 #{g:indent(operation.name)}  Outcome : in out Ada.Strings.Unbounded.Unbounded_String);
 
@@ -18,6 +19,22 @@
      new ASF.Events.Faces.Actions.Action_Method.Bind (Bean   => #{bean.type},
                                                       Method => Op_#{fn:capitalize(operation.name)},
                                                       Name   => "#{operation.name}");
+   </h:panelGroup>
+   <h:panelGroup rendered="#{operation.type == 'ASF_UPLOAD'}">
+   procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
+                #{g:indent(operation.name)}  Part : in ASF.Parts.Part'Class);
+
+   procedure Op_#{fn:capitalize(operation.name)} (Bean    : in out #{bean.type};
+                 #{g:indent(operation.name)}  Part : in ASF.Parts.Part'Class) is
+   begin
+      #{bean.type}'Class (Bean).#{fn:capitalize(operation.name)} (Part);
+   end Op_#{fn:capitalize(operation.name)};
+
+   package Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex} is
+     new ASF.Parts.Upload_Method.Bind (Bean   => #{bean.type},
+                                       Method => Op_#{fn:capitalize(operation.name)},
+                                       Name   => "#{operation.name}");
+   </h:panelGroup>
    </h:list>
 #{''}
 <h:panelGroup rendered="#{not empty bean.operations}">

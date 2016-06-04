@@ -41,8 +41,14 @@
                         Value : in Util.Beans.Objects.Object);
 <h:list value="#{bean.operations}" var="operation">
 #{''}
+<h:panelGroup rendered="#{operation.type == 'ASF_ACTION'}">
    procedure #{fn:capitalize(operation.name)} (Bean : in out #{bean.type};
               #{g:indent(operation.name)}Outcome : in out Ada.Strings.Unbounded.Unbounded_String) is abstract;
+</h:panelGroup>
+<h:panelGroup rendered="#{operation.type == 'ASF_UPLOAD'}">
+   procedure #{fn:capitalize(operation.name)} (Bean : in out #{bean.type};
+               #{g:indent(operation.name)}Part : in ASF.Parts.Part'Class) is abstract;
+</h:panelGroup>
 </h:list>
 #{''}
 

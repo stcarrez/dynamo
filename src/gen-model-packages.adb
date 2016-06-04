@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
 with Gen.Model.Beans;
+with Gen.Model.Operations;
 
 with Util.Strings;
 with Util.Strings.Transforms;
@@ -256,12 +257,36 @@ package body Gen.Model.Packages is
    procedure Prepare (O : in out Package_Definition) is
       use Gen.Model.Tables;
 
+      procedure Prepare_Operations (List : in Operation_List.List_Definition);
       procedure Prepare_Table (Table : in Table_Definition_Access);
       procedure Prepare_Definition (Def : in Definition_Access);
       procedure Collect_Dependencies (Table : in Definition_Access);
 
       Used_Types  : Gen.Utils.String_Set.Set;
-      T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
+
+      --  ------------------------------
+      --  Look at the operations used to add the necessary with clauses for parameters.
+      --  ------------------------------
+      procedure Prepare_Operations (List : in Tables.Operation_List.List_Definition) is
+         use type Operations.Operation_Type;
+
+         Iter : Operation_List.Cursor := List.First;
+      begin
+         while Operation_List.Has_Element (Iter) loop
+            case Operation_List.Element (Iter).Get_Type is
+               when Operations.UNKNOWN =>
+                  null;
+
+               when Operations.ASF_ACTION =>
+                  null;
+
+               when Operations.ASF_UPLOAD =>
+                  Used_Types.Include (To_Unbounded_String ("ASF.Parts"));
+
+            end case;
+            Operation_List.Next (Iter);
+         end loop;
+      end Prepare_Operations;
 
       procedure Prepare_Table (Table : in Table_Definition_Access) is
          C     : Column_List.Cursor := Table.Members.First;
@@ -306,6 +331,7 @@ package body Gen.Model.Packages is
             end;
             Column_List.Next (C);
          end loop;
+         Prepare_Operations (Table.Operations);
       end Prepare_Table;
 
       procedure Prepare_Definition (Def : in Definition_Access) is
@@ -324,6 +350,7 @@ package body Gen.Model.Packages is
          end if;
       end Collect_Dependencies;
 
+      T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
    begin
       Log.Info ("Preparing package {0}", O.Name);
 

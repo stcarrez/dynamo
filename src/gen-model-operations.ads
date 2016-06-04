@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,8 @@ with Gen.Model.List;
 package Gen.Model.Operations is
 
    use Ada.Strings.Unbounded;
+
+   type Operation_Type is (UNKNOWN, ASF_ACTION, ASF_UPLOAD);
 
    --  ------------------------------
    --  Parameter Definition
@@ -57,6 +59,9 @@ package Gen.Model.Operations is
                             Of_Type   : in Unbounded_String;
                             Parameter : out Parameter_Definition_Access);
 
+   --  Get the operation type.
+   function Get_Type (From : in Operation_Definition) return Operation_Type;
+
    --  Create an operation with the given name.
    function Create_Operation (Name : in Unbounded_String) return Operation_Definition_Access;
 
@@ -74,6 +79,7 @@ private
       Parameters      : aliased Parameter_List.List_Definition;
       Parameters_Bean : Util.Beans.Objects.Object;
       Return_Type     : Unbounded_String;
+      Kind            : Operation_Type := UNKNOWN;
    end record;
 
 end Gen.Model.Operations;

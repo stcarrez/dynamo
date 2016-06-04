@@ -1,8 +1,8 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Sun Apr 13 21:46:58 CEST 2014'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Fri Jun 03 08:48:57 CEST 2016'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
-      <XMI.exporterVersion>0.34(6) revised on $Date: 2010-01-11 22:20:14 +0100 (Mon, 11 Jan 2010) $ </XMI.exporterVersion>
+      <XMI.exporterVersion>0.35.1(6) revised on $Date: 2012-12-30 14:06:01 +0100 (Sun, 30 Dec 2012) $ </XMI.exporterVersion>
     </XMI.documentation>
     <XMI.metamodel xmi.name="UML" xmi.version="1.4"/></XMI.header>
   <XMI.content>
@@ -95,14 +95,14 @@ with the table and the generation of the List procedure.
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D50'
               name = 'PK' visibility = 'public' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'false'>
-              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F70'
               name = 'FK' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F83'
               name = 'DataModel' visibility = 'public' isSpecification = 'false' isRoot = 'false'
@@ -163,14 +163,14 @@ with the table and the generation of the List procedure.
             <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B43'
               name = 'Nullable' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B44'
               name = 'Not Null' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Package xmi.id = '127-0-1-1--67cacd78:13b9079e950:-8000:0000000000002C7E'
               name = 'Model' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
@@ -428,6 +428,7 @@ with the table and the generation of the List procedure.
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7F'
               name = 'Action' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
+              <UML:Stereotype.baseClass>Operation</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Method</UML:Stereotype.baseClass>
               <UML:ModelElement.taggedValue>
                 <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F80'
@@ -489,6 +490,66 @@ The Limited_Bean defines a limited type.</UML:TaggedValue.dataValue>
                 </UML:TaggedValue>
               </UML:ModelElement.taggedValue>
             </UML:Stereotype>
+            <UML:Package xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:0000000000001779'
+              name = 'Events' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Namespace.ownedElement>
+                <UML:Class xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:000000000000177A'
+                  name = 'Module_Event' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                  isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype xmi.idref = '127-0-1-1--51395fad:144adf1aa33:-8000:000000000000208C'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Classifier.feature>
+                    <UML:Attribute xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:000000000000177B'
+                      name = 'kind' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:000000000000177C'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:000000000000177D'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087C'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:000000000000177E'
+                      name = 'entity' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:000000000000177F'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:0000000000001780'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '127-0-1-1-60d24178:13b32cd98ef:-8000:0000000000002B75'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                    <UML:Attribute xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:0000000000001781'
+                      name = 'entity_type' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:0000000000001782'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:0000000000001783'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = '127-0-1-1--a3e3d33:13bc4caf93c:-8000:0000000000002D96'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
+                  </UML:Classifier.feature>
+                </UML:Class>
+              </UML:Namespace.ownedElement>
+            </UML:Package>
           </UML:Namespace.ownedElement>
         </UML:Package>
         <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F73'
@@ -524,6 +585,21 @@ The Limited_Bean defines a limited type.</UML:TaggedValue.dataValue>
             </UML:Multiplicity>
           </UML:TagDefinition.multiplicity>
         </UML:TagDefinition>
+        <UML:Package xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:0000000000001778'
+          name = 'ASF' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Namespace.ownedElement>
+            <UML:Package xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:0000000000001784'
+              name = 'Parts' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Namespace.ownedElement>
+                <UML:Class xmi.id = '127-0-1-1--47d9ba2:15514f3b616:-8000:0000000000001785'
+                  name = 'Part' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                  isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
+              </UML:Namespace.ownedElement>
+            </UML:Package>
+          </UML:Namespace.ownedElement>
+        </UML:Package>
       </UML:Namespace.ownedElement>
     </UML:Model>
   </XMI.content>

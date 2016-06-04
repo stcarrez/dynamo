@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,6 +68,9 @@ package body Gen.Artifacts.XMI is
 
    procedure Iterate_For_Enum is
      new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Enums.Enum_Definition'Class);
+
+   procedure Iterate_For_Operation is
+     new Gen.Model.XMI.Iterate_Elements (T => Gen.Model.Operations.Operation_Definition'Class);
 
    function Find_Stereotype is
      new Gen.Model.XMI.Find_Element (Element_Type        => Model.XMI.Stereotype_Element,
@@ -539,6 +542,7 @@ package body Gen.Artifacts.XMI is
             if P.Attr_Element /= null and P.Operation /= null then
                P.Attr_Element.Set_XMI_Id (P.Attr_Id);
                P.Operation.Elements.Append (P.Attr_Element.all'Access);
+               P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
             end if;
             P.Attr_Element := null;
 
@@ -983,6 +987,19 @@ package body Gen.Artifacts.XMI is
          end if;
       end Prepare_Association;
 
+      procedure Prepare_Parameter (Operation : in out Gen.Model.Operations.Operation_Definition'Class;
+                                   Node      : in Model_Element_Access) is
+         Param : constant Attribute_Element_Access := Attribute_Element'Class (Node.all)'Access;
+         P     : Gen.Model.Operations.Parameter_Definition_Access;
+      begin
+         if Param.Data_Type /= null then
+            Log.Info ("Prepare operation parameter {0} : {1}",
+                      Param.Name, Param.Data_Type.Get_Qualified_Name);
+            Operation.Add_Parameter (Param.Name,
+                                     To_Unbounded_String (Param.Data_Type.Get_Qualified_Name), P);
+         end if;
+      end Prepare_Parameter;
+
       --  ------------------------------
       --  Identify the UML operation and create an entry for it in the table.
       --  ------------------------------
@@ -991,6 +1008,7 @@ package body Gen.Artifacts.XMI is
          Op   : constant Operation_Element_Access := Operation_Element'Class (Node.all)'Access;
          Msg  : constant String := Node.Get_Error_Message;
          Operation : Gen.Model.Operations.Operation_Definition_Access;
+
       begin
          Log.Info ("Prepare class operation {0}", Op.Name);
 
@@ -998,6 +1016,7 @@ package body Gen.Artifacts.XMI is
             Context.Error (To_String (Op.Location) & ": " & Msg);
          end if;
          Table.Add_Operation (Op.Name, Operation);
+         Iterate_For_Operation (Operation.all, Op.Elements, Prepare_Parameter'Access);
       end Prepare_Operation;
 
       --  ------------------------------
@@ -1410,6 +1429,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/Parameter", FIELD_PARAMETER_END);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@xmi.idref", FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@xmi.href", FIELD_CLASSIFIER_HREF);
+   XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/Class/@href", FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/DataType/@xmi.href",
                             FIELD_CLASSIFIER_HREF);
    XMI_Mapping.Add_Mapping ("**/Parameter/Parameter.type/DataType/@href", FIELD_CLASSIFIER_HREF);

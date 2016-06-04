@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,9 @@ package body Gen.Model.Operations is
 
       elsif Name = "return" then
          return Util.Beans.Objects.To_Object (From.Return_Type);
+
+      elsif Name = "type" then
+         return Util.Beans.Objects.To_Object (Operation_Type'Image (From.Kind));
 
       else
          return Definition (From).Get_Value (Name);
@@ -67,7 +70,20 @@ package body Gen.Model.Operations is
       Parameter.Name := Name;
       Parameter.Type_Name := Of_Type;
       Into.Parameters.Append (Parameter);
+      if Into.Kind = UNKNOWN and then Of_Type = "ASF.Parts.Part" then
+         Into.Kind := ASF_UPLOAD;
+      elsif Into.Kind = UNKNOWN then
+         Into.Kind := ASF_ACTION;
+      end if;
    end Add_Parameter;
+
+   --  ------------------------------
+   --  Get the operation type.
+   --  ------------------------------
+   function Get_Type (From : in Operation_Definition) return Operation_Type is
+   begin
+      return From.Kind;
+   end Get_Type;
 
    --  ------------------------------
    --  Create an operation with the given name.

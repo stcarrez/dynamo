@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012, 2013, 2015 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -655,8 +655,12 @@ package body Gen.Model.XMI is
    overriding
    procedure Reconcile (Node  : in out Attribute_Element;
                         Model : in UML_Model) is
-      Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Ref_Id);
+      Item : Model_Element_Access;
    begin
+      if Length (Node.Ref_Id) = 0 then
+         return;
+      end if;
+      Item := Find (Model, Node.Model.all, Node.Ref_Id);
       Model_Element (Node).Reconcile (Model);
       if Item = null then
          return;

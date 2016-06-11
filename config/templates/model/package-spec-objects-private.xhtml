@@ -23,7 +23,7 @@
 #{''}
 
    Null_#{table.type} : constant #{table.type}_Ref
-      := #{table.type}_Ref'(ADO.Objects.Object_Ref with others => &lt;&gt;);
+      := #{table.type}_Ref'(ADO.Objects.Object_Ref with null record);
 #{''}
 
    type #{fn:capitalize(table.type)}_Impl is

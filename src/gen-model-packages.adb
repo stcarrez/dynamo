@@ -62,8 +62,11 @@ package body Gen.Model.Packages is
       elsif Name = "beans" then
          return From.Beans_Bean;
 
-      elsif Name = "usedTypes" then
-         return From.Used;
+      elsif Name = "usedSpecTypes" then
+         return From.Used_Spec;
+
+      elsif Name = "usedBodyTypes" then
+         return From.Used_Body;
 
       elsif Name = "useCalendarTime" then
          return Util.Beans.Objects.To_Object (From.Uses_Calendar_Time);
@@ -261,8 +264,11 @@ package body Gen.Model.Packages is
       procedure Prepare_Table (Table : in Table_Definition_Access);
       procedure Prepare_Definition (Def : in Definition_Access);
       procedure Collect_Dependencies (Table : in Definition_Access);
+      procedure Set_Used_Packages (Into       : in out List_Object;
+                                   Used_Types : in Gen.Utils.String_Set.Set);
 
-      Used_Types  : Gen.Utils.String_Set.Set;
+      Used_Spec_Types  : Gen.Utils.String_Set.Set;
+      Used_Body_Types  : Gen.Utils.String_Set.Set;
 
       --  ------------------------------
       --  Look at the operations used to add the necessary with clauses for parameters.
@@ -278,11 +284,13 @@ package body Gen.Model.Packages is
                   null;
 
                when Operations.ASF_ACTION =>
-                  Used_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
+                  Used_Spec_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
+                  Used_Body_Types.Include (To_Unbounded_String ("ASF.Events.Faces.Actions"));
 
                when Operations.ASF_UPLOAD =>
-                  Used_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
-                  Used_Types.Include (To_Unbounded_String ("ASF.Parts"));
+                  Used_Spec_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
+                  Used_Spec_Types.Include (To_Unbounded_String ("ASF.Parts"));
+                  Used_Body_Types.Include (To_Unbounded_String ("ASF.Parts.Upload_Method"));
 
             end case;
             Operation_List.Next (Iter);
@@ -316,7 +324,7 @@ package body Gen.Model.Packages is
 
                      when Model.Mappings.T_ENUM | Model.Mappings.T_BEAN | Model.Mappings.T_TABLE =>
                         if Pkg'Length > 0 and Pkg /= O.Name then
-                           Used_Types.Include (To_Unbounded_String (Pkg));
+                           Used_Spec_Types.Include (To_Unbounded_String (Pkg));
                         end if;
 
                      when others =>
@@ -351,13 +359,32 @@ package body Gen.Model.Packages is
          end if;
       end Collect_Dependencies;
 
-      T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Types'Unchecked_Access;
+      procedure Set_Used_Packages (Into       : in out List_Object;
+                                   Used_Types : in Gen.Utils.String_Set.Set) is
+         P : Gen.Utils.String_Set.Cursor := Used_Types.First;
+      begin
+         while Gen.Utils.String_Set.Has_Element (P) loop
+            declare
+               Name : constant Unbounded_String := Gen.Utils.String_Set.Element (P);
+            begin
+               Log.Info ("with {0}", Name);
+               Into.Values.Append (Util.Beans.Objects.To_Object (Name));
+            end;
+            Gen.Utils.String_Set.Next (P);
+         end loop;
+      end Set_Used_Packages;
+
+--        T1 : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Spec_Types'Unchecked_Access;
+--        T2 : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Body_Types'Unchecked_Access;
    begin
       Log.Info ("Preparing package {0}", O.Name);
 
-      O.Used := Util.Beans.Objects.To_Object (T, Util.Beans.Objects.STATIC);
-      O.Used_Types.Row := 0;
-      O.Used_Types.Values.Clear;
+--        O.Used_Spec := Util.Beans.Objects.To_Object (T1, Util.Beans.Objects.STATIC);
+      O.Used_Spec_Types.Row := 0;
+      O.Used_Spec_Types.Values.Clear;
+--        O.Used_Body := Util.Beans.Objects.To_Object (T2, Util.Beans.Objects.STATIC);
+      O.Used_Body_Types.Row := 0;
+      O.Used_Body_Types.Values.Clear;
       O.Uses_Calendar_Time := False;
 
       O.Enums.Sort;
@@ -372,19 +399,8 @@ package body Gen.Model.Packages is
       O.Tables.Iterate (Process => Collect_Dependencies'Access);
       Dependency_Sort (O.Tables);
 
-      declare
-         P : Gen.Utils.String_Set.Cursor := Used_Types.First;
-      begin
-         while Gen.Utils.String_Set.Has_Element (P) loop
-            declare
-               Name : constant Unbounded_String := Gen.Utils.String_Set.Element (P);
-            begin
-               Log.Info ("with {0}", Name);
-               O.Used_Types.Values.Append (Util.Beans.Objects.To_Object (Name));
-            end;
-            Gen.Utils.String_Set.Next (P);
-         end loop;
-      end;
+      Set_Used_Packages (O.Used_Spec_Types, Used_Spec_Types);
+      Set_Used_Packages (O.Used_Body_Types, Used_Body_Types);
    end Prepare;
 
    --  ------------------------------
@@ -398,7 +414,8 @@ package body Gen.Model.Packages is
       O.Tables_Bean  := Util.Beans.Objects.To_Object (O.Tables'Unchecked_Access, STATIC);
       O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access, STATIC);
       O.Beans_Bean   := Util.Beans.Objects.To_Object (O.Beans'Unchecked_Access, STATIC);
-      O.Used         := Util.Beans.Objects.To_Object (O.Used_Types'Unchecked_Access, STATIC);
+      O.Used_Spec    := Util.Beans.Objects.To_Object (O.Used_Spec_Types'Unchecked_Access, STATIC);
+      O.Used_Body    := Util.Beans.Objects.To_Object (O.Used_Body_Types'Unchecked_Access, STATIC);
    end Initialize;
 
    --  ------------------------------

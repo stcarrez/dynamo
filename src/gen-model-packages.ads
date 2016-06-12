@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -238,8 +238,12 @@ private
       Beans_Bean   : Util.Beans.Objects.Object;
 
       --  A list of external packages which are used (used for with clause generation).
-      Used_Types   : aliased List_Object;
-      Used         : Util.Beans.Objects.Object;
+      Used_Spec_Types    : aliased List_Object;
+      Used_Spec          : Util.Beans.Objects.Object;
+
+      --  A list of external packages which are used (used for with clause generation).
+      Used_Body_Types    : aliased List_Object;
+      Used_Body          : Util.Beans.Objects.Object;
 
       --  A map of all types defined in this package.
       Types        : Gen.Model.Mappings.Mapping_Maps.Map;

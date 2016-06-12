@@ -278,9 +278,10 @@ package body Gen.Model.Packages is
                   null;
 
                when Operations.ASF_ACTION =>
-                  null;
+                  Used_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
 
                when Operations.ASF_UPLOAD =>
+                  Used_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
                   Used_Types.Include (To_Unbounded_String ("ASF.Parts"));
 
             end case;

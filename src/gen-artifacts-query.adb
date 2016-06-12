@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-query -- Query artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013, 2015 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2015, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -89,8 +89,12 @@ package body Gen.Artifacts.Query is
                                     Node   : in DOM.Core.Node) is
          Name      : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
          Operation : Gen.Model.Operations.Operation_Definition_Access;
+         Param     : Gen.Model.Operations.Parameter_Definition_Access;
       begin
          Table.Add_Operation (Name, Operation);
+         Operation.Add_Parameter (To_Unbounded_String ("Outcome"),
+                                  To_Unbounded_String ("String"),
+                                  Param);
       end Register_Operation;
 
       --  ------------------------------

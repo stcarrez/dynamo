@@ -23,7 +23,7 @@ with Ada.Calendar;
 </h:panelGroup>
 with Ada.Strings.Unbounded;
 
-<h:list value="#{package.usedTypes}" var="type">
+<h:list value="#{package.usedSpecTypes}" var="type">
 with #{type};
 </h:list>
 pragma Warnings (On, "unit * is not referenced");

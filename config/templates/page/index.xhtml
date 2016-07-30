@@ -11,7 +11,12 @@
                 template="/WEB-INF/layouts/#{layout}.xhtml">
   <ui:param name="title" value="\#{layoutMsg.homePageTitle}" />
   <ui:param name="pageStyle" value="awa"/>
-
+#{''}
+  <!-- Page header (optional) -->
+  <ui:define name="pageHeader">
+    <meta name="author" content="#{project.author}"/>
+  </ui:define>
+#{''}
   <!-- Main page body -->
   <ui:define name="pageBody">
      <div id='awa-content'>
@@ -37,6 +42,11 @@
         </div>
      </div>
   </ui:define>
-
+#{''}
+  <!-- Page specific Javascript (optional) -->
+  <ui:define name="pageScript">
+    <script type="text/javascript" src="\#{jquery.path}"></script>
+  </ui:define>
+#{''}
 </ui:composition>
 ]]></f:view>

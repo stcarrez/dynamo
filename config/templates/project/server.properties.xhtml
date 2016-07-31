@@ -7,15 +7,22 @@
 app_search_dirs=\#{empty dynamo_search_dirs ? '.' : dynamo_search_dirs}
 
 app.modules.dir=\#{fn:composePath(app_search_dirs,'config')}
-app.config=awa.xml;#{projectName}.xml
+app.config=awa.xml
+app.config.plugins#{projectName}.xml
 contextPath=/#{fn:toLowerCase(projectName)}
-
+#{''}
 web.dir=\#{fn:composePath(app_search_dirs,'web')}
 view.dir=\#{fn:composePath(app_search_dirs,'web')}
 bundle.dir=\#{fn:composePath(app_search_dirs,'bundles')}
 
+#{''}
 awa_dispatcher_count=0
 
+#{''}
+counters.counter_age_limit=1
+counters.counter_limit=10
+
+#{''}
 view.debug=true
 view.ignore_spaces=false
 view.escape_unknown_tags=true
@@ -27,7 +34,7 @@ user.auth-filter.redirect=\#{contextPath}/auth/login.html
 #{''}
 
 # The base URL to construct URL to the application page.
-app_base_url=http://localhost:8080#{contextPath}
+app_url_base=http://localhost:8080#{contextPath}
 #{''}
 
 # The application name

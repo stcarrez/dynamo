@@ -711,6 +711,9 @@ package body Gen.Artifacts.XMI is
 
                if P.Enumeration_Literal /= null then
                   P.Enumeration_Literal.Stereotypes.Append (S.all'Access);
+               elsif P.Assos_End_Element /= null then
+                  Log.Info ("Stereotype {0} added", Util.Beans.Objects.To_String (Value));
+                  P.Assos_End_Element.Stereotypes.Append (S.all'Access);
                elsif P.Association /= null then
                   P.Association.Stereotypes.Append (S.all'Access);
                elsif P.Attr_Element /= null then
@@ -719,6 +722,8 @@ package body Gen.Artifacts.XMI is
                   P.Class_Element.Stereotypes.Append (S.all'Access);
                elsif P.Package_Element /= null then
                   P.Package_Element.Stereotypes.Append (S.all'Access);
+               else
+                  Log.Info ("Stereotype {0} ignored", Util.Beans.Objects.To_String (Value));
                end if;
             end;
 
@@ -829,6 +834,10 @@ package body Gen.Artifacts.XMI is
       --  Identify the UML association and create an entry for it in the table.
       procedure Prepare_Association (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                      Node   : in Model_Element_Access);
+
+      procedure Prepare_Parameter (Operation : in out
+                                     Gen.Model.Operations.Operation_Definition'Class;
+                                   Node      : in Model_Element_Access);
 
       --  Identify the UML operation and create an entry for it in the table.
       procedure Prepare_Operation (Table  : in out Gen.Model.Tables.Table_Definition'Class;
@@ -981,13 +990,15 @@ package body Gen.Artifacts.XMI is
             --  If the <<use foreign key>> stereotype is set on the association, to not use
             --  the Ada tagged object but create an attribute using the foreign key type.
             A.Use_Foreign_Key_Type := Node.Parent.Has_Stereotype (Handler.Use_FK_Stereotype);
+            A.Is_Key := Node.Has_Stereotype (Handler.PK_Stereotype);
             if A.Use_Foreign_Key_Type then
                Log.Info ("Association {0} type is using foreign key", Assoc.Name);
             end if;
          end if;
       end Prepare_Association;
 
-      procedure Prepare_Parameter (Operation : in out Gen.Model.Operations.Operation_Definition'Class;
+      procedure Prepare_Parameter (Operation : in out
+                                     Gen.Model.Operations.Operation_Definition'Class;
                                    Node      : in Model_Element_Access) is
          Param : constant Attribute_Element_Access := Attribute_Element'Class (Node.all)'Access;
          P     : Gen.Model.Operations.Parameter_Definition_Access;

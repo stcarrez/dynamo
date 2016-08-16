@@ -1233,6 +1233,10 @@ package body Gen.Artifacts.XMI is
                                                           "Dynamo.xmi",
                                                           "AWA.Limited_Bean",
                                                           Gen.Model.XMI.BY_NAME);
+      Handler.Serialize_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                       "Dynamo.xmi",
+                                                       "ASF.Serialize",
+                                                       Gen.Model.XMI.BY_NAME);
       Handler.Has_List_Tag := Find_Tag_Definition (Handler.Nodes,
                                                    "Dynamo.xmi",
                                                    "ADO.Table.@dynamo.table.hasList",

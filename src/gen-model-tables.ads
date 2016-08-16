@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -164,6 +164,9 @@ package Gen.Model.Tables is
 
       --  Whether the bean type is a limited type or not.
       Is_Limited       : Boolean := False;
+
+      --  Whether the serialization operation have to be generated.
+      Is_Serializable  : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

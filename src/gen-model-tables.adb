@@ -400,6 +400,9 @@ package body Gen.Model.Tables is
       elsif Name = "isLimited" then
          return Util.Beans.Objects.To_Object (From.Is_Limited);
 
+      elsif Name = "isSerializable" then
+         return Util.Beans.Objects.To_Object (From.Is_Serializable);
+
       else
          return Definition (From).Get_Value (Name);
       end if;

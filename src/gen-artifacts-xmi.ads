@@ -76,6 +76,7 @@ private
       Not_Null_Stereotype   : Gen.Model.XMI.Stereotype_Element_Access;
       Use_FK_Stereotype     : Gen.Model.XMI.Stereotype_Element_Access;
       Version_Stereotype    : Gen.Model.XMI.Stereotype_Element_Access;
+      Auditable_Stereotype  : Gen.Model.XMI.Stereotype_Element_Access;
 
       --  Tag definitions which control the generation.
       Has_List_Tag          : Gen.Model.XMI.Tag_Definition_Element_Access;

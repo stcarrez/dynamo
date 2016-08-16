@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,6 +74,9 @@ package Gen.Model.Tables is
 
       --  True if the column is included in the update statement
       Is_Updated   : Boolean := True;
+
+      --  True if the column is auditable (generate code to track changes).
+      Is_Auditable : Boolean := False;
 
       --  True if the Ada mapping must use the foreign key type.
       Use_Foreign_Key_Type : Boolean := False;

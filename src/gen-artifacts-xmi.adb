@@ -884,12 +884,13 @@ package body Gen.Artifacts.XMI is
                if Attr.Data_Type /= null then
                   C.Type_Name := To_Unbounded_String (Attr.Data_Type.Get_Qualified_Name);
                end if;
-               C.Not_Null    := Attr.Multiplicity_Lower > 0;
-               C.Is_Key      := Column.Has_Stereotype (Handler.PK_Stereotype);
-               C.Is_Version  := Column.Has_Stereotype (Handler.Version_Stereotype);
-               C.Is_Updated  := Attr.Changeability /= CHANGEABILITY_FROZEN;
-               C.Is_Inserted := True; --  Attr.Changeability = CHANGEABILITY_INSERT;
-               C.Sql_Type    := To_Unbounded_String (Sql);
+               C.Not_Null     := Attr.Multiplicity_Lower > 0;
+               C.Is_Key       := Column.Has_Stereotype (Handler.PK_Stereotype);
+               C.Is_Version   := Column.Has_Stereotype (Handler.Version_Stereotype);
+               C.Is_Auditable := Column.Has_Stereotype (Handler.Auditable_Stereotype);
+               C.Is_Updated   := Attr.Changeability /= CHANGEABILITY_FROZEN;
+               C.Is_Inserted  := True; --  Attr.Changeability = CHANGEABILITY_INSERT;
+               C.Sql_Type     := To_Unbounded_String (Sql);
 
                if Column.Has_Stereotype (Handler.Not_Null_Stereotype) then
                   C.Not_Null := True;

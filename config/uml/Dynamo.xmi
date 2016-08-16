@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Fri Jun 03 08:48:57 CEST 2016'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Aug 16 23:48:50 CEST 2016'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.35.1(6) revised on $Date: 2012-12-30 14:06:01 +0100 (Sun, 30 Dec 2012) $ </XMI.exporterVersion>
@@ -24,6 +24,15 @@
               name = 'Table' visibility = 'public' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'false'>
               <UML:Stereotype.baseClass>Class</UML:Stereotype.baseClass>
+              <UML:ModelElement.taggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1-7d018c30:156951efbee:-8000:0000000000002607'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>Represents a database table. When applied to a class, this stereorype triggers the generation of ADO support.</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+              </UML:ModelElement.taggedValue>
               <UML:Stereotype.definedTag>
                 <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D51'
                   name = '@dynamo.table.generator' visibility = 'public' isSpecification = 'false'>
@@ -95,19 +104,29 @@ with the table and the generation of the List procedure.
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D50'
               name = 'PK' visibility = 'public' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'false'>
-              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F70'
               name = 'FK' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F83'
               name = 'DataModel' visibility = 'public' isSpecification = 'false' isRoot = 'false'
               isLeaf = 'false' isAbstract = 'false'>
               <UML:Stereotype.baseClass>Package</UML:Stereotype.baseClass>
+              <UML:ModelElement.taggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1-7d018c30:156951efbee:-8000:0000000000002608'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>This stereotype must be applied on the package to activate the support of
+database and bean support for the package classes.</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+              </UML:ModelElement.taggedValue>
               <UML:Stereotype.definedTag>
                 <UML:TagDefinition xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F84'
                   name = 'dynamo.model.file' isSpecification = 'false'>
@@ -163,14 +182,14 @@ with the table and the generation of the List procedure.
             <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B43'
               name = 'Nullable' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B44'
               name = 'Not Null' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
             </UML:Stereotype>
             <UML:Package xmi.id = '127-0-1-1--67cacd78:13b9079e950:-8000:0000000000002C7E'
               name = 'Model' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
@@ -391,6 +410,12 @@ with the table and the generation of the List procedure.
                 </UML:Multiplicity>
               </UML:TagDefinition.multiplicity>
             </UML:TagDefinition>
+            <UML:Stereotype xmi.id = '127-0-1-1-7d018c30:156951efbee:-8000:00000000000017E3'
+              name = 'Auditable' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
+            </UML:Stereotype>
           </UML:Namespace.ownedElement>
         </UML:Package>
         <UML:Package xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F71'
@@ -428,8 +453,8 @@ with the table and the generation of the List procedure.
             <UML:Stereotype xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7F'
               name = 'Action' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
               isAbstract = 'false'>
-              <UML:Stereotype.baseClass>Operation</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>Method</UML:Stereotype.baseClass>
+              <UML:Stereotype.baseClass>Operation</UML:Stereotype.baseClass>
               <UML:ModelElement.taggedValue>
                 <UML:TaggedValue xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F80'
                   isSpecification = 'false'>
@@ -598,6 +623,11 @@ The Limited_Bean defines a limited type.</UML:TaggedValue.dataValue>
                   isLeaf = 'false' isAbstract = 'false' isActive = 'false'/>
               </UML:Namespace.ownedElement>
             </UML:Package>
+            <UML:Stereotype xmi.id = '127-0-1-1-7d018c30:156951efbee:-8000:00000000000017E4'
+              name = 'Serializable' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Stereotype.baseClass>Class</UML:Stereotype.baseClass>
+            </UML:Stereotype>
           </UML:Namespace.ownedElement>
         </UML:Package>
       </UML:Namespace.ownedElement>

@@ -1225,6 +1225,10 @@ package body Gen.Artifacts.XMI is
                                                     "Dynamo.xmi",
                                                     "ADO.use foreign key",
                                                     Gen.Model.XMI.BY_NAME);
+      Handler.Auditable_Stereotype := Find_Stereotype (Handler.Nodes,
+                                                       "Dynamo.xmi",
+                                                       "ADO.Auditable",
+                                                       Gen.Model.XMI.BY_NAME);
       Handler.Bean_Stereotype := Find_Stereotype (Handler.Nodes,
                                                   "Dynamo.xmi",
                                                   "AWA.Bean",

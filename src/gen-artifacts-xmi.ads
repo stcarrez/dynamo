@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -88,6 +88,9 @@ private
       --  Stereotype which triggers the generation of AWA bean types.
       Bean_Stereotype         : Gen.Model.XMI.Stereotype_Element_Access;
       Limited_Bean_Stereotype : Gen.Model.XMI.Stereotype_Element_Access;
+
+      --  Stereotype which triggers the generation of serialization.
+      Serialize_Stereotype    : Gen.Model.XMI.Stereotype_Element_Access;
    end record;
 
 end Gen.Artifacts.XMI;

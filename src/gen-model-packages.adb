@@ -341,6 +341,11 @@ package body Gen.Model.Packages is
             Column_List.Next (C);
          end loop;
          Prepare_Operations (Table.Operations);
+
+         --  If the table is using serialization, add the Serializable.IO package.
+         if Table.Is_Serializable then
+            Used_Spec_Types.Include (To_Unbounded_String ("Util.Serializable.IO"));
+         end if;
       end Prepare_Table;
 
       procedure Prepare_Definition (Def : in Definition_Access) is
@@ -374,15 +379,11 @@ package body Gen.Model.Packages is
          end loop;
       end Set_Used_Packages;
 
---        T1 : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Spec_Types'Unchecked_Access;
---        T2 : constant Util.Beans.Basic.Readonly_Bean_Access := O.Used_Body_Types'Unchecked_Access;
    begin
       Log.Info ("Preparing package {0}", O.Name);
 
---        O.Used_Spec := Util.Beans.Objects.To_Object (T1, Util.Beans.Objects.STATIC);
       O.Used_Spec_Types.Row := 0;
       O.Used_Spec_Types.Values.Clear;
---        O.Used_Body := Util.Beans.Objects.To_Object (T2, Util.Beans.Objects.STATIC);
       O.Used_Body_Types.Row := 0;
       O.Used_Body_Types.Values.Clear;
       O.Uses_Calendar_Time := False;

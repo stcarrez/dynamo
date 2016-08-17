@@ -344,7 +344,7 @@ package body Gen.Model.Packages is
 
          --  If the table is using serialization, add the Serializable.IO package.
          if Table.Is_Serializable then
-            Used_Spec_Types.Include (To_Unbounded_String ("Util.Serializable.IO"));
+            Used_Spec_Types.Include (To_Unbounded_String ("Util.Serialize.IO"));
          end if;
       end Prepare_Table;
 

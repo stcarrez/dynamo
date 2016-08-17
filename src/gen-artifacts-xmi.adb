@@ -1054,6 +1054,7 @@ package body Gen.Artifacts.XMI is
                Table.Set_Comment (Item.Get_Comment);
                Model.Register_Table (Table);
                Table.Has_List := Has_List = "true";
+               Table.Is_Serializable := Item.Has_Stereotype (Handler.Serialize_Stereotype);
                if T_Name'Length /= 0 then
                   Log.Info ("Using table name {0}", Name);
                   Table.Table_Name := To_Unbounded_String (T_Name);
@@ -1074,6 +1075,7 @@ package body Gen.Artifacts.XMI is
                Bean.Set_Comment (Item.Get_Comment);
                Bean.Target := Name;
                Bean.Is_Limited := Item.Has_Stereotype (Handler.Limited_Bean_Stereotype);
+               Bean.Is_Serializable := Item.Has_Stereotype (Handler.Serialize_Stereotype);
                if Class.Parent_Class /= null then
                   Log.Info ("Bean {0} inherit from {1}", Name,
                             To_String (Class.Parent_Class.Name));
@@ -1240,7 +1242,7 @@ package body Gen.Artifacts.XMI is
                                                           Gen.Model.XMI.BY_NAME);
       Handler.Serialize_Stereotype := Find_Stereotype (Handler.Nodes,
                                                        "Dynamo.xmi",
-                                                       "ASF.Serialize",
+                                                       "ASF.Serializable",
                                                        Gen.Model.XMI.BY_NAME);
       Handler.Has_List_Tag := Find_Tag_Definition (Handler.Nodes,
                                                    "Dynamo.xmi",

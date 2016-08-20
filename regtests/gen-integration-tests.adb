@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,6 +92,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_Zargo_Dependencies'Access);
       Caller.Add_Test (Suite, "Generate ArgoUML several packages",
                        Test_Generate_Zargo_Packages'Access);
+      Caller.Add_Test (Suite, "Generate ArgoUML serialization",
+                       Test_Generate_Zargo_Serialization'Access);
       Caller.Add_Test (Suite, "Generate ArgoUML with several UML errors",
                        Test_Generate_Zargo_Errors'Access);
       Caller.Add_Test (Suite, "Build generated project",
@@ -568,6 +570,18 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.ads");
       Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.adb");
    end Test_Generate_Zargo_Packages;
+
+   --  ------------------------------
+   --  Test UML with serialization code.
+   --  ------------------------------
+   procedure Test_Generate_Zargo_Serialization (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-serialize.zargo", Result);
+
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-serialize.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-tests-serialize.adb");
+   end Test_Generate_Zargo_Serialization;
 
    --  ------------------------------
    --  Test UML with several errors in the UML model.

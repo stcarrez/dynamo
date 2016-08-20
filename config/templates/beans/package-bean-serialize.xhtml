@@ -1,0 +1,72 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+                xmlns:u="http://code.google.com/p/ada-asf/util"
+        xmlns:f="http://java.sun.com/jsf/core">
+<h:list value="#{list.members}" var="column">
+<h:panelGroup rendered="#{not column.isVersion and column.isPrimitiveType}">
+  <h:panelGroup rendered="#{is_attribute}">
+    <h:panelGroup rendered="#{column.type.isIdentifier}">
+      ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isInteger}">
+      Stream.Write_Entity ("#{column.name}", Item.#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+      Stream.Write_Entity ("#{column.name}", Item.#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+      ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isEnum}">
+      Stream.Write_Enum_Entity ("#{column.name}", #{fn:capitalize(column.type.name)}'Image (Item.#{fn:capitalize(column.name)}));
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isBoolean}">
+      Stream.Write_Entity ("#{column.name}", Item.#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isString}">
+      Stream.Write_Entity ("#{column.name}", Item.#{fn:capitalize(column.name)});
+    </h:panelGroup>
+  </h:panelGroup>
+  <h:panelGroup rendered="#{not is_attribute}">
+    <h:panelGroup rendered="#{column.type.isIdentifier and column.isPrimaryKey}">
+      ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.Get_Key);
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isIdentifier and not column.isPrimaryKey}">
+      ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.Get_#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isInteger and column.type.name ne 'ADO.Entity_Type'}">
+      Stream.Write_Entity ("#{column.name}", Item.Get_#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+      Stream.Write_Entity ("#{column.name}", Item.Get_#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type'}">
+      ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.Get_#{fn:capitalize(column.name)});
+         Item.Set_#{fn:capitalize(column.name)} (ADO.Entity_Type (Util.Beans.Objects.To_Integer (Value)));
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+      ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.Get_#{fn:capitalize(column.name)});
+         if Util.Beans.Objects.Is_Null (Value) then
+            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => True, others => &lt;&gt;));
+         else
+            Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => False,
+                                        Value   => Util.Beans.Objects.Time.To_Time (Value)));
+         end if;
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isBoolean}">
+      Stream.Write_Entity ("#{column.name}", Item.Get_#{fn:capitalize(column.name)});
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isString}">
+      Stream.Write_Entity ("#{column.name}", String '(Item.Get_#{fn:capitalize(column.name)}));
+    </h:panelGroup>
+    <h:panelGroup rendered="#{column.type.isEnum}">
+      Stream.Write_Enum_Entity ("#{column.name}", #{fn:capitalize(column.type.name)}'Image (Item.Get_#{fn:capitalize(column.name)}));
+    </h:panelGroup>
+    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate and not column.type.isBoolean and not column.type.isString}">
+      Stream.Write_Entity ("#{column.name}", Item.Get_#{fn:capitalize(column.name)});
+    </h:panelGroup>
+  </h:panelGroup>
+</h:panelGroup></h:list>
+</ui:composition>

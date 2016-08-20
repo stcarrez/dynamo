@@ -51,5 +51,12 @@
 </h:panelGroup>
 </h:list>
 #{''}
+<h:panelGroup rendered="#{bean.isSerializable}">
+   --  Serialize the record member to a JSON/XML stream.
+   procedure Write (Stream : in out Util.Serialize.IO.Output_Stream'Class;
+                    Name   : in String;
+                    Item   : in #{fn:capitalize(bean.type)}#{bean.isBean ? '' : '_Ref'}'Class);
+#{''}
+</h:panelGroup>
 
 </ui:composition>

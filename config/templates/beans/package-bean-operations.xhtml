@@ -93,4 +93,29 @@
    end Set_Value;
 </h:panelGroup>
 
+<h:panelGroup rendered="#{bean.isSerializable}">
+#{''}
+   --  ------------------------------
+   --  Serialize the record member to a JSON/XML stream.
+   --  ------------------------------
+   procedure Write (Stream : in out Util.Serialize.IO.Output_Stream'Class;
+                    Name   : in String;
+                    Item   : in #{fn:capitalize(bean.type)}#{bean.isBean ? '' : '_Ref'}'Class) is
+   begin
+      Stream.Start_Entity (Name);
+<ui:include src="package-bean-serialize.xhtml">
+  <ui:param name="list" value="#{bean}"/>
+  <ui:param name="is_attribute" value="#{bean.isBean}"/>
+</ui:include>
+<h:panelGroup rendered="#{not empty bean.parent}">
+  <ui:include src="package-bean-serialize.xhtml">
+    <ui:param name="list" value="#{bean.parent}"/>
+    <ui:param name="is_attribute" value="#{0}"/>
+  </ui:include>
+</h:panelGroup>
+      Stream.End_Entity (Name);
+   end Write;
+#{''}
+</h:panelGroup>
+
 </ui:composition>

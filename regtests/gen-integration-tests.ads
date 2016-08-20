@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,6 +118,9 @@ package Gen.Integration.Tests is
 
    --  Test UML with several tables in several packages (non circular).
    procedure Test_Generate_Zargo_Packages (T : in out Test);
+
+   --  Test UML with serialization code.
+   procedure Test_Generate_Zargo_Serialization (T : in out Test);
 
    --  Test UML with several errors in the UML model.
    procedure Test_Generate_Zargo_Errors (T : in out Test);

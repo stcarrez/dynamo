@@ -1,0 +1,63 @@
+<query-mapping package='Gen.Events.Serialize'>
+    <description>
+      Test query mapping and serialization.
+    </description>
+
+    <class name="Gen.Events.Serialize.Event_Info" bean="yes" serializable="yes">
+        <comment>The information about a wiki page.</comment>
+        <property type='Identifier' name="id">
+            <comment>the wiki page identifier.</comment>
+        </property>
+        <property type='String' name="name">
+            <comment>the wiki page name.</comment>
+        </property>
+        <property type='String' name="title">
+            <comment>the wiki page title.</comment>
+        </property>
+        <property type='Boolean' name="is_public">
+            <comment>whether the wiki is public.</comment>
+        </property>
+        <property type='Integer' name="last_version">
+            <comment>the last version.</comment>
+        </property>
+        <property type='Integer' name="read_count">
+            <comment>the read count.</comment>
+        </property>
+        <property type='Date' name="create_date">
+            <comment>the wiki creation date.</comment>
+        </property>
+        <property type='String' name="author">
+            <comment>the wiki page author.</comment>
+        </property>
+    </class>
+
+    <query name='queue-pending-message'>
+       <comment>Get the messages which have been queued on a given message queue</comment>
+       <sql>
+    SELECT
+      page.id,
+      page.name,
+      page.title,
+      page.is_public,
+      page.last_version,
+      page.read_count,
+      content.create_date,
+      user.name
+    FROM awa_wiki_page AS page
+    LEFT JOIN awa_acl AS acl ON acl.entity_id = :wiki_id AND acl.entity_type = :table AND acl.user_id = :user_id
+    LEFT JOIN awa_wiki_content AS content ON page.content_id = content.id
+    LEFT JOIN awa_user AS user ON content.author_id = user.id
+    WHERE page.wiki_id = :wiki_id AND (page.is_public OR acl.id IS NOT NULL)
+    ORDER BY :order1
+    LIMIT :first, :count
+       </sql>
+       <sql-count>
+    SELECT
+       count(page.id)
+    FROM awa_wiki_page AS page
+    LEFT JOIN awa_acl AS acl ON acl.entity_id = :wiki_id AND acl.entity_type = :table AND acl.user_id = :user_id
+    WHERE page.wiki_id = :wiki_id AND (page.is_public OR acl.id IS NOT NULL)
+       </sql-count>
+    </query>
+
+</query-mapping>

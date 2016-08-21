@@ -191,6 +191,7 @@ package body Gen.Artifacts.Query is
          --  Construct the hash for this column mapping.
          Append (Hash, "class=");
          Append (Hash, Query.Name);
+         Query.Is_Serializable := Gen.Utils.Get_Attribute (Node, "serializable", False);
 
          Log.Debug ("Register query {0} with type {1}", Query.Name, Query.Type_Name);
          Register_Columns (Query_Definition (Query), Node);

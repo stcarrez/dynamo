@@ -449,6 +449,8 @@ package body Gen.Integration.Tests is
                                  Target_Name => "db/permissions.xml");
       Ada.Directories.Copy_File (Source_Name => "../regtests/files/queue-messages.xml",
                                  Target_Name => "db/queue-messages.xml");
+      Ada.Directories.Copy_File (Source_Name => "../regtests/files/serialize.xml",
+                                 Target_Name => "db/serialize.xml");
       T.Execute (Dynamo & " generate db", Result);
       Util.Tests.Assert_Matches (T,
                                  ".*Reading model file stored in .db.*",
@@ -468,7 +470,8 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "src/model/gen-users-models.adb");
       Util.Tests.Assert_Exists (T, "src/model/gen-events-models.ads");
       Util.Tests.Assert_Exists (T, "src/model/gen-events-models.adb");
-
+      Util.Tests.Assert_Exists (T, "src/model/gen-events-serialize.ads");
+      Util.Tests.Assert_Exists (T, "src/model/gen-events-serialize.adb");
    end Test_Generate_Hibernate;
 
    --  ------------------------------

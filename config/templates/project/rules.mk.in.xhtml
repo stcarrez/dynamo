@@ -30,7 +30,7 @@ GPRPATH:=\${NAME}.gpr
 BUILDS_SHARED=@BUILDS_SHARED@
 #{''}
 
-version=@AWA_VERSION@
+version=@#{fn:toUpperCase(projectName)}_VERSION@
 
 #{''}
 distdir=#{projectName}-@#{fn:toUpperCase(projectName)}_VERSION@

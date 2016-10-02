@@ -11,6 +11,7 @@ AC_INIT(src/#{projectName}.ads)
 
 AC_CANONICAL_SYSTEM
 dnl AM_MAINTAINER_MODE
+#{''}
 
 # Current release settings
 #{fn:toUpperCase(projectName)}_MAJOR_VERSION=0
@@ -18,25 +19,42 @@ dnl AM_MAINTAINER_MODE
 #{fn:toUpperCase(projectName)}_MICRO_VERSION=0
 #{fn:toUpperCase(projectName)}_VERSION=$#{fn:toUpperCase(projectName)}_MAJOR_VERSION.$#{fn:toUpperCase(projectName)}_MINOR_VERSION.$#{fn:toUpperCase(projectName)}_MICRO_VERSION
 
+AM_GNAT_CHECK_GPRBUILD
+
 # checking for local tools
 AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_LN_S
+#{''}
 
 AC_CHECK_PROGS(GNATMAKE, gnatmake, "")
+#{''}
 
 # Set the version number of GtkAda
 AC_SUBST(#{fn:toUpperCase(projectName)}_VERSION)
 AC_SUBST(#{fn:toUpperCase(projectName)}_MAJOR_VERSION)
 AC_SUBST(#{fn:toUpperCase(projectName)}_MINOR_VERSION)
 AC_SUBST(#{fn:toUpperCase(projectName)}_MICRO_VERSION)
+#{''}
 
 EXEC_PREFIX="$prefix"
 AC_SUBST(EXEC_PREFIX)
 
 #{fn:toUpperCase(projectName)}_LIBDIR="lib"
 AC_SUBST(#{fn:toUpperCase(projectName)}_LIBDIR)
+#{''}
+
+AC_MSG_CHECKING([number of processors])
+NR_CPUS=`getconf _NPROCESSORS_CONF 2>/dev/null || getconf NPROCESSORS_CONF 2>/dev/null || echo 1`
+AC_MSG_RESULT($NR_CPUS)
+AC_SUBST(NR_CPUS)
+
+##########################################
+# Check to enable/disable shared library
+##########################################
+AM_SHARED_LIBRARY_SUPPORT
+#{''}
 
 ##########################################
 # Ada Util library
@@ -48,6 +66,7 @@ AM_GNAT_FIND_PROJECT([ada-util],[Ada Utility Library],[util],
     UTIL_DIR=${gnat_project_dir_util}
   ])
 AC_SUBST(UTIL_DIR)
+#{''}
 
 ##########################################
 # Ada Expression Language library
@@ -59,7 +78,7 @@ AM_GNAT_FIND_PROJECT([ada-el],[Ada Expression Language Library],[el],
     EL_DIR=${gnat_project_dir_el}
   ])
 AC_SUBST(EL_DIR)
-
+#{''}
 
 ##########################################
 # Ada Server Faces library
@@ -71,6 +90,7 @@ AM_GNAT_FIND_PROJECT([ada-asf],[Ada Server Faces],[asf],
     ASF_DIR=${gnat_project_dir_asf}
   ])
 AC_SUBST(ASF_DIR)
+#{''}
 
 ##########################################
 # Ada Security library
@@ -82,6 +102,7 @@ AM_GNAT_FIND_PROJECT([ada-security],[Ada Security Library],[security],
     SECURITY_DIR=${gnat_project_dir_security}
   ])
 AC_SUBST(SECURITY_DIR)
+#{''}
 
 ##########################################
 # Ada Database Objects library
@@ -93,6 +114,7 @@ AM_GNAT_FIND_PROJECT([ada-ado],[Ada Database Objects],[ado],
     ADO_DIR=${gnat_project_dir_ado}
   ])
 AC_SUBST(ADO_DIR)
+#{''}
 
 ##########################################
 # Ada Web Application library
@@ -104,6 +126,7 @@ AM_GNAT_FIND_PROJECT([ada-awa],[Ada Web Application],[awa],
     AWA_DIR=${gnat_project_dir_awa}
   ])
 AC_SUBST(AWA_DIR)
+#{''}
 
 AC_OUTPUT(
 Makefile #{projectName}.gpr tests.gpr rules.mk

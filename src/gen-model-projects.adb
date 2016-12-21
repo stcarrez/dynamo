@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -455,6 +455,7 @@ package body Gen.Model.Projects is
       procedure Save_Module (Pos : in Project_Vectors.Cursor);
       procedure Read_Property_Line (Line : in String);
 
+      Buffer      : aliased Util.Streams.Texts.Print_Stream;
       Output      : Util.Serialize.IO.XML.Output_Stream;
       Prop_Output : Util.Streams.Texts.Print_Stream;
 
@@ -500,7 +501,8 @@ package body Gen.Model.Projects is
       Prop_Path : constant String := Ada.Directories.Compose (Dir, Prop_Name);
    begin
       Prop_Output.Initialize (Size => 100000);
-      Output.Initialize (Size => 10000);
+      Buffer.Initialize (Size => 10000);
+      Output.Initialize (Output => Buffer'Unchecked_Access);
 
       --  Read the current project property file, ignoring the dynamo.* properties.
       begin
@@ -539,7 +541,7 @@ package body Gen.Model.Projects is
       Project.Dependencies.Iterate (Save_Dependency'Access);
       Output.Write_String (ASCII.LF & "");
       Output.End_Entity (Name => "project");
-      Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Output)),
+      Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Buffer)),
                              Path    => Path);
       Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Prop_Output)),
                              Path    => Prop_Path);

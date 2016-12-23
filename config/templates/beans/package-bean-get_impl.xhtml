@@ -11,12 +11,13 @@
    function Get_Value (From : in #{fn:capitalize(bean.type)}#{bean.isBean ? '' : '_Ref'};
                        Name : in String) return Util.Beans.Objects.Object is
 <h:panelGroup rendered="#{not bean.isBean}">
-      Obj  : constant ADO.Objects.Object_Record_Access := From.Get_Load_Object;
+      Obj  : ADO.Objects.Object_Record_Access;
       Impl : access #{fn:capitalize(bean.type)}_Impl;
    begin
-      if Obj = null then
+      if From.Is_Null then
          return Util.Beans.Objects.Null_Object;
       end if;
+      Obj := From.Get_Load_Object;
       Impl := #{fn:capitalize(bean.type)}_Impl (Obj.all)'Access;
 </h:panelGroup>
 <h:panelGroup rendered="#{bean.isBean}">

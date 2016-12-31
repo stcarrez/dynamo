@@ -283,6 +283,9 @@ package body Gen.Commands.Database is
                                        Database : in String;
                                        Username : in String;
                                        Password : in String);
+      procedure Create_SQLite_Database (Model    : in String;
+                                        Config   : in ADO.Drivers.Connections.Configuration;
+                                        Database : in String);
 
       --  ------------------------------
       --  Create the database, the user and the tables.
@@ -345,6 +348,36 @@ package body Gen.Commands.Database is
       end Create_MySQL_Database;
 
       --  ------------------------------
+      --  Create the SQLite database.
+      --  ------------------------------
+      procedure Create_SQLite_Database (Model    : in String;
+                                        Config   : in ADO.Drivers.Connections.Configuration;
+                                        Database : in String) is
+         Name  : constant String := Generator.Get_Project_Name;
+         Path  : constant String := Config.Get_Database;
+         Dir   : constant String := Util.Files.Compose (Model, "sqlite");
+         File  : constant String := Util.Files.Compose (Dir, "create-" & Name & "-sqlite.sql");
+         Args  : GNAT.OS_Lib.Argument_List (1 .. 1);
+      begin
+         if Ada.Directories.Exists (Path) then
+            Log.Info ("Connecting to {0} for database setup", Database);
+         end if;
+
+         --  Initialize the session factory to connect to the
+         --  database defined by root connection (which should allow the database creation).
+         Log.Info ("Creating database tables using schema '{0}'", File);
+
+         if not Ada.Directories.Exists (File) then
+            Generator.Error ("SQL file '{0}' does not exist.", File);
+            Generator.Error ("Please, run the following command: dynamo generate db");
+            return;
+         end if;
+
+         Args (1) := new String '(Path);
+         Execute_Command ("sqlite3", Args, File);
+      end Create_SQLite_Database;
+
+      --  ------------------------------
       --  Create the database, the user and the tables.
       --  ------------------------------
       procedure Create_Database (Model    : in String;
@@ -354,17 +387,19 @@ package body Gen.Commands.Database is
          Config          : ADO.Drivers.Connections.Configuration;
       begin
          Config.Set_Connection (Database);
-         if Config.Get_Property ("user") = "" then
-            Generator.Error ("Invalid database connection: missing user property");
-            return;
-         end if;
          if Config.Get_Database = "" then
             Generator.Error ("Invalid database connection: no database name specified");
             return;
          end if;
 
          if Config.Get_Driver = "mysql" then
+            if Config.Get_Property ("user") = "" then
+               Generator.Error ("Invalid database connection: missing user property");
+               return;
+            end if;
             Create_MySQL_Database (Model, Config, Database, Username, Password);
+         elsif Config.Get_Driver = "sqlite" then
+            Create_SQLite_Database (Model, Config, Database);
          else
             Generator.Error ("Database driver {0} is not supported.", Config.Get_Driver);
          end if;

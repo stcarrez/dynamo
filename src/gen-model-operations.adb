@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012, 2016 Stephane Carrez
+--  Copyright (C) 2012, 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,6 +72,8 @@ package body Gen.Model.Operations is
       Into.Parameters.Append (Parameter);
       if Into.Kind = UNKNOWN and then Of_Type = "ASF.Parts.Part" then
          Into.Kind := ASF_UPLOAD;
+      elsif Into.Kind = UNKNOWN and then Of_Type = "AWA.Events.Module_Event" then
+         Into.Kind := AWA_EVENT;
       elsif Into.Kind = UNKNOWN then
          Into.Kind := ASF_ACTION;
       end if;

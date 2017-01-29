@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -291,6 +291,11 @@ package body Gen.Model.Packages is
                   Used_Spec_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
                   Used_Spec_Types.Include (To_Unbounded_String ("ASF.Parts"));
                   Used_Body_Types.Include (To_Unbounded_String ("ASF.Parts.Upload_Method"));
+
+               when Operations.AWA_EVENT =>
+                  Used_Spec_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
+                  Used_Spec_Types.Include (To_Unbounded_String ("AWA.Events"));
+                  Used_Body_Types.Include (To_Unbounded_String ("AWA.Events.Action_Method"));
 
             end case;
             Operation_List.Next (Iter);

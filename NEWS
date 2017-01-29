@@ -1,6 +1,7 @@
 Version 0.9     -
   - New type ASF.Parts.Part in the Dynamo UML model
   - Add support to generate ASF Upload method in UML Ada beans
+  - Add support to generate AWA event actions
   - Generate JSON/XML serialization code for UML classes
   - Update the 'create-database' command to support SQLite
 

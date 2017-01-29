@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-database -- Database creation from application model
---  Copyright (C) 2011, 2012, 2016 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -196,7 +196,9 @@ package body Gen.Commands.Database is
       Result  : GNAT.Expect.Expect_Match;
       Content : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      Util.Files.Read_File (Path => Input, Into => Content);
+      if Input /= "" then
+         Util.Files.Read_File (Path => Input, Into => Content);
+      end if;
       GNAT.Expect.Non_Blocking_Spawn (Descriptor  => Proc,
                                       Command     => Name,
                                       Args        => Args,
@@ -357,7 +359,7 @@ package body Gen.Commands.Database is
          Path  : constant String := Config.Get_Database;
          Dir   : constant String := Util.Files.Compose (Model, "sqlite");
          File  : constant String := Util.Files.Compose (Dir, "create-" & Name & "-sqlite.sql");
-         Args  : GNAT.OS_Lib.Argument_List (1 .. 1);
+         Args  : GNAT.OS_Lib.Argument_List (1 .. 3);
       begin
          if Ada.Directories.Exists (Path) then
             Log.Info ("Connecting to {0} for database setup", Database);
@@ -373,8 +375,10 @@ package body Gen.Commands.Database is
             return;
          end if;
 
-         Args (1) := new String '(Path);
-         Execute_Command ("sqlite3", Args, File);
+         Args (1) := new String '("-init");
+         Args (2) := new String '(File);
+         Args (3) := new String '(Path);
+         Execute_Command ("sqlite3", Args, "");
       end Create_SQLite_Database;
 
       --  ------------------------------

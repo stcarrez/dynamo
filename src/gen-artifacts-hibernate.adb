@@ -403,6 +403,9 @@ package body Gen.Artifacts.Hibernate is
          Incr        : Integer;
       begin
          SQL_Content := Null_Unbounded_String;
+         if Driver = "sqlite" then
+            Append (SQL_Content, "pragma synchronous=OFF;" & ASCII.LF);
+         end if;
          if Is_Reverse then
             Pos  := Project.Dynamo_Files.Last_Index;
             Incr := -1;

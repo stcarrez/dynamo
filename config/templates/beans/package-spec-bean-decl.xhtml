@@ -49,6 +49,10 @@
    procedure #{fn:capitalize(operation.name)} (Bean : in out #{bean.type};
                #{g:indent(operation.name)}Part : in ASF.Parts.Part'Class) is abstract;
 </h:panelGroup>
+<h:panelGroup rendered="#{operation.type == 'AWA_EVENT'}">
+   procedure #{fn:capitalize(operation.name)} (Bean  : in out #{bean.type};
+               #{g:indent(operation.name)}Event : in AWA.Events.Module_Event'Class) is abstract;
+</h:panelGroup>
 </h:list>
 #{''}
 <h:panelGroup rendered="#{bean.isSerializable}">

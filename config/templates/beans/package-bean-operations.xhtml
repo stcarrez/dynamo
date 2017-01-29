@@ -35,6 +35,21 @@
                                        Method => Op_#{fn:capitalize(operation.name)},
                                        Name   => "#{operation.name}");
    </h:panelGroup>
+   <h:panelGroup rendered="#{operation.type == 'AWA_EVENT'}">
+   procedure Op_#{fn:capitalize(operation.name)} (Bean  : in out #{bean.type};
+                #{g:indent(operation.name)}  Event : in AWA.Events.Module_Event'Class);
+
+   procedure Op_#{fn:capitalize(operation.name)} (Bean  : in out #{bean.type};
+                #{g:indent(operation.name)}  Event : in AWA.Events.Module_Event'Class) is
+   begin
+      #{bean.type}'Class (Bean).#{fn:capitalize(operation.name)} (Event);
+   end Op_#{fn:capitalize(operation.name)};
+
+   package Binding_#{fn:capitalize(bean.type)}_#{operation.rowIndex} is
+     new AWA.Events.Action_Method.Bind (Bean   => #{bean.type},
+                                        Method => Op_#{fn:capitalize(operation.name)},
+                                        Name   => "#{operation.name}");
+   </h:panelGroup>
    </h:list>
 #{''}
 <h:panelGroup rendered="#{not empty bean.operations}">

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-hibernate -- Hibernate artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -334,7 +334,7 @@ package body Gen.Artifacts.Hibernate is
 
       use Util.Encoders;
 
-      SQL_Content : Unbounded_String;
+      SQL_Content  : Unbounded_String;
 
       --  SHA for each SQL content that is appended in the SQL content.
       --  This is used to avoid appending the same SQL file several times in the final SQL file.
@@ -432,6 +432,9 @@ package body Gen.Artifacts.Hibernate is
          end loop;
          if not Is_Reverse then
             Collect_SQL (Project, Model_Dir, Driver, Prefix, "", SQL_Content);
+         end if;
+         if Prefix = "" then
+            Collect_SQL (Project, Model_Dir, Driver, "init-", "", SQL_Content);
          end if;
 
          Log.Info ("Generating " & Driver & " creation schema in '{0}'",

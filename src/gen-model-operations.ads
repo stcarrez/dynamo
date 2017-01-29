@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012, 2016 Stephane Carrez
+--  Copyright (C) 2012, 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ package Gen.Model.Operations is
 
    use Ada.Strings.Unbounded;
 
-   type Operation_Type is (UNKNOWN, ASF_ACTION, ASF_UPLOAD);
+   type Operation_Type is (UNKNOWN, ASF_ACTION, ASF_UPLOAD, AWA_EVENT);
 
    --  ------------------------------
    --  Parameter Definition

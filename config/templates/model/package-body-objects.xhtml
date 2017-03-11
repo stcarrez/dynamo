@@ -413,7 +413,7 @@
       Object.#{fn:capitalize(table.version.name)} := 1;
 </h:panelGroup>
 <h:list value="#{table.members}" var="column">
-  <h:panelGroup rendered="#{table.id.generator ne 'native' and table.id.name eq column.name and table.id.generator ne 'none'}">
+  <h:panelGroup rendered="#{table.keyCount eq 1 and table.id.generator ne 'native' and table.id.name eq column.name and table.id.generator ne 'none'}">
       Session.Allocate (Id => Object);
   </h:panelGroup>
   <h:panelGroup rendered="#{table.id.generator ne 'native' or table.id.name ne column.name}">

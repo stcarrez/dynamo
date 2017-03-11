@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -376,6 +376,9 @@ package body Gen.Model.Tables is
       elsif Name = "table" then
          return Util.Beans.Objects.To_Object (From.Table_Name);
 
+      elsif Name = "keyCount" then
+         return Util.Beans.Objects.To_Object (From.Key_Count);
+
       elsif Name = "parent" then
          if From.Parent /= null then
             declare
@@ -421,11 +424,13 @@ package body Gen.Model.Tables is
    begin
       Log.Info ("Prepare table {0}", O.Name);
 
+      O.Key_Count := 0;
       while Column_List.Has_Element (Iter) loop
          C := Column_List.Element (Iter);
          C.Prepare;
          if C.Is_Key then
             Log.Info ("Found key {0}", C.Name);
+            O.Key_Count := O.Key_Count + 1;
             O.Id_Column := C;
          end if;
          if C.Is_Version then

@@ -403,6 +403,7 @@ package body Gen.Artifacts.Hibernate is
          Incr        : Integer;
       begin
          SQL_Content := Null_Unbounded_String;
+         SHA_Files.Clear;
          if Driver = "sqlite" then
             Append (SQL_Content, "pragma synchronous=OFF;" & ASCII.LF);
          end if;

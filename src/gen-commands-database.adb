@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with GNAT.Command_Line;
 with GNAT.Expect;
 with GNAT.OS_Lib;
 
@@ -41,7 +40,6 @@ with System;
 with Gen.Database.Model;
 package body Gen.Commands.Database is
 
-   use GNAT.Command_Line;
    use Util.Log;
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Commands.Database");
@@ -270,9 +268,12 @@ package body Gen.Commands.Database is
    --  ------------------------------
    --  Execute the command with the arguments.
    --  ------------------------------
+   overriding
    procedure Execute (Cmd       : in Command;
+                      Name      : in String;
+                      Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name);
 
       use Ada.Strings.Unbounded;
 
@@ -417,10 +418,10 @@ package body Gen.Commands.Database is
             Generator.Error (Ada.Exceptions.Exception_Message (E));
       end Create_Database;
 
-      Model  : constant String := Get_Argument;
-      Arg1   : constant String := Get_Argument;
-      Arg2   : constant String := Get_Argument;
-      Arg3   : constant String := Get_Argument;
+      Model  : constant String := (if Args.Get_Count > 0 then Args.Get_Argument (1) else "");
+      Arg1   : constant String := (if Args.Get_Count > 1 then Args.Get_Argument (2) else "");
+      Arg2   : constant String := (if Args.Get_Count > 2 then Args.Get_Argument (3) else "");
+      Arg3   : constant String := (if Args.Get_Count > 3 then Args.Get_Argument (4) else "");
    begin
       Generator.Read_Project ("dynamo.xml");
 

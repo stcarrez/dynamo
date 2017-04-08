@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-propset -- Set a property on dynamo project
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,35 +16,35 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Text_IO;
-with GNAT.Command_Line;
 
 package body Gen.Commands.Propset is
 
    --  ------------------------------
    --  Execute the command with the arguments.
    --  ------------------------------
+   overriding
    procedure Execute (Cmd       : in Command;
+                      Name      : in String;
+                      Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
-      use GNAT.Command_Line;
       use Ada.Strings.Unbounded;
 
-      Name     : constant String := Get_Argument;
-      Value    : constant String := Get_Argument;
    begin
-      if Name'Length = 0 then
+      if Args.Get_Count /= 2 then
          Gen.Commands.Usage;
          return;
       end if;
 
       Generator.Read_Project ("dynamo.xml", True);
-      Generator.Set_Project_Property (Name, Value);
+      Generator.Set_Project_Property (Args.Get_Argument (1), Args.Get_Argument (2));
       Generator.Save_Project;
    end Execute;
 
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
+   overriding
    procedure Help (Cmd : in Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);

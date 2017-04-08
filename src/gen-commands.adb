@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands -- Commands for dynamo
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,6 @@
 with Ada.Text_IO;
 with Ada.Command_Line;
 
-with GNAT.Command_Line;
-
 with Gen.Configs;
 with Gen.Commands.Generate;
 with Gen.Commands.Project;
@@ -37,32 +35,6 @@ with Gen.Commands.Docs;
 with Util.Log.Loggers;
 
 package body Gen.Commands is
-
-   use Ada.Strings.Unbounded;
-   use Util.Log;
-
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Commands");
-
-   Commands : Command_Maps.Map;
-
-
-   --  ------------------------------
-   --  Write the command usage.
-   --  ------------------------------
-   procedure Usage (Cmd : in Command) is
-   begin
-      null;
-   end Usage;
-
-   --  ------------------------------
-   --  Print a message on the standard output.
-   --  ------------------------------
-   procedure Print (Cmd     : in Command;
-                    Message : in String) is
-      pragma Unreferenced (Cmd);
-   begin
-      Ada.Text_IO.Put_Line (Message);
-   end Print;
 
    --  ------------------------------
    --  Print dynamo usage
@@ -94,83 +66,6 @@ package body Gen.Commands is
       Put (Ada.Command_Line.Command_Name);
       Put_Line (" help' for the list of commands.");
    end Short_Help_Usage;
-
-   --  ------------------------------
-   --  Execute the command with the arguments.
-   --  ------------------------------
-   procedure Execute (Cmd       : in Help_Command;
-                      Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
-
-      procedure Print (Position : in Command_Maps.Cursor);
-
-      use Ada.Text_IO;
-      use GNAT.Command_Line;
-
-      procedure Print (Position : in Command_Maps.Cursor) is
-         Name : constant Unbounded_String := Command_Maps.Key (Position);
-      begin
-         Put_Line ("   " & To_String (Name));
-      end Print;
-
-      Name : constant String := Get_Argument;
-
-   begin
-      Log.Debug ("Execute command {0}", Name);
-
-      if Name'Length = 0 then
-         Usage;
-         New_Line;
-         Put ("Type '");
-         Put (Ada.Command_Line.Command_Name);
-         Put_Line (" help {command}' for help on a specific command.");
-         New_Line;
-         Put_Line ("Available subcommands:");
-
-         Commands.Iterate (Process => Print'Access);
-      else
-         declare
-            Target_Cmd : constant Command_Access := Find_Command (Name);
-         begin
-            if Target_Cmd = null then
-               Generator.Error ("Unknown command {0}", Name);
-            else
-               Target_Cmd.Help (Generator);
-            end if;
-         end;
-      end if;
-   end Execute;
-
-   --  ------------------------------
-   --  Write the help associated with the command.
-   --  ------------------------------
-   procedure Help (Cmd       : in Help_Command;
-                   Generator : in out Gen.Generator.Handler) is
-   begin
-      null;
-   end Help;
-
-   --  ------------------------------
-   --  Register the command under the given  name.
-   --  ------------------------------
-   procedure Add_Command (Cmd  : in Command_Access;
-                          Name : in String) is
-   begin
-      Commands.Include (Key => To_Unbounded_String (Name), New_Item => Cmd);
-   end Add_Command;
-
-   --  ------------------------------
-   --  Find the command having the given name.
-   --  ------------------------------
-   function Find_Command (Name : in String) return Command_Access is
-      Pos : constant Command_Maps.Cursor := Commands.Find (To_Unbounded_String (Name));
-   begin
-      if Command_Maps.Has_Element (Pos) then
-         return Command_Maps.Element (Pos);
-      else
-         return null;
-      end if;
-   end Find_Command;
 
    --  Generate command.
    Generate_Cmd       : aliased Gen.Commands.Generate.Command;
@@ -206,18 +101,18 @@ package body Gen.Commands is
    Doc_Plugin_Cmd     : aliased Gen.Commands.Docs.Command;
 
    --  Help command.
-   Help_Cmd           : aliased Help_Command;
+   Help_Cmd           : aliased Drivers.Help_Command_Type;
 begin
-   Add_Command (Name => "help", Cmd => Help_Cmd'Access);
-   Add_Command (Name => "generate", Cmd => Generate_Cmd'Access);
-   Add_Command (Name => "create-project", Cmd => Create_Project_Cmd'Access);
-   Add_Command (Name => "add-page", Cmd => Add_Page_Cmd'Access);
-   Add_Command (Name => "add-layout", Cmd => Add_Layout_Cmd'Access);
-   Add_Command (Name => "add-model", Cmd => Add_Model_Cmd'Access);
-   Add_Command (Name => "propset", Cmd => Propset_Cmd'Access);
-   Add_Command (Name => "create-database", Cmd => Database_Cmd'Access);
-   Add_Command (Name => "create-plugin", Cmd => Create_Plugin_Cmd'Access);
-   Add_Command (Name => "dist", Cmd => Dist_Cmd'Access);
-   Add_Command (Name => "info", Cmd => Info_Cmd'Access);
-   Add_Command (Name => "build-doc", Cmd => Doc_Plugin_Cmd'Access);
+   Driver.Add_Command (Name => "help", Command => Help_Cmd'Access);
+   Driver.Add_Command (Name => "generate", Command => Generate_Cmd'Access);
+   Driver.Add_Command (Name => "create-project", Command => Create_Project_Cmd'Access);
+   Driver.Add_Command (Name => "add-page", Command => Add_Page_Cmd'Access);
+   Driver.Add_Command (Name => "add-layout", Command => Add_Layout_Cmd'Access);
+   Driver.Add_Command (Name => "add-model", Command => Add_Model_Cmd'Access);
+   Driver.Add_Command (Name => "propset", Command => Propset_Cmd'Access);
+   Driver.Add_Command (Name => "create-database", Command => Database_Cmd'Access);
+   Driver.Add_Command (Name => "create-plugin", Command => Create_Plugin_Cmd'Access);
+   Driver.Add_Command (Name => "dist", Command => Dist_Cmd'Access);
+   Driver.Add_Command (Name => "info", Command => Info_Cmd'Access);
+   Driver.Add_Command (Name => "build-doc", Command => Doc_Plugin_Cmd'Access);
 end Gen.Commands;

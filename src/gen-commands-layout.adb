@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-layout -- Layout creation command for dynamo
---  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,10 +26,12 @@ package body Gen.Commands.Layout is
    --  ------------------------------
    --  Execute the command with the arguments.
    --  ------------------------------
+   overriding
    procedure Execute (Cmd       : in Command;
+                      Name      : in String;
+                      Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
-      use GNAT.Command_Line;
+      pragma Unreferenced (Cmd, Name);
       use Ada.Strings.Unbounded;
 
       function Get_Name return String;
@@ -38,7 +40,7 @@ package body Gen.Commands.Layout is
       Layout_Dir : constant String := Util.Files.Compose (Dir, "web/WEB-INF/layouts");
 
       function Get_Name return String is
-         Name : constant String := Get_Argument;
+         Name : constant String := (if Args.Get_Count > 0 then Args.Get_Argument (1) else "");
          Pos  : constant Natural := Util.Strings.Rindex (Name, '.');
       begin
          if Pos = 0 then
@@ -52,22 +54,23 @@ package body Gen.Commands.Layout is
          end if;
       end Get_Name;
 
-      Name   : constant String := Get_Name;
+      Page_Name : constant String := Get_Name;
    begin
-      if Name'Length = 0 then
+      if Page_Name'Length = 0 then
          Gen.Commands.Usage;
          return;
       end if;
 
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (Layout_Dir);
-      Generator.Set_Global ("pageName", Name);
+      Generator.Set_Global ("pageName", Page_Name);
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "layout");
    end Execute;
 
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
+   overriding
    procedure Help (Cmd : in Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);

@@ -34,7 +34,7 @@ package body Gen.Commands.Docs is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name, Args);
 
       Doc  : Gen.Artifacts.Docs.Artifact;
       M    : Gen.Model.Packages.Model_Definition;

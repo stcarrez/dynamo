@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  dynamo -- Ada Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2015 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2015, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ with Ada.Environment_Variables;
 with Util.Files;
 with Util.Log.Loggers;
 with Util.Systems.Os;
+with Util.Commands;
 with Gen.Utils.GNAT;
 with Gen.Generator;
 with Gen.Commands;
@@ -58,6 +59,7 @@ procedure Dynamo is
    Print_Config : Boolean := False;
    Print_Env    : Boolean := False;
    Print_CEnv   : Boolean := False;
+   First        : Natural := 0;
 
    --  ------------------------------
    --  Print information about dynamo configuration
@@ -127,12 +129,15 @@ begin
 
          when 'o' =>
             Out_Dir := To_Unbounded_String (Parameter & "/");
+            First := First + 1;
 
          when 't' =>
             Template_Dir := To_Unbounded_String (Parameter & "/");
+            First := First + 1;
 
          when 'c' =>
             Set_Config_Directory (Parameter);
+            First := First + 1;
 
          when 'e' =>
             Print_Env := True;
@@ -152,6 +157,7 @@ begin
          when others =>
             null;
       end case;
+      First := First + 1;
    end loop;
 
    if Length (Config_Dir) = 0 then
@@ -178,6 +184,9 @@ begin
    end if;
 
    declare
+      use type Gen.Commands.Command_Access;
+
+      Args      : Util.Commands.Default_Argument_List (First + 1);
       Cmd_Name  : constant String := Full_Switch;
       Cmd       : Gen.Commands.Command_Access;
       Generator : Gen.Generator.Handler;
@@ -201,7 +210,7 @@ begin
          return;
       end if;
 
-      Cmd := Gen.Commands.Find_Command (Cmd_Name);
+      Cmd := Gen.Commands.Driver.Find_Command (Cmd_Name);
 
       --  Check that the command exists.
       if Cmd = null then
@@ -213,7 +222,7 @@ begin
          return;
       end if;
 
-      Cmd.Execute (Generator);
+      Cmd.Execute (Cmd_Name, Args, Generator);
 
       Ada.Command_Line.Set_Exit_Status (Gen.Generator.Get_Status (Generator));
    end;

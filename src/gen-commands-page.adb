@@ -18,7 +18,6 @@
 with Ada.Directories;
 with Ada.Text_IO;
 with Gen.Artifacts;
-with GNAT.Command_Line;
 with Util.Strings;
 
 package body Gen.Commands.Page is
@@ -31,7 +30,7 @@ package body Gen.Commands.Page is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name);
       use Ada.Strings.Unbounded;
 
       function Get_Layout return String;

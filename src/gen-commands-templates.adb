@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -287,7 +287,10 @@ package body Gen.Commands.Templates is
    --  ------------------------------
    --  Execute the command with the arguments.
    --  ------------------------------
+   overriding
    procedure Execute (Cmd       : in Command;
+                      Name      : in String;
+                      Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
       function Get_Output_Dir return String;
       procedure Expand_Arguments (Context : in EL.Contexts.ELContext'Class);
@@ -371,6 +374,7 @@ package body Gen.Commands.Templates is
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
+   overriding
    procedure Help (Cmd       : in Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Generator);
@@ -446,8 +450,8 @@ package body Gen.Commands.Templates is
          if Closure.Command /= null then
             Log.Info ("Adding command {0}", Closure.Command.Name);
 
-            Add_Command (Name => To_String (Closure.Command.Name),
-                         Cmd  => Closure.Command.all'Access);
+            Driver.Add_Command (Name    => To_String (Closure.Command.Name),
+                                Command => Closure.Command.all'Access);
             Closure.Command := null;
          end if;
       else

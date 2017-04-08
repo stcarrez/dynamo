@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-model -- Model creation command for dynamo
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,18 +27,21 @@ package body Gen.Commands.Model is
    --  ------------------------------
    --  Execute the command with the arguments.
    --  ------------------------------
+   overriding
    procedure Execute (Cmd       : in Command;
+                      Name      : in String;
+                      Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name);
       use GNAT.Command_Line;
       use Ada.Command_Line;
 
-      Name     : constant String := Get_Argument;
-      Arg2     : constant String := Get_Argument;
+      Arg1     : constant String := (if Args.Get_Count > 0 then Args.Get_Argument (1) else "");
+      Arg2     : constant String := (if Args.Get_Count > 1 then Args.Get_Argument (2) else "");
       Root_Dir : constant String := Generator.Get_Result_Directory;
       Dir      : constant String := Util.Files.Compose (Root_Dir, "db");
    begin
-      if Name'Length = 0 then
+      if Args.Get_Count = 0 or Args.Get_Count > 2 then
          Gen.Commands.Usage;
          return;
       end if;
@@ -46,19 +49,19 @@ package body Gen.Commands.Model is
       Generator.Read_Project ("dynamo.xml");
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (Dir);
-      if Arg2'Length = 0 then
+      if Args.Get_Count = 1 then
          --  Verify that we can use the name for an Ada identifier.
-         if not Gen.Utils.Is_Valid_Name (Name) then
+         if not Gen.Utils.Is_Valid_Name (Arg1) then
             Generator.Error ("The mapping name should be a valid Ada identifier.");
-            raise Gen.Generator.Fatal_Error with "Invalid mapping name: " & Name;
+            raise Gen.Generator.Fatal_Error with "Invalid mapping name: " & Arg1;
          end if;
          Generator.Set_Global ("moduleName", "");
-         Generator.Set_Global ("modelName", Name);
+         Generator.Set_Global ("modelName", Arg1);
       else
          --  Verify that we can use the name for an Ada identifier.
-         if not Gen.Utils.Is_Valid_Name (Name) then
+         if not Gen.Utils.Is_Valid_Name (Arg1) then
             Generator.Error ("The module name should be a valid Ada identifier.");
-            raise Gen.Generator.Fatal_Error with "Invalid module name: " & Name;
+            raise Gen.Generator.Fatal_Error with "Invalid module name: " & Arg1;
          end if;
 
          --  Likewise for the mapping name.
@@ -66,7 +69,7 @@ package body Gen.Commands.Model is
             Generator.Error ("The mapping name should be a valid Ada identifier.");
             raise Gen.Generator.Fatal_Error with "Invalid mapping name: " & Arg2;
          end if;
-         Generator.Set_Global ("moduleName", Name);
+         Generator.Set_Global ("moduleName", Arg1);
          Generator.Set_Global ("modelName", Arg2);
       end if;
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "add-model");
@@ -88,6 +91,7 @@ package body Gen.Commands.Model is
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
+   overriding
    procedure Help (Cmd : in Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);

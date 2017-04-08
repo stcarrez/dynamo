@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-page -- Page creation command for dynamo
---  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,10 +26,12 @@ package body Gen.Commands.Page is
    --  ------------------------------
    --  Execute the command with the arguments.
    --  ------------------------------
+   overriding
    procedure Execute (Cmd       : in Command;
+                      Name      : in String;
+                      Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
-      use GNAT.Command_Line;
       use Ada.Strings.Unbounded;
 
       function Get_Layout return String;
@@ -38,7 +40,7 @@ package body Gen.Commands.Page is
       Dir    : constant String := Generator.Get_Result_Directory & "web/";
 
       function Get_Name return String is
-         Name : constant String := Get_Argument;
+         Name : constant String := Args.Get_Argument (1);
          Pos  : constant Natural := Util.Strings.Rindex (Name, '.');
       begin
          if Pos = 0 then
@@ -53,37 +55,39 @@ package body Gen.Commands.Page is
       end Get_Name;
 
       function Get_Layout return String is
-         Layout : constant String := Get_Argument;
       begin
-         if Layout'Length = 0 then
+         if Args.Get_Count = 1 then
             return "layout";
          end if;
-         if Ada.Directories.Exists (Dir & "WEB-INF/layouts/" & Layout & ".xhtml") then
-            return Layout;
-         end if;
+         declare
+            Layout : constant String := Args.Get_Argument (2);
+         begin
+            if Ada.Directories.Exists (Dir & "WEB-INF/layouts/" & Layout & ".xhtml") then
+               return Layout;
+            end if;
 
-         Generator.Info ("Layout file {0} not found.", Layout);
-         return Layout;
+            Generator.Info ("Layout file {0} not found.", Layout);
+            return Layout;
+         end;
       end Get_Layout;
 
-      Name   : constant String := Get_Name;
-      Layout : constant String := Get_Layout;
    begin
-      if Name'Length = 0 then
+      if Args.Get_Count = 0 or Args.Get_Count > 2 then
          Gen.Commands.Usage;
          return;
       end if;
 
       Generator.Set_Force_Save (False);
       Generator.Set_Result_Directory (Dir);
-      Generator.Set_Global ("pageName", Name);
-      Generator.Set_Global ("layout", Layout);
+      Generator.Set_Global ("pageName", Get_Name);
+      Generator.Set_Global ("layout", Get_Layout);
       Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "page");
    end Execute;
 
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
+   overriding
    procedure Help (Cmd : in Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);

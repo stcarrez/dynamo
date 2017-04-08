@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands -- Commands for dynamo
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,68 +16,24 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-with Ada.Containers.Ordered_Maps;
-
+with Util.Commands.Drivers;
 with Gen.Generator;
 package Gen.Commands is
 
-   --  ------------------------------
-   --  Command
-   --  ------------------------------
-   type Command is abstract tagged private;
-   type Command_Access is access all Command'Class;
+   package Drivers is
+     new Util.Commands.Drivers (Context_Type => Gen.Generator.Handler,
+                                Driver_Name  => "gen-commands");
 
-   --  Execute the command with the arguments.
-   procedure Execute (Cmd       : in Command;
-                      Generator : in out Gen.Generator.Handler) is abstract;
+   subtype Command is Drivers.Command_Type;
+   subtype Command_Access is Drivers.Command_Access;
+   subtype Argument_List is Util.Commands.Argument_List;
 
-   --  Write the help associated with the command.
-   procedure Help (Cmd       : in Command;
-                   Generator : in out Gen.Generator.Handler) is abstract;
-
-   --  Write the command usage.
-   procedure Usage (Cmd : in Command);
-
-   --  Print a message on the standard output.
-   procedure Print (Cmd     : in Command;
-                    Message : in String);
-
-   --  ------------------------------
-   --  Help Command
-   --  ------------------------------
-   type Help_Command is new Command with private;
-
-   --  Execute the command with the arguments.
-   procedure Execute (Cmd       : in Help_Command;
-                      Generator : in out Gen.Generator.Handler);
-
-   --  Write the help associated with the command.
-   procedure Help (Cmd       : in Help_Command;
-                   Generator : in out Gen.Generator.Handler);
-
-   --  Register the command under the given  name.
-   procedure Add_Command (Cmd  : in Command_Access;
-                          Name : in String);
-
-   --  Find the command having the given name.
-   function Find_Command (Name : in String) return Command_Access;
+   Driver : Drivers.Driver_Type;
 
    --  Print dynamo usage
    procedure Usage;
 
    --  Print dynamo short usage.
    procedure Short_Help_Usage;
-
-private
-
-   package Command_Maps is
-     new Ada.Containers.Ordered_Maps (Key_Type     => Ada.Strings.Unbounded.Unbounded_String,
-                                      Element_Type => Command_Access,
-                                      "<"          => Ada.Strings.Unbounded."<");
-
-   type Command is abstract tagged null record;
-
-   type Help_Command is new Command with null record;
 
 end Gen.Commands;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-info -- Collect and give information about the project
---  Copyright (C) 2011, 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,10 @@ package body Gen.Commands.Info is
    --  ------------------------------
    --  Execute the command with the arguments.
    --  ------------------------------
+   overriding
    procedure Execute (Cmd       : in Command;
+                      Name      : in String;
+                      Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd);
 
@@ -233,6 +236,7 @@ package body Gen.Commands.Info is
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
+   overriding
    procedure Help (Cmd       : in Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);

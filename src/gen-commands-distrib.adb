@@ -16,12 +16,8 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with GNAT.Command_Line;
-
 with Ada.Text_IO;
 package body Gen.Commands.Distrib is
-
-   use GNAT.Command_Line;
 
    --  ------------------------------
    --  Execute the command with the arguments.
@@ -31,31 +27,23 @@ package body Gen.Commands.Distrib is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name);
    begin
+      if Args.Get_Count = 0 or Args.Get_Count > 2 then
+         Generator.Error ("Missing target directory");
+         return;
+      end if;
       Generator.Read_Project ("dynamo.xml", True);
 
       --  Setup the target directory where the distribution is created.
-      declare
-         Target_Dir : constant String := Get_Argument;
-      begin
-         if Target_Dir'Length = 0 then
-            Generator.Error ("Missing target directory");
-            return;
-         end if;
-         Generator.Set_Result_Directory (Target_Dir);
-      end;
+      Generator.Set_Result_Directory (Args.Get_Argument (1));
 
       --  Read the package description.
-      declare
-         Package_File : constant String := Get_Argument;
-      begin
-         if Package_File'Length > 0 then
-            Gen.Generator.Read_Package (Generator, Package_File);
-         else
-            Gen.Generator.Read_Package (Generator, "package.xml");
-         end if;
-      end;
+      if Args.Get_Count = 2 then
+         Gen.Generator.Read_Package (Generator, Args.Get_Argument (2));
+      else
+         Gen.Generator.Read_Package (Generator, "package.xml");
+      end if;
 
       --  Run the generation.
       Gen.Generator.Prepare (Generator);

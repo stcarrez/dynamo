@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs -- Artifact for distributions
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -107,7 +107,8 @@ private
 
    --  The <b>Directory_List<b> describes the content of a source directory.
    type Directory_List (Length      : Positive;
-                        Path_Length : Natural) is record
+                        Path_Length : Natural)
+   is record
       Files       : File_Record_Vectors.Vector;
       Directories : Directory_List_Vector.Vector;
       Rel_Pos     : Positive := 1;

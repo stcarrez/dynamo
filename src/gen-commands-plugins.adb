@@ -38,7 +38,7 @@ package body Gen.Commands.Plugins is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name, Args);
       use GNAT.Command_Line;
 
       function Get_Directory_Name (Name     : in String;

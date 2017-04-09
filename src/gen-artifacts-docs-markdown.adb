@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs-markdown -- Artifact for GitHub Markdown documentation format
---  Copyright (C) 2015 Stephane Carrez
+--  Copyright (C) 2015, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +21,9 @@ with Util.Log.Loggers;
 package body Gen.Artifacts.Docs.Markdown is
 
    function Has_Scheme (Link : in String) return Boolean;
-   use Util.Log;
+   function Is_Image (Link : in String) return Boolean;
 
-
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Docs.Mark");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Docs.Mark");
 
    --  ------------------------------
    --  Get the document name from the file document (ex: <name>.wiki or <name>.md).

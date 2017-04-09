@@ -35,7 +35,7 @@ package body Gen.Commands.Info is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name, Args);
 
       procedure Collect_Directories (List   : in Gen.Utils.String_List.Vector;
                                      Result : out Gen.Utils.String_List.Vector);

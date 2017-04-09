@@ -292,6 +292,7 @@ package body Gen.Commands.Templates is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
+      pragma Unreferenced (Name, Args);
       function Get_Output_Dir return String;
       procedure Expand_Arguments (Context : in EL.Contexts.ELContext'Class);
 

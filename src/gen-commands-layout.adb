@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 with Ada.Text_IO;
 with Gen.Artifacts;
-with GNAT.Command_Line;
 
 with Util.Strings;
 with Util.Files;

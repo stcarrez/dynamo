@@ -60,7 +60,7 @@ package body Gen.Commands.Project is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name, Args);
       use GNAT.Command_Line;
 
       Web_Flag  : aliased Boolean := False;

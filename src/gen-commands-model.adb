@@ -18,7 +18,6 @@
 with Ada.Text_IO;
 with Ada.Command_Line;
 with Gen.Artifacts;
-with GNAT.Command_Line;
 
 with Gen.Utils;
 with Util.Files;
@@ -33,7 +32,6 @@ package body Gen.Commands.Model is
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Name);
-      use GNAT.Command_Line;
       use Ada.Command_Line;
 
       Arg1     : constant String := (if Args.Get_Count > 0 then Args.Get_Argument (1) else "");

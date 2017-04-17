@@ -45,8 +45,16 @@ MKDIR=mkdir
 CP=cp
 
 # Build executables for all mains defined by the project.
-build:	src/gen-configs.ads
+build:	local-build build-tests
+
+local-build: src/gen-configs.ads
 	$(GNATMAKE) -p -P "$(GPRPATH)" $(MAKE_ARGS)
+
+build-tests:
+	$(GNATMAKE) -p -Pdynamo_tests $(MAKE_ARGS)
+
+bin/dynamo:  local-build
+bin/dynamo_harness:  bin/dynamo build-tests
 
 # Not intended for manual invocation.
 # Invoked if automatic builds are enabled.
@@ -74,10 +82,7 @@ rebuild: clean build
 doc:
 	$(DYNAMO) build-doc -markdown wiki
 
-bin/dynamo_harness:  bin/dynamo
-	$(GNATMAKE) -p -Pdynamo_tests $(MAKE_ARGS)
-
-check test:	 build bin/dynamo_harness
+check test:	 build
 	-rm -rf test-app
 	-rm -f dynamo-junit.xml
 	bin/dynamo_harness -xml dynamo-aunit.xml
@@ -88,7 +93,7 @@ generate:
 	$(GENERATOR) generate config/db
 
 dist:
-	git archive -o $(DIST_FILE) --prefix=$(distdir)/ HEAD	-rm -rf $(distdir)
+	git archive -o $(DIST_FILE) --prefix=$(distdir)/ HEAD
 
 # Update src/gen.ads with the latest SVN revision number.
 version:

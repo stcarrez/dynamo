@@ -53,24 +53,26 @@ build:	src/gen-configs.ads
 # Analyzes only on those sources that have changed.
 # Does not build executables.
 autobuild:
-	$(GNATMAKE) -gnatc -c -k  -P "$(GPRPATH)" $(MAKE_ARGS)
+	$(GNATMAKE) $(MAKE_ARGS) -gnatc -c -k  -P "$(GPRPATH)"
 
 # Clean the root project of all build products.
 clean:
-	$(GNATCLEAN) -q -P "$(GPRPATH)"
+	-rm -rf lib obj bin
 
 # Clean root project and all imported projects too.
 clean_tree:
-	$(GNATCLEAN) -P "$(GPRPATH)" -r
+	$(GNATCLEAN) -q -P "$(GPRPATH)" -r
 
 # Check *all* sources for errors, even those not changed.
 # Does not build executables.
 analyze:
-	$(GNATMAKE) -f  -gnatc -c -k  -P "$(GPRPATH)" $(MAKE_ARGS)
+	$(GNATMAKE) $(MAKE_ARGS) -f  -gnatc -c -k  -P "$(GPRPATH)"
 
 # Clean, then build executables for all mains defined by the project.
 rebuild: clean build
 
+doc:
+	$(DYNAMO) build-doc -markdown wiki
 
 bin/dynamo_harness:  bin/dynamo
 	$(GNATMAKE) -p -Pdynamo_tests $(MAKE_ARGS)
@@ -85,36 +87,8 @@ GENERATOR=dynamo
 generate:
 	$(GENERATOR) generate config/db
 
-# Files to package in source distribution
-DISTFILES=README.md NEWS LICENSE.txt NOTICE.txt CHANGES COPYING3 config.guess configure config.sub \
-configure.in Makefile.in install-sh aclocal.m4 ChangeLog \
-dynamo.gpr.in config.gpr dynamo_tests.gpr.in \
-src \
-bin obj config doc regtests
-
 dist:
-	-rm -rf $(distdir)
-	mkdir $(distdir)
-	-chmod 777 $(distdir)
-	here=`cd $(top_builddir) && pwd`; \
-	top_distdir=`cd $(distdir) && pwd`; \
-	distdir=`cd $(distdir) && pwd`; \
-	for file in $(DISTFILES); do \
-	  d=$(srcdir); \
-	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
-	  else \
-	    test -f $(distdir)/$$file \
-	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
-	    || cp -p $$d/$$file $(distdir)/$$file || :; \
-	  fi; \
-	done
-	-rm -rf $(distdir)/src/asis
-	-rm -f $(distdir)/bin/*
-	-rm -f $(distdir)/obj/*
-	tar --exclude=.svn --exclude=.git --exclude="*~" --exclude="*.o" --exclude="*.ali" \
-	    --exclude="*.log" --exclude="*.a" \
-	    -cvzf $(DIST_FILE) $(distdir)
+	git archive -o $(DIST_FILE) --prefix=$(distdir)/ HEAD	-rm -rf $(distdir)
 
 # Update src/gen.ads with the latest SVN revision number.
 version:
@@ -154,10 +128,3 @@ uninstall:
 	rm -rf ${prefix}/share/dynamo/base
 	rm -f ${bindir}/dynamo
 	rm -f $(prefix)/share/man/man1/dynamo.1
-
-# prepare before releasing a new version of the package
-# (collect information about changes and SVN repository)
-prepare-release:
-	# ${SVN} update
-	# ${SVN} info > CHANGES
-	# ${SVN} log -v > ChangeLog

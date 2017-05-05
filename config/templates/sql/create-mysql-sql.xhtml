@@ -14,7 +14,7 @@ CREATE TABLE #{table.table} (
   `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} #{not column.isNull ? 'NOT NULL' : ''}#{column.isPrimaryKey and (table.id.generator eq 'increment') ? ' AUTO_INCREMENT' : ''},
 </h:list><u:set var="counter" value="0"/>
   PRIMARY KEY (<h:list value="#{table.members}" var="column"><h:panelGroup rendered="#{column.isPrimaryKey}"><h:panelGroup rendered="#{counter ne 0}">, </h:panelGroup><u:set var="counter" value="#{counter + 1}"/>`#{column.sqlName}`</h:panelGroup></h:list>)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 </h:list>
 <h:panelGroup rendered="#{not empty model.tables}">
 INSERT INTO entity_type (name) VALUES

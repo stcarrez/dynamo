@@ -266,6 +266,7 @@ package body Gen.Commands.Database is
                                        Password : in String) is
          Factory         : ADO.Sessions.Factory.Session_Factory;
          Root_Connection : Unbounded_String;
+         Root_Hidden     : Unbounded_String;
          Pos             : Natural;
       begin
          --  Build a connection string to create the database.
@@ -279,12 +280,14 @@ package body Gen.Commands.Database is
          end if;
          Append (Root_Connection, "/?user=");
          Append (Root_Connection, Username);
+         Root_Connection := Root_Hidden;
          if Password'Length > 0 then
             Append (Root_Connection, "&password=");
             Append (Root_Connection, Password);
+            Append (Root_Hidden, "&password=XXXXXXXX");
          end if;
 
-         Log.Info ("Connecting to {0} for database setup", Root_Connection);
+         Log.Info ("Connecting to {0} for database setup", Root_Hidden);
 
          --  Initialize the session factory to connect to the
          --  database defined by root connection (which should allow the database creation).

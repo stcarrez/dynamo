@@ -16,9 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with GNAT.Expect;
-with GNAT.OS_Lib;
-
 with Ada.Text_IO;
 with Ada.Strings.Fixed;
 with Ada.IO_Exceptions;
@@ -28,14 +25,15 @@ with Ada.Exceptions;
 with Util.Strings;
 with Util.Files;
 with Util.Log.Loggers;
+with Util.Processes;
+with Util.Streams.Texts;
+with Util.Streams.Pipes;
 
 with ADO.Drivers.Connections;
 with ADO.Sessions.Factory;
 with ADO.Statements;
 with ADO.Queries;
 with ADO.Parameters;
-
-with System;
 
 with Gen.Database.Model;
 package body Gen.Commands.Database is
@@ -52,16 +50,10 @@ package body Gen.Commands.Database is
    function Has_Tables (DB   : in ADO.Sessions.Session'Class;
                         Name : in String) return Boolean;
 
-   --  Expect filter to print the command output/error
-   procedure Command_Output (Descriptor : in GNAT.Expect.Process_Descriptor'Class;
-                             Data       : in String;
-                             Closure    : in System.Address);
-
    --  Execute the external command <b>Name</b> with the arguments in <b>Args</b>
    --  and send the content of the file <b>Input</b> to that command.
-   procedure Execute_Command (Name  : in String;
-                              Args  : in GNAT.OS_Lib.Argument_List;
-                              Input : in String);
+   procedure Execute_Command (Command : in String;
+                              Input   : in String);
 
    --  Create the MySQL tables in the database.  The tables are created by launching
    --  the external command 'mysql' and using the create-xxx-mysql.sql generated scripts.
@@ -171,51 +163,36 @@ package body Gen.Commands.Database is
    end Create_User_Grant;
 
    --  ------------------------------
-   --  Expect filter to print the command output/error
-   --  ------------------------------
-   procedure Command_Output (Descriptor : in GNAT.Expect.Process_Descriptor'Class;
-                             Data       : in String;
-                             Closure    : in System.Address) is
-      pragma Unreferenced (Descriptor, Closure);
-   begin
-      Log.Error ("{0}", Data);
-   end Command_Output;
-
-   --  ------------------------------
    --  Execute the external command <b>Name</b> with the arguments in <b>Args</b>
    --  and send the content of the file <b>Input</b> to that command.
    --  ------------------------------
-   procedure Execute_Command (Name  : in String;
-                              Args  : in GNAT.OS_Lib.Argument_List;
-                              Input : in String) is
-      Proc    : GNAT.Expect.Process_Descriptor;
-      Status  : Integer;
-      Func    : constant GNAT.Expect.Filter_Function := Command_Output'Access;
-      Result  : GNAT.Expect.Expect_Match;
-      Content : Ada.Strings.Unbounded.Unbounded_String;
+   procedure Execute_Command (Command : in String;
+                              Input   : in String) is
+      Proc    : aliased Util.Streams.Pipes.Pipe_Stream;
+      Text    : Util.Streams.Texts.Reader_Stream;
    begin
       if Input /= "" then
-         Util.Files.Read_File (Path => Input, Into => Content);
+         Proc.Set_Input_Stream (Input);
       end if;
-      GNAT.Expect.Non_Blocking_Spawn (Descriptor  => Proc,
-                                      Command     => Name,
-                                      Args        => Args,
-                                      Buffer_Size => 4096,
-                                      Err_To_Out  => True);
-      GNAT.Expect.Add_Filter (Descriptor => Proc,
-                              Filter     => Func,
-                              Filter_On  => GNAT.Expect.Output);
-      GNAT.Expect.Send (Descriptor   => Proc,
-                        Str          => Ada.Strings.Unbounded.To_String (Content),
-                        Add_LF       => False,
-                        Empty_Buffer => False);
-      GNAT.Expect.Expect (Proc, Result, ".*");
-      GNAT.Expect.Close (Descriptor => Proc,
-                         Status     => Status);
-      if Status = 0 then
+      Text.Initialize (Proc'Unchecked_Access);
+      Proc.Open (Command, Util.Processes.READ);
+      while not Text.Is_Eof loop
+         declare
+            Line : Ada.Strings.Unbounded.Unbounded_String;
+         begin
+            Text.Read_Line (Line, Strip => False);
+            exit when Ada.Strings.Unbounded.Length (Line) = 0;
+            Log.Error ("{0}", Ada.Strings.Unbounded.To_String (Line));
+         end;
+      end loop;
+      Proc.Close;
+      if Proc.Get_Exit_Status = 0 then
          Log.Info ("Database schema created successfully.");
+      elsif Proc.Get_Exit_Status = 255 then
+         Log.Error ("Command not found: {0}", Command);
       else
-         Log.Error ("Error while creating the database schema.");
+         Log.Error ("Command {0} failed with exit code {1}", Command,
+                    Util.Strings.Image (Proc.Get_Exit_Status));
       end if;
 
    exception
@@ -246,22 +223,11 @@ package body Gen.Commands.Database is
       end if;
 
       if Password'Length > 0 then
-         declare
-            Args : GNAT.OS_Lib.Argument_List (1 .. 3);
-         begin
-            Args (1) := new String '("--user=" & Username);
-            Args (2) := new String '("--password=" & Password);
-            Args (3) := new String '(Database);
-            Execute_Command ("mysql", Args, File);
-         end;
+         Execute_Command ("mysql --user=" & Username & " --password=" & Password & " "
+                          & Database, File);
       else
-         declare
-            Args : GNAT.OS_Lib.Argument_List (1 .. 2);
-         begin
-            Args (1) := new String '("--user=" & Username);
-            Args (2) := new String '(Database);
-            Execute_Command ("mysql", Args, File);
-         end;
+         Execute_Command ("mysql --user=" & Username & " "
+                          & Database, File);
       end if;
    end Create_Mysql_Tables;
 
@@ -360,7 +326,6 @@ package body Gen.Commands.Database is
          Path  : constant String := Config.Get_Database;
          Dir   : constant String := Util.Files.Compose (Model, "sqlite");
          File  : constant String := Util.Files.Compose (Dir, "create-" & Name & "-sqlite.sql");
-         Args  : GNAT.OS_Lib.Argument_List (1 .. 3);
       begin
          if Ada.Directories.Exists (Path) then
             Log.Info ("Connecting to {0} for database setup", Database);
@@ -376,10 +341,7 @@ package body Gen.Commands.Database is
             return;
          end if;
 
-         Args (1) := new String '("-init");
-         Args (2) := new String '(File);
-         Args (3) := new String '(Path);
-         Execute_Command ("sqlite3", Args, "");
+         Execute_Command ("sqlite3 --init " & File & " " & Path, "");
       end Create_SQLite_Database;
 
       --  ------------------------------

@@ -98,6 +98,10 @@ package body Gen.Artifacts.Distribs is
          procedure Collect_Includes (Rule  : in out Distrib_Rule_Access;
                                      Node  : in DOM.Core.Node);
 
+         --  Collect the exclude definitions for the distribution rule.
+         procedure Collect_Excludes (Rule  : in out Distrib_Rule_Access;
+                                     Node  : in DOM.Core.Node);
+
          --  Collect the fileset definitions for the distribution rule.
          procedure Collect_Filesets (Rule  : in out Distrib_Rule_Access;
                                      Node  : in DOM.Core.Node);
@@ -124,9 +128,28 @@ package body Gen.Artifacts.Distribs is
             Rule.Matches.Append (Match);
          end Collect_Includes;
 
+         --  ------------------------------
+         --  Collect the exclude definitions for the distribution rule.
+         --  ------------------------------
+         procedure Collect_Excludes (Rule  : in out Distrib_Rule_Access;
+                                     Node  : in DOM.Core.Node) is
+            Name : constant String := To_String (Gen.Utils.Get_Attribute (Node, "name"));
+         begin
+            if Name = "" then
+               Context.Error ("Invalid exclude name {0}", Name);
+               return;
+            end if;
+            Match.Match := To_Unbounded_String (Name);
+            Rule.Excludes.Append (Match);
+         end Collect_Excludes;
+
          procedure Iterate is
            new Gen.Utils.Iterate_Nodes (T => Distrib_Rule_Access,
                                         Process => Collect_Includes);
+
+         procedure Iterate_Excludes is
+           new Gen.Utils.Iterate_Nodes (T => Distrib_Rule_Access,
+                                        Process => Collect_Excludes);
 
          --  ------------------------------
          --  Collect the include definitions for the distribution rule.
@@ -141,6 +164,7 @@ package body Gen.Artifacts.Distribs is
             end if;
             Match.Base_Dir := To_Unbounded_String (Dir);
             Iterate (Rule, Node, "include");
+            Iterate_Excludes (Rule, Node, "exclude", False);
          end Collect_Filesets;
 
          procedure Iterate_Filesets is
@@ -154,6 +178,7 @@ package body Gen.Artifacts.Distribs is
             Rule.Dir := To_Unbounded_String (Dir);
             Handler.Rules.Append (Rule);
             Iterate (Rule, Node, "include", False);
+            Iterate_Excludes (Rule, Node, "exclude", False);
             Iterate_Filesets (Rule, Node, "fileset");
          end if;
       end Register_Rule;
@@ -493,12 +518,50 @@ package body Gen.Artifacts.Distribs is
    end Add_Source_File;
 
    --  ------------------------------
+   --  Remove the file to be processed by the distribution rule.  This is the opposite of
+   --  <tt>Add_Source_File</tt> and used for the <exclude name="xxx"/> rules.
+   --  ------------------------------
+   procedure Remove_Source_File (Rule     : in out Distrib_Rule;
+                                 Path     : in String;
+                                 File     : in File_Record) is
+      procedure Remove_File (Key  : in String;
+                             Info : in out File_Vector);
+
+      Target_Path : constant String := Distrib_Rule'Class (Rule).Get_Target_Path (Path, File);
+      Need_Remove : Boolean := False;
+
+      procedure Remove_File (Key  : in String;
+                             Info : in out File_Vector) is
+         pragma Unreferenced (Key);
+         Pos : File_Cursor := Info.Find (File);
+      begin
+         if File_Record_Vectors.Has_Element (Pos) then
+            Log.Debug ("Excluding {0} - {1}", Path, Target_Path);
+
+            Info.Delete (Pos);
+            Need_Remove := Info.Is_Empty;
+         end if;
+      end Remove_File;
+
+      Pos : File_Tree.Cursor := Rule.Files.Find (Target_Path);
+   begin
+      if File_Tree.Has_Element (Pos) then
+         Rule.Files.Update_Element (Pos, Remove_File'Access);
+         if Need_Remove then
+            Rule.Files.Delete (Pos);
+         end if;
+      end if;
+   end Remove_Source_File;
+
+   --  ------------------------------
    --  Scan the directory tree whose root is defined by <b>Dir</b> and find the files
    --  that match the current rule.
    --  ------------------------------
    procedure Scan (Rule : in out Distrib_Rule;
                    Dir  : in Directory_List) is
       procedure Scan_Pattern (Pos : in Match_Rule_Vector.Cursor);
+
+      Exclude : Boolean;
 
       procedure Scan_Pattern (Pos : in Match_Rule_Vector.Cursor) is
          Match   : constant Match_Rule := Match_Rule_Vector.Element (Pos);
@@ -507,7 +570,7 @@ package body Gen.Artifacts.Distribs is
       begin
          Log.Debug ("Scan pattern base {0} - pat {1}", Base, Pattern);
          if Base = "" then
-            Rule.Scan (Dir, ".", Pattern);
+            Rule.Scan (Dir, ".", Pattern, Exclude);
             return;
          end if;
          declare
@@ -529,7 +592,7 @@ package body Gen.Artifacts.Distribs is
                   if D.Name = Base (P .. N) then
                      if N = Base'Last then
                         Log.Debug ("Scanning from sub directory at {0}", Base);
-                        Rule.Scan (D.all, Base, Pattern);
+                        Rule.Scan (D.all, Base, Pattern, Exclude);
                         return;
                      end if;
                      Iter := D.Directories.First;
@@ -543,13 +606,17 @@ package body Gen.Artifacts.Distribs is
       end Scan_Pattern;
 
    begin
+      Exclude := False;
       Rule.Matches.Iterate (Scan_Pattern'Access);
+      Exclude := True;
+      Rule.Excludes.Iterate (Scan_Pattern'Access);
    end Scan;
 
    procedure Scan (Rule     : in out Distrib_Rule;
                    Dir      : in Directory_List;
                    Base_Dir : in String;
-                   Pattern  : in String) is
+                   Pattern  : in String;
+                   Exclude  : in Boolean) is
 
       procedure Collect_Subdirs (Name_Pattern : in String);
       procedure Collect_Files (Name_Pattern : in String);
@@ -572,7 +639,11 @@ package body Gen.Artifacts.Distribs is
             Log.Debug ("Check {0} - {1}", Base_Dir, File.Name);
 
             if Match (Matcher, File.Name) then
-               Rule.Add_Source_File (Base_Dir, File);
+               if Exclude then
+                  Rule.Remove_Source_File (Base_Dir, File);
+               else
+                  Rule.Add_Source_File (Base_Dir, File);
+               end if;
             end if;
          end Collect_File;
 
@@ -591,7 +662,7 @@ package body Gen.Artifacts.Distribs is
          begin
             if Name_Pattern = Sub_Dir.Name or else Name_Pattern = "*" then
                Rule.Scan (Sub_Dir.all, Base_Dir,
-                          Pattern (Pos .. Pattern'Last));
+                          Pattern (Pos .. Pattern'Last), Exclude);
             end if;
          end Collect_Dir;
 

@@ -87,9 +87,12 @@ begin
    Driver.Set_Description (Gen.Configs.RELEASE);
    Driver.Set_Usage ("[-v] [-o directory] [-t templates] {command} {arguments}" & ASCII.LF &
                        "where:" & ASCII.LF &
-                       "   -v           Print the version, configuration and installation paths" & ASCII.LF &
-                       "   -o directory Directory where the Ada mapping files are generated" & ASCII.LF &
-                       "   -t templates Directory where the Ada templates are defined" & ASCII.LF &
+                       "   -v           Print the version, configuration and installation paths" &
+                       ASCII.LF &
+                       "   -o directory Directory where the Ada mapping files are generated" &
+                       ASCII.LF &
+                       "   -t templates Directory where the Ada templates are defined" &
+                       ASCII.LF &
                        "   -c dir       Directory where the Ada templates " &
                        "and configurations are defined");
    Driver.Add_Command (Name => "help", Command => Help_Cmd'Access);

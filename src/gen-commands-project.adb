@@ -60,7 +60,7 @@ package body Gen.Commands.Project is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Name, Args);
+      pragma Unreferenced (Name, Args);
       use GNAT.Command_Line;
 
       Web_Flag  : aliased Boolean := False;
@@ -131,7 +131,7 @@ package body Gen.Commands.Project is
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing project name");
-            Gen.Commands.Usage;
+            Cmd.Usage;
             return;
          end if;
 
@@ -149,7 +149,7 @@ package body Gen.Commands.Project is
 
          elsif Arg3'Length > 0 then
             Generator.Error ("The last argument should be the author's email address.");
-            Gen.Commands.Usage;
+            Cmd.Usage;
             return;
          end if;
 

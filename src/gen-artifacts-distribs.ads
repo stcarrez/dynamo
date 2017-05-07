@@ -152,6 +152,7 @@ private
    type Distrib_Rule is abstract tagged record
       Dir      : Ada.Strings.Unbounded.Unbounded_String;
       Matches  : Match_Rule_Vector.Vector;
+      Excludes : Match_Rule_Vector.Vector;
       Files    : File_Tree.Map;
       Level    : Util.Log.Level_Type := Util.Log.DEBUG_LEVEL;
    end record;
@@ -174,7 +175,8 @@ private
    procedure Scan (Rule     : in out Distrib_Rule;
                    Dir      : in Directory_List;
                    Base_Dir : in String;
-                   Pattern  : in String);
+                   Pattern  : in String;
+                   Exclude  : in Boolean);
 
    procedure Execute (Rule    : in out Distrib_Rule;
                       Path    : in String;
@@ -195,6 +197,12 @@ private
    procedure Add_Source_File (Rule     : in out Distrib_Rule;
                               Path     : in String;
                               File     : in File_Record);
+
+   --  Remove the file to be processed by the distribution rule.  This is the opposite of
+   --  <tt>Add_Source_File</tt> and used for the <exclude name="xxx"/> rules.
+   procedure Remove_Source_File (Rule     : in out Distrib_Rule;
+                                 Path     : in String;
+                                 File     : in File_Record);
 
    --  Create a distribution rule identified by <b>Kind</b>.
    --  The distribution rule is configured according to the DOM tree whose node is <b>Node</b>.

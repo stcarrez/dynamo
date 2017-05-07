@@ -30,9 +30,6 @@ package Gen.Commands is
 
    Driver : Drivers.Driver_Type;
 
-   --  Print dynamo usage
-   procedure Usage;
-
    --  Print dynamo short usage.
    procedure Short_Help_Usage;
 

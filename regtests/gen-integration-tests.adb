@@ -34,7 +34,20 @@ package body Gen.Integration.Tests is
    --  Get the dynamo executable path.
    function Dynamo return String;
 
+   --  Clean the directory if it exists.
+   procedure Clean_Directory (Path : in String);
+
    package Caller is new Util.Test_Caller (Test, "Dynamo");
+
+   --  ------------------------------
+   --  Clean the directory if it exists.
+   --  ------------------------------
+   procedure Clean_Directory (Path : in String) is
+   begin
+      if Ada.Directories.Exists (Path) then
+         Ada.Directories.Delete_Tree (Path);
+      end if;
+   end Clean_Directory;
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite) is
    begin
@@ -104,9 +117,7 @@ package body Gen.Integration.Tests is
                        Test_Build_Model'Access);
 
       --  Delete the previous test application if it exists.
-      if Ada.Directories.Exists ("test-app") then
-         Ada.Directories.Delete_Tree ("test-app");
-      end if;
+      Clean_Directory ("test-app");
    end Add_Tests;
 
    --  ------------------------------
@@ -395,6 +406,7 @@ package body Gen.Integration.Tests is
    procedure Test_Dist (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
+      Clean_Directory ("../test-dist");
       T.Execute (Dynamo & " dist ../test-dist", Result);
       Util.Tests.Assert_Matches (T,
                                  ".*Installing.*files with copy.*",
@@ -404,8 +416,8 @@ package body Gen.Integration.Tests is
                                  ".*Installing.*compressor.*",
                                  Result,
                                  "Invalid dist");
-      Util.Tests.Assert_Exists (T, "../test-dir/bundles/test.properties");
-      Util.Tests.Assert_Exists (T, "../test-dir/bundles/tuser.properties");
+      Util.Tests.Assert_Exists (T, "../test-dist/bundles/test.properties");
+      Util.Tests.Assert_Exists (T, "../test-dist/bundles/tuser.properties");
    end Test_Dist;
 
    --  ------------------------------
@@ -414,6 +426,7 @@ package body Gen.Integration.Tests is
    procedure Test_Dist_Exclude (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
+      Clean_Directory ("../test-dist");
       T.Execute (Dynamo & " dist ../test-dist ../regtests/files/package.xml", Result);
       Util.Tests.Assert_Matches (T,
                                  ".*Installing.*files with copy.*",
@@ -423,7 +436,7 @@ package body Gen.Integration.Tests is
                                  ".*Installing.*compressor.*",
                                  Result,
                                  "Invalid dist");
-      Util.Tests.Assert_Exists (T, "../test-dir/bundles/test.properties");
+      Util.Tests.Assert_Exists (T, "../test-dist/bundles/test.properties");
       T.Assert (not Ada.Directories.Exists ("../test-dir/bundles/tuser.properties"),
                 "File should not be copied");
    end Test_Dist_Exclude;

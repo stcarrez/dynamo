@@ -38,7 +38,7 @@ package body Gen.Commands.Plugins is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Name, Args);
+      pragma Unreferenced (Name, Args);
       use GNAT.Command_Line;
 
       function Get_Directory_Name (Name     : in String;
@@ -112,7 +112,7 @@ package body Gen.Commands.Plugins is
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing plugin name");
-            Gen.Commands.Usage;
+            Cmd.Usage;
             return;
          end if;
          if Kind /= "ada" and Kind /= "web" then

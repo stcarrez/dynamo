@@ -91,6 +91,7 @@ GENERATOR=dynamo
 
 generate:
 	$(GENERATOR) generate config/db
+	rm -f src/model/gen-database-model.adb
 
 dist:
 	git archive -o $(DIST_FILE) --prefix=$(distdir)/ HEAD

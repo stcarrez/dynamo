@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2016 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -85,6 +85,9 @@ package Gen.Integration.Tests is
 
    --  Test dist command.
    procedure Test_Dist (T : in out Test);
+
+   --  Test dist with exclude support command.
+   procedure Test_Dist_Exclude (T : in out Test);
 
    --  Test dist command.
    procedure Test_Info (T : in out Test);

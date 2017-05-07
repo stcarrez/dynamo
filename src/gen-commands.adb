@@ -37,25 +37,6 @@ with Util.Log.Loggers;
 package body Gen.Commands is
 
    --  ------------------------------
-   --  Print dynamo usage
-   --  ------------------------------
-   procedure Usage is
-      use Ada.Text_IO;
-   begin
-      Put_Line (Gen.Configs.RELEASE);
-      New_Line;
-      Put ("Usage: ");
-      Put (Ada.Command_Line.Command_Name);
-      Put_Line (" [-v] [-o directory] [-t templates] {command} {arguments}");
-      Put_Line ("where:");
-      Put_Line ("   -v           Print the version, configuration and installation paths");
-      Put_Line ("   -o directory Directory where the Ada mapping files are generated");
-      Put_Line ("   -t templates Directory where the Ada templates are defined");
-      Put_Line ("   -c dir       Directory where the Ada templates "
-                & "and configurations are defined");
-   end Usage;
-
-   --  ------------------------------
    --  Print dynamo short usage.
    --  ------------------------------
    procedure Short_Help_Usage is
@@ -103,6 +84,14 @@ package body Gen.Commands is
    --  Help command.
    Help_Cmd           : aliased Drivers.Help_Command_Type;
 begin
+   Driver.Set_Description (Gen.Configs.RELEASE);
+   Driver.Set_Usage ("[-v] [-o directory] [-t templates] {command} {arguments}" & ASCII.LF &
+                       "where:" & ASCII.LF &
+                       "   -v           Print the version, configuration and installation paths" & ASCII.LF &
+                       "   -o directory Directory where the Ada mapping files are generated" & ASCII.LF &
+                       "   -t templates Directory where the Ada templates are defined" & ASCII.LF &
+                       "   -c dir       Directory where the Ada templates " &
+                       "and configurations are defined");
    Driver.Add_Command (Name => "help", Command => Help_Cmd'Access);
    Driver.Add_Command (Name => "generate", Command => Generate_Cmd'Access);
    Driver.Add_Command (Name => "create-project", Command => Create_Project_Cmd'Access);

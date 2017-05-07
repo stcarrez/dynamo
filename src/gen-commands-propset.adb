@@ -27,12 +27,12 @@ package body Gen.Commands.Propset is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Name);
+      pragma Unreferenced (Name);
       use Ada.Strings.Unbounded;
 
    begin
       if Args.Get_Count /= 2 then
-         Gen.Commands.Usage;
+         Cmd.Usage;
          return;
       end if;
 

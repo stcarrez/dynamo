@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2015, 2016 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,6 +70,8 @@ package body Gen.Integration.Tests is
                        Test_Help'Access);
       Caller.Add_Test (Suite, "Dist",
                        Test_Dist'Access);
+      Caller.Add_Test (Suite, "Dist with exclude",
+                       Test_Dist_Exclude'Access);
       Caller.Add_Test (Suite, "Info",
                        Test_Info'Access);
       Caller.Add_Test (Suite, "Build Doc",
@@ -114,7 +116,8 @@ package body Gen.Integration.Tests is
    procedure Set_Up (T : in out Test) is
       pragma Unreferenced (T);
 
-      Dir : constant String := Util.Files.Compose (Gen.Testsuite.Get_Test_Directory, "test-app");
+      Test_Dir : constant String := Gen.Testsuite.Get_Test_Directory;
+      Dir      : constant String := Util.Files.Compose (Test_Dir, "test-app");
    begin
       Log.Debug ("Change {0}", Dir);
       if Ada.Directories.Exists (Dir) then
@@ -401,7 +404,29 @@ package body Gen.Integration.Tests is
                                  ".*Installing.*compressor.*",
                                  Result,
                                  "Invalid dist");
+      Util.Tests.Assert_Exists (T, "../test-dir/bundles/test.properties");
+      Util.Tests.Assert_Exists (T, "../test-dir/bundles/tuser.properties");
    end Test_Dist;
+
+   --  ------------------------------
+   --  Test dist with exclude support command.
+   --  ------------------------------
+   procedure Test_Dist_Exclude (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " dist ../test-dist ../regtests/files/package.xml", Result);
+      Util.Tests.Assert_Matches (T,
+                                 ".*Installing.*files with copy.*",
+                                 Result,
+                                 "Invalid dist");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Installing.*compressor.*",
+                                 Result,
+                                 "Invalid dist");
+      Util.Tests.Assert_Exists (T, "../test-dir/bundles/test.properties");
+      T.Assert (not Ada.Directories.Exists ("../test-dir/bundles/tuser.properties"),
+                "File should not be copied");
+   end Test_Dist_Exclude;
 
    --  ------------------------------
    --  Test dist command.

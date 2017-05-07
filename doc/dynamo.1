@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "May 2, 2014" "Ada Web Application"
+.TH DYNAMO 1 "May 7, 2017" "Ada Web Application"
 .SH NAME
 dynamo - Ada Application Generator
 .SH SYNOPSIS
@@ -156,7 +156,7 @@ or
 .\"
 .SS The create-database command
 .RS 0
-dynamo \fBcreate-database \fImodel [connection] admin-user [admin-password]\fR\fR
+dynamo \fBcreate-database\fP \fImodel [connection] admin-user [admin-password]\fR
 .RE
 .PP
 The create-database command creates the database used by the application.
@@ -328,9 +328,33 @@ to add some other necessary Ada
 clauses and implement the new operation.  The default implementation creates
 a database transaction, saves the entity and commits the transaction.
 .\"
+.\"
+.SS The add-permission command
+.RS 0
+dynamo \fBadd-permission\fP \fImodule entity\fP
+.RE
+.PP
+This command adds several permissions for the a new module in the application.
+The
+.I module
+is the name of the module in the application and
+.I entity
+is the name
+of the entity or database table.  Three permissions are created for the entity.
+It creates the following permissions by instantiating the
+.I Security.Permissions.Definition
+package:
+.\"
+.RS 0
+  \fIentity\fR-create
+  \fIentity\fR-delete
+  \fIentity\fR-update
+.RE
+.\"
+.\"
 .SS The build-doc command
 .RS 0
-dynamo \fBbuild-doc \fIdirectory\fR\fR
+dynamo \fBbuild-doc\fP [\fI-markdown|-google\fP] \fIdirectory\fP
 .RE
 .PP
 Extract the documentation from the project source files and generate the
@@ -340,6 +364,12 @@ the project documentation.  The XML files are also scanned and the documentation
 is extracted from these files.  It can be merged together with other
 documentation to build up the final project user documentation.
 .\"
+.PP
+The
+.I -markdown
+option generates the documentation using the Markdown Wiki syntax and the
+.I -google
+option generates a Google Code Wiki syntax.
 .\"
 .SS The info command
 .RS 0
@@ -355,14 +385,14 @@ components that are used by the current project.
 .\"
 .SS The help command
 .RS 0
-dynamo \fBhelp \fIname\fR\fR
+dynamo \fBhelp\fP \fIname\fP
 .RE
 .PP
 Give an help description about a command.
 .\"
 .SS The generate command
 .RS 0
-dynamo \fBgenerate [--package \fIname\fR] [\fImodel ... \fR]\fR
+dynamo \fBgenerate\fP [--package \fIname\fP] [\fImodel ... \fP]
 .RE
 .PP
 Generate the Ada model implementation from the XML model mappings or from a UML model.

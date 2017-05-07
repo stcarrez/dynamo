@@ -30,7 +30,7 @@ package body Gen.Commands.Layout is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Name);
+      pragma Unreferenced (Name);
       use Ada.Strings.Unbounded;
 
       function Get_Name return String;
@@ -56,7 +56,7 @@ package body Gen.Commands.Layout is
       Page_Name : constant String := Get_Name;
    begin
       if Page_Name'Length = 0 then
-         Gen.Commands.Usage;
+         Cmd.Usage;
          return;
       end if;
 

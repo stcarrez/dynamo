@@ -3,11 +3,12 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="configure.in">dnl Autoconf configure script for #{projectName}
-
+        file="configure.ac">dnl Autoconf configure script for #{projectName}
+#{''}
 dnl Process this file with autoconf to produce a configure script.
-
+#{''}
 AC_INIT(src/#{projectName}.ads)
+#{''}
 
 AC_CANONICAL_SYSTEM
 dnl AM_MAINTAINER_MODE
@@ -26,9 +27,6 @@ AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_LN_S
-#{''}
-
-AC_CHECK_PROGS(GNATMAKE, gnatmake, "")
 #{''}
 
 # Set the version number of GtkAda

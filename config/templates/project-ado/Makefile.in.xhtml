@@ -99,44 +99,6 @@ generate:
 	$(DYNAMO) generate db
 #{''}
 
-# Files to package in source distribution
-DISTFILES=README LICENSE.txt NOTICE.txt NEWS CHANGES ChangeLog config.guess configure config.sub \
-configure.in Makefile.in install-sh \
-\${NAME}.gpr.in config.gpr dynamo.xml \
-src db \${NAME}.properties \
-distrib bin obj
-#{''}
-
-dist-prepare:
-	-rm -rf $(distdir)
-	mkdir $(distdir)
-	-chmod 777 $(distdir)
-	here=`cd $(top_builddir) && pwd`; \
-	top_distdir=`cd $(distdir) && pwd`; \
-	distdir=`cd $(distdir) && pwd`; \
-	for file in $(DISTFILES); do \
-	  d=$(srcdir); \
-	  if test -d $$d/$$file; then \
-	    cp -pr $$d/$$file $(distdir)/$$file; \
-	  else \
-	    test -f $(distdir)/$$file \
-	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
-	    || cp -p $$d/$$file $(distdir)/$$file || :; \
-	  fi; \
-	done
-	mkdir -p $(distdir)/bin
-	mkdir -p $(distdir)/obj
-	mkdir -p $(distdir)/lib
-#{''}
-
-dist:   dist-prepare
-	tar --exclude=.svn --exclude="*~" --exclude="*.o" --exclude="*.ali" \
-	    --exclude="*.log" --exclude="*.a" --exclude=".project" \
-	    --exclude=".cproject" \
-	    --exclude=".gb_project" \
-	    -cvzf $(DIST_FILE) $(distdir)
-#{''}
-
 install:  uninstall
 	$(INSTALL) bin/\${NAME} $(prefix)/bin/\${NAME}
 #{''}

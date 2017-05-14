@@ -138,6 +138,8 @@ AM_GNAT_FIND_PROJECT([ada-awa],[Ada Web Application],[awa],
 AC_SUBST(AWA_DIR)
 #{''}
 
+AM_UTIL_CHECK_INSTALL
+
 AC_OUTPUT(
 Makefile #{projectName}.gpr tests.gpr rules.mk
 )

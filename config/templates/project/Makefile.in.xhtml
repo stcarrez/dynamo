@@ -19,14 +19,18 @@ DYNAMO_ARGS=db
 
 #{''}
 post-build:
+ifneq (\${PLUGINS},)
 	for i in ${PLUGINS} ; do \
 	   $(MAKE) -C plugins/$$i ; \
 	done
+endif
 
 #{''}
 post-generate:
+ifneq (\${PLUGINS},)
 	for i in ${PLUGINS} ; do \
 	   $(MAKE) -C plugins/$$i generate ; \
 	done
+endif
 
 </f:view>

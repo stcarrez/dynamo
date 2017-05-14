@@ -11,7 +11,9 @@ with Ada.Exceptions;
 #{''}
 with Util.Log.loggers;
 #{''}
+with AWS.Config.Set;
 with ASF.Server.Web;
+with AWA.Setup.Applications;
 #{''}
 with #{fn:capitalize(projectName)}.Applications;
 procedure #{fn:capitalize(projectName)}.Server is
@@ -19,16 +21,31 @@ procedure #{fn:capitalize(projectName)}.Server is
    Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.Server");
 
    App     : constant #{fn:capitalize(projectName)}.Applications.Application_Access := new #{fn:capitalize(projectName)}.Applications.Application;
-
+#{''}
+   procedure Setup is
+     new AWA.Setup.Applications.Configure (#{fn:capitalize(projectName)}.Applications.Application'Class,
+                                           #{fn:capitalize(projectName)}.Applications.Application_Access,
+                                           #{fn:capitalize(projectName)}.Applications.Initialize);
+#{''}
 
    WS      : ASF.Server.Web.AWS_Container;
+#{''}
+   procedure Configure (Config : in out AWS.Config.Object) is
+   begin
+      AWS.Config.Set.Input_Line_Size_Limit (1_000_000);
+      AWS.Config.Set.Max_Connection (Config, 2);
+      AWS.Config.Set.Accept_Queue_Size (Config, 100);
+      AWS.Config.Set.Send_Buffer_Size (Config, 128 * 1024);
+      AWS.Config.Set.Upload_Size_Limit (Config, 100_000_000);
+   end Configure;
+#{''}
 begin
-   #{fn:capitalize(projectName)}.Applications.Initialize (App);
-
-   WS.Register_Application (#{fn:capitalize(projectName)}.Applications.CONTEXT_PATH, App.all'Access);
-
-   Log.Info ("Connect you browser to: http://localhost:8080/#{projectName}/index.html");
+   WS.Configure (Configure'Access);
    WS.Start;
+   Log.Info ("Connect you browser to: http://localhost:8080{0}/index.html",
+             #{fn:capitalize(projectName)}.Applications.CONTEXT_PATH);
+   Setup (WS, App, #{fn:capitalize(projectName)}.Applications.CONFIG_PATH,
+          #{fn:capitalize(projectName)}.Applications.CONTEXT_PATH);
 
    delay 365.0 * 24.0 * 3600.0;
 

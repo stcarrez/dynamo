@@ -5,7 +5,6 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{projectName}-applications.adb">-----------------------------------------------------------------------
 --  #{projectName} -- #{projectName} applications
------------------------------------------------------------------------
 <ui:include src="../../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
@@ -20,7 +19,6 @@ with ASF.Applications.Main.Configs;
 #{''}
 with AWA.Applications.Factory;
 #{''}
---  with #{fn:capitalize(projectName)}.XXX.Module;
 package body #{fn:capitalize(projectName)}.Applications is
 #{''}
    use AWA.Applications;
@@ -35,22 +33,12 @@ package body #{fn:capitalize(projectName)}.Applications is
    --     &lt;li&gt;Define the servlet and filter mappings.
    --  &lt;/ul&gt;
    --  ------------------------------
-   procedure Initialize (App : in Application_Access) is
+   procedure Initialize (App    : in Application_Access;
+                         Config : in ASF.Applications.Config) is
       Fact  : AWA.Applications.Factory.Application_Factory;
-      C     : ASF.Applications.Config;
    begin
       App.Self := App;
-      begin
-         C.Load_Properties ("#{projectName}.properties");
-         Util.Log.Loggers.Initialize (Util.Properties.Manager (C));
-#{''}
-      exception
-         when Ada.IO_Exceptions.Name_Error =>
-            Log.Error ("Cannot read application configuration file {0}", CONFIG_PATH);
-
-      end;
-      App.Initialize (C, Fact);
-#{''}
+      App.Initialize (Config, Fact);
       App.Set_Global ("contextPath", CONTEXT_PATH);
    end Initialize;
 #{''}
@@ -87,6 +75,7 @@ package body #{fn:capitalize(projectName)}.Applications is
       App.Add_Filter (Name => "dump", Filter => App.Self.Dump'Access);
       App.Add_Filter (Name => "measures", Filter => App.Self.Measures'Access);
       App.Add_Filter (Name => "service", Filter => App.Self.Service_Filter'Access);
+      App.Add_Filter (Name => "no-cache", Filter => App.Self.No_Cache'Access);
    end Initialize_Filters;
 #{''}
    --  ------------------------------
@@ -98,6 +87,11 @@ package body #{fn:capitalize(projectName)}.Applications is
    procedure Initialize_Modules (App : in out Application) is
    begin
       Log.Info ("Initializing application modules...");
+#{''}
+      App.Add_Converter (Name      => "smartDateConverter",
+                         Converter => App.Self.Rel_Date_Converter'Access);
+      App.Add_Converter (Name      => "sizeConverter",
+                         Converter => App.Self.Size_Converter'Access);
 #{''}
       Register (App    => App.Self.all'Access,
                 Name   => AWA.Users.Modules.NAME,
@@ -125,14 +119,39 @@ package body #{fn:capitalize(projectName)}.Applications is
                 Module => App.Tag_Module'Access);
 #{''}
       Register (App    => App.Self.all'Access,
+                Name   => AWA.Jobs.Modules.NAME,
+                URI    => "jobs",
+                Module => App.Job_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
                 Name   => AWA.Storages.Modules.NAME,
                 URI    => "storages",
                 Module => App.Storage_Module'Access);
 #{''}
       Register (App    => App.Self.all'Access,
+                Name   => AWA.Images.Modules.NAME,
+                URI    => "images",
+                Module => App.Image_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
+                Name   => AWA.Counters.Modules.NAME,
+                URI    => "counters",
+                Module => App.Counter_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
                 Name   => AWA.Blogs.Modules.NAME,
                 URI    => "blogs",
                 Module => App.Blog_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
+                Name   => AWA.Wikis.Modules.NAME,
+                URI    => "wikis",
+                Module => App.Wiki_Module'Access);
+#{''}
+      Register (App    => App.Self.all'Access,
+                Name   => AWA.Wikis.Previews.NAME,
+                URI    => "wikis-preview",
+                Module => App.Preview_Module'Access);
    end Initialize_Modules;
 #{''}
 end #{fn:capitalize(projectName)}.Applications;

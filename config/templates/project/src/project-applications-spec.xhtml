@@ -5,7 +5,6 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{projectName}-applications.ads">-----------------------------------------------------------------------
 --  #{projectName} -- #{projectName} applications
------------------------------------------------------------------------
 <ui:include src="../../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 
@@ -13,7 +12,10 @@ with ASF.Servlets.Faces;
 with ASF.Servlets.Files;
 with ASF.Servlets.Ajax;
 with ASF.Filters.Dump;
+with ASF.Filters.Cache_Control;
 with ASF.Servlets.Measures;
+with ASF.Applications;
+with ASF.Converters.Sizes;
 #{''}
 with ASF.Security.Servlets;
 #{''}
@@ -27,16 +29,23 @@ with AWA.Storages.Modules;
 with AWA.Applications;
 with AWA.Workspaces.Modules;
 with AWA.Services.Filters;
+with AWA.Wikis.Modules;
+with AWA.Wikis.Previews;
+with AWA.Images.Modules;
+with AWA.Jobs.Modules;
+with AWA.Counters.Modules;
+with AWA.Converters.Dates;
 package #{fn:capitalize(projectName)}.Applications is
 #{''}
-   CONFIG_PATH  : constant String := "/#{fn:toLowerCase(projectName)}";
+   CONFIG_PATH  : constant String := "#{fn:toLowerCase(projectName)}";
    CONTEXT_PATH : constant String := "/#{projectName}";
 #{''}
    type Application is new AWA.Applications.Application with private;
    type Application_Access is access all Application'Class;
 #{''}
    --  Initialize the application.
-   procedure Initialize (App : in Application_Access);
+   procedure Initialize (App    : in Application_Access;
+                         Config : in ASF.Applications.Config);
 #{''}
    --  Initialize the servlets provided by the application.
    --  This procedure is called by <b>Initialize</b>.
@@ -59,27 +68,38 @@ package #{fn:capitalize(projectName)}.Applications is
 private
 #{''}
    type Application is new AWA.Applications.Application with record
-      Self              : Application_Access;
+      Self               : Application_Access;
+#{''}
       --  Application servlets and filters (add new servlet and filter instances here).
-      Faces             : aliased ASF.Servlets.Faces.Faces_Servlet;
-      Ajax              : aliased ASF.Servlets.Ajax.Ajax_Servlet;
-      Files             : aliased ASF.Servlets.Files.File_Servlet;
-      Dump              : aliased ASF.Filters.Dump.Dump_Filter;
-      Service_Filter    : aliased AWA.Services.Filters.Service_Filter;
-      Measures          : aliased ASF.Servlets.Measures.Measure_Servlet;
+      Faces              : aliased ASF.Servlets.Faces.Faces_Servlet;
+      Ajax               : aliased ASF.Servlets.Ajax.Ajax_Servlet;
+      Files              : aliased ASF.Servlets.Files.File_Servlet;
+      Dump               : aliased ASF.Filters.Dump.Dump_Filter;
+      Service_Filter     : aliased AWA.Services.Filters.Service_Filter;
+      Measures           : aliased ASF.Servlets.Measures.Measure_Servlet;
+      No_Cache           : aliased ASF.Filters.Cache_Control.Cache_Control_Filter;
 #{''}
       --  Authentication servlet and filter.
-      Auth              : aliased ASF.Security.Servlets.Request_Auth_Servlet;
-      Verify_Auth       : aliased AWA.Users.Servlets.Verify_Auth_Servlet;
+      Auth               : aliased ASF.Security.Servlets.Request_Auth_Servlet;
+      Verify_Auth        : aliased AWA.Users.Servlets.Verify_Auth_Servlet;
+#{''}
+      --  Converters shared by web requests.
+      Rel_Date_Converter : aliased AWA.Converters.Dates.Relative_Date_Converter;
+      Size_Converter     : aliased ASF.Converters.Sizes.Size_Converter;
 #{''}
       --  The application modules.
-      User_Module       : aliased AWA.Users.Modules.User_Module;
-      Workspace_Module  : aliased AWA.Workspaces.Modules.Workspace_Module;
-      Blog_Module       : aliased AWA.Blogs.Modules.Blog_Module;
-      Mail_Module       : aliased AWA.Mail.Modules.Mail_Module;
-      Comment_Module    : aliased AWA.Comments.Modules.Comment_Module;
-      Storage_Module    : aliased AWA.Storages.Modules.Storage_Module;
-      Tag_Module        : aliased AWA.Tags.Modules.Tag_Module;
+      User_Module        : aliased AWA.Users.Modules.User_Module;
+      Workspace_Module   : aliased AWA.Workspaces.Modules.Workspace_Module;
+      Blog_Module        : aliased AWA.Blogs.Modules.Blog_Module;
+      Mail_Module        : aliased AWA.Mail.Modules.Mail_Module;
+      Comment_Module     : aliased AWA.Comments.Modules.Comment_Module;
+      Storage_Module     : aliased AWA.Storages.Modules.Storage_Module;
+      Tag_Module         : aliased AWA.Tags.Modules.Tag_Module;
+      Job_Module         : aliased AWA.Jobs.Modules.Job_Module;
+      Image_Module       : aliased AWA.Images.Modules.Image_Module;
+      Wiki_Module        : aliased AWA.Wikis.Modules.Wiki_Module;
+      Preview_Module     : aliased AWA.Wikis.Previews.Preview_Module;
+      Counter_Module     : aliased AWA.Counters.Modules.Counter_Module;
 #{''}
       --  Add your modules here.
    end record;

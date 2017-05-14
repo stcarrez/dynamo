@@ -61,7 +61,7 @@ AM_GNAT_FIND_PROJECT([ada-util],[Ada Utility Library],[util],
   [git@github.com:stcarrez/ada-util.git],
   [Building #{projectName} requires the Ada Utility Library.],
   [
-    UTIL_DIR=${gnat_project_dir_util}
+    UTIL_DIR=\${gnat_project_dir_util}
   ])
 AC_SUBST(UTIL_DIR)
 #{''}
@@ -74,7 +74,7 @@ AM_GNAT_FIND_PROJECT([ada-ado],[Ada Database Objects],[ado],
   [git@github.com:stcarrez/ada-ado.git],
   [Building #{projectName} requires the Ada Database Objects Library.],
   [
-    ADO_DIR=${gnat_project_dir_ado}
+    ADO_DIR=\${gnat_project_dir_ado}
   ])
 AC_SUBST(ADO_DIR)
 

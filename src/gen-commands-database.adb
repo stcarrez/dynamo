@@ -280,11 +280,12 @@ package body Gen.Commands.Database is
          end if;
          Append (Root_Connection, "/?user=");
          Append (Root_Connection, Username);
-         Root_Connection := Root_Hidden;
+         Root_Hidden := Root_Connection;
          if Password'Length > 0 then
             Append (Root_Connection, "&password=");
+            Root_Hidden := Root_Connection;
             Append (Root_Connection, Password);
-            Append (Root_Hidden, "&password=XXXXXXXX");
+            Append (Root_Hidden, "XXXXXXXX");
          end if;
 
          Log.Info ("Connecting to {0} for database setup", Root_Hidden);

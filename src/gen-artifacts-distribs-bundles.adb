@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-bundles -- Merge bundles for distribution artifact
---  Copyright (C) 2013 Stephane Carrez
+--  Copyright (C) 2013, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,8 +60,10 @@ package body Gen.Artifacts.Distribs.Bundles is
                       Files   : in File_Vector;
                       Context : in out Generator'Class) is
       procedure Load_File (File : in File_Record);
-      procedure Merge_Property (Name, Item : in Util.Properties.Value);
-      procedure Save_Property (Name, Item : in Util.Properties.Value);
+      procedure Merge_Property (Name : in String;
+                                Item : in Util.Properties.Value);
+      procedure Save_Property (Name : in String;
+                               Item : in Util.Properties.Value);
 
       Dir    : constant String := Ada.Directories.Containing_Directory (Path);
       Output : Ada.Text_IO.File_Type;
@@ -70,16 +72,18 @@ package body Gen.Artifacts.Distribs.Bundles is
       --  ------------------------------
       --  Merge the property into the target property list.
       --  ------------------------------
-      procedure Merge_Property (Name, Item : in Util.Properties.Value) is
+      procedure Merge_Property (Name : in String;
+                                Item : in Util.Properties.Value) is
       begin
-         Merge.Set (Name, Item);
+         Merge.Set_Value (Name, Item);
       end Merge_Property;
 
-      procedure Save_Property (Name, Item : in Util.Properties.Value) is
+      procedure Save_Property (Name : in String;
+                               Item : in Util.Properties.Value) is
       begin
-         Ada.Text_IO.Put (Output, Ada.Strings.Unbounded.To_String (Name));
+         Ada.Text_IO.Put (Output, Name);
          Ada.Text_IO.Put (Output, "=");
-         Ada.Text_IO.Put_Line (Output, Ada.Strings.Unbounded.To_String (Item));
+         Ada.Text_IO.Put_Line (Output, Util.Properties.To_String (Item));
       end Save_Property;
 
       --  ------------------------------

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,7 @@ with Util.Serialize.Mappers.Record_Mapper;
 with Util.Streams.Buffered;
 with Util.Streams.Texts;
 with Util.Strings.Transforms;
+with Util.Strings.Vectors;
 
 package body Gen.Model.Projects is
 
@@ -518,20 +519,21 @@ package body Gen.Model.Projects is
       Output.Write_String (ASCII.LF & "    ");
       Output.Write_Entity (Name => "name", Value => Util.Beans.Objects.To_Object (Name));
       declare
-         Names : constant Util.Properties.Name_Array := Project.Props.Get_Names;
+         Names : Util.Strings.Vectors.Vector;
       begin
-         for I in Names'Range loop
+         Project.Props.Get_Names (Names);
+         for Name of Names loop
             Output.Write_String (ASCII.LF & "    ");
             Output.Start_Entity (Name => "property");
             Output.Write_Attribute (Name  => "name",
-                                    Value => Util.Beans.Objects.To_Object (Names (I)));
+                                    Value => Util.Beans.Objects.To_Object (Name));
             Output.Write_String (Value => Util.Strings.Transforms.Escape_Xml
-                                 (To_String (Project.Props.Get (Names (I)))));
+                                 (To_String (Project.Props.Get (Name))));
             Output.End_Entity (Name => "property");
             Prop_Output.Write ("dynamo_");
-            Prop_Output.Write (Names (I));
+            Prop_Output.Write (Name);
             Prop_Output.Write ("=");
-            Prop_Output.Write (To_String (Project.Props.Get (Names (I))));
+            Prop_Output.Write (To_String (Project.Props.Get (Name)));
 
             Prop_Output.Write (ASCII.LF);
          end loop;

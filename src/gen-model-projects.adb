@@ -168,7 +168,7 @@ package body Gen.Model.Projects is
    begin
       Log.Debug ("Adding dependency {0}", Name);
 
-      if Depend.Project = null then
+      if Depend.Project = null and Depend.Kind = NONE then
          Depend.Project := Into.Find_Project_By_Name (Name);
          Depend.Kind := Kind;
          Into.Dependencies.Append (Depend);
@@ -502,7 +502,7 @@ package body Gen.Model.Projects is
       Prop_Path : constant String := Ada.Directories.Compose (Dir, Prop_Name);
    begin
       Prop_Output.Initialize (Size => 100000);
-      Buffer.Initialize (Size => 10000);
+      Buffer.Initialize (Size => 100000);
       Output.Initialize (Output => Buffer'Unchecked_Access);
 
       --  Read the current project property file, ignoring the dynamo.* properties.

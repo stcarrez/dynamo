@@ -57,6 +57,8 @@ package body Gen.Integration.Tests is
                        Test_Create_ADO_Project'Access);
       Caller.Add_Test (Suite, "Create GTK project",
                        Test_Create_GTK_Project'Access);
+      Caller.Add_Test (Suite, "Create Lib project",
+                       Test_Create_Lib_Project'Access);
       Caller.Add_Test (Suite, "Configure",
                        Test_Configure'Access);
       Caller.Add_Test (Suite, "Propset",
@@ -215,6 +217,19 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Matches (T, ".*Generating file.*src/test-main.adb", Result,
                                  "Invalid generation");
    end Test_Create_GTK_Project;
+
+   --  ------------------------------
+   --  Test dynamo create-project command --lib.
+   --  ------------------------------
+   procedure Test_Create_Lib_Project (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " -o test-lib create-project -l gpl3 --lib test", Result);
+      Util.Tests.Assert_Matches (T, ".*Generating file.*Makefile", Result,
+                                 "Invalid generation");
+      Util.Tests.Assert_Matches (T, ".*Generating file.*src/test.ads", Result,
+                                 "Invalid generation");
+   end Test_Create_Lib_Project;
 
    --  ------------------------------
    --  Test project configure.

@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "May 7, 2017" "Ada Web Application"
+.TH DYNAMO 1 "Sep 9, 2017" "Ada Web Application"
 .SH NAME
 dynamo - Ada Application Generator
 .SH SYNOPSIS
@@ -93,7 +93,7 @@ templates provided by \fIdynamo\fR.
 .\"
 .SS The create-project command
 .RS 0
-dynamo \fBcreate-project\fR [-l \fI{apache|gpl|bsd3|mit|proprietary}\fR] [--web] [--gtk] [--tool] [--ado] \fIname\fR \fIauthor\fR \fIemail\fR
+dynamo \fBcreate-project\fR [-l \fI{apache|gpl|bsd3|mit|proprietary}\fR] [--web] [--gtk] [--lib] [--tool] [--ado] \fIname\fR \fIauthor\fR \fIemail\fR
 .RE
 .PP
 Create a new project in the current working directory or in the
@@ -114,6 +114,8 @@ can be specified in the command line so that the license headers integrates them
 The project type is controlled by one of the
 .B --web
 ,
+.B --lib
+,
 .B --tool
 ,
 .B --gtk
@@ -127,6 +129,10 @@ project does not use Ada Server Faces nor Ada Web Application.  When
 option is specified, a full web application based on ASF and AWA is created.  The
 .B --web
 is the default if no other option is specified.
+.\"
+The
+.B --lib
+option is helpful to generate a simple library with static or shared library support.
 .\"
 The
 .B --gtk

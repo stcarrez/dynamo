@@ -1,0 +1,14 @@
+<f:view xmlns:util="http://code.google.com/p/ada-asf/util"
+        xmlns:f="http://java.sun.com/jsf/core"
+        mode="remove-empty"
+        file="#{project.license eq 'apache' ? 'LICENSE.txt' : 'LICENSE'}">
+    <util:file rendered="#{project.license eq 'apache'}"
+               escape="false"
+               src="/licenses/apache2/LICENSE.txt"/>
+    <util:file rendered="#{project.license eq 'mit'}"
+               escape="false"
+               src="/licenses/mit/LICENSE"/>
+    <util:file rendered="#{project.license eq 'bsd3'}"
+               escape="false"
+               src="/licenses/bsd3/LICENSE"/>
+</f:view>

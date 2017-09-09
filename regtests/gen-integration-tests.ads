@@ -47,6 +47,9 @@ package Gen.Integration.Tests is
    --  Test dynamo create-project command --gtk.
    procedure Test_Create_GTK_Project (T : in out Test);
 
+   --  Test dynamo create-project command --lib.
+   procedure Test_Create_Lib_Project (T : in out Test);
+
    --  Test project configure.
    procedure Test_Configure (T : in out Test);
 

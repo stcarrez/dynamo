@@ -67,6 +67,7 @@ package body Gen.Commands.Project is
       Tool_Flag : aliased Boolean := False;
       Ado_Flag  : aliased Boolean := False;
       Gtk_Flag  : aliased Boolean := False;
+      Lib_Flag  : aliased Boolean := False;
    begin
       --  If a dynamo.xml file exists, read it.
       if Ada.Directories.Exists ("dynamo.xml") then
@@ -88,6 +89,8 @@ package body Gen.Commands.Project is
                Tool_Flag := True;
             elsif Full_Switch = "-ado" then
                Ado_Flag := True;
+            elsif Full_Switch = "-lib" then
+               Lib_Flag := True;
             elsif Full_Switch = "-gtk" then
                Gtk_Flag := True;
             end if;
@@ -157,12 +160,15 @@ package body Gen.Commands.Project is
          Generator.Set_Project_Property ("is_tool", Boolean'Image (Tool_Flag));
          Generator.Set_Project_Property ("is_ado", Boolean'Image (Ado_Flag));
          Generator.Set_Project_Property ("is_gtk", Boolean'Image (Gtk_Flag));
+         Generator.Set_Project_Property ("is_lib", Boolean'Image (Lib_Flag));
          Generator.Set_Project_Name (Name);
          Generator.Set_Force_Save (False);
          if Ado_Flag then
             Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project-ado");
          elsif Gtk_Flag then
             Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project-gtk");
+         elsif Lib_Flag then
+            Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project-lib");
          else
             Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project");
          end if;
@@ -203,7 +209,7 @@ package body Gen.Commands.Project is
    begin
       Put_Line ("create-project: Create a new Ada Web Application project");
       Put_Line ("Usage: create-project [-l apache|gpl|gpl3|mit|bsd3|proprietary] [--web] [--tool]"
-                & "[--ado] [--gtk] NAME [AUTHOR] [EMAIL]");
+                & "[--lib] [--ado] [--gtk] NAME [AUTHOR] [EMAIL]");
       New_Line;
       Put_Line ("  Creates a new AWA application with the name passed in NAME.");
       Put_Line ("  The application license is controlled with the -l option. ");
@@ -215,6 +221,7 @@ package body Gen.Commands.Project is
       Put_Line ("  --tool  Generate a command line tool");
       Put_Line ("  --ado   Generate a database tool operation for ADO");
       Put_Line ("  --gtk   Generate a GtkAda project");
+      Put_Line ("  --lib   Generate a library project");
    end Help;
 
 end Gen.Commands.Project;

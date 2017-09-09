@@ -79,7 +79,7 @@ package body Gen.Commands.Project is
       end if;
       --  Parse the command line
       loop
-         case Getopt ("l: ? -web -tool -ado -gtk") is
+         case Getopt ("l: ? -lib -web -tool -ado -gtk") is
          when ASCII.NUL => exit;
 
          when '-' =>
@@ -209,7 +209,7 @@ package body Gen.Commands.Project is
    begin
       Put_Line ("create-project: Create a new Ada Web Application project");
       Put_Line ("Usage: create-project [-l apache|gpl|gpl3|mit|bsd3|proprietary] [--web] [--tool]"
-                & "[--lib] [--ado] [--gtk] NAME [AUTHOR] [EMAIL]");
+                & " [--lib] [--ado] [--gtk] NAME [AUTHOR] [EMAIL]");
       New_Line;
       Put_Line ("  Creates a new AWA application with the name passed in NAME.");
       Put_Line ("  The application license is controlled with the -l option. ");

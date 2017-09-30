@@ -555,18 +555,19 @@ package body Gen.Commands.Templates is
 
          Loader : aliased Command_Loader;
          Reader : Util.Serialize.IO.XML.Parser;
+         Mapper : Util.Serialize.Mappers.Processing;
       begin
          Log.Info ("Reading command file '{0}'", File_Path);
          Done := False;
 
          --  Create the mapping to load the XML command file.
-         Reader.Add_Mapping ("commands", Cmd_Mapper'Access);
+         Mapper.Add_Mapping ("commands", Cmd_Mapper'Access);
 
          --  Set the context for Set_Member.
-         Command_Mapper.Set_Context (Reader, Loader'Unchecked_Access);
+         Command_Mapper.Set_Context (Mapper, Loader'Unchecked_Access);
 
          --  Read the XML command file.
-         Reader.Parse (File_Path);
+         Reader.Parse (File_Path, Mapper);
 
       exception
          when Ada.IO_Exceptions.Name_Error =>

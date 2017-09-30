@@ -1362,6 +1362,7 @@ package body Gen.Artifacts.XMI is
          end Error;
 
          Reader   : aliased Parser;
+         Mapper   : Util.Serialize.Mappers.Processing;
          Info     : aliased XMI_Info;
          Def_Type : constant String := Context.Get_Parameter (Gen.Configs.GEN_UML_DEFAULT_TYPE);
       begin
@@ -1371,11 +1372,11 @@ package body Gen.Artifacts.XMI is
          Info.File         := To_Unbounded_String (Name & ".xmi");
          Info.Default_Type := To_Unbounded_String (Def_Type);
          Info.Is_Profile   := Is_Predefined;
-         Reader.Add_Mapping ("XMI", XMI_Mapping'Access);
+         Mapper.Add_Mapping ("XMI", XMI_Mapping'Access);
          if Context.Get_Parameter (Gen.Configs.GEN_DEBUG_ENABLE) then
-            Reader.Dump (Log);
+            Mapper.Dump (Log);
          end if;
-         XMI_Mapper.Set_Context (Reader, Info'Unchecked_Access);
+         XMI_Mapper.Set_Context (Mapper, Info'Unchecked_Access);
 
          if N > 0 and then File (N .. File'Last) = ".zargo" then
             declare
@@ -1385,11 +1386,11 @@ package body Gen.Artifacts.XMI is
                Pipe.Open ("unzip -cq " & File & " " & Name & ".xmi",
                           Util.Processes.READ);
                Buffer.Initialize (null, Pipe'Unchecked_Access, 4096);
-               Reader.Parse (Buffer);
+               Reader.Parse (Buffer, Mapper);
                Pipe.Close;
             end;
          else
-            Reader.Parse (File);
+            Reader.Parse (File, Mapper);
          end if;
       end Read;
 

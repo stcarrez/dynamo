@@ -607,10 +607,11 @@ package body Gen.Model.Projects is
                                                   Fields              => Project_Fields,
                                                   Set_Member          => Set_Member);
 
-      Path   : constant String := To_String (Project.Path);
-      Loader : aliased Project_Loader;
-      Mapper : aliased Project_Mapper.Mapper;
-      Reader : Util.Serialize.IO.XML.Parser;
+      Path       : constant String := To_String (Project.Path);
+      Loader     : aliased Project_Loader;
+      Mapper     : aliased Project_Mapper.Mapper;
+      Reader     : Util.Serialize.IO.XML.Parser;
+      Prj_Mapper : Util.Serialize.Mappers.Processing;
    begin
       Log.Info ("Reading project file '{0}'", Path);
 
@@ -621,15 +622,15 @@ package body Gen.Model.Projects is
          Mapper.Add_Mapping ("property", FIELD_PROPERTY_VALUE);
          Mapper.Add_Mapping ("module/@name", FIELD_MODULE_NAME);
          Mapper.Add_Mapping ("depend/@name", FIELD_DEPEND_NAME);
-         Reader.Add_Mapping ("project", Mapper'Unchecked_Access);
+         Prj_Mapper.Add_Mapping ("project", Mapper'Unchecked_Access);
 
          --  Set the context for Set_Member.
-         Project_Mapper.Set_Context (Reader, Loader'Access);
+         Project_Mapper.Set_Context (Prj_Mapper, Loader'Access);
 
          Project.Name := Null_Unbounded_String;
 
          --  Read the XML query file.
-         Reader.Parse (Path);
+         Reader.Parse (Path, Prj_Mapper);
       end if;
 
       if Length (Project.Name) = 0 then

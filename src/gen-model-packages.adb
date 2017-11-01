@@ -453,7 +453,7 @@ package body Gen.Model.Packages is
    function Get_Row (From  : List_Object) return Util.Beans.Objects.Object is
    begin
       Log.Debug ("Getting row {0}", Natural'Image (From.Row));
-      return From.Values.Element (From.Row - 1);
+      return From.Values.Element (From.Row);
    end Get_Row;
 
    --  ------------------------------

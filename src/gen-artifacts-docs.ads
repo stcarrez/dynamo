@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2015 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -113,6 +113,7 @@ private
       Line_Number  : Natural := 0;
       Lines        : Line_Vectors.Vector;
       Was_Included : Boolean := False;
+      Print_Footer : Boolean := True;
       Formatter    : Document_Formatter_Access;
    end record;
 

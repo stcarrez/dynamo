@@ -83,9 +83,11 @@ package body Gen.Artifacts.Docs is
    --  Set the output document format to generate.
    --  ------------------------------
    procedure Set_Format (Handler : in out Artifact;
-                         Format  : in Doc_Format) is
+                         Format  : in Doc_Format;
+                         Footer  : in Boolean) is
    begin
       Handler.Format := Format;
+      Handler.Print_Footer := Footer;
       case Format is
          when DOC_WIKI_GOOGLE =>
             Handler.Formatter := Google_Formatter'Access;
@@ -268,6 +270,7 @@ package body Gen.Artifacts.Docs is
             else
                Log.Debug ("Collect {0}", Full_Path);
 
+               Doc.Print_Footer := Handler.Print_Footer;
                Doc.Formatter := Handler.Formatter;
                if Name (Pos .. Name'Last) = ".ads" then
                   Handler.Read_Ada_File (Full_Path, Doc);

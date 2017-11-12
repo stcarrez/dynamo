@@ -36,11 +36,12 @@ package body Gen.Commands.Docs is
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Name, Args);
 
-      Doc  : Gen.Artifacts.Docs.Artifact;
-      M    : Gen.Model.Packages.Model_Definition;
-      Arg1 : constant String := Get_Argument;
-      Arg2 : constant String := Get_Argument;
-      Fmt  : Gen.Artifacts.Docs.Doc_Format := Gen.Artifacts.Docs.DOC_WIKI_GOOGLE;
+      Doc    : Gen.Artifacts.Docs.Artifact;
+      M      : Gen.Model.Packages.Model_Definition;
+      Arg1   : constant String := Get_Argument;
+      Arg2   : constant String := Get_Argument;
+      Footer : Boolean := True;
+      Fmt    : Gen.Artifacts.Docs.Doc_Format := Gen.Artifacts.Docs.DOC_WIKI_GOOGLE;
    begin
       Generator.Read_Project ("dynamo.xml", False);
 
@@ -59,6 +60,9 @@ package body Gen.Commands.Docs is
             Fmt := Gen.Artifacts.Docs.DOC_MARKDOWN;
          elsif Arg1 = "-google" then
             Fmt := Gen.Artifacts.Docs.DOC_WIKI_GOOGLE;
+         elsif Arg1 = "-pandoc" then
+            Fmt := Gen.Artifacts.Docs.DOC_MARKDOWN;
+            Footer := False;
          else
             Generator.Error ("Invalid markup option " & Arg1);
             return;
@@ -69,7 +73,7 @@ package body Gen.Commands.Docs is
          end if;
          Generator.Set_Result_Directory (Arg2);
       end if;
-      Doc.Set_Format (Fmt);
+      Doc.Set_Format (Fmt, Footer);
       Doc.Prepare (M, Generator);
    end Execute;
 
@@ -83,7 +87,7 @@ package body Gen.Commands.Docs is
       use Ada.Text_IO;
    begin
       Put_Line ("build-doc: Extract and generate the project documentation");
-      Put_Line ("Usage: build-doc [-markdown|-google] target-dir");
+      Put_Line ("Usage: build-doc [-markdown|-google|-pandoc] target-dir");
       New_Line;
       Put_Line ("  Extract the documentation from the project source files and generate the");
       Put_Line ("  project documentation.  The following files are scanned:");

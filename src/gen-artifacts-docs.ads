@@ -85,7 +85,8 @@ package Gen.Artifacts.Docs is
 
    --  Set the output document format to generate.
    procedure Set_Format (Handler : in out Artifact;
-                         Format  : in Doc_Format);
+                         Format  : in Doc_Format;
+                         Footer  : in Boolean);
 
 private
 
@@ -207,6 +208,7 @@ private
    type Artifact is new Gen.Artifacts.Artifact with record
       Xslt_Command : Ada.Strings.Unbounded.Unbounded_String;
       Format       : Doc_Format := DOC_WIKI_GOOGLE;
+      Print_Footer : Boolean := True;
       Formatter    : Document_Formatter_Access;
    end record;
 

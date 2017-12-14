@@ -134,3 +134,5 @@ uninstall:
 	rm -rf ${prefix}/share/dynamo/base
 	rm -f ${bindir}/dynamo
 	rm -f $(prefix)/share/man/man1/dynamo.1
+
+.PHONY: doc

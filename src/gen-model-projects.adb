@@ -631,6 +631,12 @@ package body Gen.Model.Projects is
 
          --  Read the XML query file.
          Reader.Parse (Path, Prj_Mapper);
+         declare
+            Is_Plugin  : constant String := Project.Props.Get ("is_plugin", "FALSE");
+         begin
+            Project.Is_Plugin
+              := Is_Plugin = "TRUE" or Is_Plugin = "true" or Is_Plugin = "1";
+         end;
       end if;
 
       if Length (Project.Name) = 0 then
@@ -735,17 +741,17 @@ package body Gen.Model.Projects is
                Has_File : constant Boolean := Result.Contains (Dynamo);
                P        : Model.Projects.Project_Definition_Access;
             begin
+               Log.Info ("GNAT project {0}", Name);
                Project_Info_Vectors.Next (Iter);
 
                --  Do not include the 'dynamo.xml' path if it is already in the list
                --  (this happens if a project uses several GNAT project files).
                --  We have to make sure that the 'dynamo.xml' stored in the current directory
-               --  appears last in the list.
-               if (not Has_File or else not Project_Info_Vectors.Has_Element (Iter))
-               --  Insert only if there is a file.
-                 and Dynamo'Length > 0
+               --  appears last in the list.  Insert only if there is a file.
+               if not Info.Is_Abstract
+                 and then (not Has_File or else not Project_Info_Vectors.Has_Element (Iter))
+                 and then Dynamo'Length > 0
                then
-
                   Log.Debug ("Dynamo file {0} is used", Dynamo);
                   if Has_File then
                      Result.Delete (Result.Find_Index (Dynamo));
@@ -759,6 +765,7 @@ package body Gen.Model.Projects is
                      Log.Debug ("Create dependency for {0} on {1}", Name, Dynamo);
                      Project.Create_Project (Path => Dynamo, Name => Name, Project => P);
                      P.Read_Project;
+                     Log.Debug ("Loaded project {0}", P.Name);
                      Project.Add_Dependency (P, DIRECT);
                   end if;
                end if;
@@ -870,7 +877,7 @@ package body Gen.Model.Projects is
                   begin
                      Log.Debug ("Checking dynamo file {0}", Dynamo);
                      if Ada.Directories.Exists (Dynamo) then
-                        if not  Project.Dynamo_Files.Contains (Dynamo) then
+                        if not Project.Dynamo_Files.Contains (Dynamo) then
                            Project.Dynamo_Files.Append (Dynamo);
                         end if;
                         Item.Project      := new Project_Definition;

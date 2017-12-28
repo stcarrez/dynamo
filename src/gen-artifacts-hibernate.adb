@@ -463,9 +463,8 @@ package body Gen.Artifacts.Hibernate is
       end Print_Info;
 
       Name       : constant String := Project.Get_Project_Name;
-      Is_Plugin  : constant String := Project.Props.Get ("is_plugin", "FALSE");
    begin
-      if Is_Plugin /= "TRUE" and Is_Plugin /= "true" and Is_Plugin /= "1" then
+      if Project.Is_Plugin then
          Build_SQL_Schemas ("mysql", "", "create-" & Name, False);
          Build_SQL_Schemas ("sqlite", "", "create-" & Name, False);
          Build_SQL_Schemas ("mysql", "drop-", "drop-" & Name, True);

@@ -2233,6 +2233,9 @@ package body Prj.Nmsc is
                      Project.Config.Lib_Support :=
                        Library_Support'Value (Get_Name_String
                                               (Attribute.Value.Value));
+                     if Project.Config.Lib_Support = Prj.None then
+                        Project.Config.Lib_Support := Prj.Static_Only;
+                     end if;
                   exception
                      when Constraint_Error =>
                         Error_Msg
@@ -3478,6 +3481,9 @@ package body Prj.Nmsc is
 
       if Project.Library then
          Support_For_Libraries := Project.Config.Lib_Support;
+         if Support_For_Libraries = Prj.None then
+            Support_For_Libraries := Prj.Static_Only;
+         end if;
 
          if not Project.Externally_Built
            and then Support_For_Libraries = Prj.None

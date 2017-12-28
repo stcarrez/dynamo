@@ -122,6 +122,7 @@ package body Gen.Utils.GNAT is
                                Tree  : in Prj.Project_Tree_Ref;
                                Dummy : in out Boolean) is
          pragma Unreferenced (Tree, Dummy);
+         use type Prj.Project_Qualifier;
 
          Path    : constant String := Namet.Get_Name_String (Proj.Path.Name);
          Name    : constant String := Get_Project_Name (Proj);
@@ -131,6 +132,7 @@ package body Gen.Utils.GNAT is
 
          Project.Path := To_Unbounded_String (Path);
          Project.Name := To_Unbounded_String (Name);
+         Project.Is_Abstract := Proj.Qualifier = Prj.Abstract_Project;
          Project_List.Append (Project);
       end Recursive_Add;
 

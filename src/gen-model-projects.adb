@@ -24,7 +24,6 @@ with Util.Files;
 with Util.Log.Loggers;
 with Util.Serialize.IO.XML;
 with Util.Serialize.Mappers.Record_Mapper;
-with Util.Streams.Buffered;
 with Util.Streams.Texts;
 with Util.Strings.Transforms;
 with Util.Strings.Vectors;
@@ -448,7 +447,6 @@ package body Gen.Model.Projects is
    --  ------------------------------
    procedure Save (Project : in out Project_Definition;
                    Path    : in String) is
-      use Util.Streams.Buffered;
       use Util.Streams;
       use Util.Beans.Objects;
 
@@ -543,9 +541,9 @@ package body Gen.Model.Projects is
       Project.Dependencies.Iterate (Save_Dependency'Access);
       Output.Write_String (ASCII.LF & "");
       Output.End_Entity (Name => "project");
-      Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Buffer)),
+      Util.Files.Write_File (Content => Texts.To_String (Buffer),
                              Path    => Path);
-      Util.Files.Write_File (Content => Texts.To_String (Buffered_Stream (Prop_Output)),
+      Util.Files.Write_File (Content => Texts.To_String (Prop_Output),
                              Path    => Prop_Path);
    end Save;
 

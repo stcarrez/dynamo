@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -119,6 +119,7 @@ package body Gen.Artifacts.Docs is
 
          Iter : Line_Vectors.Cursor := Doc.Lines.Last;
       begin
+         Into.Lines.Insert (Before => Position, New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
          while Line_Vectors.Has_Element (Iter) loop
             Into.Lines.Insert (Before => Position, New_Item => Line_Vectors.Element (Iter));
             Line_Vectors.Previous (Iter);
@@ -308,8 +309,10 @@ package body Gen.Artifacts.Docs is
    begin
       if Line'Length <= 3 then
          return False;
+      elsif Line (Line'First) = '*' and Line (Line'First + 1) = ' ' then
+         return True;
       else
-         return Line (Line'First + 2) = '*';
+         return Line (Line'First .. Line'First + 3) = "  * ";
       end if;
    end Is_List;
 

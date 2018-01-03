@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs-markdown -- Artifact for GitHub Markdown documentation format
---  Copyright (C) 2015, 2017 Stephane Carrez
+--  Copyright (C) 2015, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,8 +45,10 @@ package body Gen.Artifacts.Docs.Markdown is
                              File      : in Ada.Text_IO.File_Type) is
       pragma Unreferenced (Formatter);
    begin
-      Ada.Text_IO.Put_Line (File, "# " & Ada.Strings.Unbounded.To_String (Document.Title));
-      Ada.Text_IO.New_Line (File);
+      if Document.Print_Footer then
+         Ada.Text_IO.Put_Line (File, "# " & Ada.Strings.Unbounded.To_String (Document.Title));
+         Ada.Text_IO.New_Line (File);
+      end if;
    end Start_Document;
 
    --  ------------------------------
@@ -215,7 +217,7 @@ package body Gen.Artifacts.Docs.Markdown is
 
          when L_START_CODE =>
             Formatter.Mode := Line.Kind;
-            Formatter.Write_Line (File, "```");
+            Formatter.Write_Line (File, "```Ada");
 
          when L_END_CODE =>
             Formatter.Mode := L_TEXT;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,6 +72,9 @@ package Gen.Model.Projects is
 
       --  Whether we did a recursive scan of Dynamo dependencies.
       Depend_Scan    : Boolean := False;
+
+      --  Whether this project is a plugin.
+      Is_Plugin      : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -609,7 +609,12 @@ package body Gen.Generator is
          if H.Get_Project_Property ("search_dirs", ".") = "." then
             H.Read_Project ("dynamo.xml", True);
          end if;
-         H.Set_Project_Property ("search_dirs", H.Get_Search_Directories);
+
+         --  Do not update the search_dirs if the project is a plugin.
+         --  This is only meaningful in the final project.
+         if not H.Project.Is_Plugin then
+            H.Set_Project_Property ("search_dirs", H.Get_Search_Directories);
+         end if;
       end if;
       H.Project.Save (Path);
    end Save_Project;

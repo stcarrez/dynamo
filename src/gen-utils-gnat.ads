@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils-gnat -- GNAT utilities
---  Copyright (C) 2011, 2012, 2015 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2017 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,8 +33,9 @@ package Gen.Utils.GNAT is
    ADA_PROJECT_PATH_NAME    : constant String := "ADA_PROJECT_PATH";
 
    type Project_Info is record
-      Path : Ada.Strings.Unbounded.Unbounded_String;
-      Name : Ada.Strings.Unbounded.Unbounded_String;
+      Path        : Ada.Strings.Unbounded.Unbounded_String;
+      Name        : Ada.Strings.Unbounded.Unbounded_String;
+      Is_Abstract : Boolean := False;
    end record;
 
    package Project_Info_Vectors is

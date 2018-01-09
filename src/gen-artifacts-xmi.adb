@@ -1381,11 +1381,11 @@ package body Gen.Artifacts.XMI is
          if N > 0 and then File (N .. File'Last) = ".zargo" then
             declare
                Pipe   : aliased Util.Streams.Pipes.Pipe_Stream;
-               Buffer : Util.Streams.Buffered.Buffered_Stream;
+               Buffer : Util.Streams.Buffered.Input_Buffer_Stream;
             begin
                Pipe.Open ("unzip -cq " & File & " " & Name & ".xmi",
                           Util.Processes.READ);
-               Buffer.Initialize (null, Pipe'Unchecked_Access, 4096);
+               Buffer.Initialize (Pipe'Unchecked_Access, 4096);
                Reader.Parse (Buffer, Mapper);
                Pipe.Close;
             end;

@@ -22,6 +22,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Gen.Model.Packages;
+private with Util.Strings.Maps;
 
 --  with Asis;
 --  with Asis.Text;
@@ -88,6 +89,11 @@ package Gen.Artifacts.Docs is
                          Format  : in Doc_Format;
                          Footer  : in Boolean);
 
+   --  Load from the file a list of link definitions which can be injected in the generated doc.
+   --  This allows to avoid polluting the Ada code with external links.
+   procedure Read_Links (Handler : in out Artifact;
+                         Path    : in String);
+
 private
 
    type Line_Kind is (L_TEXT, L_LIST, L_LIST_ITEM, L_SEE, L_INCLUDE, L_START_CODE, L_END_CODE,
@@ -104,7 +110,9 @@ private
 
    type Doc_State is (IN_PARA, IN_SEPARATOR, IN_CODE, IN_CODE_SEPARATOR, IN_LIST);
 
-   type Document_Formatter is abstract tagged null record;
+   type Document_Formatter is abstract tagged record
+      Links : Util.Strings.Maps.Map;
+   end record;
    type Document_Formatter_Access is access all Document_Formatter'Class;
 
    type File_Document is record

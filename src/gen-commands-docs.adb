@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-docs -- Extract and generate documentation for the project
---  Copyright (C) 2012, 2015, 2017 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,6 +74,7 @@ package body Gen.Commands.Docs is
          Generator.Set_Result_Directory (Arg2);
       end if;
       Doc.Set_Format (Fmt, Footer);
+      Doc.Read_Links (Generator.Get_Project_Property ("links", "links.txt"));
       Doc.Prepare (M, Generator);
    end Execute;
 

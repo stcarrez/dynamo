@@ -109,8 +109,12 @@ package body Gen.Artifacts.Docs.Markdown is
          end if;
          Ada.Text_IO.Put (File, Text (Start .. Pos - 1));
 
+         if Pos - 1 >= Text'First and then (Text (Pos - 1) = '\' or Text (Pos - 1) = '`') then
+            Ada.Text_IO.Put (File, "[");
+            Start := Pos + 1;
+
          --  Parse a markdown link format.
-         if Text (Pos + 1) = '[' then
+         elsif Text (Pos + 1) = '[' then
             Start := Pos + 2;
             Pos := Util.Strings.Index (Text, ']', Pos + 2);
             if Pos = 0 then

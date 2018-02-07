@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-propset -- Set a property on dynamo project
---  Copyright (C) 2011, 2012, 2017 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ package body Gen.Commands.Propset is
       use Ada.Text_IO;
    begin
       Put_Line ("propset: Set the value of a property in the dynamo project file");
-      Put_Line ("Usage: propset NAME VALUEE");
+      Put_Line ("Usage: propset NAME VALUE");
       New_Line;
    end Help;
 

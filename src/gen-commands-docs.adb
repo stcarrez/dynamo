@@ -43,7 +43,9 @@ package body Gen.Commands.Docs is
       Footer : Boolean := True;
       Fmt    : Gen.Artifacts.Docs.Doc_Format := Gen.Artifacts.Docs.DOC_WIKI_GOOGLE;
    begin
-      Generator.Read_Project ("dynamo.xml", False);
+      if Ada.Directories.Exists ("dynamo.xml") then
+         Generator.Read_Project ("dynamo.xml", False);
+      end if;
 
       if Arg1'Length = 0 then
          Generator.Error ("Missing target directory");

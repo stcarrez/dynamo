@@ -283,7 +283,9 @@ package body Gen.Artifacts.Docs.Markdown is
             Formatter.Write_Line (File, "```");
 
          when L_TEXT =>
-            Formatter.Mode := L_TEXT;
+            if Formatter.Mode /= L_START_CODE then
+               Formatter.Mode := L_TEXT;
+            end if;
             Formatter.Write_Line (File, Line.Content);
 
          when L_HEADER_1 =>

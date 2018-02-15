@@ -19,6 +19,7 @@
 with GNAT.Command_Line;
 
 with Ada.Text_IO;
+with Ada.Directories;
 
 with Gen.Artifacts.Docs;
 with Gen.Model.Packages;

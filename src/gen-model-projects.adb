@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -548,6 +548,16 @@ package body Gen.Model.Projects is
    end Save;
 
    --  ------------------------------
+   --  Update the project definition from the properties.
+   --  ------------------------------
+   procedure Update_From_Properties (Project : in out Project_Definition) is
+      Is_Plugin  : constant String := Project.Props.Get ("is_plugin", "FALSE");
+   begin
+      Project.Is_Plugin
+        := Is_Plugin = "TRUE" or Is_Plugin = "true" or Is_Plugin = "1";
+   end Update_From_Properties;
+
+   --  ------------------------------
    --  Read the XML project description into the project description.
    --  ------------------------------
    procedure Read_Project (Project : in out Project_Definition) is
@@ -629,12 +639,7 @@ package body Gen.Model.Projects is
 
          --  Read the XML query file.
          Reader.Parse (Path, Prj_Mapper);
-         declare
-            Is_Plugin  : constant String := Project.Props.Get ("is_plugin", "FALSE");
-         begin
-            Project.Is_Plugin
-              := Is_Plugin = "TRUE" or Is_Plugin = "true" or Is_Plugin = "1";
-         end;
+         Project.Update_From_Properties;
       end if;
 
       if Length (Project.Name) = 0 then

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs-markdown -- Artifact for GitHub Markdown documentation format
---  Copyright (C) 2015 Stephane Carrez
+--  Copyright (C) 2015, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,5 +56,10 @@ private package Gen.Artifacts.Docs.Markdown is
    procedure Write_Text (Formatter : in out Document_Formatter;
                          File      : in Ada.Text_IO.File_Type;
                          Text      : in String);
+
+   --  Write a line doing some link transformation for Markdown.
+   procedure Write_Text_Auto_Links (Formatter : in out Document_Formatter;
+                                    File      : in Ada.Text_IO.File_Type;
+                                    Text      : in String);
 
 end Gen.Artifacts.Docs.Markdown;

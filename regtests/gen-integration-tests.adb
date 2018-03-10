@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -172,6 +172,7 @@ package body Gen.Integration.Tests is
       P.Open (Command, Util.Processes.READ_ALL);
 
       --  Write on the process input stream.
+      Result := Ada.Strings.Unbounded.Null_Unbounded_String;
       Buffer.Initialize (P'Unchecked_Access, 8192);
       Buffer.Read (Result);
       P.Close;
@@ -383,6 +384,7 @@ package body Gen.Integration.Tests is
    procedure Test_Generate (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
+      T.Execute (Dynamo & " propset is_plugin true", Result);
       T.Execute (Dynamo & " generate db", Result);
       Util.Tests.Assert_Matches (T,
                                  ".*Reading model file stored in .db.*",
@@ -394,6 +396,21 @@ package body Gen.Integration.Tests is
                                  "Invalid generate");
       Util.Tests.Assert_Matches (T,
                                  ".*Generating mysql.*db/mysql/create-test-mysql.sql.*",
+                                 Result,
+                                 "Invalid generate");
+
+      T.Execute (Dynamo & " propset is_plugin false", Result);
+      T.Execute (Dynamo & " generate db", Result);
+      Util.Tests.Assert_Matches (T,
+                                 ".*Reading model file stored in .db.*",
+                                 Result,
+                                 "Invalid generate");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Generating file.*src/model/test-tuser-models.*",
+                                 Result,
+                                 "Invalid generate");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Generating file.*db/mysql/test-mysql.sql.*",
                                  Result,
                                  "Invalid generate");
    end Test_Generate;
@@ -514,7 +531,7 @@ package body Gen.Integration.Tests is
                                  Result,
                                  "Invalid generate");
       Util.Tests.Assert_Matches (T,
-                                 ".*Generating mysql.*db/mysql/create-test-mysql.sql.*",
+                                 ".*Generating file.*db/mysql/test-mysql.sql.*",
                                  Result,
                                  "Invalid generate");
       Util.Tests.Assert_Exists (T, "src/model/gen-permissions-models.ads");

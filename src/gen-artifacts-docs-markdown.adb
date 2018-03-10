@@ -16,14 +16,24 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Strings.Fixed;
+with Ada.Strings.Maps;
 with Util.Strings;
 with Util.Log.Loggers;
 package body Gen.Artifacts.Docs.Markdown is
+
+   use type Ada.Strings.Maps.Character_Set;
 
    function Has_Scheme (Link : in String) return Boolean;
    function Is_Image (Link : in String) return Boolean;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Docs.Mark");
+
+   Marker : constant Ada.Strings.Maps.Character_Set
+     := Ada.Strings.Maps.To_Set (" .,;:!?")
+     or Ada.Strings.Maps.To_Set (ASCII.HT)
+     or Ada.Strings.Maps.To_Set (ASCII.VT)
+     or Ada.Strings.Maps.To_Set (ASCII.CR)
+     or Ada.Strings.Maps.To_Set (ASCII.LF);
 
    --  ------------------------------
    --  Get the document name from the file document (ex: <name>.wiki or <name>.md).
@@ -83,13 +93,58 @@ package body Gen.Artifacts.Docs.Markdown is
       end if;
    end Is_Image;
 
+   procedure Write_Text_Auto_Links (Formatter : in out Document_Formatter;
+                                    File      : in Ada.Text_IO.File_Type;
+                                    Text      : in String) is
+      Start : Natural := Text'First;
+      Last  : Natural := Text'Last;
+      Link  : Util.Strings.Maps.Cursor;
+      Pos   : Natural;
+   begin
+      Log.Debug ("Auto link |{0}|", Text);
+      loop
+         --  Emit spaces at beginning of line or words.
+         while Start <= Text'Last and then Ada.Strings.Maps.Is_In (Text (Start), Marker) loop
+            Ada.Text_IO.Put (File, Text (Start));
+            Start := Start + 1;
+         end loop;
+         exit when Start > Text'Last;
+
+         --  Find a possible link.
+         Link := Formatter.Links.Find (Text (Start .. Last));
+         if Util.Strings.Maps.Has_Element (Link) then
+            Ada.Text_IO.Put (File, "[");
+            Ada.Text_IO.Put (File, Text (Start .. Last));
+            Ada.Text_IO.Put (File, "](");
+            Ada.Text_IO.Put (File, Util.Strings.Maps.Element (Link));
+            Ada.Text_IO.Put (File, ")");
+            Start := Last + 1;
+            Last := Text'Last;
+         else
+            Pos := Ada.Strings.Fixed.Index (Text (Start .. Last), Marker,
+                                            Going => Ada.Strings.Backward);
+            if Pos = 0 then
+               Ada.Text_IO.Put (File, Text (Start .. Last));
+               Start := Last + 1;
+               Last := Text'Last;
+            else
+               Last := Pos - 1;
+
+               --  Skip spaces at end of words for the search.
+               while Last > Start and then Ada.Strings.Maps.Is_In (Text (Last), Marker) loop
+                  Last := Last - 1;
+               end loop;
+            end if;
+         end if;
+      end loop;
+   end Write_Text_Auto_Links;
+
    --  ------------------------------
    --  Write a line doing some link transformation for Markdown.
    --  ------------------------------
    procedure Write_Text (Formatter : in out Document_Formatter;
                          File      : in Ada.Text_IO.File_Type;
                          Text      : in String) is
-      pragma Unreferenced (Formatter);
       Pos      : Natural;
       Start    : Natural := Text'First;
       End_Pos  : Natural;
@@ -104,13 +159,17 @@ package body Gen.Artifacts.Docs.Markdown is
       loop
          Pos := Util.Strings.Index (Text, '[', Start);
          if Pos = 0 or else Pos = Text'Last then
-            Ada.Text_IO.Put (File, Text (Start .. Text'Last));
+            Formatter.Write_Text_Auto_Links (File, Text (Start .. Text'Last));
             return;
          end if;
-         Ada.Text_IO.Put (File, Text (Start .. Pos - 1));
+         Formatter.Write_Text_Auto_Links (File, Text (Start .. Pos - 1));
+
+         if Pos - 1 >= Text'First and then (Text (Pos - 1) = '\' or Text (Pos - 1) = '`') then
+            Ada.Text_IO.Put (File, "[");
+            Start := Pos + 1;
 
          --  Parse a markdown link format.
-         if Text (Pos + 1) = '[' then
+         elsif Text (Pos + 1) = '[' then
             Start := Pos + 2;
             Pos := Util.Strings.Index (Text, ']', Pos + 2);
             if Pos = 0 then
@@ -224,6 +283,9 @@ package body Gen.Artifacts.Docs.Markdown is
             Formatter.Write_Line (File, "```");
 
          when L_TEXT =>
+            if Formatter.Mode /= L_START_CODE then
+               Formatter.Mode := L_TEXT;
+            end if;
             Formatter.Write_Line (File, Line.Content);
 
          when L_HEADER_1 =>

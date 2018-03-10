@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -583,6 +583,7 @@ package body Gen.Generator is
       Log.Debug ("Set property {0} to {1}", Name, Value);
 
       H.Project.Props.Set (Name, Value);
+      H.Project.Update_From_Properties;
    end Set_Project_Property;
 
    --  ------------------------------
@@ -606,9 +607,9 @@ package body Gen.Generator is
       --  Set the 'search_dirs' property only if we did a recursive scan of GNAT project files.
       --  Otherwise we don't know which Dynamo module or library is used.
       if H.Project.Recursive_Scan then
-         if H.Get_Project_Property ("search_dirs", ".") = "." then
-            H.Read_Project ("dynamo.xml", True);
-         end if;
+--           if H.Get_Project_Property ("search_dirs", ".") = "." then
+--              H.Read_Project ("dynamo.xml", True);
+--           end if;
 
          --  Do not update the search_dirs if the project is a plugin.
          --  This is only meaningful in the final project.

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-docs -- Extract and generate documentation for the project
---  Copyright (C) 2012, 2015, 2017 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@
 with GNAT.Command_Line;
 
 with Ada.Text_IO;
+with Ada.Directories;
 
 with Gen.Artifacts.Docs;
 with Gen.Model.Packages;
@@ -43,7 +44,9 @@ package body Gen.Commands.Docs is
       Footer : Boolean := True;
       Fmt    : Gen.Artifacts.Docs.Doc_Format := Gen.Artifacts.Docs.DOC_WIKI_GOOGLE;
    begin
-      Generator.Read_Project ("dynamo.xml", False);
+      if Ada.Directories.Exists ("dynamo.xml") then
+         Generator.Read_Project ("dynamo.xml", False);
+      end if;
 
       if Arg1'Length = 0 then
          Generator.Error ("Missing target directory");
@@ -74,6 +77,7 @@ package body Gen.Commands.Docs is
          Generator.Set_Result_Directory (Arg2);
       end if;
       Doc.Set_Format (Fmt, Footer);
+      Doc.Read_Links (Generator.Get_Project_Property ("links", "links.txt"));
       Doc.Prepare (M, Generator);
    end Execute;
 

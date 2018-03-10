@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014, 2017 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -151,6 +151,9 @@ package Gen.Model.Projects is
    --  <b>modules</b> directory.  Each module is stored in its own directory and has its own
    --  <b>dynamo.xml</b> file.
    procedure Read_Modules (Project  : in out Project_Definition);
+
+   --  Update the project definition from the properties.
+   procedure Update_From_Properties (Project : in out Project_Definition);
 
    --  ------------------------------
    --  Root Project Definition

@@ -99,6 +99,29 @@ package body Gen.Artifacts.Docs is
    end Set_Format;
 
    --  ------------------------------
+   --  Load from the file a list of link definitions which can be injected in the generated doc.
+   --  This allows to avoid polluting the Ada code with external links.
+   --  ------------------------------
+   procedure Read_Links (Handler : in out Artifact;
+                         Path    : in String) is
+      use Ada.Strings.Fixed;
+      procedure Read (Line : in String);
+      procedure Read (Line : in String) is
+         Pos : constant Natural := Util.Strings.Rindex (Line, ' ');
+      begin
+         if Pos > 0 and then Line (Line'First) /= '#' then
+            Handler.Formatter.Links.Include
+              (Key      => Trim (Line (Line'First .. Pos), Ada.Strings.Both),
+               New_Item => Trim (Line (Pos .. Line'Last), Ada.Strings.Both));
+         end if;
+      end Read;
+   begin
+      if Ada.Directories.Exists (Path) then
+         Util.Files.Read_File (Path, Read'Access);
+      end if;
+   end Read_Links;
+
+   --  ------------------------------
    --  Include the document extract represented by <b>Name</b> into the document <b>Into</b>.
    --  The included document is marked so that it will not be generated.
    --  ------------------------------
@@ -119,7 +142,8 @@ package body Gen.Artifacts.Docs is
 
          Iter : Line_Vectors.Cursor := Doc.Lines.Last;
       begin
-         Into.Lines.Insert (Before => Position, New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
+         Into.Lines.Insert (Before => Position,
+                            New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
          while Line_Vectors.Has_Element (Iter) loop
             Into.Lines.Insert (Before => Position, New_Item => Line_Vectors.Element (Iter));
             Line_Vectors.Previous (Iter);

@@ -32,6 +32,7 @@ with ASF.Responses.Mockup;
 with ASF.Components.Root;
 with ASF.Components.Base;
 with ASF.Servlets.Faces;
+with Servlet.Core;
 
 with Util.Beans.Basic;
 with Util.Strings.Vectors;
@@ -1018,7 +1019,7 @@ package body Gen.Generator is
       Req.Set_Attribute (Name => "date",
                          Value => Util.Beans.Objects.Time.To_Object (Ada.Calendar.Clock));
 
-      ASF.Servlets.Forward (Dispatcher, Req, Reply);
+      Servlet.Core.Forward (Dispatcher, Req, Reply);
 
       declare
          Content  : Unbounded_String;

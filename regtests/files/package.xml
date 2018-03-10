@@ -46,7 +46,7 @@
        </fileset>
      </install>
      <install mode='exec' dir='web'>
-       <command>yui-compressor --type js --charset UTF-8 -o #{dst} #{src}</command>
+       <command>cp #{src} #{dst}</command>
        <fileset dir="web">
          <include name="**/*.js"/>
        </fileset>

@@ -103,6 +103,17 @@ AM_GNAT_FIND_PROJECT([ada-security],[Ada Security Library],[security],
 AC_SUBST(SECURITY_DIR)
 
 ##########################################
+# Ada Servlet library
+##########################################
+AM_GNAT_FIND_PROJECT([ada-servlet],[Ada Servlet Library],[servlet],
+  [git@github.com:stcarrez/ada-servlet.git],
+  [Building Ada Server Faces requires the Ada Servlet Library.],
+  [
+    SERVLET_DIR=${gnat_project_dir_servlet}
+  ])
+AC_SUBST(SERVLET_DIR)
+
+##########################################
 # Ada Database Objects library
 ##########################################
 AM_GNAT_FIND_PROJECT([ada-ado],[Ada Database Objects],[ado],

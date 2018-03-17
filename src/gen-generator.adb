@@ -426,6 +426,7 @@ package body Gen.Generator is
       H.Servlet := new ASF.Servlets.Faces.Faces_Servlet;
       H.Add_Servlet (Name => "file", Server => H.Servlet);
       H.Add_Mapping ("*.xhtml", "file");
+      H.Start;
 
       begin
          Gen.Commands.Templates.Read_Commands (H);

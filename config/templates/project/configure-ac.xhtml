@@ -79,6 +79,18 @@ AC_SUBST(EL_DIR)
 #{''}
 
 ##########################################
+# Ada Servlet library
+##########################################
+AM_GNAT_FIND_PROJECT([ada-servlet],[Ada Servlet],[servlet],
+  [git@github.com:stcarrez/ada-servlet.git],
+  [Building #{projectName} requires the Ada Servlet Library.],
+  [
+    SERVLET_DIR=\${gnat_project_dir_servlet}
+  ])
+AC_SUBST(SERVLET_DIR)
+#{''}
+
+##########################################
 # Ada Server Faces library
 ##########################################
 AM_GNAT_FIND_PROJECT([ada-asf],[Ada Server Faces],[asf],

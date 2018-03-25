@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-plugins -- Plugin creation and management commands for dynamo
---  Copyright (C) 2012, 2015, 2017 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ package body Gen.Commands.Plugins is
 
    --  Execute the command with the arguments.
    overriding
-   procedure Execute (Cmd       : in Command;
+   procedure Execute (Cmd       : in out Command;
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
@@ -112,7 +112,7 @@ package body Gen.Commands.Plugins is
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing plugin name");
-            Cmd.Usage;
+            Cmd.Usage (Name);
             return;
          end if;
          if Kind /= "ada" and Kind /= "web" then

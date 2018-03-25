@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-project -- Project creation command for dynamo
---  Copyright (C) 2011, 2012, 2013, 2014, 2017 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -56,7 +56,7 @@ package body Gen.Commands.Project is
    --  Execute the command with the arguments.
    --  ------------------------------
    overriding
-   procedure Execute (Cmd       : in Command;
+   procedure Execute (Cmd       : in out Command;
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
@@ -134,7 +134,7 @@ package body Gen.Commands.Project is
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing project name");
-            Cmd.Usage;
+            Cmd.Usage (Name);
             return;
          end if;
 
@@ -152,7 +152,7 @@ package body Gen.Commands.Project is
 
          elsif Arg3'Length > 0 then
             Generator.Error ("The last argument should be the author's email address.");
-            Cmd.Usage;
+            Cmd.Usage (Name);
             return;
          end if;
 

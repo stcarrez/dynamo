@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-generate -- Generate command for dynamo
---  Copyright (C) 2011, 2012, 2015, 2017 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ package body Gen.Commands.Generate is
    --  Execute the command with the arguments.
    --  ------------------------------
    overriding
-   procedure Execute (Cmd       : in Command;
+   procedure Execute (Cmd       : in out Command;
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is

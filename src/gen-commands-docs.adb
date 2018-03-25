@@ -31,7 +31,7 @@ package body Gen.Commands.Docs is
    --  Execute the command with the arguments.
    --  ------------------------------
    overriding
-   procedure Execute (Cmd       : in Command;
+   procedure Execute (Cmd       : in out Command;
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is

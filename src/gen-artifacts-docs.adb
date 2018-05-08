@@ -66,8 +66,11 @@ package body Gen.Artifacts.Docs is
                       Context : in out Generator'Class) is
       pragma Unreferenced (Model);
 
-      Docs : Doc_Maps.Map;
-      Command : constant String := Context.Get_Parameter ("generator.doc.xslt.command");
+      Docs   : Doc_Maps.Map;
+      Name    : constant String := (if Handler.Format = DOC_WIKI_GOOGLE
+                                    then "generator.doc.xslt.command"
+                                    else "generator.markdown.xslt.command");
+      Command : constant String := Context.Get_Parameter (Name);
    begin
       Log.Info ("Using command: {0}", Command);
 
@@ -649,6 +652,7 @@ package body Gen.Artifacts.Docs is
       Command : constant String := Ada.Strings.Unbounded.To_String (Handler.Xslt_Command);
       Is_Empty : Boolean := True;
    begin
+      Log.Info ("Running {0} {1}", Command, File);
       Pipe.Open (Command & " " & File, Util.Processes.READ);
       Reader.Initialize (Pipe'Unchecked_Access);
 

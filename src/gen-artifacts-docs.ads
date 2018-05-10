@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2015, 2017 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,10 +65,14 @@ package Gen.Artifacts.Docs is
    TAG_CHAR     : constant Character := '@';
 
    --  Specific tags recognized when analyzing the documentation.
-   TAG_AUTHOR   : constant String := "author";
-   TAG_TITLE    : constant String := "title";
-   TAG_INCLUDE  : constant String := "include";
-   TAG_SEE      : constant String := "see";
+   TAG_AUTHOR         : constant String := "author";
+   TAG_TITLE          : constant String := "title";
+   TAG_INCLUDE        : constant String := "include";
+   TAG_INCLUDE_CONFIG : constant String := "include-config";
+   TAG_INCLUDE_BEAN   : constant String := "include-bean";
+   TAG_INCLUDE_QUERY  : constant String := "include-query";
+   TAG_INCLUDE_PERM   : constant String := "include-permission";
+   TAG_SEE            : constant String := "see";
 
    type Doc_Format is (DOC_MARKDOWN, DOC_WIKI_GOOGLE);
 
@@ -96,8 +100,12 @@ package Gen.Artifacts.Docs is
 
 private
 
-   type Line_Kind is (L_TEXT, L_LIST, L_LIST_ITEM, L_SEE, L_INCLUDE, L_START_CODE, L_END_CODE,
+   type Line_Kind is (L_TEXT, L_LIST, L_LIST_ITEM, L_SEE, L_INCLUDE, L_INCLUDE_CONFIG,
+                      L_INCLUDE_BEAN, L_INCLUDE_PERMISSION, L_INCLUDE_QUERY,
+                      L_START_CODE, L_END_CODE,
                       L_HEADER_1, L_HEADER_2, L_HEADER_3, L_HEADER_4);
+
+   subtype Line_Include_Kind is Line_Kind range L_INCLUDE .. L_INCLUDE_QUERY;
 
    type Line_Type (Len : Natural) is record
       Kind    : Line_Kind := L_TEXT;
@@ -107,6 +115,8 @@ private
    package Line_Vectors is
       new Ada.Containers.Indefinite_Vectors (Index_Type   => Positive,
                                              Element_Type => Line_Type);
+
+   type Line_Group_Vector is array (Line_Include_Kind) of Line_Vectors.Vector;
 
    type Doc_State is (IN_PARA, IN_SEPARATOR, IN_CODE, IN_CODE_SEPARATOR, IN_LIST);
 
@@ -120,7 +130,7 @@ private
       Title        : Ada.Strings.Unbounded.Unbounded_String;
       State        : Doc_State := IN_PARA;
       Line_Number  : Natural := 0;
-      Lines        : Line_Vectors.Vector;
+      Lines        : Line_Group_Vector;
       Was_Included : Boolean := False;
       Print_Footer : Boolean := True;
       Formatter    : Document_Formatter_Access;
@@ -157,6 +167,7 @@ private
    procedure Include (Docs     : in out Doc_Maps.Map;
                       Into     : in out File_Document;
                       Name     : in String;
+                      Mode     : in Line_Include_Kind;
                       Position : in Natural);
 
    --  Generate the project documentation that was collected in <b>Docs</b>.

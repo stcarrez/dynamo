@@ -131,6 +131,7 @@ package body Gen.Artifacts.Docs is
    procedure Include (Docs     : in out Doc_Maps.Map;
                       Into     : in out File_Document;
                       Name     : in String;
+                      Mode     : in Line_Include_Kind;
                       Position : in Natural) is
       --  Include the lines from the document into another.
       procedure Do_Include (Source : in String;
@@ -143,12 +144,13 @@ package body Gen.Artifacts.Docs is
                             Doc    : in out File_Document) is
          pragma Unreferenced (Source);
 
-         Iter : Line_Vectors.Cursor := Doc.Lines.Last;
+         Iter : Line_Vectors.Cursor := Doc.Lines (Mode).Last;
       begin
-         Into.Lines.Insert (Before => Position,
-                            New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
+         Into.Lines (L_INCLUDE).Insert (Before => Position,
+                                        New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
          while Line_Vectors.Has_Element (Iter) loop
-            Into.Lines.Insert (Before => Position, New_Item => Line_Vectors.Element (Iter));
+            Into.Lines (L_INCLUDE).Insert (Before   => Position,
+                                           New_Item => Line_Vectors.Element (Iter));
             Line_Vectors.Previous (Iter);
          end loop;
          Doc.Was_Included := True;
@@ -187,13 +189,16 @@ package body Gen.Artifacts.Docs is
 
          Pos : Natural := 1;
       begin
-         while Pos <= Natural (Doc.Lines.Length) loop
+         while Pos <= Natural (Doc.Lines (L_INCLUDE).Length) loop
             declare
-               L : constant Line_Type := Line_Vectors.Element (Doc.Lines, Pos);
+               L : constant Line_Type := Line_Vectors.Element (Doc.Lines (L_INCLUDE), Pos);
             begin
-               if L.Kind = L_INCLUDE then
-                  Line_Vectors.Delete (Doc.Lines, Pos);
-                  Include (Docs, Doc, L.Content, Pos);
+               if L.Kind in L_INCLUDE | L_INCLUDE_QUERY |
+               L_INCLUDE_PERMISSION | L_INCLUDE_CONFIG |
+               L_INCLUDE_BEAN
+               then
+                  Line_Vectors.Delete (Doc.Lines (L_INCLUDE), Pos);
+                  Include (Docs, Doc, L.Content, L.Kind, Pos);
                else
                   Pos := Pos + 1;
                end if;
@@ -212,7 +217,7 @@ package body Gen.Artifacts.Docs is
          Name : constant String := Doc.Formatter.Get_Document_Name (Doc);
          Path : constant String := Util.Files.Compose (Dir, Name);
          File : Ada.Text_IO.File_Type;
-         Iter : Line_Vectors.Cursor := Doc.Lines.First;
+         Iter : Line_Vectors.Cursor := Doc.Lines (L_INCLUDE).First;
 
          procedure Write (Line : in Line_Type) is
          begin
@@ -221,7 +226,7 @@ package body Gen.Artifacts.Docs is
          end Write;
 
       begin
-         if Doc.Lines.Is_Empty or Doc.Was_Included then
+         if Doc.Lines (L_INCLUDE).Is_Empty or Doc.Was_Included then
             return;
          end if;
 
@@ -394,29 +399,37 @@ package body Gen.Artifacts.Docs is
       Level : Natural;
    begin
       if Doc.State = IN_LIST then
-         Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_LIST_ITEM, Content => Line));
+         Doc.Lines (L_INCLUDE).Append (Line_Type '(Len  => Line'Length,
+                                                   Kind => L_LIST_ITEM,
+                                                   Content => Line));
       else
          Level := Get_Header_Level (Line);
          if Level = 0 then
-            Doc.Lines.Append (Line_Type '(Len => Line'Length, Kind => L_TEXT, Content => Line));
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len  => Line'Length,
+                                                      Kind => L_TEXT,
+                                                      Content => Line));
          else
             declare
                Header : constant String := Get_Header (Line);
             begin
                case Level is
                   when 1 =>
-                     Doc.Lines.Append (Line_Type '(Len => Header'Length, Kind => L_HEADER_1,
-                                                   Content => Header));
+                     Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => Header'Length,
+                                                               Kind => L_HEADER_1,
+                                                               Content => Header));
 
                   when 2 =>
-                     Doc.Lines.Append (Line_Type '(Len => Header'Length, Kind => L_HEADER_2,
-                                                   Content => Header));
+                     Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => Header'Length,
+                                                               Kind => L_HEADER_2,
+                                                               Content => Header));
                   when 3 =>
-                     Doc.Lines.Append (Line_Type '(Len => Header'Length, Kind => L_HEADER_3,
-                                                   Content => Header));
+                     Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => Header'Length,
+                                                               Kind => L_HEADER_3,
+                                                               Content => Header));
                   when others =>
-                     Doc.Lines.Append (Line_Type '(Len => Header'Length, Kind => L_HEADER_4,
-                                                   Content => Header));
+                     Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => Header'Length,
+                                                               Kind => L_HEADER_4,
+                                                               Content => Header));
                end case;
             end;
          end if;
@@ -443,13 +456,33 @@ package body Gen.Artifacts.Docs is
             Doc.Title := To_Unbounded_String (Value);
 
          elsif Tag (Tag'First .. Pos - 1) = TAG_SEE then
-            Doc.Lines.Append (Line_Type '(Len     => Value'Length,
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
                                           Kind    => L_SEE,
                                           Content => Value));
 
          elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE then
-            Doc.Lines.Append (Line_Type '(Len     => Value'Length,
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
                                           Kind    => L_INCLUDE,
+                                          Content => Value));
+
+         elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE_PERM then
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
+                                          Kind    => L_INCLUDE_PERMISSION,
+                                          Content => Value));
+
+         elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE_CONFIG then
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
+                                          Kind    => L_INCLUDE_CONFIG,
+                                          Content => Value));
+
+         elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE_BEAN then
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
+                                          Kind    => L_INCLUDE_BEAN,
+                                          Content => Value));
+
+         elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE_QUERY then
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
+                                          Kind    => L_INCLUDE_QUERY,
                                           Content => Value));
 
          end if;
@@ -465,7 +498,7 @@ package body Gen.Artifacts.Docs is
       if Line'Length >= 1 and then Line (Line'First) = TAG_CHAR then
          --  Force a close of the code extract if we see some @xxx command.
          if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
-            Doc.Lines.Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
             Append_Line (Doc, "");
          end if;
          Doc.State := IN_PARA;
@@ -489,7 +522,9 @@ package body Gen.Artifacts.Docs is
 
             elsif Is_Code (Line) then
                Doc.State := IN_CODE;
-               Doc.Lines.Append (Line_Type '(Len => 0, Kind => L_START_CODE, Content => ""));
+               Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0,
+                                                         Kind => L_START_CODE,
+                                                         Content => ""));
             end if;
             Append_Line (Doc, Line);
 
@@ -505,7 +540,9 @@ package body Gen.Artifacts.Docs is
             then (Ada.Characters.Handling.Is_Letter (Line (Line'First))
                   or Line (Line'First) = '=')
             then
-               Doc.Lines.Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
+               Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0,
+                                                         Kind => L_END_CODE,
+                                                         Content => ""));
                Append_Line (Doc, "");
                Doc.State := IN_PARA;
             end if;
@@ -513,8 +550,8 @@ package body Gen.Artifacts.Docs is
 
          when IN_LIST =>
             if Is_List (Line) then
-               Doc.Lines.Append (Line_Type '(Len => Line'Length,
-                                             Kind => L_LIST, Content => Line));
+               Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => Line'Length,
+                                                         Kind => L_LIST, Content => Line));
 
             elsif Line'Length = 0 then
                Doc.State := IN_SEPARATOR;
@@ -534,7 +571,7 @@ package body Gen.Artifacts.Docs is
    procedure Finish (Doc : in out File_Document) is
    begin
       if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
-         Doc.Lines.Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
+         Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
          Doc.State := IN_PARA;
       end if;
    end Finish;
@@ -679,7 +716,7 @@ package body Gen.Artifacts.Docs is
                     Integer'Image (Pipe.Get_Exit_Status));
       end if;
       if Is_Empty then
-         Line_Vectors.Clear (Result.Lines);
+         Line_Vectors.Clear (Result.Lines (L_INCLUDE));
       end if;
 
    exception

@@ -760,6 +760,9 @@ package body Gen.Generator is
       if Ext = "xmi" or Ext = "XMI" or Ext = "zargo" then
          H.XMI.Read_Model (File, H);
          return;
+      elsif Ext = "yaml" or Ext = "YAML" then
+         H.Yaml.Read_Model (File, H.Model, H);
+         return;
       end if;
 
       --  Base file name should be used as the public Id
@@ -823,6 +826,14 @@ package body Gen.Generator is
             H.Model.Set_Dirname ("src", Path);
          end if;
          Start_Search (Search, Directory => Path, Pattern => "*.xm[il]", Filter => Filter);
+
+         --  Collect the files in the vector array.
+         while More_Entries (Search) loop
+            Get_Next_Entry (Search, Ent);
+            Files.Append (Full_Name (Ent));
+         end loop;
+
+         Start_Search (Search, Directory => Path, Pattern => "*.yaml", Filter => Filter);
 
          --  Collect the files in the vector array.
          while More_Entries (Search) loop

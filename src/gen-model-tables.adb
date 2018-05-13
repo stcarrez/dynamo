@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
+--  Copyright (C) 2009 - 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -168,6 +168,18 @@ package body Gen.Model.Tables is
          return To_String (From.Type_Name);
       end if;
    end Get_Type;
+
+   --  ------------------------------
+   --  Set the column type.
+   --  ------------------------------
+   procedure Set_Type (Into : in out Column_Definition;
+                       Name : in String) is
+   begin
+      Into.Type_Name := To_Unbounded_String (Name);
+      if Length (Into.Sql_Type) = 0 then
+         Into.Sql_Type  := To_Unbounded_String (Name);
+      end if;
+   end Set_Type;
 
    --  ------------------------------
    --  Returns the column type mapping.

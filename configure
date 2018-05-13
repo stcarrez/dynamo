@@ -594,6 +594,7 @@ SERVLET_DIR
 SECURITY_DIR
 ASF_DIR
 EL_DIR
+YAML_DIR
 UTIL_DIR
 GEN_LIBDIR
 EXEC_PREFIX
@@ -671,6 +672,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 with_ada_util
+with_yaml
 with_ada_el
 with_ada_asf
 with_ada_security
@@ -1307,6 +1309,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-ada-util=x       Path for Ada Utility Library
+  --with-yaml=x           Path for AdaYaml Library
   --with-ada-el=x         Path for Ada Expression Language Library
   --with-ada-asf=x        Path for Ada Server Faces
   --with-ada-security=x   Path for Ada Security Library
@@ -3246,8 +3249,8 @@ $as_echo "no" >&6; }
   else
     gnat_project_dir_util=
     gnat_project_name_util=
-    if test x"Building Ada EL requires the Ada Utility Library." != x; then
-      as_fn_error $? "Building Ada EL requires the Ada Utility Library.
+    if test x"Building Dynamo requires the Ada Utility Library." != x; then
+      as_fn_error $? "Building Dynamo requires the Ada Utility Library.
   You should build and install the Ada Utility Library component.
   It must be available and found by ${GNATMAKE}.
   This project was not found in the ADA_PROJECT_PATH environment variable.
@@ -3261,6 +3264,107 @@ $as_echo "no" >&6; }
     fi
   fi
 
+
+
+##########################################
+# Ada Yaml
+##########################################
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking AdaYaml Library" >&5
+$as_echo_n "checking AdaYaml Library... " >&6; }
+
+# Check whether --with-yaml was given.
+if test "${with_yaml+set}" = set; then :
+  withval=$with_yaml;
+      gnat_project_name_yaml=${withval}/
+      if test -d "${withval}"; then
+	    gnat_project_name_yaml=${withval}/yaml
+	  fi
+
+else
+
+      gnat_project_name_yaml=yaml
+
+fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: trying ${gnat_project_name_yaml}" >&5
+$as_echo "trying ${gnat_project_name_yaml}" >&6; }
+
+  rm -f conftest.gpr
+  # Search in the GNAT project path.
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${gnat_project_name_yaml} project exists in gnatmake's search path" >&5
+$as_echo_n "checking whether ${gnat_project_name_yaml} project exists in gnatmake's search path... " >&6; }
+  echo "with \"${gnat_project_name_yaml}\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
+  if { ac_try='gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+  then
+    gnat_project_yaml=yes
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  else
+    gnat_project_yaml=no
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+    # Search in ../yaml-*/yaml.gpr
+    files=`ls -r ../yaml/yaml.gpr ../yaml/yaml.gpr ../yaml-*/yaml.gpr 2>/dev/null`
+    for name in $files; do
+      dir=`dirname $name`
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for AdaYaml Library project in ${dir}" >&5
+$as_echo_n "checking for AdaYaml Library project in ${dir}... " >&6; }
+      echo "with \"${name}\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
+      if { ac_try='gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+      then
+         gnat_project_yaml=yes
+		 gnat_project_name_yaml=${name}
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+         break
+      else
+         gnat_project_yaml=no
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      fi
+    done
+  fi
+  rm -f conftest.gpr
+  if test x${gnat_project_yaml} = xyes; then
+    gnat_project_with_yaml="with \"${gnat_project_name_yaml}\";";
+    gnat_project_dir_yaml=`dirname ${gnat_project_name_yaml}`
+    if test ${gnat_project_dir_yaml} = . ; then
+       gnat_project_dir_yaml=
+    else
+       gnat_project_dir_yaml="${gnat_project_dir_yaml}/"
+    fi
+
+    YAML_DIR=${gnat_project_dir_yaml}
+
+  else
+    gnat_project_dir_yaml=
+    gnat_project_name_yaml=
+    if test x"Building Dynamo requires the Ada Yaml Library." != x; then
+      as_fn_error $? "Building Dynamo requires the Ada Yaml Library.
+  You should build and install the AdaYaml Library component.
+  It must be available and found by ${GNATMAKE}.
+  This project was not found in the ADA_PROJECT_PATH environment variable.
+  This project was not found in ../yaml nor in ../yaml-*.
+  The component is available at git@github.com:yaml/AdaYaml.git.
+  Please, download and configure AdaYaml Library.
+  The current configuration was using:
+    ${GNATMAKE}
+    ADA_PROJECT_PATH=$ADA_PROJECT_PATH
+" "$LINENO" 5
+    fi
+  fi
 
 
 
@@ -3349,8 +3453,8 @@ $as_echo "no" >&6; }
   else
     gnat_project_dir_el=
     gnat_project_name_el=
-    if test x"Building Ada Server Faces requires the Ada EL Library." != x; then
-      as_fn_error $? "Building Ada Server Faces requires the Ada EL Library.
+    if test x"Building Dynamo requires the Ada EL Library." != x; then
+      as_fn_error $? "Building Dynamo requires the Ada EL Library.
   You should build and install the Ada Expression Language Library component.
   It must be available and found by ${GNATMAKE}.
   This project was not found in the ADA_PROJECT_PATH environment variable.
@@ -3553,8 +3657,8 @@ $as_echo "no" >&6; }
   else
     gnat_project_dir_security=
     gnat_project_name_security=
-    if test x"Building Ada Server Faces requires the Ada Security Library." != x; then
-      as_fn_error $? "Building Ada Server Faces requires the Ada Security Library.
+    if test x"Building Dynamo requires the Ada Security Library." != x; then
+      as_fn_error $? "Building Dynamo requires the Ada Security Library.
   You should build and install the Ada Security Library component.
   It must be available and found by ${GNATMAKE}.
   This project was not found in the ADA_PROJECT_PATH environment variable.
@@ -3655,8 +3759,8 @@ $as_echo "no" >&6; }
   else
     gnat_project_dir_servlet=
     gnat_project_name_servlet=
-    if test x"Building Ada Server Faces requires the Ada Servlet Library." != x; then
-      as_fn_error $? "Building Ada Server Faces requires the Ada Servlet Library.
+    if test x"Building Dynamo requires the Ada Servlet Library." != x; then
+      as_fn_error $? "Building Dynamo requires the Ada Servlet Library.
   You should build and install the Ada Servlet Library component.
   It must be available and found by ${GNATMAKE}.
   This project was not found in the ADA_PROJECT_PATH environment variable.

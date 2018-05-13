@@ -1,5 +1,5 @@
 dnl Autoconf configure script for Dynamo
-dnl Copyright (C) 2001, 2002, 2003, 2009, 2010, 2011, 2012, 2013, 2015, 2016 Stephane Carrez
+dnl Copyright (C) 2011-2018 Stephane Carrez
 dnl Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 dnl
 dnl  Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,19 +62,29 @@ AC_SUBST(GEN_LIBDIR)
 ##########################################
 AM_GNAT_FIND_PROJECT([ada-util],[Ada Utility Library],[util],
   [git@github.com:stcarrez/ada-util.git],
-  [Building Ada EL requires the Ada Utility Library.],
+  [Building Dynamo requires the Ada Utility Library.],
   [
     UTIL_DIR=${gnat_project_dir_util}
   ])
 AC_SUBST(UTIL_DIR)
 
+##########################################
+# Ada Yaml
+##########################################
+AM_GNAT_FIND_PROJECT([yaml],[AdaYaml Library],[yaml],
+  [git@github.com:yaml/AdaYaml.git],
+  [Building Dynamo requires the Ada Yaml Library.],
+  [
+    YAML_DIR=${gnat_project_dir_yaml}
+  ])
+AC_SUBST(YAML_DIR)
 
 ##########################################
 # Ada Expression Language library
 ##########################################
 AM_GNAT_FIND_PROJECT([ada-el],[Ada Expression Language Library],[el],
   [git@github.com:stcarrez/ada-el.git],
-  [Building Ada Server Faces requires the Ada EL Library.],
+  [Building Dynamo requires the Ada EL Library.],
   [
     EL_DIR=${gnat_project_dir_el}
   ])
@@ -96,7 +106,7 @@ AC_SUBST(ASF_DIR)
 ##########################################
 AM_GNAT_FIND_PROJECT([ada-security],[Ada Security Library],[security],
   [git@github.com:stcarrez/ada-security.git],
-  [Building Ada Server Faces requires the Ada Security Library.],
+  [Building Dynamo requires the Ada Security Library.],
   [
     SECURITY_DIR=${gnat_project_dir_security}
   ])
@@ -107,7 +117,7 @@ AC_SUBST(SECURITY_DIR)
 ##########################################
 AM_GNAT_FIND_PROJECT([ada-servlet],[Ada Servlet Library],[servlet],
   [git@github.com:stcarrez/ada-servlet.git],
-  [Building Ada Server Faces requires the Ada Servlet Library.],
+  [Building Dynamo requires the Ada Servlet Library.],
   [
     SERVLET_DIR=${gnat_project_dir_servlet}
   ])

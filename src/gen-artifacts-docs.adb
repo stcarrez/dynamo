@@ -146,6 +146,7 @@ package body Gen.Artifacts.Docs is
 
          Iter : Line_Vectors.Cursor := Doc.Lines (Mode).Last;
       begin
+         Log.Debug ("Merge {0} in {1}", Source, Ada.Strings.Unbounded.To_String (Into.Name));
          Into.Lines (L_INCLUDE).Insert (Before => Position,
                                         New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
          while Line_Vectors.Has_Element (Iter) loop
@@ -683,11 +684,48 @@ package body Gen.Artifacts.Docs is
    procedure Read_Xml_File (Handler : in out Artifact;
                             File    : in String;
                             Result  : in out File_Document) is
+      Is_Empty       : Boolean := True;
+      Current_Mode   : Line_Include_Kind := L_INCLUDE;
+
+      function Find_Mode (Line : in String) return Line_Include_Kind is
+      begin
+         if Line = "### Permissions" then
+            return L_INCLUDE_PERMISSION;
+         elsif Line = "### Queries" then
+            return L_INCLUDE_QUERY;
+         elsif Line = "### Beans" or Line = "### Mapping" then
+            return L_INCLUDE_BEAN;
+         elsif Line = "### Configuration" then
+            return L_INCLUDE_CONFIG;
+         else
+            return L_INCLUDE;
+         end if;
+      end Find_Mode;
+
+      procedure Append (Line : in Ada.Strings.Unbounded.Unbounded_String) is
+         Content : constant String := Ada.Strings.Unbounded.To_String (Line);
+         Trimmed : constant String := Ada.Strings.Fixed.Trim (Content, Spaces, Spaces);
+         Mode    : Line_Include_Kind := Find_Mode (Content);
+      begin
+         if Trimmed'Length > 0 then
+            Is_Empty := False;
+         end if;
+         Result.Lines (L_INCLUDE).Append (Line_Type '(Len  => Trimmed'Length,
+                                                      Kind => L_TEXT,
+                                                      Content => Trimmed));
+         if Mode /= L_INCLUDE then
+            Current_Mode := Mode;
+            return;
+         end if;
+         Result.Lines (Current_Mode).Append (Line_Type '(Len  => Trimmed'Length,
+                                                         Kind => L_TEXT,
+                                                         Content => Trimmed));
+      end Append;
+
       Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
       Reader  : Util.Streams.Texts.Reader_Stream;
       Name    : constant String := Ada.Directories.Base_Name (File);
       Command : constant String := Ada.Strings.Unbounded.To_String (Handler.Xslt_Command);
-      Is_Empty : Boolean := True;
    begin
       Log.Info ("Running {0} {1}", Command, File);
       Pipe.Open (Command & " " & File, Util.Processes.READ);
@@ -700,12 +738,7 @@ package body Gen.Artifacts.Docs is
             Reader.Read_Line (Line, True);
             Log.Debug ("Doc: {0}", Line);
 
-            if Ada.Strings.Unbounded.Length (Line) > 0 then
-               Is_Empty := False;
-            end if;
-            Append_Line (Result,
-                         Ada.Strings.Fixed.Trim (Ada.Strings.Unbounded.To_String (Line),
-                Spaces, Spaces));
+            Append (Line);
          end;
       end loop;
       Pipe.Close;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -104,6 +104,10 @@ package Gen.Model.Tables is
 
    --  Returns the column type.
    function Get_Type (From : Column_Definition) return String;
+
+   --  Set the column type.
+   procedure Set_Type (Into : in out Column_Definition;
+                       Name : in String);
 
    --  Returns the column type mapping.
    function Get_Type_Mapping (From : in Column_Definition)

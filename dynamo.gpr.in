@@ -5,6 +5,7 @@ with "@EL_DIR@el";
 with "@ASF_DIR@asf";
 with "@SERVLET_DIR@servlet_core";
 with "@ADO_DIR@ado";
+with "@YAML_DIR@yaml";
 @WITH_ADO_MYSQL@
 @WITH_ADO_SQLITE@
 

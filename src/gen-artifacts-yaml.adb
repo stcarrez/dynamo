@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
 with Ada.Exceptions;
+with Ada.Text_IO;
 
 with Util.Strings;
 
@@ -53,11 +54,13 @@ package body Gen.Artifacts.Yaml is
    type State_Type is (IN_ROOT,
                        IN_TABLE,
                        IN_COLUMNS,
+                       IN_KEYS,
                        IN_COLUMN,
+                       IN_KEY,
                        IN_UNKOWN);
 
    type Node_Info is record
-      State    : State_Type;
+      State    : State_Type := IN_UNKOWN;
       Name     : Text.Reference;
       Has_Name : Boolean := False;
       Table    : Gen.Model.Tables.Table_Definition_Access;
@@ -84,7 +87,7 @@ package body Gen.Artifacts.Yaml is
                Node.Table.Table_Name := To_Unbounded_String (Value);
             end if;
 
-         when IN_COLUMN =>
+         when IN_COLUMN | IN_KEY =>
             if Node.Col = null then
                return;
             end if;
@@ -129,6 +132,18 @@ package body Gen.Artifacts.Yaml is
                   New_Node := Node_Stack.Current (Stack);
                   New_Node.Table := Node.Table;
                   New_Node.State := IN_COLUMNS;
+
+               elsif Node.Name = "id" then
+                  Node_Stack.Push (Stack);
+                  New_Node := Node_Stack.Current (Stack);
+                  New_Node.Table := Node.Table;
+                  New_Node.State := IN_KEYS;
+
+               else
+                  Node_Stack.Push (Stack);
+                  New_Node := Node_Stack.Current (Stack);
+                  New_Node.Table := Node.Table;
+                  New_Node.State := IN_TABLE;
                end if;
 
             when IN_COLUMNS =>
@@ -138,12 +153,23 @@ package body Gen.Artifacts.Yaml is
                New_Node.Table := Node.Table;
                New_Node.State := IN_COLUMN;
 
+            when IN_KEYS =>
+               Node.Table.Add_Column (To_Unbounded_String (Node.Name & ""), Node.Col);
+               Node.Col.Is_Key := True;
+               Node_Stack.Push (Stack);
+               New_Node := Node_Stack.Current (Stack);
+               New_Node.Table := Node.Table;
+               New_Node.State := IN_KEY;
+
             when others =>
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
                New_Node.State := IN_UNKOWN;
 
          end case;
+      else
+         Node_Stack.Push (Stack);
+
       end if;
    end Process_Mapping;
 
@@ -170,6 +196,8 @@ package body Gen.Artifacts.Yaml is
          case Cur.Kind is
             when Stream_Start | Document_Start =>
                Node_Stack.Push (Stack);
+               Node := Node_Stack.Current (Stack);
+               Node.State := IN_ROOT;
 
             when Stream_End | Document_End =>
                Node_Stack.Pop (Stack);

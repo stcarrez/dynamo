@@ -6,6 +6,7 @@
 <mappings name="MySQL">
     <mapping type='string'>
         <from>String</from>
+        <from>string</from>
         <from>datatype::String</from>
         <to>VARCHAR(#{column.sqlLength}) BINARY</to>
     </mapping>
@@ -53,6 +54,7 @@
     <mapping>
         <from>int</from>
         <from>Integer</from>
+        <from>integer</from>
         <from>Natural</from>
         <from>PrimitiveTypes::Integer</from>
         <from>datatype::int</from>

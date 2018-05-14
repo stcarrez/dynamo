@@ -33,6 +33,7 @@
     <mapping type="integer">
         <from>int</from>
         <from>Integer</from>
+        <from>integer</from>
         <from>PrimitiveTypes::Integer</from>
         <from>datatype::Integer</from>
         <to>Integer</to>
@@ -100,6 +101,7 @@
     </mapping>
     <mapping type="string">
         <from>String</from>
+        <from>string</from>
         <to>Ada.Strings.Unbounded.Unbounded_String</to>
     </mapping>
     <mapping>

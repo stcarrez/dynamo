@@ -1,0 +1,47 @@
+Testing.Email:
+  type: entity
+  table: cms_email
+  schema: schema_name
+  readOnly: true
+  description: This is the User email table
+  indexes:
+    name_index:
+      columns: [ email ]
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    email:
+      type: string
+      length: 32
+      column: user_email
+      unique: true
+      description: the user email address
+      options:
+        fixed: true
+        comment: User's email address
+  oneToOne:
+    address:
+      targetEntity: Address
+      joinColumn:
+        name: address_id
+        referencedColumnName: id
+        onDelete: CASCADE
+  oneToMany:
+    phonenumbers:
+      targetEntity: Phonenumber
+      mappedBy: user
+      cascade: ["persist", "merge"]
+  manyToMany:
+    groups:
+      targetEntity: Group
+      joinTable:
+        name: cms_users_groups
+        joinColumns:
+          user_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          group_id:
+            referencedColumnName: id

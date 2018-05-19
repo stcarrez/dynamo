@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-testsuite -- Testsuite for gen
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ with Ada.Directories;
 with Ada.Strings.Unbounded;
 
 with Gen.Artifacts.XMI.Tests;
+with Gen.Artifacts.Yaml.Tests;
 with Gen.Integration.Tests;
 package body Gen.Testsuite is
 
@@ -31,6 +32,7 @@ package body Gen.Testsuite is
       Result : constant Util.Tests.Access_Test_Suite := Tests'Access;
    begin
       Gen.Artifacts.XMI.Tests.Add_Tests (Result);
+      Gen.Artifacts.Yaml.Tests.Add_Tests (Result);
       Gen.Integration.Tests.Add_Tests (Result);
       return Result;
    end Suite;

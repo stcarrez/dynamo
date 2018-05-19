@@ -101,8 +101,10 @@ package body Gen.Artifacts.Yaml is
                Node.Col.Sql_Name := To_Unbounded_String (Value);
             elsif Name = "unique" then
                Node.Col.Unique := Value = "true" or Value = "yes";
-            elsif Name = "nullable" then
+            elsif Name = "nullable" or Name = "optional" then
                Node.Col.Not_Null := Value = "false" or Value = "no";
+            elsif Name = "not-null" or Name = "required" then
+               Node.Col.Not_Null := Value = "true" or Value = "yes";
             end if;
 
          when others =>

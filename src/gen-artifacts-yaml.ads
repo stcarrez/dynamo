@@ -36,8 +36,7 @@ package Gen.Artifacts.Yaml is
    procedure Read_Model (Handler       : in out Artifact;
                          File          : in String;
                          Model         : in out Gen.Model.Packages.Model_Definition;
-                         Context       : in out Generator'Class;
-                         Is_Predefined : in Boolean := False);
+                         Context       : in out Generator'Class);
 
 private
 

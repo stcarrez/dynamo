@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
 with Ada.Exceptions;
-with Ada.Text_IO;
 
 with Util.Strings;
 
@@ -27,7 +26,6 @@ with Yaml.Parser;
 
 with Gen.Configs;
 with Gen.Model.Tables;
-with Gen.Model.Queries;
 with Gen.Model.Mappings;
 with Gen.Model.Operations;
 
@@ -42,7 +40,6 @@ package body Gen.Artifacts.Yaml is
    use Ada.Strings.Unbounded;
    use Gen.Model;
    use Gen.Model.Tables;
-   use Gen.Model.Queries;
    use Gen.Configs;
 
    use Util.Log;
@@ -85,7 +82,7 @@ package body Gen.Artifacts.Yaml is
             Log.Debug ("Set table {0} attribute {1}={2}", Node.Table.Name, Name, Value);
             if Name = "table" then
                Node.Table.Table_Name := To_Unbounded_String (Value);
-            elsif Name = "description" then
+            elsif Name = "description" or name = "comment" then
                Node.Table.Set_Comment (Value);
             end if;
 
@@ -107,7 +104,7 @@ package body Gen.Artifacts.Yaml is
                Node.Col.Not_Null := Value = "false" or Value = "no";
             elsif Name = "not-null" or Name = "required" then
                Node.Col.Not_Null := Value = "true" or Value = "yes";
-            elsif Name = "description" then
+            elsif Name = "description" or name = "comment" then
                Node.Col.Set_Comment (Value);
             end if;
 
@@ -183,8 +180,7 @@ package body Gen.Artifacts.Yaml is
    procedure Read_Model (Handler       : in out Artifact;
                          File          : in String;
                          Model         : in out Gen.Model.Packages.Model_Definition;
-                         Context       : in out Generator'Class;
-                         Is_Predefined : in Boolean := False) is
+                         Context       : in out Generator'Class) is
       Input : Source.Pointer;
       P     : Parser.Instance;
       Cur   : Event;

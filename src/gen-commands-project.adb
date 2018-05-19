@@ -167,6 +167,8 @@ package body Gen.Commands.Project is
             Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project-ado");
          elsif Gtk_Flag then
             Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project-gtk");
+         elsif Tool_Flag then
+            Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project-tool");
          elsif Lib_Flag then
             Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE, "project-lib");
          else

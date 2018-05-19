@@ -102,7 +102,7 @@ package body Gen.Artifacts.Yaml is
             elsif Name = "unique" then
                Node.Col.Unique := Value = "true" or Value = "yes";
             elsif Name = "nullable" then
-               null;
+               Node.Col.Not_Null := Value = "false" or Value = "no";
             end if;
 
          when others =>

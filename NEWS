@@ -6,6 +6,7 @@ Version 0.9     -
   - Update the 'create-database' command to support SQLite
   - Fix model generation for multiple primary keys per table
   - Add support for <exclude> patterns in the dist command
+  - Add support for YAML database model files
 
 Version 0.8     - Dec 2015
   - Support to generate Markdown documentation

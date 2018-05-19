@@ -484,6 +484,8 @@ package body Gen.Artifacts.Docs is
                                           Kind    => L_INCLUDE_QUERY,
                                           Content => Value));
 
+         else
+            raise Unknown_Tag with Tag (Tag'First .. Pos - 1);
          end if;
       end;
    end Append_Tag;
@@ -671,6 +673,13 @@ package body Gen.Artifacts.Docs is
             end;
 
          end if;
+
+      exception
+         when E : Unknown_Tag =>
+            Log.Error ("{0}:{1}: Unkown comment tag '@{2}'",
+                       Ada.Directories.Base_Name (File),
+                       Util.Strings.Image (Result.Line_Number),
+                       Ada.Exceptions.Exception_Message (E));
       end Process;
    begin
       Util.Files.Read_File (File, Process'Access);

@@ -85,6 +85,8 @@ package body Gen.Artifacts.Yaml is
             Log.Debug ("Set table {0} attribute {1}={2}", Node.Table.Name, Name, Value);
             if Name = "table" then
                Node.Table.Table_Name := To_Unbounded_String (Value);
+            elsif Name = "description" then
+               Node.Table.Set_Comment (Value);
             end if;
 
          when IN_COLUMN | IN_KEY =>
@@ -105,6 +107,8 @@ package body Gen.Artifacts.Yaml is
                Node.Col.Not_Null := Value = "false" or Value = "no";
             elsif Name = "not-null" or Name = "required" then
                Node.Col.Not_Null := Value = "true" or Value = "yes";
+            elsif Name = "description" then
+               Node.Col.Set_Comment (Value);
             end if;
 
          when others =>

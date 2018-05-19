@@ -142,8 +142,6 @@ package body Gen.Artifacts.Docs is
       --  ------------------------------
       procedure Do_Include (Source : in String;
                             Doc    : in out File_Document) is
-         pragma Unreferenced (Source);
-
          Iter : Line_Vectors.Cursor := Doc.Lines (Mode).Last;
       begin
          Log.Debug ("Merge {0} in {1}", Source, Ada.Strings.Unbounded.To_String (Into.Name));
@@ -499,7 +497,9 @@ package body Gen.Artifacts.Docs is
       if Line'Length >= 1 and then Line (Line'First) = TAG_CHAR then
          --  Force a close of the code extract if we see some @xxx command.
          if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
-            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0,
+                                                      Kind => L_END_CODE,
+                                                      Content => ""));
             Append_Line (Doc, "");
          end if;
          Doc.State := IN_PARA;
@@ -684,6 +684,9 @@ package body Gen.Artifacts.Docs is
    procedure Read_Xml_File (Handler : in out Artifact;
                             File    : in String;
                             Result  : in out File_Document) is
+      function Find_Mode (Line : in String) return Line_Include_Kind;
+      procedure Append (Line : in Ada.Strings.Unbounded.Unbounded_String);
+
       Is_Empty       : Boolean := True;
       Current_Mode   : Line_Include_Kind := L_INCLUDE;
 
@@ -705,7 +708,7 @@ package body Gen.Artifacts.Docs is
       procedure Append (Line : in Ada.Strings.Unbounded.Unbounded_String) is
          Content : constant String := Ada.Strings.Unbounded.To_String (Line);
          Trimmed : constant String := Ada.Strings.Fixed.Trim (Content, Spaces, Spaces);
-         Mode    : Line_Include_Kind := Find_Mode (Content);
+         Mode    : constant Line_Include_Kind := Find_Mode (Content);
       begin
          if Trimmed'Length > 0 then
             Is_Empty := False;

@@ -1,0 +1,7 @@
+<f:view xmlns:util="http://code.google.com/p/ada-asf/util"
+        xmlns:f="http://java.sun.com/jsf/core"
+        mode="remove-empty"
+        file="#{project.license eq 'gpl' ? 'COPYING' : 'COPYING3'}">
+    <util:file rendered="#{project.license eq 'gpl'}" src="/licenses/gpl/COPYING"/>
+    <util:file rendered="#{project.license eq 'gpl3'}" src="/licenses/gpl/COPYING3"/>
+</f:view>

@@ -1,0 +1,43 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}.properties">
+ado.queries.load=true
+ado.queries.paths=db
+ado.queries.load=true
+#{''}
+ado.database=mysql://localhost:3306/#{projectName}?user=#{projectName}
+
+#{''}
+# Configuration for log4j
+log4j.rootCategory=DEBUG,console,result
+
+log4j.appender.console=Console
+log4j.appender.console.level=DEBUG
+log4j.appender.console.layout=level-message
+
+log4j.appender.result=File
+log4j.appender.result.File=#{projectName}.log
+
+# Logger configuration
+log4j.logger.log=WARN
+
+log4j.logger.Util.Properties=DEBUG
+log4j.logger.Util.Log=WARN
+log4j.logger.Util=DEBUG
+log4j.logger.Util.Serialize.Mappers=WARN
+log4j.logger.Util.Serialize.IO=INFO
+
+log4j.logger.AWA=DEBUG
+log4j.logger.ASF=DEBUG
+log4j.logger.AWA.Modules=INFO
+
+log4j.logger.ADO.Databases=INFO
+log4j.logger.ASF.Views.Nodes.Reader=INFO
+log4j.logger.AWA.Applications.Configs=WARN
+log4j.logger.AWA.Modules=WARN
+#{''}
+
+</f:view>

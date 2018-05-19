@@ -74,6 +74,8 @@ package Gen.Artifacts.Docs is
    TAG_INCLUDE_PERM   : constant String := "include-permission";
    TAG_SEE            : constant String := "see";
 
+   Unknown_Tag : exception;
+
    type Doc_Format is (DOC_MARKDOWN, DOC_WIKI_GOOGLE);
 
    --  ------------------------------

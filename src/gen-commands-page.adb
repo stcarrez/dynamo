@@ -30,7 +30,6 @@ package body Gen.Commands.Page is
                       Name      : in String;
                       Args      : in Argument_List'Class;
                       Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Name);
       use Ada.Strings.Unbounded;
 
       function Get_Layout return String;

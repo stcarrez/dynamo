@@ -73,7 +73,7 @@
      </install>
 
      <install mode='exec' dir='web'>
-       <command>pngcrush -q -fix -no_cc -rem alla -reduce -brute \#{src} \#{dst}</command>
+       <command>pngcrush -q \#{src} \#{dst}</command>
        <fileset dir="web">
          <include name="**/*.png"/>
        </fileset>

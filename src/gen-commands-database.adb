@@ -31,6 +31,7 @@ with Util.Streams.Pipes;
 
 with ADO.Drivers.Connections;
 with ADO.Sessions.Factory;
+with ADO.Sessions.Sources;
 with ADO.Statements;
 with ADO.Queries;
 with ADO.Parameters;
@@ -59,7 +60,7 @@ package body Gen.Commands.Database is
    --  the external command 'mysql' and using the create-xxx-mysql.sql generated scripts.
    procedure Create_Mysql_Tables (Name   : in String;
                                   Model  : in String;
-                                  Config : in ADO.Drivers.Connections.Configuration;
+                                  Config : in ADO.Sessions.Sources.Data_Source;
                                   Generator : in out Gen.Generator.Handler);
 
    --  Create the database identified by the given name.
@@ -206,7 +207,7 @@ package body Gen.Commands.Database is
    --  ------------------------------
    procedure Create_Mysql_Tables (Name      : in String;
                                   Model     : in String;
-                                  Config    : in ADO.Drivers.Connections.Configuration;
+                                  Config    : in ADO.Sessions.Sources.Data_Source;
                                   Generator : in out Gen.Generator.Handler) is
       Database : constant String := Config.Get_Database;
       Username : constant String := Config.Get_Property ("user");
@@ -248,22 +249,23 @@ package body Gen.Commands.Database is
                                  Username : in String;
                                  Password : in String);
       procedure Create_MySQL_Database (Model    : in String;
-                                       Config   : in ADO.Drivers.Connections.Configuration;
+                                       Config   : in ADO.Sessions.Sources.Data_Source;
                                        Database : in String;
                                        Username : in String;
                                        Password : in String);
       procedure Create_SQLite_Database (Model    : in String;
-                                        Config   : in ADO.Drivers.Connections.Configuration;
+                                        Config   : in ADO.Sessions.Sources.Data_Source;
                                         Database : in String);
 
       --  ------------------------------
       --  Create the database, the user and the tables.
       --  ------------------------------
       procedure Create_MySQL_Database (Model    : in String;
-                                       Config   : in ADO.Drivers.Connections.Configuration;
+                                       Config   : in ADO.Sessions.Sources.Data_Source;
                                        Database : in String;
                                        Username : in String;
                                        Password : in String) is
+         Root_Config     : ADO.Sessions.Sources.Data_Source := Config;
          Factory         : ADO.Sessions.Factory.Session_Factory;
          Root_Connection : Unbounded_String;
          Root_Hidden     : Unbounded_String;
@@ -292,7 +294,8 @@ package body Gen.Commands.Database is
 
          --  Initialize the session factory to connect to the
          --  database defined by root connection (which should allow the database creation).
-         Factory.Create (To_String (Root_Connection));
+         Root_Config.Set_Connection (To_String (Root_Connection));
+         Factory.Create (Root_Config);
 
          declare
             Name : constant String := Generator.Get_Project_Name;
@@ -326,7 +329,7 @@ package body Gen.Commands.Database is
       --  Create the SQLite database.
       --  ------------------------------
       procedure Create_SQLite_Database (Model    : in String;
-                                        Config   : in ADO.Drivers.Connections.Configuration;
+                                        Config   : in ADO.Sessions.Sources.Data_Source;
                                         Database : in String) is
          Name  : constant String := Generator.Get_Project_Name;
          Path  : constant String := Config.Get_Database;
@@ -357,9 +360,10 @@ package body Gen.Commands.Database is
                                  Database : in String;
                                  Username : in String;
                                  Password : in String) is
-         Config          : ADO.Drivers.Connections.Configuration;
+         Config          : ADO.Sessions.Sources.Data_Source;
       begin
          Config.Set_Connection (Database);
+         Config.Set_Property ("ado.queries.paths", Generator.Get_Parameter ("ado.queries.paths"));
          if Config.Get_Database = "" then
             Generator.Error ("Invalid database connection: no database name specified");
             return;

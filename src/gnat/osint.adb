@@ -248,8 +248,9 @@ package body Osint is
       Attr : aliased File_Attributes;
    end record;
 
-   No_File_Info_Cache : constant File_Info_Cache :=
-                          (No_File, Unknown_Attributes);
+   --  SCz 2018-06-10: this is a constant that is initialized during the package elaboration.
+   --  It can't be put as constant because it would be part of read-only section.
+   No_File_Info_Cache : File_Info_Cache;
 
    package File_Name_Hash_Table is new GNAT.HTable.Simple_HTable (
      Header_Num => File_Hash_Num,
@@ -3308,6 +3309,17 @@ package body Osint is
    procedure Reset_File_Attributes (Attr : System.Address);
    pragma Import (C, Reset_File_Attributes, "__gnat_reset_attributes");
 
+   --  SCz 2018-06-10: the previous code was using a constant for the variable
+   --  and it then initialized that constant during the elaboration.
+   --  Since constants can be put in read-only section, this creates a SEGV
+   --  during elaboration.
+   Unknown_Attributes_Var : File_Attributes;
+
+   function Unknown_Attributes return File_Attributes is
+   begin
+      return Unknown_Attributes_Var;
+   end Unknown_Attributes;
+
 begin
    Initialization : declare
 
@@ -3330,7 +3342,9 @@ begin
    begin
       pragma Assert (Sizeof_File_Attributes <= File_Attributes_Size);
 
-      Reset_File_Attributes (Unknown_Attributes'Address);
+      Reset_File_Attributes (Unknown_Attributes_Var'Address);
+
+      No_File_Info_Cache := File_Info_Cache'(No_File, Unknown_Attributes);
 
       Identifier_Character_Set := Get_Default_Identifier_Character_Set;
       Maximum_File_Name_Length := Get_Maximum_File_Name_Length;

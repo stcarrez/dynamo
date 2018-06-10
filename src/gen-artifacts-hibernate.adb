@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-hibernate -- Hibernate artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2017 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -464,7 +464,7 @@ package body Gen.Artifacts.Hibernate is
 
       Name       : constant String := Project.Get_Project_Name;
    begin
-      if Project.Is_Plugin then
+      if not Project.Is_Plugin then
          Build_SQL_Schemas ("mysql", "", "create-" & Name, False);
          Build_SQL_Schemas ("sqlite", "", "create-" & Name, False);
          Build_SQL_Schemas ("mysql", "drop-", "drop-" & Name, True);

@@ -35,6 +35,9 @@ Dynamo integrates some files from the GNU Compiler Collection (5.2.0).
 These files are used to read the GNAT project files (see src/gnat).
 They are distributed under the GPL version 3 license.
 
+Dynamo integrates the AdaYaml library written by Felix Krause and
+distributed under the MIT license (see copying.txt and src/yaml).
+
 The Dynamo core implementation is distributed under the Apache 2.0 license.
 
 The Dynamo templates are distributed under the Apache 2.0 license.

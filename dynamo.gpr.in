@@ -5,7 +5,7 @@ with "@EL_DIR@el";
 with "@ASF_DIR@asf";
 with "@SERVLET_DIR@servlet_core";
 with "@ADO_DIR@ado";
-with "@YAML_DIR@yaml";
+--  with "@YAML_DIR@yaml";
 @WITH_ADO_MYSQL@
 @WITH_ADO_SQLITE@
 
@@ -26,7 +26,7 @@ project Dynamo is
 
    for Languages use ("Ada", "C");
 
-   for Source_Dirs use ("src", "src/model", "src/gnat");
+   for Source_Dirs use ("src", "src/model", "src/gnat", "src/yaml");
 
    for Object_Dir use "./" & Config'Object_Dir & "/obj";
    for Exec_Dir use "./" & Config'Exec_Dir & "/bin";

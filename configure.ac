@@ -71,13 +71,13 @@ AC_SUBST(UTIL_DIR)
 ##########################################
 # Ada Yaml
 ##########################################
-AM_GNAT_FIND_PROJECT([yaml],[AdaYaml Library],[yaml],
-  [git@github.com:yaml/AdaYaml.git],
-  [Building Dynamo requires the Ada Yaml Library.],
-  [
-    YAML_DIR=${gnat_project_dir_yaml}
-  ])
-AC_SUBST(YAML_DIR)
+#AM_GNAT_FIND_PROJECT([yaml],[AdaYaml Library],[yaml],
+#  [git@github.com:yaml/AdaYaml.git],
+#  [Building Dynamo requires the Ada Yaml Library.],
+#  [
+#    YAML_DIR=${gnat_project_dir_yaml}
+#  ])
+#AC_SUBST(YAML_DIR)
 
 ##########################################
 # Ada Expression Language library
@@ -157,6 +157,8 @@ AC_SUBST(DYNAMO_HAVE_SQLITE)
 AC_SUBST(WITH_ADO_SQLITE)
 
 AC_SUBST(mkdir_p)
+
+AM_UTIL_CHECK_INSTALL
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT(

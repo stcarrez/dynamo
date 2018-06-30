@@ -57,6 +57,39 @@ AC_SUBST(EXEC_PREFIX)
 GEN_LIBDIR="lib"
 AC_SUBST(GEN_LIBDIR)
 
+AC_MSG_CHECKING([for GNAT project paths])
+if test ${prefix} = "NONE"; then
+   gnat_project_paths=/usr/share/gpr:/usr/share/ada/adainclude
+else
+   gnat_project_paths=${prefix}/share/gpr:${prefix}/share/ada/adainclude
+fi
+ac_gprbuild=`which gprbuild`
+ac_gprbuild_dir=`dirname $ac_gprbuild`
+ac_gnat_share_dir=`realpath ${ac_gprbuild_dir}/../share/gpr`
+if test -d $ac_gnat_share_dir; then
+   gnat_project_paths="${gnat_project_paths}:${ac_gnat_share_dir}"
+fi
+ac_gnat_share_dir=`realpath ${ac_gprbuild_dir}/../share/adainclude`
+if test -d $ac_gnat_share_dir; then
+   gnat_project_paths=${gnat_project_paths}:${ac_gnat_share_dir}
+fi
+AC_MSG_RESULT(${gnat_project_paths})
+
+AC_ARG_WITH(gprpath,
+    AS_HELP_STRING([--with-gprpath=paths], [Paths for GNAT projects]),
+    [
+      gnat_project_paths=${withval}
+    ],
+    [
+    ])
+GNAT_PROJECT_PATHS=${gnat_project_paths}
+AC_SUBST(GNAT_PROJECT_PATHS)
+
+# directories GNAT project gives the installation paths
+AM_GNAT_CHECK_PROJECT([gpr],[gpr])
+UTIL_HAVE_PRJ_DIRECTORIES=${gnat_project_gpr}
+AC_SUBST(UTIL_HAVE_PRJ_DIRECTORIES)
+
 ##########################################
 # Ada Util library
 ##########################################
@@ -115,11 +148,11 @@ AC_SUBST(SECURITY_DIR)
 ##########################################
 # Ada Servlet library
 ##########################################
-AM_GNAT_FIND_PROJECT([ada-servlet],[Ada Servlet Library],[servlet],
+AM_GNAT_FIND_PROJECT([ada-servlet],[Ada Servlet Library],[servlet_core],
   [git@github.com:stcarrez/ada-servlet.git],
   [Building Dynamo requires the Ada Servlet Library.],
   [
-    SERVLET_DIR=${gnat_project_dir_servlet}
+    SERVLET_DIR=${gnat_project_dir_servlet_core}
   ])
 AC_SUBST(SERVLET_DIR)
 
@@ -165,4 +198,5 @@ AC_OUTPUT(
 dynamo.gpr
 dynamo_tests.gpr
 regtests/check_build/check_build.gpr
+config/generator.properties
 )

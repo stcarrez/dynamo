@@ -600,6 +600,8 @@ SECURITY_DIR
 ASF_DIR
 EL_DIR
 UTIL_DIR
+UTIL_HAVE_PRJ_DIRECTORIES
+GNAT_PROJECT_PATHS
 GEN_LIBDIR
 EXEC_PREFIX
 GEN_MICRO_VERSION
@@ -675,6 +677,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_gprpath
 with_ada_util
 with_ada_el
 with_ada_asf
@@ -1311,6 +1314,7 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-gprpath=paths    Paths for GNAT projects
   --with-ada-util=x       Path for Ada Utility Library
   --with-ada-el=x         Path for Ada Expression Language Library
   --with-ada-asf=x        Path for Ada Server Faces
@@ -3166,6 +3170,63 @@ EXEC_PREFIX="$prefix"
 GEN_LIBDIR="lib"
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GNAT project paths" >&5
+$as_echo_n "checking for GNAT project paths... " >&6; }
+if test ${prefix} = "NONE"; then
+   gnat_project_paths=/usr/share/gpr:/usr/share/ada/adainclude
+else
+   gnat_project_paths=${prefix}/share/gpr:${prefix}/share/ada/adainclude
+fi
+ac_gprbuild=`which gprbuild`
+ac_gprbuild_dir=`dirname $ac_gprbuild`
+ac_gnat_share_dir=`realpath ${ac_gprbuild_dir}/../share/gpr`
+if test -d $ac_gnat_share_dir; then
+   gnat_project_paths="${gnat_project_paths}:${ac_gnat_share_dir}"
+fi
+ac_gnat_share_dir=`realpath ${ac_gprbuild_dir}/../share/adainclude`
+if test -d $ac_gnat_share_dir; then
+   gnat_project_paths=${gnat_project_paths}:${ac_gnat_share_dir}
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ${gnat_project_paths}" >&5
+$as_echo "${gnat_project_paths}" >&6; }
+
+
+# Check whether --with-gprpath was given.
+if test "${with_gprpath+set}" = set; then :
+  withval=$with_gprpath;
+      gnat_project_paths=${withval}
+
+fi
+
+GNAT_PROJECT_PATHS=${gnat_project_paths}
+
+
+# directories GNAT project gives the installation paths
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gpr project exists" >&5
+$as_echo_n "checking whether gpr project exists... " >&6; }
+  echo "with \"gpr\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
+  if { ac_try='gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+  then
+    gnat_project_gpr=yes
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes, using gpr" >&5
+$as_echo "yes, using gpr" >&6; }
+    gnat_project_with_gpr="with \"gpr\";";
+  else
+    gnat_project_gpr=no
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+  fi
+  rm -f conftest.gpr
+
+UTIL_HAVE_PRJ_DIRECTORIES=${gnat_project_gpr}
+
+
 ##########################################
 # Ada Util library
 ##########################################
@@ -3595,25 +3656,25 @@ $as_echo_n "checking Ada Servlet Library... " >&6; }
 # Check whether --with-ada-servlet was given.
 if test "${with_ada_servlet+set}" = set; then :
   withval=$with_ada_servlet;
-      gnat_project_name_servlet=${withval}/
+      gnat_project_name_servlet_core=${withval}/
       if test -d "${withval}"; then
-	    gnat_project_name_servlet=${withval}/servlet
+	    gnat_project_name_servlet_core=${withval}/servlet_core
 	  fi
 
 else
 
-      gnat_project_name_servlet=servlet
+      gnat_project_name_servlet_core=servlet_core
 
 fi
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: trying ${gnat_project_name_servlet}" >&5
-$as_echo "trying ${gnat_project_name_servlet}" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: trying ${gnat_project_name_servlet_core}" >&5
+$as_echo "trying ${gnat_project_name_servlet_core}" >&6; }
 
   rm -f conftest.gpr
   # Search in the GNAT project path.
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${gnat_project_name_servlet} project exists in gnatmake's search path" >&5
-$as_echo_n "checking whether ${gnat_project_name_servlet} project exists in gnatmake's search path... " >&6; }
-  echo "with \"${gnat_project_name_servlet}\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${gnat_project_name_servlet_core} project exists in gnatmake's search path" >&5
+$as_echo_n "checking whether ${gnat_project_name_servlet_core} project exists in gnatmake's search path... " >&6; }
+  echo "with \"${gnat_project_name_servlet_core}\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
   if { ac_try='gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out'
   { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
   (eval $ac_try) 2>&5
@@ -3621,16 +3682,16 @@ $as_echo_n "checking whether ${gnat_project_name_servlet} project exists in gnat
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; }
   then
-    gnat_project_servlet=yes
+    gnat_project_servlet_core=yes
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
   else
-    gnat_project_servlet=no
+    gnat_project_servlet_core=no
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
-    # Search in ../ada-servlet-*/servlet.gpr
-    files=`ls -r ../ada-servlet/servlet.gpr ../servlet/servlet.gpr ../ada-servlet-*/servlet.gpr 2>/dev/null`
+    # Search in ../ada-servlet-*/servlet_core.gpr
+    files=`ls -r ../ada-servlet/servlet_core.gpr ../servlet_core/servlet_core.gpr ../ada-servlet-*/servlet_core.gpr 2>/dev/null`
     for name in $files; do
       dir=`dirname $name`
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Ada Servlet Library project in ${dir}" >&5
@@ -3643,39 +3704,39 @@ $as_echo_n "checking for Ada Servlet Library project in ${dir}... " >&6; }
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; }
       then
-         gnat_project_servlet=yes
-		 gnat_project_name_servlet=${name}
+         gnat_project_servlet_core=yes
+		 gnat_project_name_servlet_core=${name}
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
          break
       else
-         gnat_project_servlet=no
+         gnat_project_servlet_core=no
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
       fi
     done
   fi
   rm -f conftest.gpr
-  if test x${gnat_project_servlet} = xyes; then
-    gnat_project_with_servlet="with \"${gnat_project_name_servlet}\";";
-    gnat_project_dir_servlet=`dirname ${gnat_project_name_servlet}`
-    if test ${gnat_project_dir_servlet} = . ; then
-       gnat_project_dir_servlet=
+  if test x${gnat_project_servlet_core} = xyes; then
+    gnat_project_with_servlet_core="with \"${gnat_project_name_servlet_core}\";";
+    gnat_project_dir_servlet_core=`dirname ${gnat_project_name_servlet_core}`
+    if test ${gnat_project_dir_servlet_core} = . ; then
+       gnat_project_dir_servlet_core=
     else
-       gnat_project_dir_servlet="${gnat_project_dir_servlet}/"
+       gnat_project_dir_servlet_core="${gnat_project_dir_servlet_core}/"
     fi
 
-    SERVLET_DIR=${gnat_project_dir_servlet}
+    SERVLET_DIR=${gnat_project_dir_servlet_core}
 
   else
-    gnat_project_dir_servlet=
-    gnat_project_name_servlet=
+    gnat_project_dir_servlet_core=
+    gnat_project_name_servlet_core=
     if test x"Building Dynamo requires the Ada Servlet Library." != x; then
       as_fn_error $? "Building Dynamo requires the Ada Servlet Library.
   You should build and install the Ada Servlet Library component.
   It must be available and found by ${GNATMAKE}.
   This project was not found in the ADA_PROJECT_PATH environment variable.
-  This project was not found in ../servlet nor in ../ada-servlet-*.
+  This project was not found in ../servlet_core nor in ../ada-servlet-*.
   The component is available at git@github.com:stcarrez/ada-servlet.git.
   Please, download and configure Ada Servlet Library.
   The current configuration was using:
@@ -4284,7 +4345,7 @@ $as_echo "<prefix>/${ADA_PRJ_BASE}" >&6; }
 
 ac_config_files="$ac_config_files Makefile"
 
-ac_config_files="$ac_config_files dynamo.gpr dynamo_tests.gpr regtests/check_build/check_build.gpr"
+ac_config_files="$ac_config_files dynamo.gpr dynamo_tests.gpr regtests/check_build/check_build.gpr config/generator.properties"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4996,6 +5057,7 @@ do
     "dynamo.gpr") CONFIG_FILES="$CONFIG_FILES dynamo.gpr" ;;
     "dynamo_tests.gpr") CONFIG_FILES="$CONFIG_FILES dynamo_tests.gpr" ;;
     "regtests/check_build/check_build.gpr") CONFIG_FILES="$CONFIG_FILES regtests/check_build/check_build.gpr" ;;
+    "config/generator.properties") CONFIG_FILES="$CONFIG_FILES config/generator.properties" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

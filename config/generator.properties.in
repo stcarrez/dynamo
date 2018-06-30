@@ -18,7 +18,7 @@ generator.model.dir=#{generator_config_dir}/templates
 generator.commands.dir=commands
 
 # Directory where the GNAT project files are installed on the host.
-generator.gnat.projects.dir=/build/local-gnat-2018/share/gpr:/build/local-gnat-2018/share/ada/adainclude:/opt/applications/gnat-2018/share/gpr
+generator.gnat.projects.dir=@GNAT_PROJECT_PATHS@
 
 generator_doc_xslt_file=extract-doc.xsl
 generator_markdown_xslt_file=extract-doc-markdown.xsl

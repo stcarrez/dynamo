@@ -5,7 +5,6 @@ GNATMAKE=gprbuild
 GNATCLEAN=gprclean
 GPRINSTALL=@GPRINSTALL@
 GPRPATH=dynamo.gpr
-SVN=svn
 
 distdir=dynamo-@GEN_VERSION@
 
@@ -96,12 +95,6 @@ generate:
 dist:
 	git archive -o $(DIST_FILE) --prefix=$(distdir)/ HEAD
 
-# Update src/gen.ads with the latest SVN revision number.
-version:
-	gnatprep -DCONFIG_DIR='"$(config_dir)/base"' \
-	   `svn info | grep '^[UR][eR][Lv]' | sed -e 's,URL: \(.*\),-DURL="\1",' -e 's,Revision: ,-DREVISION=,'` \
-		  src/gen.gpb src/gen.ads
-
 src/gen-configs.ads:   Makefile src/gen-configs.gpb
 	gnatprep -DCONFIG_DIR='"$(config_dir)/base"' -DVERSION='"@GEN_VERSION@"' \
 		  src/gen-configs.gpb src/gen-configs.ads
@@ -120,7 +113,6 @@ install:	  install_dirs
 	$(CP) -r config/templates $(prefix)/share/dynamo/base
 	$(CP) -r config/commands $(prefix)/share/dynamo/base
 	$(CP) config/db/*.xml $(prefix)/share/dynamo/base/db
-	-find $(prefix)/share/dynamo/base -name .svn -a -type d | xargs rm -rf
 
 install_dirs:
 	${MKDIR} -p ${bindir}

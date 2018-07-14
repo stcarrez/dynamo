@@ -93,6 +93,17 @@ AC_SUBST(UTIL_HAVE_PRJ_DIRECTORIES)
 ##########################################
 # Ada Util library
 ##########################################
+AM_GNAT_FIND_PROJECT([gpr],[GNAT Project Library],[gpr],
+  [],
+  [Building Dynamo requires the GNAT Project Library.],
+  [
+    GPR_DIR=${gnat_project_dir_gpr}
+  ])
+AC_SUBST(GPR_DIR)
+
+##########################################
+# Ada Util library
+##########################################
 AM_GNAT_FIND_PROJECT([ada-util],[Ada Utility Library],[util],
   [git@github.com:stcarrez/ada-util.git],
   [Building Dynamo requires the Ada Utility Library.],

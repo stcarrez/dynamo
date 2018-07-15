@@ -4,7 +4,7 @@
 with Text.Pool;
 
 package Text.Builder is
-   type Reference is new Ada.Finalization.Controlled with private;
+   type Reference is tagged private;
 
    procedure Init (Object : in out Reference; Pool : Text.Pool.Reference;
                    Initial_Size : Positive := 255);
@@ -27,15 +27,8 @@ package Text.Builder is
 
    function Length (Object : Reference) return Natural;
 private
-   type Reference is new Ada.Finalization.Controlled with record
-      Pool : Text.Pool.Reference;
-      Buffer : UTF_8_String_Access;
-      Next : System.Storage_Elements.Storage_Offset := 1;
+   type Reference is tagged record
+      Buffer : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 
-   overriding procedure Adjust (Object : in out Reference);
-   overriding procedure Finalize (Object : in out Reference);
-
-   procedure Grow (Object : in out Reference;
-                   Size : System.Storage_Elements.Storage_Offset);
 end Text.Builder;

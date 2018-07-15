@@ -2,6 +2,7 @@
 --  released under the terms of the MIT license, see the file "copying.txt"
 
 with Ada.Finalization;
+with Ada.Strings.Unbounded;
 with Text;
 with Lexer;
 
@@ -94,6 +95,9 @@ package Yaml is
 
    function To_String (E : Event) return String;
 
+   function To_String (T : Text.Reference) return String
+     renames Ada.Strings.Unbounded.To_String;
+
    Standard_Annotation_Namespace : constant Text.Reference;
 
    --  base type for refcounted types (mainly event streams). all streams and
@@ -121,9 +125,9 @@ package Yaml is
    procedure Decrease_Refcount (Object : not null access Refcount_Base'Class);
 private
    Standard_Annotation_Namespace_Holder : constant Text.Constant_Instance :=
-     Text.Hold ("@@");
+     Ada.Strings.Unbounded.To_Unbounded_String ("@@");
 
-   Standard_Annotation_Namespace : constant Text.Reference := Text.Held
+   Standard_Annotation_Namespace : constant Text.Reference :=
      (Standard_Annotation_Namespace_Holder);
 
    type Refcount_Base is abstract limited new

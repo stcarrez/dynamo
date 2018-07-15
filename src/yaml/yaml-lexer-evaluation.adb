@@ -188,6 +188,9 @@ package body Yaml.Lexer.Evaluation is
    end Read_Plain_Scalar;
 
    procedure Process_Quoted_Whitespace (L : in out Instance; Init : Natural;
+                                        Target : in out Text.Builder.Reference);
+
+   procedure Process_Quoted_Whitespace (L : in out Instance; Init : Natural;
                                         Target : in out Text.Builder.Reference) is
       Newlines : Natural := Init;
       First_Space : constant Positive := L.Pos - 1;
@@ -274,6 +277,9 @@ package body Yaml.Lexer.Evaluation is
    end Read_Single_Quoted_Scalar;
 
    subtype Hex_Code_Point is Natural range 0 .. 16#1FFFFF#;
+
+   procedure Read_Hex_Sequence (L : in out Instance; Length : Positive;
+                                Target : in out Text.Builder.Reference);
 
    procedure Read_Hex_Sequence (L : in out Instance; Length : Positive;
                                 Target : in out Text.Builder.Reference) is
@@ -548,7 +554,8 @@ package body Yaml.Lexer.Evaluation is
             L.State := Expect_Line_End'Access;
          else
             raise Lexer_Error with
-              "This line at " & Escaped (L.Cur) & " is less indented than necessary." & L.Cur_Line'Img;
+              "This line at " & Escaped (L.Cur) & " is less indented than necessary."
+              & L.Cur_Line'Img;
          end if;
       elsif L.Pos = L.Line_Start + 1 then
          L.State := Line_Start'Access;

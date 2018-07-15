@@ -3,7 +3,7 @@
 
 with Ada.Containers;
 with Ada.Strings.UTF_Encoding;
-with Ada.Finalization;
+with Ada.Strings.Unbounded;
 with System.Storage_Elements;
 private with Ada.Unchecked_Conversion;
 
@@ -46,39 +46,18 @@ package Text is
    subtype Pool_Offset is System.Storage_Elements.Storage_Offset
    range 0 .. System.Storage_Elements.Storage_Offset (Integer'Last);
 
-   --  this type is used to forbid the user to copy the pointer to UTF_8_String
-   --  into a variable of a named access type. thus, we can be sure that no
-   --  pointer to the String outlives the smart pointers.
-   type Accessor (Data : not null access constant UTF_8_String) is
-     limited private with Implicit_Dereference => Data;
-
    --  this is a smart pointer. use Value to access its value.
-   type Reference is tagged private with Constant_Indexing => Element;
-
-   function Value (Object : Reference) return Accessor with Inline;
+   subtype Reference is Ada.Strings.Unbounded.Unbounded_String;
 
    --  shortcut for Object.Value.Data'Length
-   function Length (Object : Reference) return Natural with Inline;
+   function Length (Object : Reference) return Natural renames Ada.Strings.Unbounded.Length;
 
-   function "&" (Left, Right : Reference) return String with Inline;
-   function "&" (Left : Reference; Right : String)
-                 return String with Inline;
-   function "&" (Left : Reference; Right : Character) return String
-     with Inline;
-   function "&" (Left : String; Right : Reference)
-                 return String with Inline;
-   function "&" (Left : Character; Right : Reference) return String
-     with Inline;
+   function "&" (Left, Right : Reference) return String;
 
    --  compares the string content of two Content values.
-   function "=" (Left, Right : Reference) return Boolean with Inline;
-
-   function "=" (Left : Reference; Right : String) return Boolean with Inline;
-   function "=" (Left : String; Right : Reference) return Boolean with Inline;
+   function "=" (Left, Right : Reference) return Boolean renames Ada.Strings.Unbounded."=";
 
    function Hash (Object : Reference) return Ada.Containers.Hash_Type;
-
-   function Element (Object : Reference; Position : Positive) return Character;
 
    --  equivalent to the empty string. default value for References.
    Empty : constant Reference;
@@ -86,28 +65,17 @@ package Text is
    --  this can be used for constant Reference values that are declared at
    --  library level where no Pool is available. References pointing to a
    --  Constant_Content_Holder are never freed.
-   type Constant_Instance (<>) is private;
+   subtype Constant_Instance is Reference;
 
    --  note that there is a limit of 128 characters for Content values created
    --  like this.
-   function Hold (Content : String) return Constant_Instance;
+   function Hold (Content : String) return Constant_Instance
+     renames Ada.Strings.Unbounded.To_Unbounded_String;
 
    --  get a Reference value which is a reference to the string contained in the
    --  Holder.
-   function Held (Holder : Constant_Instance) return Reference;
+   function Held (Holder : Constant_Instance) return Reference is (Holder);
 
-   --  used for exporting to C interfaces
-   subtype Exported is System.Address;
-
-   --  increases the reference count and returns a value that can be used in
-   --  places where C expects a `const char*` value.
-   function Export (Object : Reference) return Exported;
-
-   --  creates a content value from an exported pointer
-   function Import (Pointer : Exported) return Reference;
-
-   --  decreases the reference count (and so possibly deallocates the value).
-   procedure Delete_Exported (Pointer : Exported);
 private
    --  this forces GNAT to store the First and Last dope values right before
    --  the first element of the String. we use that to our advantage.
@@ -188,26 +156,11 @@ private
 
    Header_Size : constant Pool_Offset := Header'Size / System.Storage_Unit;
 
-   type Constant_Instance (Length : Positive) is record
-      Data : String (1 .. Length);
-   end record;
-
    Chunk_Start_Index : constant := Chunk_Index_Start / System.Storage_Unit + 1;
    Refcount_Start_Index : constant := Refcount_Start / System.Storage_Unit + 1;
    First_Start_Index : constant := First_Start / System.Storage_Unit + 1;
    Last_Start_Index  : constant := Last_Start / System.Storage_Unit + 1;
    End_Index         : constant := (Header_End + 1) / System.Storage_Unit;
-
-   Empty_Holder : constant Constant_Instance :=
-     (Length => Positive (Header_Size) + 1, Data =>
-          (1 .. Chunk_Start_Index - 1 => Character'Val (0),
-           Chunk_Start_Index .. Refcount_Start_Index - 1 => <>,
-           Refcount_Start_Index .. First_Start_Index - 2 => Character'Val (0),
-           First_Start_Index - 1 => Character'Val (1),
-           First_Start_Index .. Last_Start_Index - 2 => Character'Val (0),
-           Last_Start_Index - 1 => Character'Val (1),
-           Last_Start_Index .. End_Index => Character'Val (0),
-           End_Index + 1 => Character'Val (0)));
 
    type Accessor (Data : not null access constant UTF_8_String) is limited
       record
@@ -219,16 +172,7 @@ private
    function To_UTF_8_String_Access is new Ada.Unchecked_Conversion
      (System.Address, UTF_8_String_Access);
 
-   type Reference is new Ada.Finalization.Controlled with record
-      Data : UTF_8_String_Access :=
-        To_UTF_8_String_Access (Empty_Holder.Data (Positive (Header_Size) + 1)'Address);
-   end record;
-
-   overriding procedure Adjust (Object : in out Reference);
-   overriding procedure Finalize (Object : in out Reference);
-
-   Empty : constant Reference :=
-     (Ada.Finalization.Controlled with Data => <>);
+   Empty : constant Reference := Ada.Strings.Unbounded.Null_Unbounded_String;
 
    --  it is important that all allocated strings are aligned to the header
    --  length. else, it may happen that we generate a region of free memory that
@@ -240,14 +184,5 @@ private
                                   return Pool_Offset is
      ((Length + Header_Size - 1) / Header_Size * Header_Size);
 
-   procedure Decrease_Usage (Pool : in out Pool_Data_Access;
-                             Chunk_Index : Chunk_Index_Type);
-
-   function Fitting_Position (Length : Pool_Offset;
-                              P : Pool_Data_Access) return System.Address;
-
-   function Header_Of (S : UTF_8_String_Access) return not null access Header;
-
-   function As_String (C : Chunk) return String;
 end Text;
 

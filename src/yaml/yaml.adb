@@ -18,9 +18,10 @@ package body Yaml is
      ((Props.Anchor = Text.Empty and then Props.Tag = Tags.Question_Mark));
 
    function To_String (E : Event) return String is
+
       function Prop_String (A : Properties) return String is
-        ((if A.Anchor = Text.Empty then "" else " &" & A.Anchor.Value) &
-         (if A.Tag = Tags.Question_Mark then "" else " <" & A.Tag.Value & '>'));
+        ((if A.Anchor = Text.Empty then "" else " &" & To_String (A.Anchor)) &
+         (if A.Tag = Tags.Question_Mark then "" else " <" & To_String (A.Tag) & '>'));
 
       function Scalar_Indicator (S : Scalar_Style_Type) return String is
         ((case S is
@@ -30,12 +31,15 @@ package body Yaml is
              when Literal => " |",
              when Folded => " >"));
 
+      function Escaped (C : Text.Reference) return String;
+
       function Escaped (C : Text.Reference) return String is
-         Ret : String (1 .. C.Length * 2);
+         S   : constant String := To_String (C);
+         Ret : String (1 .. S'Length * 2);
          Pos : Positive := 1;
       begin
-         for I in C.Value.Data'Range loop
-            case C.Value.Data (I) is
+         for I in S'Range loop
+            case S (I) is
                when Character'Val (7) =>
                   Ret (Pos .. Pos + 1) := "\a";
                   Pos := Pos + 2;
@@ -55,7 +59,7 @@ package body Yaml is
                   Ret (Pos .. Pos + 1) := "\\";
                   Pos := Pos + 2;
                when others =>
-                  Ret (Pos) := C.Value.Data (I);
+                  Ret (Pos) := S (I);
                   Pos := Pos + 1;
             end case;
          end loop;
@@ -81,10 +85,10 @@ package body Yaml is
             return "=VAL" & Prop_String (E.Scalar_Properties) &
               Scalar_Indicator (E.Scalar_Style) & Escaped (E.Content);
          when Alias =>
-            return "=ALI *" & E.Target.Value;
+            return "=ALI *" & To_String (E.Target);
          when Annotation_Start =>
             return "+ANN" & Prop_String (E.Annotation_Properties) & ' ' &
-              E.Namespace & E.Name;
+              To_String (E.Namespace & E.Name);
          when Annotation_End =>
             return "-ANN";
       end case;

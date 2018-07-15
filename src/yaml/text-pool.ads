@@ -2,7 +2,7 @@
 --  released under the terms of the MIT license, see the file "copying.txt"
 
 package Text.Pool is
-   type Reference is new Ada.Finalization.Controlled with private;
+   type Reference is tagged private;
 
    Default_Size : constant Pool_Offset;
 
@@ -21,19 +21,11 @@ package Text.Pool is
    function From_String (P : Reference'Class; Data : String)
                          return Text.Reference;
 
-   function With_Length (P : Reference'Class; Length : Positive)
-                         return Text.Reference;
-
-   --  for debugging
-   function Current_Chunk_As_String (P : Reference) return String;
 private
-   type Reference is new Ada.Finalization.Controlled with record
+   type Reference is tagged record
       Data : Pool_Data_Access;
    end record with Type_Invariant =>
      (Reference.Data = null or else Reference.Data.Pos mod Header_Size = 1);
-
-   overriding procedure Adjust (Object : in out Reference);
-   overriding procedure Finalize (Object : in out Reference);
 
    Default_Size : constant Pool_Offset := 8192;
 end Text.Pool;

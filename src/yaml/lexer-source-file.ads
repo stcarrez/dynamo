@@ -22,4 +22,5 @@ private
       Stream : Ada.Streams.Stream_IO.Stream_Access;
       Input_At, Input_Length : Ada.Directories.File_Size;
    end record;
+   type Instance_Access is access all Instance'Class;
 end Lexer.Source.File;

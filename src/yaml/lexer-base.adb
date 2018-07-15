@@ -36,11 +36,13 @@ package body Lexer.Base is
    end Next;
 
    procedure Refill_Buffer (L : in out Instance) is
+      function Search_Sentinel return Boolean with Inline;
+
       Bytes_To_Copy : constant Natural := L.Buffer'Last + 1 - L.Internal.Sentinel;
       Fill_At : Positive := Bytes_To_Copy + 1;
       Bytes_Read : Positive;
 
-      function Search_Sentinel return Boolean with Inline is
+      function Search_Sentinel return Boolean is
          Peek : Positive := L.Buffer'Last;
       begin
          while not (L.Buffer (Peek) in Line_End) loop

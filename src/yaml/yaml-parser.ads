@@ -64,8 +64,10 @@ package Yaml.Parser is
 private
    overriding procedure Finalize (P : in out Instance);
 
+   type Instance_Access is not null access all Instance;
+
    type Reference is new Ada.Finalization.Controlled with record
-      Data : not null access Instance;
+      Data : Instance_Access;
    end record;
 
    overriding procedure Adjust (Object : in out Reference);

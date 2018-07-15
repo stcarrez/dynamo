@@ -13,14 +13,14 @@ package Lexer.Base is
 
    type Instance is limited new Ada.Finalization.Limited_Controlled with record
       Cur_Line    : Positive := 1;
-        --  index of the line at the current position
+      --  index of the line at the current position
       Line_Start  : Positive := 1;
-        --  the buffer index where the current line started
+      --  the buffer index where the current line started
       Prev_Lines_Chars : Natural := 0;
-        --  number of characters in all previous lines,
-        --  used for calculating index.
+      --  number of characters in all previous lines,
+      --  used for calculating index.
       Pos         : Positive := 1;
-        --  position of the next character to be read from the buffer
+      --  position of the next character to be read from the buffer
       Buffer      : Buffer_Type;  --  input buffer. filled from the source.
       Internal : Private_Values;
    end record;

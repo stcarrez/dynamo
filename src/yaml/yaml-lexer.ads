@@ -26,7 +26,7 @@ private package Yaml.Lexer is
       Unknown_Directive, --  any directive but `%YAML` and `%TAG`
       Directive_Param,   --  parameters of %YAML and unknown directives
       Empty_Line,        --  necessary for correctly handling line folding in
-                         --  multiline plain scalars
+      --  multiline plain scalars
       Directives_End,    --  explicit `---`
       Document_End,      --  explicit `...`
       Stream_End,        --  end of input
@@ -46,10 +46,10 @@ private package Yaml.Lexer is
       Flow_Separator,    --  `,`
       Tag_Handle,        --  a handle of a tag, e.g. `!!` of `!!str`
       Suffix,            --  suffix of a tag shorthand, e.g. `str` of `!!str`
-                         --  also used for the URI of the %TAG directive and
-                         --  annotations.
+      --  also used for the URI of the %TAG directive and
+      --  annotations.
       Verbatim_Tag,      --  a verbatim tag, e.g. `!<tag:yaml.org,2002:str>`
-                         --  TODO: remove (unsupported in YAML 1.3)
+      --  TODO: remove (unsupported in YAML 1.3)
       Anchor,            --  an anchor property of a node, e.g. `&anchor`
       Alias,             --  an alias property of a node, e.g. `*alias`
       Annotation_Handle, --  handle of an annotation, e.g. '@@' of '@@concat'
@@ -98,38 +98,38 @@ private
 
    type Instance is limited new Standard.Lexer.Base.Instance with record
       Token_Start : Positive;
-        --  index of the character that started the current token PLUS ONE.
-        --  this index is one behind the actual first token for implementation
-        --  reasons; use Short_Lexeme and Full_Lexeme to compensate.
+      --  index of the character that started the current token PLUS ONE.
+      --  this index is one behind the actual first token for implementation
+      --  reasons; use Short_Lexeme and Full_Lexeme to compensate.
       Token_Start_Mark : Mark;
-        --  mark at the current token's start. necessary for inspection in the
-        --  case of a Lexer_Error.
+      --  mark at the current token's start. necessary for inspection in the
+      --  case of a Lexer_Error.
       Indentation : Indentation_Type;
-        --  number of indentation spaces of the recently yielded content token.
-        --  this is important for internal processing of multiline tokens, as
-        --  they must have at least one space of indentation more than their
-        --  parents on all lines.
+      --  number of indentation spaces of the recently yielded content token.
+      --  this is important for internal processing of multiline tokens, as
+      --  they must have at least one space of indentation more than their
+      --  parents on all lines.
       Proposed_Indentation : Indentation_Type;
-        --  number of indentation spaces of the recently started set of node
-        --  properties. This is only necessary for implicit scalar keys with
-        --  properties, to get the proper indentation value for those.
+      --  number of indentation spaces of the recently started set of node
+      --  properties. This is only necessary for implicit scalar keys with
+      --  properties, to get the proper indentation value for those.
       State       : State_Type;
-        --  pointer to the implementation of the current lexer state
+      --  pointer to the implementation of the current lexer state
       Line_Start_State : State_Type;
-        --  state to go to after ending the current line. used in conjunction
-        --  with the Expect_Line_End state.
+      --  state to go to after ending the current line. used in conjunction
+      --  with the Expect_Line_End state.
       Json_Enabling_State : State_Type;
-        --  used for special JSON compatibility productions. after certain
-        --  tokens, it is allowed for a map value indicator to not be succeeded
-        --  by whitespace.
+      --  used for special JSON compatibility productions. after certain
+      --  tokens, it is allowed for a map value indicator to not be succeeded
+      --  by whitespace.
       Cur         : Character;  --  recently read character
       Flow_Depth, Annotation_Depth  : Natural;
-        --  current level of flow collections and annotation parameter lists
+      --  current level of flow collections and annotation parameter lists
       Value : Text.Reference;
-        --  content of the recently read scalar or URI, if any.
+      --  content of the recently read scalar or URI, if any.
       Pool : Text.Pool.Reference; --  used for generating Content
       Seen_Multiline : Boolean;
-        --  remember whether the last scalar was multiline
+      --  remember whether the last scalar was multiline
    end record;
 
    --  The following stuff is declared here so that it can be unit-tested.

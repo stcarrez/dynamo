@@ -4,7 +4,20 @@
 with Yaml.Lexer.Evaluation;
 
 package body Yaml.Lexer is
-   use type Text.Reference;
+
+   function Is_Document_End (L : in out Instance) return Boolean;
+   function Is_Directives_End (L : in out Instance) return Boolean;
+
+   procedure Basic_Init (L : in out Instance; Pool  : Text.Pool.Reference);
+   procedure Leave_Flow_Collection (L : in out Instance; T : out Token;
+                                    Kind : Token_Kind);
+   procedure Read_Anchor_Name (L : in out Instance);
+   procedure Read_Namespace (L : in out Instance; T : out Token;
+                             NS_Char : Character; Kind : Token_Kind);
+   procedure Enter_Flow_Collection (L : in out Instance; T : out Token;
+                                    Kind : Token_Kind);
+   procedure Check_Indicator_Char (L : in out Instance; Kind : Token_Kind;
+                                   T : out Token);
 
    -----------------------------------------------------------------------------
    --             Initialization and buffer handling                          --
@@ -43,10 +56,12 @@ package body Yaml.Lexer is
    -----------------------------------------------------------------------------
 
    function Escaped (S : String) return String is
+      procedure Add_Escape_Sequence (C : Character) with Inline;
+
       Ret : String (1 .. S'Length * 4 + 2) := (1 => '"', others => <>);
       Retpos : Positive := 2;
 
-      procedure Add_Escape_Sequence (C : Character) with Inline is
+      procedure Add_Escape_Sequence (C : Character) is
       begin
          Ret (Retpos .. Retpos + 1) := "\" & C;
          Retpos := Retpos + 2;
@@ -84,7 +99,7 @@ package body Yaml.Lexer is
      (Escaped ("" & C));
 
    function Escaped (C : Text.Reference) return String is
-     (Escaped (C.Value));
+     (Escaped (To_String (C)));
 
    function Next_Is_Plain_Safe (L : Instance) return Boolean is
       (case L.Buffer (L.Pos) is
@@ -277,6 +292,7 @@ package body Yaml.Lexer is
    end Outside_Doc;
 
    function Yaml_Version (L : in out Instance; T : out Token) return Boolean is
+      procedure Read_Numeric_Subtoken;
       procedure Read_Numeric_Subtoken is
       begin
          if not (L.Cur in Digit) then
@@ -475,7 +491,8 @@ package body Yaml.Lexer is
       end case;
       if Indent <= L.Indentation then
          raise Lexer_Error with
-           "Too few indentation spaces (must surpass surrounding block element)" & L.Indentation'Img;
+           "Too few indentation spaces (must surpass surrounding block element)"
+           & L.Indentation'Img;
       end if;
       L.State := Inside_Line'Access;
       return False;
@@ -542,8 +559,7 @@ package body Yaml.Lexer is
    end Leave_Flow_Collection;
 
    procedure Read_Namespace (L : in out Instance; T : out Token;
-                             NS_Char : Character; Kind : Token_Kind) with
-     Pre => L.Cur = NS_Char is
+                             NS_Char : Character; Kind : Token_Kind) is
    begin
       Start_Token (L);
       L.Cur := Next (L);

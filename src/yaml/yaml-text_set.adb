@@ -6,6 +6,14 @@ with Ada.Unchecked_Deallocation;
 
 package body Yaml.Text_Set is
    use type Ada.Containers.Hash_Type;
+   use type Text.Reference;
+   function Grow_If_Needed (Object : in out Reference) return Boolean;
+   function Non_Zero_Hash (S : Standard.String)
+                           return Ada.Containers.Hash_Type;
+   function Raw_Set (Object : in out Reference;
+                     Hash : Ada.Containers.Hash_Type;
+                     S : Standard.String)
+                     return not null access Holder;
 
    function Non_Zero_Hash (S : Standard.String)
                            return Ada.Containers.Hash_Type is
@@ -27,7 +35,7 @@ package body Yaml.Text_Set is
       Cur : not null access Holder := Object.Elements (Pos)'Access;
    begin
       while Cur.Hash /= 0 and then
-        (Cur.Hash /= Hash or else Cur.Key.Value /= S) loop
+        (Cur.Hash /= Hash or else Cur.Key /= S) loop
          Pos := Pos + 1;
          if Pos = Object.Elements'Length then
             Pos := 0;
@@ -48,7 +56,7 @@ package body Yaml.Text_Set is
          Object.Elements.all := (others => (Hash => 0, others => <>));
          for E of Old_Elements.all loop
             if E.Hash /= 0 then
-               Raw_Set (Object, E.Hash, E.Key.Value).all := E;
+               Raw_Set (Object, E.Hash, To_String (E.Key)).all := E;
             end if;
          end loop;
          Free (Old_Elements);

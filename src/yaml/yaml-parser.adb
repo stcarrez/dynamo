@@ -9,8 +9,19 @@ package body Yaml.Parser is
    use type Lexer.Token_Kind;
    use type Text.Reference;
 
+   function Forced_Next_Sequence_Item (P : in out Class;
+                                       E : out Event) return Boolean;
+
+   function Possible_Next_Sequence_Item (P : in out Class;
+                                         E : out Event;
+                                         End_Token : Lexer.Token_Kind;
+                                         After_Props, After_Item : State_Type)
+                                         return Boolean;
+
+   procedure Init (P : in out Instance) with Inline;
+
    function New_Parser return Reference is
-      Ptr : constant not null access Instance := new Instance;
+      Ptr : constant Instance_Access := new Instance;
    begin
       return Reference'(Ada.Finalization.Controlled with Data => Ptr);
    end New_Parser;
@@ -28,7 +39,7 @@ package body Yaml.Parser is
       Decrease_Refcount (Object.Data);
    end Finalize;
 
-   procedure Init (P : in out Instance) with Inline is
+   procedure Init (P : in out Instance) is
    begin
       P.Levels := Level_Stacks.New_Stack (32);
       P.Levels.Push ((State => At_Stream_Start'Access, Indentation => -2));
@@ -82,6 +93,10 @@ package body Yaml.Parser is
    function Recent_Lexer_Token_End (P : Instance) return Mark is
      (P.Current.End_Pos);
 
+   function Parse_Tag (P : in out Class)
+                       return Text.Reference;
+   procedure Reset_Tag_Handles (P : in out Class);
+
    -----------------------------------------------------------------------------
    --                   internal utility subroutines
    -----------------------------------------------------------------------------
@@ -115,7 +130,8 @@ package body Yaml.Parser is
          raise Parser_Error with "Unexpected token (expected tag suffix): " &
            P.Current.Kind'Img;
       end if;
-      return P.Pool.From_String (Holder.Value & Lexer.Current_Content (P.L));
+      --  return P.Pool.From_String (Holder.Value & Lexer.Current_Content (P.L));
+      return Holder.Value & Lexer.Current_Content (P.L);
    end Parse_Tag;
 
    function To_Style (T : Lexer.Scalar_Token_Kind)
@@ -203,7 +219,7 @@ package body Yaml.Parser is
             end if;
             Version := P.Pool.From_String (Lexer.Full_Lexeme (P.L));
             if Version /= "1.3" and then P.Handler /= null then
-               P.Handler.Wrong_Yaml_Version (Version.Value);
+               P.Handler.Wrong_Yaml_Version (To_String (Version));
             end if;
             P.Current := Lexer.Next_Token (P.L);
          when Lexer.Tag_Directive =>
@@ -227,7 +243,8 @@ package body Yaml.Parser is
                   Holder.Value := Lexer.Current_Content (P.L);
                else
                   if not Tag_Handle_Sets.Set (P.Tag_Handles, Tag_Handle,
-                                              Lexer.Current_Content (P.L)) then
+                                              Lexer.Current_Content (P.L))
+                  then
                      raise Parser_Error with
                        "Redefinition of tag handle " & Tag_Handle;
                   end if;
@@ -252,7 +269,7 @@ package body Yaml.Parser is
                      end if;
                      Params.Append (Lexer.Full_Lexeme (P.L));
                   end loop;
-                  P.Handler.Unknown_Directive (Name, Params.Lock.Value.Data.all);
+                  P.Handler.Unknown_Directive (Name, To_String (Params.Lock));
                end;
             else
                loop
@@ -396,8 +413,9 @@ package body Yaml.Parser is
                            Collection_Style      => Block);
                P.Header_Props := Default_Properties;
                P.Levels.Top.State := After_Implicit_Map_Start'Access;
-            elsif P.Current.Kind in Lexer.Indentation | Lexer.Document_End |
-              Lexer.Directives_End | Lexer.Stream_End then
+            elsif P.Current.Kind in Lexer.Indentation | Lexer.Document_End
+              | Lexer.Directives_End | Lexer.Stream_End
+            then
                raise Parser_Error with "Scalar at root level requires '---'.";
             end if;
             return True;
@@ -405,8 +423,8 @@ package body Yaml.Parser is
             P.Levels.Top.State := Before_Flow_Item_Props'Access;
             return False;
          when Lexer.Indentation =>
-              raise Parser_Error with
-                "Stand-alone node properties not allowed on non-header line";
+            raise Parser_Error with
+              "Stand-alone node properties not allowed on non-header line";
          when others =>
             raise Parser_Error with
               "Unexpected token (expected implicit mapping key): " &
@@ -422,7 +440,7 @@ package body Yaml.Parser is
          (P.Current.Kind /= Lexer.Seq_Item_Ind or else
           P.Levels.Element (P.Levels.Length - 2).State = In_Block_Seq'Access)
       then
-         -- empty element is empty scalar
+         --  empty element is empty scalar
          E := Event'(Start_Position => P.Header_Start,
                             End_Position   => P.Header_Start,
                             Kind => Scalar,
@@ -962,7 +980,8 @@ package body Yaml.Parser is
             return False;
          when others =>
             if P.Levels.Element (P.Levels.Length - 2).Indentation =
-              P.Levels.Top.Indentation then
+              P.Levels.Top.Indentation
+            then
                E := Event'(Start_Position => P.Current.Start_Pos,
                            End_Position   => P.Current.End_Pos,
                            Kind           => Sequence_End);
@@ -1132,6 +1151,8 @@ package body Yaml.Parser is
 
    function Before_Block_Indentation (P : in out Class;
                                       E : out Event) return Boolean is
+      procedure End_Block_Node;
+
       procedure End_Block_Node is
       begin
          if P.Levels.Top.State = Before_Block_Map_Key'Access then

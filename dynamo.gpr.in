@@ -13,9 +13,9 @@ project Dynamo is
 
    type Yes_No is ("yes", "no");
 
-   Has_Mysql  := "@DYNAMO_HAVE_MYSQL@";
-   Has_Sqlite := "@DYNAMO_HAVE_SQLITE@";
-   Has_Gpr := "@DYNAMO_HAVE_GPR@";
+   Has_Mysql  : Yes_No := "@DYNAMO_HAVE_MYSQL@";
+   Has_Sqlite : Yes_No := "@DYNAMO_HAVE_SQLITE@";
+   Has_Gpr    : Yes_No := "@DYNAMO_HAVE_GPR@";
 
    Mains := ("dynamo.adb");
 

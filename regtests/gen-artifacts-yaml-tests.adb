@@ -20,11 +20,8 @@ with Ada.Strings.Unbounded;
 
 with Util.Test_Caller;
 
-with Gen.Configs;
 with Gen.Generator;
 package body Gen.Artifacts.Yaml.Tests is
-
-   use Ada.Strings.Unbounded;
 
    package Caller is new Util.Test_Caller (Test, "Gen.Yaml");
 

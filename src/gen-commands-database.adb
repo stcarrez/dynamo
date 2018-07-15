@@ -117,7 +117,6 @@ package body Gen.Commands.Database is
    --  ------------------------------
    procedure Create_Database (DB   : in ADO.Sessions.Master_Session;
                               Name : in String) is
-      use Ada.Strings.Unbounded;
       Query : ADO.Queries.Context;
       Stmt  : ADO.Statements.Query_Statement;
    begin
@@ -137,8 +136,6 @@ package body Gen.Commands.Database is
                                 Name     : in String;
                                 User     : in String;
                                 Password : in String) is
-      use Ada.Strings.Unbounded;
-
       Query : ADO.Queries.Context;
       Stmt  : ADO.Statements.Query_Statement;
    begin

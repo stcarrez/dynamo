@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-mappings -- Type mapping artifact for Code Generator
---  Copyright (C) 2011, 2012, 2015 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +25,6 @@ with Gen.Model.Mappings;
 --  The <b>Gen.Artifacts.Mappings</b> package is an artifact to map XML-based types
 --  into Ada types.
 package body Gen.Artifacts.Mappings is
-
-   use type DOM.Core.Node;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Query");
 

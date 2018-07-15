@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Stephane Carrez
+--  Copyright (C) 2009 - 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,10 +31,7 @@ with Util.Strings.Transforms;
 with Util.Log.Loggers;
 package body Gen.Model.Packages is
 
-   use type DOM.Core.Node;
-   use Util.Log;
-
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Model.Packages");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Packages");
 
    --  ------------------------------
    --  Get the value identified by the name.

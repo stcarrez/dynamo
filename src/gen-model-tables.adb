@@ -176,9 +176,9 @@ package body Gen.Model.Tables is
                        Name : in String) is
    begin
       Into.Type_Name := To_Unbounded_String (Name);
-      if Length (Into.Sql_Type) = 0 then
-         Into.Sql_Type  := To_Unbounded_String (Name);
-      end if;
+--        if Length (Into.Sql_Type) = 0 then
+--           Into.Sql_Type  := To_Unbounded_String (Name);
+--        end if;
    end Set_Type;
 
    --  ------------------------------
@@ -214,8 +214,6 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    procedure Prepare (O : in out Column_Definition) is
-      use type Mappings.Mapping_Definition_Access;
-
    begin
       O.Bean := Util.Beans.Objects.To_Object (O'Unchecked_Access,
                                               Util.Beans.Objects.STATIC);
@@ -266,6 +264,8 @@ package body Gen.Model.Tables is
    function Create_Table (Name : in Unbounded_String) return Table_Definition_Access is
       Table : constant Table_Definition_Access := new Table_Definition;
    begin
+      Log.Debug ("Create table {0}", Name);
+
       Table.Name   := Name;
       Table.Kind   := Gen.Model.Mappings.T_TABLE;
       Table.Target := Name;

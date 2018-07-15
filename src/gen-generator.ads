@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-generator -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -246,6 +246,8 @@ private
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Keys => "=");
 
+   type Object_Access is access all Util.Beans.Objects.Object;
+
    type Handler is new ASF.Applications.Main.Application and Gen.Artifacts.Generator with record
       Conf       : ASF.Applications.Config;
 
@@ -259,16 +261,16 @@ private
       Status : Ada.Command_Line.Exit_Status := 0;
 
       --  The file that must be saved (the file attribute in <f:view>.
-      File     : access Util.Beans.Objects.Object;
+      File     : Object_Access;
 
       --  Indicates whether the file must be saved at each generation or only once.
       --  This is the mode attribute in <f:view>.
-      Mode     : access Util.Beans.Objects.Object;
+      Mode     : Object_Access;
 
       --  Indicates whether the file must be ignored after the generation.
       --  This is the ignore attribute in <f:view>.  It is intended to be used for the package
       --  body generation to skip that in some cases when it turns out there is no operation.
-      Ignore   : access Util.Beans.Objects.Object;
+      Ignore   : Object_Access;
 
       --  Whether the AdaMappings.xml file was loaded or not.
       Type_Mapping_Loaded : Boolean := False;

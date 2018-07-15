@@ -50,7 +50,6 @@ package body Gen.Utils.GNAT is
    procedure Initialize (Config : in Util.Properties.Manager'Class) is
       Project_Dirs : constant String := Config.Get (Gen.Configs.GEN_GNAT_PROJECT_DIRS,
                                                     DEFAULT_GNAT_PROJECT_DIR);
-      Paths : GPR.Env.Project_Search_Path;
    begin
       Log.Info ("Initializing GNAT runtime to read projects from: {0}", Project_Dirs);
 
@@ -63,8 +62,7 @@ package body Gen.Utils.GNAT is
       GPR.Env.Initialize_Default_Project_Path (Gpr_Build_Util.Root_Environment.Project_Path,
                                                GPR.Sdefault.Hostname);
       GPR.Env.Add_Directories (Gpr_Build_Util.Root_Environment.Project_Path, Project_Dirs);
-      Paths := Gpr_Build_Util.Root_Environment.Project_Path;
-      Log.Info ("Added directories {0}", Gpr.Util.Executable_Prefix_Path);
+      Log.Info ("Added directories {0}", GPR.Util.Executable_Prefix_Path);
    end Initialize;
 
    --  ------------------------------

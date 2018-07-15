@@ -395,7 +395,6 @@ package body Gen.Artifacts.Hibernate is
                                    Name       : in String;
                                    Is_Reverse : in Boolean) is
          use type Gen.Model.Projects.Project_Definition_Access;
-         use Ada.Directories;
 
          Out_Dir     : constant String := Util.Files.Compose (Model_Dir, Driver);
          Path        : constant String := Util.Files.Compose (Out_Dir, Name);

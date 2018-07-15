@@ -27,26 +27,23 @@ with Yaml.Parser;
 with Gen.Configs;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
-with Gen.Model.Operations;
 
 with Util.Log.Loggers;
-with Util.Encoders.HMAC.SHA1;
 with Util.Stacks;
 
 use Yaml;
 
 package body Gen.Artifacts.Yaml is
 
+   function To_String (S : Ada.Strings.Unbounded.Unbounded_String) return String
+     renames Ada.Strings.Unbounded.To_String;
+
    use Ada.Strings.Unbounded;
    use Gen.Model;
    use Gen.Model.Tables;
    use Gen.Configs;
 
-   use Util.Log;
-
-   use type Text.Reference;
-
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Yaml");
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Yaml");
 
    type State_Type is (IN_ROOT,
                        IN_TABLE,
@@ -69,6 +66,13 @@ package body Gen.Artifacts.Yaml is
    package Node_Stack is new Util.Stacks (Element_Type        => Node_Info,
                                           Element_Type_Access => Node_Info_Access);
 
+   procedure Process_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
+                              Stack : in out Node_Stack.Stack);
+
+   procedure Read_Scalar (Node  : in Node_Info_Access;
+                          Name  : in String;
+                          Value : in String);
+
    procedure Read_Scalar (Node  : in Node_Info_Access;
                           Name  : in String;
                           Value : in String) is
@@ -82,7 +86,7 @@ package body Gen.Artifacts.Yaml is
             Log.Debug ("Set table {0} attribute {1}={2}", Node.Table.Name, Name, Value);
             if Name = "table" then
                Node.Table.Table_Name := To_Unbounded_String (Value);
-            elsif Name = "description" or name = "comment" then
+            elsif Name = "description" or Name = "comment" then
                Node.Table.Set_Comment (Value);
             end if;
 
@@ -104,7 +108,7 @@ package body Gen.Artifacts.Yaml is
                Node.Col.Not_Null := Value = "false" or Value = "no";
             elsif Name = "not-null" or Name = "required" then
                Node.Col.Not_Null := Value = "true" or Value = "yes";
-            elsif Name = "description" or name = "comment" then
+            elsif Name = "description" or Name = "comment" then
                Node.Col.Set_Comment (Value);
             end if;
 
@@ -125,7 +129,7 @@ package body Gen.Artifacts.Yaml is
             when IN_ROOT =>
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
-               New_Node.Table := Gen.Model.Tables.Create_Table (To_Unbounded_String (Node.Name & ""));
+               New_Node.Table := Gen.Model.Tables.Create_Table (Node.Name);
                New_Node.State := IN_TABLE;
                Model.Register_Table (New_Node.Table);
 
@@ -150,14 +154,14 @@ package body Gen.Artifacts.Yaml is
                end if;
 
             when IN_COLUMNS =>
-               Node.Table.Add_Column (To_Unbounded_String (Node.Name & ""), Node.Col);
+               Node.Table.Add_Column (Node.Name, Node.Col);
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
                New_Node.Table := Node.Table;
                New_Node.State := IN_COLUMN;
 
             when IN_KEYS =>
-               Node.Table.Add_Column (To_Unbounded_String (Node.Name & ""), Node.Col);
+               Node.Table.Add_Column (Node.Name, Node.Col);
                Node.Col.Is_Key := True;
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
@@ -181,6 +185,8 @@ package body Gen.Artifacts.Yaml is
                          File          : in String;
                          Model         : in out Gen.Model.Packages.Model_Definition;
                          Context       : in out Generator'Class) is
+      pragma Unreferenced (Handler);
+
       Input : Source.Pointer;
       P     : Parser.Instance;
       Cur   : Event;
@@ -210,7 +216,7 @@ package body Gen.Artifacts.Yaml is
             when Scalar =>
                Node := Node_Stack.Current (Stack);
                if Node.Has_Name then
-                  Read_Scalar (Node, Node.Name & "", Cur.Content & "");
+                  Read_Scalar (Node, To_String (Node.Name), To_String (Cur.Content));
                   Node.Has_Name := False;
                else
                   Node.Name := Cur.Content;

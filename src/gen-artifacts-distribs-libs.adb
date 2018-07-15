@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-libs -- Unix shared library extraction and distribution
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,16 +29,15 @@ with EL.Contexts.Default;
 with Gen.Utils;
 package body Gen.Artifacts.Distribs.Libs is
 
-   use Util.Log;
-
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Distribs.Exec");
+   Log : constant Util.Log.Loggers.Logger
+     := Util.Log.Loggers.Create ("Gen.Artifacts.Distribs.Exec");
 
    --  ------------------------------
    --  Create a distribution rule to extract the shared libraries used by an executable
    --  and copy a selected subset in the target directory.
    --  ------------------------------
    function Create_Rule (Node : in DOM.Core.Node) return Distrib_Rule_Access is
-      use type DOM.Core.Node;
+
       procedure Collect_Libraries (Rule  : in out Libs_Rule'Class;
                                    Node  : in DOM.Core.Node);
 

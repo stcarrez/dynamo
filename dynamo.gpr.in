@@ -7,7 +7,7 @@ with "@SERVLET_DIR@servlet_core";
 with "@ADO_DIR@ado";
 @WITH_ADO_MYSQL@
 @WITH_ADO_SQLITE@
-with "gpr";
+@WITH_GPR@
 
 project Dynamo is
 
@@ -15,6 +15,7 @@ project Dynamo is
 
    Has_Mysql  := "@DYNAMO_HAVE_MYSQL@";
    Has_Sqlite := "@DYNAMO_HAVE_SQLITE@";
+   Has_Gpr := "@DYNAMO_HAVE_GPR@";
 
    Mains := ("dynamo.adb");
 
@@ -24,9 +25,18 @@ project Dynamo is
 
    for Main use Mains;
 
-   for Languages use ("Ada");
+   case Has_Gpr is
+      when "yes" =>
+          for Languages use ("Ada");
 
-   for Source_Dirs use ("src", "src/model", "src/yaml");
+          for Source_Dirs use ("src", "src/model", "src/yaml", "src/gpr");
+
+      when others =>
+          for Languages use ("Ada", "C");
+
+          for Source_Dirs use ("src", "src/model", "src/yaml", "src/gnat");
+
+   end case;
 
    for Object_Dir use "./" & Config'Object_Dir & "/obj";
    for Exec_Dir use "./" & Config'Exec_Dir & "/bin";

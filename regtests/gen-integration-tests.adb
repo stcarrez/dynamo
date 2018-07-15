@@ -394,10 +394,6 @@ package body Gen.Integration.Tests is
                                  ".*Generating file.*src/model/test-tuser-models.*",
                                  Result,
                                  "Invalid generate");
-      Util.Tests.Assert_Matches (T,
-                                 ".*Generating mysql.*db/mysql/create-test-mysql.sql.*",
-                                 Result,
-                                 "Invalid generate");
 
       T.Execute (Dynamo & " propset is_plugin false", Result);
       T.Execute (Dynamo & " generate db", Result);
@@ -411,6 +407,10 @@ package body Gen.Integration.Tests is
                                  "Invalid generate");
       Util.Tests.Assert_Matches (T,
                                  ".*Generating file.*db/mysql/test-mysql.sql.*",
+                                 Result,
+                                 "Invalid generate");
+      Util.Tests.Assert_Matches (T,
+                                 ".*Generating mysql.*db/mysql/create-test-mysql.sql.*",
                                  Result,
                                  "Invalid generate");
    end Test_Generate;

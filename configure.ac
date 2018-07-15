@@ -90,16 +90,15 @@ AM_GNAT_CHECK_PROJECT([gpr],[gpr])
 UTIL_HAVE_PRJ_DIRECTORIES=${gnat_project_gpr}
 AC_SUBST(UTIL_HAVE_PRJ_DIRECTORIES)
 
-##########################################
-# Ada Util library
-##########################################
-AM_GNAT_FIND_PROJECT([gpr],[GNAT Project Library],[gpr],
-  [],
-  [Building Dynamo requires the GNAT Project Library.],
-  [
-    GPR_DIR=${gnat_project_dir_gpr}
-  ])
-AC_SUBST(GPR_DIR)
+if test T$gnat_project_gpr = Tno; then
+  WITH_GPR='';
+  DYNAMO_HAVE_GPR='no';
+else
+  WITH_GPR="with \"${GPR_DIR}gpr\";";
+  DYNAMO_HAVE_GPR='yes';
+fi
+AC_SUBST(DYNAMO_HAVE_GPR)
+AC_SUBST(WITH_GPR)
 
 ##########################################
 # Ada Util library

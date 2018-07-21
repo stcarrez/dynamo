@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2016 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2016, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -149,6 +149,11 @@ package Gen.Model.Packages is
    --  Returns True if the generation is enabled for the given package name.
    function Is_Generation_Enabled (Model : in Model_Definition;
                                    Name  : in String) return Boolean;
+
+   --  Iterate over the model tables.
+   procedure Iterate_Tables (Model   : in Model_Definition;
+                             Process : not null access
+                               procedure (Item : in out Tables.Table_Definition));
 
    --  Prepare the generation of the package:
    --  o identify the column types which are used

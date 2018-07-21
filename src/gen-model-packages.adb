@@ -249,6 +249,24 @@ package body Gen.Model.Packages is
    end Is_Generation_Enabled;
 
    --  ------------------------------
+   --  Iterate over the model tables.
+   --  ------------------------------
+   procedure Iterate_Tables (Model   : in Model_Definition;
+                             Process : not null access
+                               procedure (Item : in out Tables.Table_Definition)) is
+
+      procedure Process_Definition (Item : in Definition_Access);
+
+      procedure Process_Definition (Item : in Definition_Access) is
+      begin
+         Process (Tables.Table_Definition (Item.all));
+      end Process_Definition;
+
+   begin
+      Model.Tables.Iterate (Process_Definition'Access);
+   end Iterate_Tables;
+
+   --  ------------------------------
    --  Prepare the generation of the package:
    --  o identify the column types which are used
    --  o build a list of package for the with clauses.

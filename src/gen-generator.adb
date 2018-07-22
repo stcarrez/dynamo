@@ -788,6 +788,7 @@ package body Gen.Generator is
          H.Mappings.Initialize (Path => File, Model => H.Model, Node => Root, Context => H);
          H.Hibernate.Initialize (Path => File, Model => H.Model, Node => Root, Context => H);
          H.Query.Initialize (Path => File, Model => H.Model, Node => Root, Context => H);
+         H.Yaml.Initialize (Path => File, Model => H.Model, Node => Root, Context => H);
       end;
 
 --        DOM.Readers.Free (My_Tree_Reader);
@@ -895,6 +896,9 @@ package body Gen.Generator is
    begin
       if H.XMI.Is_Initialized then
          H.XMI.Prepare (Model => H.Model, Context => H);
+      end if;
+      if H.Yaml.Is_Initialized then
+         H.Yaml.Prepare (Model => H.Model, Context => H);
       end if;
       H.Model.Prepare;
       if H.Hibernate.Is_Initialized then

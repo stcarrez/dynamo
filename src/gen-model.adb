@@ -15,10 +15,14 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with Ada.Strings.Fixed;
+with Ada.Strings.Maps;
 with DOM.Core.Nodes;
 with Gen.Utils;
 package body Gen.Model is
+
+   Trim_Chars : constant Ada.Strings.Maps.Character_Set
+     := Ada.Strings.Maps.To_Set (" " & ASCII.HT & ASCII.LF & ASCII.CR);
 
    --  ------------------------------
    --  Get the object unique name.
@@ -74,8 +78,9 @@ package body Gen.Model is
    --  ------------------------------
    procedure Set_Comment (Def     : in out Definition;
                           Comment : in String) is
+      Trimmed_Comment : constant String := Ada.Strings.Fixed.Trim (Comment, Trim_Chars, Trim_Chars);
    begin
-      Def.Comment := Util.Beans.Objects.To_Object (Comment);
+      Def.Comment := Util.Beans.Objects.To_Object (Trimmed_Comment);
    end Set_Comment;
 
    --  ------------------------------

@@ -17,8 +17,10 @@
 -----------------------------------------------------------------------
 with Ada.Strings.Unbounded;
 with Ada.Exceptions;
+with Ada.Text_IO;
 
 with Util.Strings;
+with Util.Beans.Objects;
 
 with Text;
 with Yaml.Source.File;
@@ -253,6 +255,113 @@ package body Gen.Artifacts.Yaml is
    end Read_Model;
 
    --  ------------------------------
+   --  Save the model in a YAML file.
+   --  ------------------------------
+   procedure Save_Model (Handler : in Artifact;
+                         Path    : in String;
+                         Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                         Context : in out Generator'Class) is
+
+      procedure Write_Description (Comment : in Util.Beans.Objects.Object;
+                                   Indent  : in Ada.Text_IO.Count);
+
+      File : Ada.Text_IO.File_Type;
+
+      --  Write a description field taking into account multi-lines.
+      procedure Write_Description (Comment : in Util.Beans.Objects.Object;
+                                   Indent  : in Ada.Text_IO.Count) is
+         use type Ada.Text_IO.Count;
+
+         Content     : constant String := Util.Beans.Objects.To_String (Comment);
+         Pos, Start  : Positive := Content'First;
+      begin
+         Ada.Text_IO.Set_Col (File, Indent);
+         Ada.Text_IO.Put (File, "description: ");
+         if Util.Strings.Index (Content, ASCII.LF) > 0
+           or Util.Strings.Index (Content, ASCII.CR) > 0
+         then
+            Start := Content'First;
+            Pos   := Content'First;
+            Ada.Text_IO.Put_Line (File, "|");
+            while Pos <= Content'Last loop
+               if Content (Pos) = ASCII.CR or Content (Pos) = ASCII.LF then
+                  Ada.Text_IO.Set_Col (File, Indent + 2);
+                  Ada.Text_IO.Put_Line (File, Content (Start .. Pos - 1));
+                  Start := Pos + 1;
+               end if;
+               Pos := Pos + 1;
+            end loop;
+            if Start < Pos then
+               Ada.Text_IO.Set_Col (File, Indent + 2);
+               Ada.Text_IO.Put_Line (File, Content (Start .. Pos - 1));
+            end if;
+         else
+            Ada.Text_IO.Put (File, Content);
+         end if;
+         Ada.Text_IO.New_Line (File);
+      end Write_Description;
+
+      procedure Write_Field (Item  : in out Gen.Model.Definition'Class;
+                             Name  : in String) is
+         Value : constant Util.Beans.Objects.Object := Item.Get_Value (Name);
+      begin
+         Ada.Text_IO.Put_Line (File, Util.Beans.Objects.To_String (Value));
+      end Write_Field;
+
+      procedure Process_Table (Table : in out Gen.Model.Tables.Table_Definition) is
+
+         Iter : Gen.Model.Tables.Column_List.Cursor := Table.Members.First;
+         Col  : Gen.Model.Tables.Column_Definition_Access;
+      begin
+
+         Ada.Text_IO.Put (File, Table.Get_Name);
+         Ada.Text_IO.Put_Line (File, ":");
+         Ada.Text_IO.Put_Line (File, "  type: entity");
+         Ada.Text_IO.Put (File, "  table: ");
+         Write_Field (Table, "sqlName");
+         Ada.Text_IO.Put (File, "  schema: ");
+         Ada.Text_IO.New_Line (File);
+         Ada.Text_IO.Put (File, "  readOnly: ");
+         Ada.Text_IO.New_Line (File);
+         Write_Description (Table.Comment, 3);
+         Ada.Text_IO.Put (File, "  indexes: ");
+         Ada.Text_IO.New_Line (File);
+         Ada.Text_IO.Put (File, "  id: ");
+         Ada.Text_IO.New_Line (File);
+         Ada.Text_IO.Put (File, "  fields: ");
+         Ada.Text_IO.New_Line (File);
+
+         for Col of Table.Members loop
+
+            Ada.Text_IO.Put (File, "    ");
+            Ada.Text_IO.Put (File, Col.Get_Name);
+            Ada.Text_IO.Put_Line (File, ":");
+            Ada.Text_IO.Put (File, "      type: ");
+            Ada.Text_IO.Put (File, Col.Get_Type);
+            Ada.Text_IO.New_Line (File);
+            if Col.Length > 0 then
+               Ada.Text_IO.Put (File, "      length:");
+               Ada.Text_IO.Put_Line (File, Positive'Image (Col.Length));
+               Ada.Text_IO.New_Line (File);
+            end if;
+            Ada.Text_IO.Put (File, "      column: ");
+            Write_Field (Col.all, "sqlName");
+            Ada.Text_IO.Put (File, "      not-null: ");
+            Ada.Text_IO.Put_Line (File, (if Col.Not_Null then "true" else "false"));
+            Ada.Text_IO.Put (File, "      unique: ");
+            Ada.Text_IO.Put_Line (File, (if Col.Unique then "true" else "false"));
+            Write_Description (Col.Comment, 5);
+            Gen.Model.Tables.Column_List.Next (Iter);
+         end loop;
+      end Process_Table;
+
+   begin
+      Ada.Text_IO.Create (File, Ada.Text_IO.Out_File, Path);
+      Model.Iterate_Tables (Process_Table'Access);
+      Ada.Text_IO.Close (File);
+   end Save_Model;
+
+   --  ------------------------------
    --  Prepare the generation of the package:
    --  o identify the column types which are used
    --  o build a list of package for the with clauses.
@@ -262,15 +371,22 @@ package body Gen.Artifacts.Yaml is
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
       pragma Unreferenced (Handler);
+      Iter : Gen.Model.Packages.Package_Cursor;
+      Pkg  : Gen.Model.Packages.Package_Definition_Access;
+
    begin
       Log.Debug ("Preparing the model for query");
 
-      if Model.Has_Packages then
-         Context.Add_Generation (Name => GEN_PACKAGE_SPEC, Mode => ITERATION_PACKAGE,
-                                 Mapping => Gen.Model.Mappings.ADA_MAPPING);
-         Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE,
-                                 Mapping => Gen.Model.Mappings.ADA_MAPPING);
-      end if;
+      Handler.Save_Model (Path    => "model.yaml",
+                          Model   => Model,
+                          Context => Context);
+      --
+--        Iter := Gen.Model.Packages.First (Model);
+--        while Gen.Model.Packages.Has_Element (Iter) loop
+--           Pkg := Gen.Model.Packages.Element (Iter);
+--
+--           Gen.Model.Packages.Next (Iter);
+--        end loop;
    end Prepare;
 
 end Gen.Artifacts.Yaml;

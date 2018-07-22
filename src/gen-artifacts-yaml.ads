@@ -38,6 +38,12 @@ package Gen.Artifacts.Yaml is
                          Model         : in out Gen.Model.Packages.Model_Definition;
                          Context       : in out Generator'Class);
 
+   --  Save the model in a YAML file.
+   procedure Save_Model (Handler : in Artifact;
+                         Path    : in String;
+                         Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                         Context : in out Generator'Class);
+
 private
 
    type Artifact is new Gen.Artifacts.Artifact with null record;

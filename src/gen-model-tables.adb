@@ -385,7 +385,7 @@ package body Gen.Model.Tables is
       elsif Name = "type" then
          return Util.Beans.Objects.To_Object (From.Type_Name);
 
-      elsif Name = "table" then
+      elsif Name = "table" or Name = "sqlName" then
          return Util.Beans.Objects.To_Object (From.Table_Name);
 
       elsif Name = "keyCount" then

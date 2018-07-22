@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-list -- List bean interface for model objects
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,43 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 package body Gen.Model.List is
+
+   --  ------------------------------
+   --  Make an iterator for the list.
+   --  ------------------------------
+   function Iterate (Container : in List_Definition)
+                     return List_Iterator.Forward_Iterator'Class is
+   begin
+      return Result : constant Iterator := (List => Container.Self);
+   end Iterate;
+
+   --  ------------------------------
+   --  Make an iterator for the list.
+   --  ------------------------------
+   function Element_Value (Container : in List_Definition;
+                           Pos       : in Cursor)
+                           return T_Access is
+      pragma Unreferenced (Container);
+   begin
+      return Element (Pos);
+   end Element_Value;
+
+   overriding
+   function First (Object : in Iterator) return Cursor is
+   begin
+      return Object.List.First;
+   end First;
+
+   overriding
+   function Next (Object : in Iterator;
+                  Pos    : in Cursor) return Cursor is
+      pragma Unreferenced (Object);
+
+      C : Cursor := Pos;
+   begin
+      Next (C);
+      return C;
+   end Next;
 
    --  ------------------------------
    --  Compare the two definitions.

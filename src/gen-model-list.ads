@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-list -- List bean interface for model objects
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ with Util.Beans.Objects;
 with Util.Beans.Basic;
 with Gen.Model;
 with Ada.Containers.Vectors;
+with Ada.Iterator_Interfaces;
 
 generic
    type T is new Gen.Model.Definition with private;
@@ -48,7 +49,21 @@ package Gen.Model.List is
    procedure Next (Position : in out Cursor)
      renames Vectors.Next;
 
-   type List_Definition is limited new Util.Beans.Basic.List_Bean with private;
+   type List_Definition is limited new Util.Beans.Basic.List_Bean with private
+     with Default_Iterator  => Iterate,
+     Iterator_Element  => T_Access,
+     Constant_Indexing => Element_Value;
+
+   package List_Iterator is
+     new Ada.Iterator_Interfaces (Cursor, Has_Element);
+
+   --  Make an iterator for the list.
+   function Iterate (Container : in List_Definition)
+      return List_Iterator.Forward_Iterator'Class;
+
+   --  Get the iterator element.
+   function Element_Value (Container : in List_Definition;
+                           Pos       : in Cursor) return T_Access;
 
    --  Get the first item of the list
    function First (Def : List_Definition) return Cursor;
@@ -93,10 +108,25 @@ package Gen.Model.List is
                       Process : not null access procedure (Item : in T_Access));
 
 private
+
+   type List_Definition_Access is access all List_Definition;
+
    type List_Definition is limited new Util.Beans.Basic.List_Bean with record
+      Self       : List_Definition_Access := List_Definition'Unchecked_Access;
       Nodes      : Vectors.Vector;
       Row        : Natural := 0;
       Value_Bean : Util.Beans.Objects.Object;
    end record;
+
+   type Iterator is limited new List_Iterator.Forward_Iterator with record
+      List : List_Definition_Access;
+   end record;
+
+   overriding
+   function First (Object : Iterator) return Cursor;
+
+   overriding
+   function Next (Object : Iterator;
+                  Pos    : Cursor) return Cursor;
 
 end Gen.Model.List;

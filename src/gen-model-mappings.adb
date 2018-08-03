@@ -119,12 +119,14 @@ package body Gen.Model.Mappings is
          Mapping := Mapping_Maps.Element (Pos);
       else
          Mapping := new Mapping_Definition;
+         Mapping.Set_Name (From);
          Types.Insert (Name, Mapping);
       end if;
       if Allow_Null then
          Mapping.Allow_Null := new Mapping_Definition;
          Mapping.Allow_Null.Target := To_Unbounded_String (Target);
          Mapping.Allow_Null.Kind := Kind;
+         Mapping.Allow_Null.Nullable := True;
          if not Found then
             Mapping.Target := To_Unbounded_String (Target);
             Mapping.Kind   := Kind;

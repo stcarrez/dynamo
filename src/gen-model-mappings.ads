@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012, 2015 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,6 +57,9 @@ package Gen.Model.Mappings is
    function Find_Type (Name       : in Ada.Strings.Unbounded.Unbounded_String;
                        Allow_Null : in Boolean)
                        return Mapping_Definition_Access;
+
+   --  Get the type name.
+   function Get_Type_Name (From : Mapping_Definition) return String;
 
    procedure Register_Type (Name    : in String;
                             Mapping : in Mapping_Definition_Access;

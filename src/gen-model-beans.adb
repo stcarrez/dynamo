@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-beans -- Ada Bean declarations
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,7 +49,7 @@ package body Gen.Model.Beans is
                             Column : out Gen.Model.Tables.Column_Definition_Access) is
    begin
       Column := new Gen.Model.Tables.Column_Definition;
-      Column.Name     := Name;
+      Column.Set_Name (Name);
       Column.Sql_Name := Name;
       Column.Number   := Bean.Members.Get_Count;
       Column.Table    := Bean'Unchecked_Access;
@@ -63,7 +63,7 @@ package body Gen.Model.Beans is
       Bean : constant Bean_Definition_Access := new Bean_Definition;
    begin
       Bean.Kind := Mappings.T_BEAN;
-      Bean.Name := Name;
+      Bean.Set_Name (Name);
       declare
          Pos : constant Natural := Index (Bean.Name, ".", Ada.Strings.Backward);
       begin

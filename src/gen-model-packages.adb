@@ -137,7 +137,7 @@ package body Gen.Model.Packages is
       Enum.Package_Def.Enums.Append (Enum.all'Access);
       Enum.Package_Def.Types.Include (Enum.Name, Enum.all'Access);
       O.Enums.Append (Enum.all'Access);
-      Gen.Model.Mappings.Register_Type (To_String (Enum.Name), Enum.all'Access,
+      Gen.Model.Mappings.Register_Type (Enum.Get_Name, Enum.all'Access,
                                         Gen.Model.Mappings.T_ENUM);
    end Register_Enum;
 
@@ -203,7 +203,7 @@ package body Gen.Model.Packages is
             Base_Name := Translate (Name, Map);
 
             Result := new Package_Definition;
-            Result.Name  := Name;
+            Result.Set_Name (Name);
             Result.Model := O'Unchecked_Access;
             Result.Tables_Bean := Util.Beans.Objects.To_Object (Result.Tables'Access,
                                                                 Util.Beans.Objects.STATIC);

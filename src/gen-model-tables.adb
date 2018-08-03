@@ -196,6 +196,21 @@ package body Gen.Model.Tables is
    end Set_Type;
 
    --  ------------------------------
+   --  Set the SQL length of the column.
+   --  ------------------------------
+   procedure Set_Sql_Length (Into  : in out Column_Definition;
+                             Value : in String;
+                             Log   : in out Util.Log.Logging'Class) is
+   begin
+      Into.Sql_Length := Positive'Value (Value);
+
+   exception
+      when others =>
+         Log.Error (Into.Get_Location & ": SQL length '" & Value
+                    & "' for column '" & Into.Get_Name & "' must be a number");
+   end Set_Sql_Length;
+
+   --  ------------------------------
    --  Returns the column type mapping.
    --  ------------------------------
    function Get_Type_Mapping (From : in Column_Definition)

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012, 2015 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,6 +60,36 @@ package body Gen.Model.Mappings is
          return Definition (From).Get_Value (Name);
       end if;
    end Get_Value;
+
+   --  ------------------------------
+   --  Get the type name.
+   --  ------------------------------
+   function Get_Type_Name (From : Mapping_Definition) return String is
+   begin
+      case From.Kind is
+         when T_BOOLEAN =>
+            return "boolean";
+
+         when T_INTEGER =>
+            return "integer";
+
+         when T_DATE =>
+            return "date";
+
+         when T_IDENTIFIER =>
+            return "identifier";
+
+         when T_STRING =>
+            return "string";
+
+         when T_ENUM =>
+            return From.Get_Name;
+
+         when others =>
+            return From.Get_Name;
+
+      end case;
+   end Get_Type_Name;
 
    --  ------------------------------
    --  Find the mapping for the given type name.

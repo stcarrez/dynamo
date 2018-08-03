@@ -99,6 +99,11 @@ package Gen.Model.Tables is
    overriding
    procedure Prepare (O : in out Column_Definition);
 
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   overriding
+   procedure Validate (Def : in out Column_Definition;
+                       Log : in out Util.Log.Logging'Class);
+
    --  Returns true if the column type is a basic type.
    function Is_Basic_Type (From : Column_Definition) return Boolean;
 
@@ -188,6 +193,11 @@ package Gen.Model.Tables is
    --  Prepare the generation of the model.
    overriding
    procedure Prepare (O : in out Table_Definition);
+
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   overriding
+   procedure Validate (Def : in out Table_Definition;
+                       Log : in out Util.Log.Logging'Class);
 
    --  Initialize the table definition instance.
    overriding

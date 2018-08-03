@@ -157,4 +157,15 @@ package body Gen.Model is
       end loop;
    end Initialize;
 
+   --  ------------------------------
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   --  ------------------------------
+   procedure Validate (Def : in out Definition;
+                       Log : in out Util.Log.Logging'Class) is
+   begin
+      if Ada.Strings.Unbounded.Length (Def.Def_Name) = 0 then
+         Log.Error (Def.Get_Location & ": name is empty");
+      end if;
+   end Validate;
+
 end Gen.Model;

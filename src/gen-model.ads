@@ -18,6 +18,7 @@
 with Ada.Finalization;
 with Ada.Strings.Unbounded;
 
+with Util.Log;
 with Util.Beans.Basic;
 with Util.Beans.Objects;
 with Util.Beans.Objects.Maps;
@@ -82,6 +83,10 @@ package Gen.Model is
    procedure Initialize (Def  : in out Definition;
                          Name : in Ada.Strings.Unbounded.Unbounded_String;
                          Node : in DOM.Core.Node);
+
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   procedure Validate (Def : in out Definition;
+                       Log : in out Util.Log.Logging'Class);
 
 private
 

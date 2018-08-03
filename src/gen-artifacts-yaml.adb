@@ -69,7 +69,9 @@ package body Gen.Artifacts.Yaml is
                                           Element_Type_Access => Node_Info_Access);
 
    procedure Process_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
-                              Stack : in out Node_Stack.Stack);
+                              Stack : in out Node_Stack.Stack;
+                              File  : in String;
+                              Loc   : in Mark);
 
    procedure Read_Scalar (Node  : in Node_Info_Access;
                           Name  : in String;
@@ -119,8 +121,15 @@ package body Gen.Artifacts.Yaml is
       end case;
    end Read_Scalar;
 
-   procedure Process_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
-                              Stack : in out Node_Stack.Stack) is
+   procedure Process_Mapping (Model    : in out Gen.Model.Packages.Model_Definition;
+                              Stack    : in out Node_Stack.Stack;
+                              File     : in String;
+                              Loc      : in Mark) is
+
+      function Location return String is
+         (File & ":" & Util.Strings.Image (Loc.Line) & ":"
+                     & Util.Strings.Image (Loc.Column));
+
       Node     : Node_Info_Access;
       New_Node : Node_Info_Access;
    begin
@@ -132,6 +141,7 @@ package body Gen.Artifacts.Yaml is
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
                New_Node.Table := Gen.Model.Tables.Create_Table (Node.Name);
+               New_Node.Table.Set_Location (Location);
                New_Node.State := IN_TABLE;
                Model.Register_Table (New_Node.Table);
 
@@ -157,6 +167,7 @@ package body Gen.Artifacts.Yaml is
 
             when IN_COLUMNS =>
                Node.Table.Add_Column (Node.Name, Node.Col);
+               Node.Col.Set_Location (Location);
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
                New_Node.Table := Node.Table;
@@ -164,6 +175,7 @@ package body Gen.Artifacts.Yaml is
 
             when IN_KEYS =>
                Node.Table.Add_Column (Node.Name, Node.Col);
+               Node.Col.Set_Location (Location);
                Node.Col.Is_Key := True;
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
@@ -232,7 +244,7 @@ package body Gen.Artifacts.Yaml is
                Node_Stack.Pop (Stack);
 
             when Mapping_Start =>
-               Process_Mapping (Model, Stack);
+               Process_Mapping (Model, Stack, File, P.Current_Lexer_Token_Start);
 
             when Mapping_End =>
                Node_Stack.Pop (Stack);
@@ -309,6 +321,8 @@ package body Gen.Artifacts.Yaml is
       end Write_Field;
 
       procedure Write_Column (Col : in Gen.Model.Tables.Column_Definition'Class) is
+         use type Gen.Model.Mappings.Mapping_Definition_Access;
+
          Col_Type : Gen.Model.Mappings.Mapping_Definition_Access;
       begin
          Col_Type := Col.Get_Type_Mapping;
@@ -316,7 +330,9 @@ package body Gen.Artifacts.Yaml is
          Ada.Text_IO.Put (File, Col.Get_Name);
          Ada.Text_IO.Put_Line (File, ":");
          Ada.Text_IO.Put (File, "      type: ");
-         Ada.Text_IO.Put (File, Ada.Strings.Unbounded.To_String (Col_Type.Name));
+         if Col_Type /= null then
+            Ada.Text_IO.Put (File, Ada.Strings.Unbounded.To_String (Col_Type.Name));
+         end if;
          Ada.Text_IO.New_Line (File);
          if Col.Is_Variable_Length then
             Ada.Text_IO.Put (File, "      length:");
@@ -324,7 +340,7 @@ package body Gen.Artifacts.Yaml is
          end if;
          Ada.Text_IO.Put (File, "      column: ");
          Write_Field (Col, "sqlName");
-         if Col_Type.Nullable then
+         if Col_Type /= null and then Col_Type.Nullable then
             Ada.Text_IO.Put_Line (File, "       nullable: true");
          end if;
          Ada.Text_IO.Put (File, "      not-null: ");

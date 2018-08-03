@@ -229,7 +229,7 @@ package body Gen.Model.Projects is
    begin
       Project      := new Project_Definition;
       Project.Path := To_Unbounded_String (Path);
-      Project.Name := To_Unbounded_String (Name);
+      Project.Set_Name (Name);
       Log.Info ("Creating project {0} - {1}", Name, Path);
       Project_Definition'Class (Into).Add_Project (Project);
    end Create_Project;
@@ -586,7 +586,7 @@ package body Gen.Model.Projects is
       begin
          case Field is
          when FIELD_PROJECT_NAME =>
-            Project.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+            Project.Set_Name (Util.Beans.Objects.To_Unbounded_String (Value));
 
          when FIELD_MODULE_NAME =>
             declare
@@ -635,7 +635,7 @@ package body Gen.Model.Projects is
          --  Set the context for Set_Member.
          Project_Mapper.Set_Context (Prj_Mapper, Loader'Access);
 
-         Project.Name := Null_Unbounded_String;
+         Project.Set_Name (Null_Unbounded_String);
 
          --  Read the XML query file.
          Reader.Parse (Path, Prj_Mapper);
@@ -839,7 +839,7 @@ package body Gen.Model.Projects is
                         if Result.Project = null then
                            Result.Project      := new Project_Definition;
                            Result.Project.Path := To_Unbounded_String ("");
-                           Result.Project.Name := Result.Name;
+                           Result.Project.Set_Name (Result.Name);
                            Pending.Append (Result);
                         end if;
                         declare
@@ -885,7 +885,7 @@ package body Gen.Model.Projects is
                         end if;
                         Item.Project      := new Project_Definition;
                         Item.Project.Path := To_Unbounded_String (Dynamo);
-                        Item.Project.Name := Item.Name;
+                        Item.Project.Set_Name (Item.Name);
                         Pending.Append (Item);
                         Log.Info ("Preparing to load {0} from {1}", Name, Dynamo);
                      else

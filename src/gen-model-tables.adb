@@ -156,6 +156,23 @@ package body Gen.Model.Tables is
    end Is_Basic_Type;
 
    --  ------------------------------
+   --  Returns true if the column is using a variable length (ex: a string).
+   --  ------------------------------
+   function Is_Variable_Length (From : Column_Definition) return Boolean is
+      use type Gen.Model.Mappings.Mapping_Definition_Access;
+      use type Gen.Model.Mappings.Basic_Type;
+
+      T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
+      Name : constant String := To_String (From.Type_Name);
+   begin
+      if T /= null then
+         return T.Kind = Gen.Model.Mappings.T_STRING;
+      else
+         return false;
+      end if;
+   end Is_Variable_Length;
+
+   --  ------------------------------
    --  Returns the column type.
    --  ------------------------------
    function Get_Type (From : in Column_Definition) return String is
@@ -176,9 +193,6 @@ package body Gen.Model.Tables is
                        Name : in String) is
    begin
       Into.Type_Name := To_Unbounded_String (Name);
---        if Length (Into.Sql_Type) = 0 then
---           Into.Sql_Type  := To_Unbounded_String (Name);
---        end if;
    end Set_Type;
 
    --  ------------------------------

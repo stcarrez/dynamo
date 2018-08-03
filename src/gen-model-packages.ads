@@ -42,6 +42,11 @@ package Gen.Model.Packages is
    type Model_Definition is new Definition with private;
    type Model_Definition_Access is access all Model_Definition'Class;
 
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   overriding
+   procedure Validate (Def : in out Model_Definition;
+                       Log : in out Util.Log.Logging'Class);
+
    --  ------------------------------
    --  Package Definition
    --  ------------------------------
@@ -61,6 +66,11 @@ package Gen.Model.Packages is
    --  o build a list of package for the with clauses.
    overriding
    procedure Prepare (O : in out Package_Definition);
+
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   overriding
+   procedure Validate (Def : in out Package_Definition;
+                       Log : in out Util.Log.Logging'Class);
 
    --  Initialize the package instance
    overriding

@@ -64,8 +64,12 @@ package Gen.Generator is
    --  Report an error and set the exit status accordingly
    procedure Error (H : in out Handler;
                     Message : in String;
-                    Arg1    : in String := "";
+                    Arg1    : in String;
                     Arg2    : in String := "");
+
+   overriding
+   procedure Error (H       : in out Handler;
+                    Message : in String);
 
    --  Report an info message.
    procedure Info (H : in out Handler;

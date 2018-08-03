@@ -557,7 +557,7 @@ package body Gen.Generator is
          H.Error ("The project name should be a valid Ada identifier ([A-Za-z][A-Za-z0-9_]*).");
          raise Fatal_Error with "Invalid project name: " & Name;
       end if;
-      H.Project.Name := To_Unbounded_String (Name);
+      H.Project.Set_Name (Name);
       H.Set_Global ("projectName", Name);
       if Pos > Name'First then
          H.Set_Global ("projectAdaName", Name (Name'First .. Pos - 1));

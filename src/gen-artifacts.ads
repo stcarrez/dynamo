@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts -- Artifacts for Code Generator
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 with Ada.Finalization;
 
 with DOM.Core;
+with Util.Log;
 with Gen.Model;
 with Gen.Model.Packages;
 with Gen.Model.Projects;
@@ -28,12 +29,12 @@ package Gen.Artifacts is
 
    type Iteration_Mode is (ITERATION_PACKAGE, ITERATION_TABLE);
 
-   type Generator is limited interface;
+   type Generator is limited interface and Util.Log.Logging;
 
    --  Report an error and set the exit status accordingly
    procedure Error (Handler : in out Generator;
                     Message : in String;
-                    Arg1    : in String := "";
+                    Arg1    : in String;
                     Arg2    : in String := "") is abstract;
 
    --  Get the config directory path.

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012, 2013, 2014, 2015, 2016 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -871,7 +871,7 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare class attribute {0}", Column.Name);
 
          if Msg'Length /= 0 then
-            Context.Error (To_String (Column.Location) & ": " & Msg);
+            Context.Error (Column.Get_Location & ": " & Msg);
          end if;
 
          Table.Add_Column (Column.Name, C);
@@ -910,7 +910,7 @@ package body Gen.Artifacts.XMI is
                elsif C.Type_Name = "String" and not C.Not_Null then
                   C.Type_Name := To_Unbounded_String ("Nullable_String");
                elsif not C.Not_Null then
-                  Context.Error (To_String (Column.Location) &
+                  Context.Error (Column.Get_Location &
                                    ": In table " & To_String (Table.Name) &
                                    ", column '{1}' uses not nullable type '{0}'",
                                  To_String (C.Type_Name), To_String (Column.Name));
@@ -925,7 +925,7 @@ package body Gen.Artifacts.XMI is
 
                   exception
                      when others =>
-                        Context.Error (To_String (Column.Location) &
+                        Context.Error (Column.Get_Location &
                                          ": SQL length '{0}' for column '{1}' must be a number",
                                        Len, To_String (Column.Name));
                   end;
@@ -945,7 +945,7 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare class attribute {0}", Column.Name);
 
          if Msg'Length /= 0 then
-            Context.Error (To_String (Column.Location) & ": " & Msg);
+            Context.Error (Column.Get_Location & ": " & Msg);
          end if;
 
          Bean.Add_Attribute (Column.Name, C);
@@ -976,10 +976,10 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare class association {0}", Assoc.Name);
 
          if Msg'Length /= 0 then
-            Context.Error (To_String (Assoc.Location) & ": " & Msg);
+            Context.Error (Assoc.Get_Location & ": " & Msg);
          end if;
          if Assoc.Multiplicity_Upper /= 1 then
-            Context.Error (To_String (Assoc.Location) &
+            Context.Error (Assoc.Get_Location &
                              ": multiple association '{0}' for table '{1}' is not supported.",
                            To_String (Assoc.Name), Table.Get_Name);
          else
@@ -1025,7 +1025,7 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare class operation {0}", Op.Name);
 
          if Msg'Length /= 0 then
-            Context.Error (To_String (Op.Location) & ": " & Msg);
+            Context.Error (Op.Get_Location & ": " & Msg);
          end if;
          Table.Add_Operation (Op.Name, Operation);
          Iterate_For_Operation (Operation.all, Op.Elements, Prepare_Parameter'Access);
@@ -1112,7 +1112,7 @@ package body Gen.Artifacts.XMI is
 
             exception
                when others =>
-                  Context.Error (To_String (Item.Location) &
+                  Context.Error (Item.Get_Location &
                                    ": value '{0}' for enum literal '{1}' must be a number",
                                  Value, To_String (Item.Name));
             end;
@@ -1134,7 +1134,7 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare enum {0}", Name);
 
          if Msg'Length > 0 then
-            Context.Error (To_String (Item.Location) & ": " & Msg);
+            Context.Error (Item.Get_Location & ": " & Msg);
          end if;
          Enum := Gen.Model.Enums.Create_Enum (To_Unbounded_String (Name));
          Enum.Set_Comment (Item.Get_Comment);

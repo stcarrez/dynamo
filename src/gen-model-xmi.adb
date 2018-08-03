@@ -315,7 +315,7 @@ package body Gen.Model.XMI is
                        Value : in Util.Beans.Objects.Object) is
    begin
       if not Util.Beans.Objects.Is_Null (Value) then
-         Node.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+         Node.Set_Name (Util.Beans.Objects.To_Unbounded_String (Value));
       end if;
    end Set_Name;
 
@@ -327,15 +327,6 @@ package body Gen.Model.XMI is
    begin
       Node.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Value);
    end Set_XMI_Id;
-
-   --  ------------------------------
-   --  Set the location (file and line) where the model element is defined in the XMI file.
-   --  ------------------------------
-   procedure Set_Location (Node     : in out Model_Element;
-                           Location : in String) is
-   begin
-      Node.Location := Ada.Strings.Unbounded.To_Unbounded_String (Location);
-   end Set_Location;
 
    --  ------------------------------
    --  Validate the node definition as much as we can before the reconcile phase.
@@ -497,7 +488,7 @@ package body Gen.Model.XMI is
       Item : constant Model_Element_Access := Find (Model, Node.Model.all, Node.Ref_Id);
    begin
       if Item /= null then
-         Node.Name   := Item.Name;
+         Node.Set_Name (Item.Name);
          Node.Ref    := Item;
          Node.XMI_Id := Item.XMI_Id;
       end if;
@@ -569,7 +560,7 @@ package body Gen.Model.XMI is
    begin
       Literal := new Literal_Element (Node.Model);
       Literal.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Id);
-      Literal.Name   := Util.Beans.Objects.To_Unbounded_String (Name);
+      Literal.Set_Name (Util.Beans.Objects.To_Unbounded_String (Name));
       Node.Elements.Append (Literal.all'Access);
    end Add_Literal;
 
@@ -884,7 +875,7 @@ package body Gen.Model.XMI is
    begin
       Model_Element (Node).Reconcile (Model);
       if Item /= null then
-         Node.Name := Item.Name;
+         Node.Set_Name (Item.Name);
          if not (Item.all in Tag_Definition_Element'Class) then
             Log.Error ("Element {0} is not a tag definition.  Tag is {1}, reference is {2}",
                        Ada.Strings.Unbounded.To_String (Item.Name),

@@ -44,6 +44,7 @@ package Gen.Model.Mappings is
       Target        : Ada.Strings.Unbounded.Unbounded_String;
       Kind          : Basic_Type := T_INTEGER;
       Allow_Null    : Mapping_Definition_Access;
+      Nullable      : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

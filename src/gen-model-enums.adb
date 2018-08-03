@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-enums -- Enum definitions
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,7 +91,7 @@ package body Gen.Model.Enums is
                         Value : out Value_Definition_Access) is
    begin
       Value := new Value_Definition;
-      Value.Name   := To_Unbounded_String (Name);
+      Value.Set_Name (Name);
       Value.Number := Enum.Values.Get_Count;
       Enum.Values.Append (Value);
    end Add_Value;
@@ -102,7 +102,7 @@ package body Gen.Model.Enums is
    function Create_Enum (Name : in Unbounded_String) return Enum_Definition_Access is
       Enum : constant Enum_Definition_Access := new Enum_Definition;
    begin
-      Enum.Name := Name;
+      Enum.Set_Name (Name);
       declare
          Pos : constant Natural := Index (Enum.Name, ".", Ada.Strings.Backward);
       begin

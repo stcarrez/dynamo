@@ -234,6 +234,37 @@ package body Gen.Model.Tables is
    end Prepare;
 
    --  ------------------------------
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   --  ------------------------------
+   overriding
+   procedure Validate (Def : in out Column_Definition;
+                       Log : in out Util.Log.Logging'Class) is
+      use type Gen.Model.Mappings.Mapping_Definition_Access;
+   begin
+      Definition (Def).Validate (Log);
+      if Def.Type_Name = "DateTime" and not Def.Not_Null then
+         Def.Type_Name := To_Unbounded_String ("Nullable_DateTime");
+      elsif Def.Type_Name = "Time" and not Def.Not_Null then
+         Def.Type_Name := To_Unbounded_String ("Nullable_DateTime");
+      elsif Def.Type_Name = "Integer" and not Def.Not_Null then
+         Def.Type_Name := To_Unbounded_String ("Nullable_Integer");
+      elsif Def.Type_Name = "String" and not Def.Not_Null then
+         Def.Type_Name := To_Unbounded_String ("Nullable_String");
+      elsif not Def.Not_Null and Def.Is_Basic_Type then
+         Log.Error (Def.Get_Location &
+                      ": In table " & To_String (Def.Table.Name) &
+                      ", column '" & To_String (Def.Name) &
+                      "' uses not nullable type '" & To_String (Def.Type_Name) & "'");
+      end if;
+      if Def.Get_Type_Mapping = null then
+         Log.Error (Def.Get_Location &
+                      ": In table " & To_String (Def.Table.Name) &
+                      ", column '" & To_String (Def.Type_Name) &
+                      "' uses unkown type '" & To_String (Def.Type_Name) & "'");
+      end if;
+  end Validate;
+
+   --  ------------------------------
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
@@ -491,6 +522,18 @@ package body Gen.Model.Tables is
          end;
       end if;
    end Prepare;
+
+   --  ------------------------------
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   --  ------------------------------
+   overriding
+   procedure Validate (Def : in out Table_Definition;
+                       Log : in out Util.Log.Logging'Class) is
+   begin
+      for Col of Def.Members loop
+         Col.Validate (Log);
+      end loop;
+   end Validate;
 
    --  ------------------------------
    --  Collect the dependencies to other tables.

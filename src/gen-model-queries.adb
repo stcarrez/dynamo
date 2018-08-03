@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-queries -- XML Mapped Database queries representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -73,7 +73,7 @@ package body Gen.Model.Queries is
                        Sql  : in Unbounded_String) is
       Item : constant Sort_Definition_Access := new Sort_Definition;
    begin
-      Item.Name := Name;
+      Item.Set_Name (Name);
       Item.Sql  := Sql;
       Into.Sorts.Append (Item);
    end Add_Sort;
@@ -124,7 +124,7 @@ package body Gen.Model.Queries is
                         Query  : out Query_Definition_Access) is
    begin
       Query := new Query_Definition;
-      Query.Name := Name;
+      Query.Set_Name (Name);
       Into.Queries.Append (Query.all'Access);
       --  Query.Number := Into.Queries.Get_Count;
    end Add_Query;

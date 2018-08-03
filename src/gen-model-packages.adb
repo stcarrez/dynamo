@@ -426,6 +426,22 @@ package body Gen.Model.Packages is
    end Prepare;
 
    --  ------------------------------
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   --  ------------------------------
+   overriding
+   procedure Validate (Def : in out Package_Definition;
+                       Log : in out Util.Log.Logging'Class) is
+      procedure Validate_Definition (Def : in Definition_Access);
+      procedure Validate_Definition (Def : in Definition_Access) is
+      begin
+         Def.Validate (Log);
+      end Validate_Definition;
+   begin
+      Def.Tables.Iterate (Process => Validate_Definition'Access);
+      Def.Beans.Iterate (Process => Validate_Definition'Access);
+   end Validate;
+
+   --  ------------------------------
    --  Initialize the package instance
    --  ------------------------------
    overriding
@@ -550,14 +566,24 @@ package body Gen.Model.Packages is
    --  ------------------------------
    overriding
    procedure Prepare (O : in out Model_Definition) is
-      Iter : Package_Cursor := O.Packages.First;
    begin
-      while Has_Element (Iter) loop
-         Element (Iter).Prepare;
-         Next (Iter);
+      for P of O.Packages loop
+         P.Prepare;
       end loop;
       O.Tables.Sort;
    end Prepare;
+
+   --  ------------------------------
+   --  Validate the definition by checking and reporting problems to the logger interface.
+   --  ------------------------------
+   overriding
+   procedure Validate (Def : in out Model_Definition;
+                       Log : in out Util.Log.Logging'Class) is
+   begin
+      for P of Def.Packages loop
+         P.Validate (Log);
+      end loop;
+   end Validate;
 
    --  ------------------------------
    --  Get the first package of the model definition.

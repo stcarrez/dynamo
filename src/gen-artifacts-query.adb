@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-query -- Query artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013, 2015, 2016 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2015, 2016, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -183,9 +183,9 @@ package body Gen.Artifacts.Query is
          Query.Set_Table_Name (To_String (Name));
 
          if Name /= "" then
-            Query.Name := Name;
+            Query.Set_Name (Name);
          else
-            Query.Name := To_Unbounded_String (Gen.Utils.Get_Query_Name (Path));
+            Query.Set_Name (Gen.Utils.Get_Query_Name (Path));
          end if;
 
          --  Construct the hash for this column mapping.

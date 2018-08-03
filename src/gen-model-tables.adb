@@ -168,7 +168,7 @@ package body Gen.Model.Tables is
       if T /= null then
          return T.Kind = Gen.Model.Mappings.T_STRING;
       else
-         return false;
+         return False;
       end if;
    end Is_Variable_Length;
 
@@ -280,7 +280,7 @@ package body Gen.Model.Tables is
    begin
       Log.Debug ("Create table {0}", Name);
 
-      Table.Name   := Name;
+      Table.Set_Name (Name);
       Table.Kind   := Gen.Model.Mappings.T_TABLE;
       Table.Target := Name;
       declare
@@ -306,7 +306,7 @@ package body Gen.Model.Tables is
                          Column : out Column_Definition_Access) is
    begin
       Column := new Column_Definition;
-      Column.Name     := Name;
+      Column.Set_Name (Name);
       Column.Sql_Name := Name;
       Column.Number   := Table.Members.Get_Count;
       Column.Table    := Table'Unchecked_Access;
@@ -321,7 +321,7 @@ package body Gen.Model.Tables is
                               Assoc  : out Association_Definition_Access) is
    begin
       Assoc := new Association_Definition;
-      Assoc.Name   := Name;
+      Assoc.Set_Name (Name);
       Assoc.Number := Table.Members.Get_Count;
       Assoc.Table  := Table'Unchecked_Access;
       Table.Members.Append (Assoc.all'Access);
@@ -336,7 +336,7 @@ package body Gen.Model.Tables is
                             Operation : out Model.Operations.Operation_Definition_Access) is
    begin
       Operation := new Model.Operations.Operation_Definition;
-      Operation.Name := Name;
+      Operation.Set_Name (Name);
       Table.Operations.Append (Operation.all'Access);
    end Add_Operation;
 
@@ -448,19 +448,19 @@ package body Gen.Model.Tables is
       C    : Column_Definition_Access;
       T    : Gen.Model.Mappings.Mapping_Definition_Access;
    begin
-      Log.Info ("Prepare table {0}", O.Name);
+      Log.Info ("Prepare table {0}", O.Get_Name);
 
       O.Key_Count := 0;
       while Column_List.Has_Element (Iter) loop
          C := Column_List.Element (Iter);
          C.Prepare;
          if C.Is_Key then
-            Log.Info ("Found key {0}", C.Name);
+            Log.Info ("Found key {0}", C.Get_Name);
             O.Key_Count := O.Key_Count + 1;
             O.Id_Column := C;
          end if;
          if C.Is_Version then
-            Log.Info ("Found version column {0}", C.Name);
+            Log.Info ("Found version column {0}", C.Get_Name);
             O.Version_Column := C;
 
             --  For the <<Version>> columns, do not allow users to modify them.
@@ -533,7 +533,7 @@ package body Gen.Model.Tables is
                              Name  : in String) is
       Pos : constant Natural := Util.Strings.Rindex (Name, '.');
    begin
-      Table.Name := To_Unbounded_String (Name);
+      Table.Set_Name (Name);
       if Pos > 0 then
          Table.Pkg_Name := To_Unbounded_String (Name (Name'First .. Pos - 1));
          Table.Type_Name := To_Unbounded_String (Name (Pos + 1 .. Name'Last));

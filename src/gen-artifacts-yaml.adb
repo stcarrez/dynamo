@@ -73,13 +73,15 @@ package body Gen.Artifacts.Yaml is
                               File  : in String;
                               Loc   : in Mark);
 
-   procedure Read_Scalar (Node  : in Node_Info_Access;
-                          Name  : in String;
-                          Value : in String);
+   procedure Read_Scalar (Node    : in Node_Info_Access;
+                          Name    : in String;
+                          Value   : in String;
+                          Context : in out Generator'Class);
 
-   procedure Read_Scalar (Node  : in Node_Info_Access;
-                          Name  : in String;
-                          Value : in String) is
+   procedure Read_Scalar (Node    : in Node_Info_Access;
+                          Name    : in String;
+                          Value   : in String;
+                          Context : in out Generator'Class) is
    begin
       case Node.State is
          when IN_TABLE =>
@@ -103,7 +105,7 @@ package body Gen.Artifacts.Yaml is
             if Name = "type" then
                Node.Col.Set_Type (Value);
             elsif Name = "length" then
-               Node.Col.Sql_Length := Natural'Value (Value);
+               Node.Col.Set_Sql_Length (Value, Context);
             elsif Name = "column" then
                Node.Col.Sql_Name := To_Unbounded_String (Value);
             elsif Name = "unique" then
@@ -230,7 +232,7 @@ package body Gen.Artifacts.Yaml is
             when Scalar =>
                Node := Node_Stack.Current (Stack);
                if Node.Has_Name then
-                  Read_Scalar (Node, To_String (Node.Name), To_String (Cur.Content));
+                  Read_Scalar (Node, To_String (Node.Name), To_String (Cur.Content), Context);
                   Node.Has_Name := False;
                else
                   Node.Name := Cur.Content;
@@ -331,7 +333,7 @@ package body Gen.Artifacts.Yaml is
          Ada.Text_IO.Put_Line (File, ":");
          Ada.Text_IO.Put (File, "      type: ");
          if Col_Type /= null then
-            Ada.Text_IO.Put (File, Ada.Strings.Unbounded.To_String (Col_Type.Name));
+            Ada.Text_IO.Put (File, Col_Type.Get_Type_Name);
          end if;
          Ada.Text_IO.New_Line (File);
          if Col.Is_Variable_Length then

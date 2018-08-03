@@ -906,15 +906,7 @@ package body Gen.Artifacts.XMI is
                end if;
 
                if Len'Length > 0 then
-                  begin
-                     C.Sql_Length := Positive'Value (Len);
-
-                  exception
-                     when others =>
-                        Context.Error (Column.Get_Location &
-                                         ": SQL length '{0}' for column '{1}' must be a number",
-                                       Len, To_String (Column.Name));
-                  end;
+                  C.Set_Sql_Length (Len, Context);
                end if;
             end;
          end if;

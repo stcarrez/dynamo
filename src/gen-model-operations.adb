@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012, 2016, 2017 Stephane Carrez
+--  Copyright (C) 2012, 2016, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,7 +67,7 @@ package body Gen.Model.Operations is
                             Parameter : out Parameter_Definition_Access) is
    begin
       Parameter := new Parameter_Definition;
-      Parameter.Name := Name;
+      Parameter.Set_Name (Name);
       Parameter.Type_Name := Of_Type;
       Into.Parameters.Append (Parameter);
       if Into.Kind = UNKNOWN and then Of_Type = "ASF.Parts.Part" then

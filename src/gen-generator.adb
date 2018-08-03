@@ -634,10 +634,18 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Error (H : in out Handler;
                     Message : in String;
-                    Arg1    : in String := "";
+                    Arg1    : in String;
                     Arg2    : in String := "") is
    begin
       Log.Error ("error: " & Message, Arg1, Arg2);
+      H.Status := 1;
+   end Error;
+
+   overriding
+   procedure Error (H       : in out Handler;
+                    Message : in String) is
+   begin
+      Log.Error ("error: " & Message);
       H.Status := 1;
    end Error;
 
@@ -910,6 +918,7 @@ package body Gen.Generator is
       if H.Distrib.Is_Initialized then
          H.Distrib.Prepare (Model => H.Model, Context => H);
       end if;
+      H.Model.Validate (H);
    end Prepare;
 
    --  ------------------------------

@@ -63,7 +63,7 @@
         <from>Natural</from>
         <to>Natural</to>
     </mapping>
-    <mapping type="integer">
+    <mapping type="identifier">
         <from>ADO.Identifier</from>
         <from>Identifier</from>
         <from>identifier</from>

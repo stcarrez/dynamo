@@ -103,7 +103,7 @@
         <from>Entity_Type</from>
 	<to>INTEGER</to>
     </mapping>
-    <mapping>
+    <mapping type='identifier'>
         <from>ADO.Identifier</from>
         <from>Identifier</from>
         <from>identifier</from>

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -163,9 +163,6 @@ package Gen.Model.XMI is
 
       --  The parent model element;
       Parent        : Model_Element_Access;
-
-      --  The location (file and line) where the definition was found in the XMI file.
-      Location      : Ada.Strings.Unbounded.Unbounded_String;
    end record;
 
    --  Get the element type.
@@ -188,10 +185,6 @@ package Gen.Model.XMI is
    --  Set the model XMI unique id.
    procedure Set_XMI_Id (Node  : in out Model_Element;
                          Value : in Util.Beans.Objects.Object);
-
-   --  Set the location (file and line) where the model element is defined in the XMI file.
-   procedure Set_Location (Node     : in out Model_Element;
-                           Location : in String);
 
    --  Validate the node definition as much as we can before the reconcile phase.
    --  If an error is detected, return a message.  Returns an empty string if everything is ok.

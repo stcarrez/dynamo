@@ -301,12 +301,47 @@ package body Gen.Artifacts.Yaml is
          Ada.Text_IO.New_Line (File);
       end Write_Description;
 
-      procedure Write_Field (Item  : in out Gen.Model.Definition'Class;
+      procedure Write_Field (Item  : in Gen.Model.Definition'Class;
                              Name  : in String) is
          Value : constant Util.Beans.Objects.Object := Item.Get_Value (Name);
       begin
          Ada.Text_IO.Put_Line (File, Util.Beans.Objects.To_String (Value));
       end Write_Field;
+
+      procedure Write_Column (Col : in Gen.Model.Tables.Column_Definition'Class) is
+         Col_Type : Gen.Model.Mappings.Mapping_Definition_Access;
+      begin
+         Col_Type := Col.Get_Type_Mapping;
+         Ada.Text_IO.Put (File, "    ");
+         Ada.Text_IO.Put (File, Col.Get_Name);
+         Ada.Text_IO.Put_Line (File, ":");
+         Ada.Text_IO.Put (File, "      type: ");
+         Ada.Text_IO.Put (File, Ada.Strings.Unbounded.To_String (Col_Type.Name));
+         Ada.Text_IO.New_Line (File);
+         if Col.Is_Variable_Length then
+            Ada.Text_IO.Put (File, "      length:");
+            Ada.Text_IO.Put_Line (File, Positive'Image (Col.Sql_Length));
+         end if;
+         Ada.Text_IO.Put (File, "      column: ");
+         Write_Field (Col, "sqlName");
+         if Col_Type.Nullable then
+            Ada.Text_IO.Put_Line (File, "       nullable: true");
+         end if;
+         Ada.Text_IO.Put (File, "      not-null: ");
+         Ada.Text_IO.Put_Line (File, (if Col.Not_Null then "true" else "false"));
+         if Col.Is_Version then
+            Ada.Text_IO.Put_Line (File, "      version: true");
+         end if;
+         if not Col.Is_Updated then
+            Ada.Text_IO.Put_Line (File, "      readonly: true");
+         end if;
+         if Col.Is_Auditable then
+            Ada.Text_IO.Put_Line (File, "      auditable: true");
+         end if;
+         Ada.Text_IO.Put (File, "      unique: ");
+         Ada.Text_IO.Put_Line (File, (if Col.Unique then "true" else "false"));
+         Write_Description (Col.Get_Comment, 7);
+      end Write_Column;
 
       procedure Process_Table (Table : in out Gen.Model.Tables.Table_Definition) is
 
@@ -319,39 +354,25 @@ package body Gen.Artifacts.Yaml is
          Ada.Text_IO.Put_Line (File, "  type: entity");
          Ada.Text_IO.Put (File, "  table: ");
          Write_Field (Table, "sqlName");
-         Ada.Text_IO.Put (File, "  schema: ");
-         Ada.Text_IO.New_Line (File);
-         Ada.Text_IO.Put (File, "  readOnly: ");
-         Ada.Text_IO.New_Line (File);
-         Write_Description (Table.Comment, 3);
+         Write_Description (Table.Get_Comment, 3);
          Ada.Text_IO.Put (File, "  indexes: ");
          Ada.Text_IO.New_Line (File);
          Ada.Text_IO.Put (File, "  id: ");
          Ada.Text_IO.New_Line (File);
+
+         for Col of Table.Members loop
+            if Col.Is_Key then
+               Write_Column (Col.all);
+            end if;
+         end loop;
+
          Ada.Text_IO.Put (File, "  fields: ");
          Ada.Text_IO.New_Line (File);
 
          for Col of Table.Members loop
-
-            Ada.Text_IO.Put (File, "    ");
-            Ada.Text_IO.Put (File, Col.Get_Name);
-            Ada.Text_IO.Put_Line (File, ":");
-            Ada.Text_IO.Put (File, "      type: ");
-            Ada.Text_IO.Put (File, Col.Get_Type);
-            Ada.Text_IO.New_Line (File);
-            if Col.Length > 0 then
-               Ada.Text_IO.Put (File, "      length:");
-               Ada.Text_IO.Put_Line (File, Positive'Image (Col.Length));
-               Ada.Text_IO.New_Line (File);
+            if not Col.Is_Key then
+               Write_Column (Col.all);
             end if;
-            Ada.Text_IO.Put (File, "      column: ");
-            Write_Field (Col.all, "sqlName");
-            Ada.Text_IO.Put (File, "      not-null: ");
-            Ada.Text_IO.Put_Line (File, (if Col.Not_Null then "true" else "false"));
-            Ada.Text_IO.Put (File, "      unique: ");
-            Ada.Text_IO.Put_Line (File, (if Col.Unique then "true" else "false"));
-            Write_Description (Col.Comment, 5);
-            Gen.Model.Tables.Column_List.Next (Iter);
          end loop;
       end Process_Table;
 
@@ -370,7 +391,6 @@ package body Gen.Artifacts.Yaml is
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
-      pragma Unreferenced (Handler);
       Iter : Gen.Model.Packages.Package_Cursor;
       Pkg  : Gen.Model.Packages.Package_Definition_Access;
 

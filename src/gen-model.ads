@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model -- Model for Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,12 +33,7 @@ package Gen.Model is
    --  Model Definition
    --  ------------------------------
    type Definition is new Ada.Finalization.Limited_Controlled
-     and Util.Beans.Basic.Readonly_Bean with record
-      Row_Index  : Natural;
-      Name       : Ada.Strings.Unbounded.Unbounded_String;
-      Attrs      : Util.Beans.Objects.Maps.Map_Bean;
-      Comment    : Util.Beans.Objects.Object;
-   end record;
+     and Util.Beans.Basic.Readonly_Bean with private;
    type Definition_Access is access all Definition'Class;
 
    --  Prepare the generation of the model.
@@ -46,6 +41,13 @@ package Gen.Model is
 
    --  Get the object unique name.
    function Get_Name (From : in Definition) return String;
+   function Name (From : in Definition) return Ada.Strings.Unbounded.Unbounded_String;
+
+   --  Set the object unique name.
+   procedure Set_Name (Def  : in out Definition;
+                       Name : in String);
+   procedure Set_Name (Def  : in out Definition;
+                       Name : in Ada.Strings.Unbounded.Unbounded_String);
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
@@ -66,9 +68,30 @@ package Gen.Model is
    procedure Set_Comment (Def     : in out Definition;
                           Comment : in String);
 
+   --  Get the comment associated with the element.
+   function Get_Comment (Def : in Definition) return Util.Beans.Objects.Object;
+
+   --  Set the location (file and line) where the model element is defined in the XMI file.
+   procedure Set_Location (Node     : in out Definition;
+                           Location : in String);
+
+   --  Get the location file and line where the model element is defined.
+   function Get_Location (Node : in Definition) return String;
+
    --  Initialize the definition from the DOM node attributes.
    procedure Initialize (Def  : in out Definition;
                          Name : in Ada.Strings.Unbounded.Unbounded_String;
                          Node : in DOM.Core.Node);
+
+private
+
+   type Definition is new Ada.Finalization.Limited_Controlled
+     and Util.Beans.Basic.Readonly_Bean with record
+      Row_Index  : Natural;
+      Def_Name   : Ada.Strings.Unbounded.Unbounded_String;
+      Attrs      : Util.Beans.Objects.Maps.Map_Bean;
+      Comment    : Util.Beans.Objects.Object;
+      Location   : Ada.Strings.Unbounded.Unbounded_String;
+   end record;
 
 end Gen.Model;

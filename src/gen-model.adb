@@ -29,8 +29,28 @@ package body Gen.Model is
    --  ------------------------------
    function Get_Name (From : in Definition) return String is
    begin
-      return Ada.Strings.Unbounded.To_String (From.Name);
+      return Ada.Strings.Unbounded.To_String (From.Def_Name);
    end Get_Name;
+
+   function Name (From : in Definition) return Ada.Strings.Unbounded.Unbounded_String is
+   begin
+      return From.Def_Name;
+   end Name;
+
+   --  ------------------------------
+   --  Set the object unique name.
+   --  ------------------------------
+   procedure Set_Name (Def  : in out Definition;
+                       Name : in String) is
+   begin
+      Def.Def_Name := Ada.Strings.Unbounded.To_Unbounded_String (Name);
+   end Set_Name;
+
+   procedure Set_Name (Def  : in out Definition;
+                       Name : in Ada.Strings.Unbounded.Unbounded_String) is
+   begin
+      Def.Def_Name := Name;
+   end Set_Name;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -46,7 +66,7 @@ package body Gen.Model is
          return Util.Beans.Objects.To_Object (From.Row_Index);
 
       elsif Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Name);
+         return Util.Beans.Objects.To_Object (From.Def_Name);
       else
          return From.Attrs.Get_Value (Name);
       end if;
@@ -84,6 +104,31 @@ package body Gen.Model is
    end Set_Comment;
 
    --  ------------------------------
+   --  Get the comment associated with the element.
+   --  ------------------------------
+   function Get_Comment (Def : in Definition) return Util.Beans.Objects.Object is
+   begin
+      return Def.Comment;
+   end Get_Comment;
+
+   --  ------------------------------
+   --  Set the location (file and line) where the model element is defined in the XMI file.
+   --  ------------------------------
+   procedure Set_Location (Node     : in out Definition;
+                           Location : in String) is
+   begin
+      Node.Location := Ada.Strings.Unbounded.To_Unbounded_String (Location);
+   end Set_Location;
+
+   --  ------------------------------
+   --  Get the location file and line where the model element is defined.
+   --  ------------------------------
+   function Get_Location (Node : in Definition) return String is
+   begin
+      return Ada.Strings.Unbounded.To_String (Node.Location);
+   end Get_Location;
+
+   --  ------------------------------
    --  Initialize the definition from the DOM node attributes.
    --  ------------------------------
    procedure Initialize (Def  : in out Definition;
@@ -93,7 +138,7 @@ package body Gen.Model is
 
       Attrs : constant DOM.Core.Named_Node_Map := DOM.Core.Nodes.Attributes (Node);
    begin
-      Def.Name := Name;
+      Def.Def_Name := Name;
       Def.Comment := Util.Beans.Objects.To_Object (Gen.Utils.Get_Comment (Node));
 
       for I in 0 .. DOM.Core.Nodes.Length (Attrs) loop

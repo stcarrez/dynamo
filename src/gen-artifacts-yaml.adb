@@ -52,10 +52,12 @@ package body Gen.Artifacts.Yaml is
                        IN_TYPE,
                        IN_TABLE,
                        IN_COLUMNS,
+                       IN_ONE_TO_MANY,
                        IN_ENUM,
                        IN_ENUM_VALUES,
                        IN_KEYS,
                        IN_COLUMN,
+                       IN_ASSOCIATION,
                        IN_KEY,
                        IN_UNKOWN);
 
@@ -67,6 +69,7 @@ package body Gen.Artifacts.Yaml is
       Enum     : Gen.Model.Enums.Enum_Definition_Access;
       Table    : Gen.Model.Tables.Table_Definition_Access;
       Col      : Gen.Model.Tables.Column_Definition_Access;
+      Assoc    : Gen.Model.Tables.Association_Definition_Access;
    end record;
 
    type Node_Info_Access is access all Node_Info;
@@ -129,9 +132,11 @@ package body Gen.Artifacts.Yaml is
                Node.Table.Table_Name := To_Unbounded_String (Value);
             elsif Name = "description" or Name = "comment" then
                Node.Table.Set_Comment (Value);
+            elsif Name = "hasList" then
+               Node.Table.Has_List := Value = "true" or Value = "yes";
             end if;
 
-         when IN_COLUMN | IN_KEY =>
+         when IN_COLUMN | IN_KEY | IN_ASSOCIATION =>
             if Node.Col = null then
                return;
             end if;
@@ -151,6 +156,12 @@ package body Gen.Artifacts.Yaml is
                Node.Col.Not_Null := Value = "true" or Value = "yes";
             elsif Name = "description" or Name = "comment" then
                Node.Col.Set_Comment (Value);
+            elsif Name = "version" then
+               Node.Col.Is_Version := Value = "true" or Value = "yes";
+            elsif Name = "readonly" then
+               Node.Col.Is_Updated := Value = "false" or Value = "no";
+            elsif Name = "useForeignKey" and Node.Assoc /= null then
+               Node.Assoc.Use_Foreign_Key_Type := Value = "true" or Value = "yes";
             end if;
 
          when IN_ENUM_VALUES =>
@@ -187,10 +198,6 @@ package body Gen.Artifacts.Yaml is
                New_Node := Node_Stack.Current (Stack);
                New_Node.Tag := Node.Name;
                New_Node.State := IN_TYPE;
-               --  New_Node.Table := Gen.Model.Tables.Create_Table (Node.Name);
-               --  New_Node.Table.Set_Location (Location);
-               --  New_Node.State := IN_TABLE;
-               --  Model.Register_Table (New_Node.Table);
 
             when IN_TABLE =>
                if Node.Name = "fields" or Node.Name = "properties" then
@@ -204,6 +211,12 @@ package body Gen.Artifacts.Yaml is
                   New_Node := Node_Stack.Current (Stack);
                   New_Node.Table := Node.Table;
                   New_Node.State := IN_KEYS;
+
+               elsif Node.Name = "oneToMany" then
+                  Node_Stack.Push (Stack);
+                  New_Node := Node_Stack.Current (Stack);
+                  New_Node.Table := Node.Table;
+                  New_Node.State := IN_ONE_TO_MANY;
 
                else
                   Node_Stack.Push (Stack);
@@ -219,6 +232,15 @@ package body Gen.Artifacts.Yaml is
                New_Node := Node_Stack.Current (Stack);
                New_Node.Table := Node.Table;
                New_Node.State := IN_COLUMN;
+
+            when IN_ONE_TO_MANY =>
+               Node_Stack.Push (Stack);
+               New_Node := Node_Stack.Current (Stack);
+               New_Node.Table := Node.Table;
+               New_Node.State := IN_ASSOCIATION;
+               Node.Table.Add_Association (Node.Name, New_Node.Assoc);
+               New_Node.Assoc.Set_Location (Location);
+               New_Node.Col := New_Node.Assoc.all'Access;
 
             when IN_KEYS =>
                Node.Table.Add_Column (Node.Name, Node.Col);
@@ -409,6 +431,45 @@ package body Gen.Artifacts.Yaml is
          Write_Description (Col.Get_Comment, 7);
       end Write_Column;
 
+      procedure Write_Association (Col : in Gen.Model.Tables.Association_Definition'Class) is
+         use type Gen.Model.Mappings.Mapping_Definition_Access;
+
+         Col_Type : Gen.Model.Mappings.Mapping_Definition_Access;
+      begin
+         Col_Type := Col.Get_Type_Mapping;
+         Ada.Text_IO.Put (File, "    ");
+         Ada.Text_IO.Put (File, Col.Get_Name);
+         Ada.Text_IO.Put_Line (File, ":");
+         Ada.Text_IO.Put (File, "      type: ");
+         if Col_Type /= null then
+            Ada.Text_IO.Put (File, Col_Type.Get_Type_Name);
+         end if;
+         Ada.Text_IO.New_Line (File);
+         if Col.Is_Variable_Length then
+            Ada.Text_IO.Put (File, "      length:");
+            Ada.Text_IO.Put_Line (File, Positive'Image (Col.Sql_Length));
+         end if;
+         Ada.Text_IO.Put (File, "      column: ");
+         Write_Field (Col, "sqlName");
+         if Col_Type /= null and then Col_Type.Nullable then
+            Ada.Text_IO.Put_Line (File, "      nullable: true");
+         end if;
+         Ada.Text_IO.Put (File, "      not-null: ");
+         Ada.Text_IO.Put_Line (File, (if Col.Not_Null then "true" else "false"));
+         if not Col.Is_Updated then
+            Ada.Text_IO.Put_Line (File, "      readonly: true");
+         end if;
+         if Col.Is_Auditable then
+            Ada.Text_IO.Put_Line (File, "      auditable: true");
+         end if;
+         if Col.Use_Foreign_Key_Type then
+            Ada.Text_IO.Put_Line (File, "      useForeignKey: true");
+         end if;
+         Ada.Text_IO.Put (File, "      unique: ");
+         Ada.Text_IO.Put_Line (File, (if Col.Unique then "true" else "false"));
+         Write_Description (Col.Get_Comment, 7);
+      end Write_Association;
+
       procedure Process_Table (Table : in out Gen.Model.Tables.Table_Definition) is
 
          Iter : Gen.Model.Tables.Column_List.Cursor := Table.Members.First;
@@ -421,6 +482,8 @@ package body Gen.Artifacts.Yaml is
          Ada.Text_IO.Put (File, "  table: ");
          Write_Field (Table, "sqlName");
          Write_Description (Table.Get_Comment, 3);
+         Ada.Text_IO.Put (File, "  hasList: ");
+         Ada.Text_IO.Put_Line (File, (if Table.Has_List then "true" else "false"));
          Ada.Text_IO.Put (File, "  indexes: ");
          Ada.Text_IO.New_Line (File);
          Ada.Text_IO.Put (File, "  id: ");
@@ -436,10 +499,21 @@ package body Gen.Artifacts.Yaml is
          Ada.Text_IO.New_Line (File);
 
          for Col of Table.Members loop
-            if not Col.Is_Key then
+            if not Col.Is_Key and then
+              not (Col.all in Gen.Model.Tables.Association_Definition'Class)
+            then
                Write_Column (Col.all);
             end if;
          end loop;
+
+         if Table.Has_Associations then
+            Ada.Text_IO.Put_Line (File, "  oneToMany:");
+            for Col of Table.Members loop
+               if (Col.all in Gen.Model.Tables.Association_Definition'Class) then
+                  Write_Association (Gen.Model.Tables.Association_Definition'Class (Col.all));
+               end if;
+            end loop;
+         end if;
       end Process_Table;
 
       procedure Process_Enum (Enum : in out Gen.Model.Enums.Enum_Definition) is

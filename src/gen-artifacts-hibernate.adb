@@ -102,9 +102,9 @@ package body Gen.Artifacts.Hibernate is
          T : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "type");
       begin
          if T /= null then
-            C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (T, "name"));
+            C.Set_Type (Gen.Utils.Get_Normalized_Type (T, "name"));
          else
-            C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (Column, "type"));
+            C.Set_Type (Gen.Utils.Get_Normalized_Type (Column, "type"));
          end if;
 
          Log.Debug ("Register column {0} of type {1}", Name, To_String (C.Type_Name));
@@ -143,7 +143,7 @@ package body Gen.Artifacts.Hibernate is
       declare
          N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
       begin
-         C.Type_Name := Gen.Utils.Get_Attribute (Column, "class");
+         C.Set_Type (Gen.Utils.Get_Attribute (Column, "class"));
          if N /= null then
             C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
             C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");

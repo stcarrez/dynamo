@@ -105,27 +105,7 @@ package body Gen.Generator is
       use Gen.Model.Mappings;
       use Gen.Model;
 
-      function To_Ada_Type (Value : in String) return Util.Beans.Objects.Object;
-
       Column : Column_Definition_Access := null;
-
-      function To_Ada_Type (Value : in String) return Util.Beans.Objects.Object is
-      begin
-         if Value = "String" or Value = "java.lang.String" then
-            return Util.Beans.Objects.To_Object
-              (String '("Ada.Strings.Unbounded.Unbounded_String"));
-         elsif Value = "Integer" or Value = "int" or Value = "java.lang.Integer" then
-            return Util.Beans.Objects.To_Object (String '("Integer"));
-         elsif Value = "Timestamp" then
-            if Util.Beans.Objects.To_Integer (Param) = 2 then
-               return Util.Beans.Objects.To_Object (String '("Time"));
-            else
-               return Util.Beans.Objects.To_Object (String '("Ada.Calendar.Time"));
-            end if;
-         else
-            return Util.Beans.Objects.To_Object (Value);
-         end if;
-      end To_Ada_Type;
 
       Ptr : constant access Util.Beans.Basic.Readonly_Bean'Class
         := Util.Beans.Objects.To_Bean (Value);
@@ -159,14 +139,14 @@ package body Gen.Generator is
                return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref");
             end if;
          elsif Column.Is_Basic_Type then
-            return To_Ada_Type (Column.Get_Type);
+            return Util.Beans.Objects.To_Object (Column.Get_Type);
          elsif Util.Beans.Objects.To_Integer (Param) = 1 then
             return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
          else
             return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref");
          end if;
       else
-         return To_Ada_Type (Util.Beans.Objects.To_String (Value));
+         return Value;
       end if;
    end To_Ada_Type;
 

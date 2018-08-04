@@ -94,6 +94,9 @@ package body Gen.Artifacts.Mappings is
          elsif Kind = "blob" or To = "ADO.Blob_Ref" then
             Kind_Type := Gen.Model.Mappings.T_BLOB;
 
+         elsif Kind = "entity_type" or To = "ADO.Entity_Type" then
+            Kind_Type := Gen.Model.Mappings.T_ENTITY_TYPE;
+
          else
             Kind_Type := Gen.Model.Mappings.T_INTEGER;
          end if;

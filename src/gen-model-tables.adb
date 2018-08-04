@@ -255,6 +255,7 @@ package body Gen.Model.Tables is
    procedure Validate (Def : in out Column_Definition;
                        Log : in out Util.Log.Logging'Class) is
       use type Gen.Model.Mappings.Mapping_Definition_Access;
+      T : Gen.Model.Mappings.Mapping_Definition_Access := Def.Get_Type_Mapping;
    begin
       Definition (Def).Validate (Log);
       if Def.Type_Name = "DateTime" and not Def.Not_Null then
@@ -265,7 +266,9 @@ package body Gen.Model.Tables is
          Def.Type_Name := To_Unbounded_String ("Nullable_Integer");
       elsif Def.Type_Name = "String" and not Def.Not_Null then
          Def.Type_Name := To_Unbounded_String ("Nullable_String");
-      elsif not Def.Not_Null and Def.Is_Basic_Type then
+      elsif not Def.Not_Null and then Def.Is_Basic_Type
+        and then T /= null and then T.Allow_Null = null
+      then
          Log.Error (Def.Get_Location &
                       ": In table " & To_String (Def.Table.Name) &
                       ", column '" & To_String (Def.Name) &
@@ -274,7 +277,7 @@ package body Gen.Model.Tables is
       if Def.Get_Type_Mapping = null then
          Log.Error (Def.Get_Location &
                       ": In table " & To_String (Def.Table.Name) &
-                      ", column '" & To_String (Def.Type_Name) &
+                      ", column '" & To_String (Def.Name) &
                       "' uses unkown type '" & To_String (Def.Type_Name) & "'");
       end if;
   end Validate;

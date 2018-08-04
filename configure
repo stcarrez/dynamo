@@ -1906,8 +1906,8 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
 # Current release settings
-GEN_MAJOR_VERSION=0
-GEN_MINOR_VERSION=9
+GEN_MAJOR_VERSION=1
+GEN_MINOR_VERSION=0
 GEN_MICRO_VERSION=0
 GEN_VERSION=$GEN_MAJOR_VERSION.$GEN_MINOR_VERSION.$GEN_MICRO_VERSION
 

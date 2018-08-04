@@ -760,6 +760,7 @@ package body Gen.Generator is
          H.Read_Mappings;
       end if;
 
+      Gen.Model.Mappings.Set_Mapping_Name (Gen.Model.Mappings.ADA_MAPPING);
       if Silent then
          Log.Debug ("Reading model file '{0}'", File);
       else

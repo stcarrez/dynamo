@@ -267,6 +267,24 @@ package body Gen.Model.Packages is
    end Iterate_Tables;
 
    --  ------------------------------
+   --  Iterate over the model enums.
+   --  ------------------------------
+   procedure Iterate_Enums (Model   : in Model_Definition;
+                             Process : not null access
+                               procedure (Item : in out Enums.Enum_Definition)) is
+
+      procedure Process_Definition (Item : in Definition_Access);
+
+      procedure Process_Definition (Item : in Definition_Access) is
+      begin
+         Process (Enums.Enum_Definition (Item.all));
+      end Process_Definition;
+
+   begin
+      Model.Enums.Iterate (Process_Definition'Access);
+   end Iterate_Enums;
+
+   --  ------------------------------
    --  Prepare the generation of the package:
    --  o identify the column types which are used
    --  o build a list of package for the with clauses.

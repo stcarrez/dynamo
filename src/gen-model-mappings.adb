@@ -43,7 +43,7 @@ package body Gen.Model.Mappings is
       elsif Name = "isBoolean" then
          return Util.Beans.Objects.To_Object (From.Kind = T_BOOLEAN);
       elsif Name = "isInteger" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_INTEGER);
+         return Util.Beans.Objects.To_Object (From.Kind = T_INTEGER or From.Kind = T_ENTITY_TYPE);
       elsif Name = "isString" then
          return Util.Beans.Objects.To_Object (From.Kind = T_STRING);
       elsif Name = "isIdentifier" then
@@ -81,6 +81,9 @@ package body Gen.Model.Mappings is
 
          when T_STRING =>
             return "string";
+
+         when T_ENTITY_TYPE =>
+            return "entity_type";
 
          when T_ENUM =>
             return From.Get_Name;

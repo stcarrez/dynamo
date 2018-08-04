@@ -27,6 +27,7 @@ with Yaml.Source.File;
 with Yaml.Parser;
 
 with Gen.Configs;
+with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
 
@@ -38,7 +39,7 @@ use Yaml;
 package body Gen.Artifacts.Yaml is
 
    function To_String (S : Ada.Strings.Unbounded.Unbounded_String) return String
-     renames Ada.Strings.Unbounded.To_String;
+                       renames Ada.Strings.Unbounded.To_String;
 
    use Ada.Strings.Unbounded;
    use Gen.Model;
@@ -48,8 +49,11 @@ package body Gen.Artifacts.Yaml is
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Yaml");
 
    type State_Type is (IN_ROOT,
+                       IN_TYPE,
                        IN_TABLE,
                        IN_COLUMNS,
+                       IN_ENUM,
+                       IN_ENUM_VALUES,
                        IN_KEYS,
                        IN_COLUMN,
                        IN_KEY,
@@ -58,7 +62,9 @@ package body Gen.Artifacts.Yaml is
    type Node_Info is record
       State    : State_Type := IN_UNKOWN;
       Name     : Text.Reference;
+      Tag      : Text.Reference;
       Has_Name : Boolean := False;
+      Enum     : Gen.Model.Enums.Enum_Definition_Access;
       Table    : Gen.Model.Tables.Table_Definition_Access;
       Col      : Gen.Model.Tables.Column_Definition_Access;
    end record;
@@ -67,23 +73,52 @@ package body Gen.Artifacts.Yaml is
 
    package Node_Stack is new Util.Stacks (Element_Type        => Node_Info,
                                           Element_Type_Access => Node_Info_Access);
+   --  Read the UML/XMI model file.
+   procedure Read_Model (Handler       : in out Artifact;
+                         File          : in String;
+                         Model         : in out Gen.Model.Packages.Model_Definition;
+                         Context       : in out Generator'Class) is
+      pragma Unreferenced (Handler);
 
-   procedure Process_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
-                              Stack : in out Node_Stack.Stack;
-                              File  : in String;
-                              Loc   : in Mark);
+      procedure Process_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
+                                 Stack : in out Node_Stack.Stack;
+                                 File  : in String;
+                                 Loc   : in Mark);
 
-   procedure Read_Scalar (Node    : in Node_Info_Access;
-                          Name    : in String;
-                          Value   : in String;
-                          Context : in out Generator'Class);
+      procedure Read_Scalar (Node    : in Node_Info_Access;
+                             Name    : in String;
+                             Value   : in String;
+                             Loc     : in Mark);
 
-   procedure Read_Scalar (Node    : in Node_Info_Access;
-                          Name    : in String;
-                          Value   : in String;
-                          Context : in out Generator'Class) is
-   begin
-      case Node.State is
+      procedure Read_Scalar (Node    : in Node_Info_Access;
+                             Name    : in String;
+                             Value   : in String;
+                             Loc     : in Mark) is
+
+         use type Gen.Model.Enums.Enum_Definition_Access;
+
+         function Location return String is
+           (File & ":" & Util.Strings.Image (Loc.Line) & ":"
+            & Util.Strings.Image (Loc.Column));
+
+         New_Value : Gen.Model.Enums.Value_Definition_Access;
+      begin
+         case Node.State is
+         when IN_TYPE =>
+            if Name = "type" then
+               if Value = "enum" then
+                  Node.Enum := Gen.Model.Enums.Create_Enum (Node.Tag);
+                  Node.Enum.Set_Location (Location);
+                  Node.State := IN_ENUM;
+                  Model.Register_Enum (Node.Enum);
+               else
+                  Node.Table := Gen.Model.Tables.Create_Table (Node.Tag);
+                  Node.Table.Set_Location (Location);
+                  Node.State := IN_TABLE;
+                  Model.Register_Table (Node.Table);
+               end if;
+            end if;
+
          when IN_TABLE =>
             if Node.Table = null then
                return;
@@ -118,34 +153,44 @@ package body Gen.Artifacts.Yaml is
                Node.Col.Set_Comment (Value);
             end if;
 
+         when IN_ENUM_VALUES =>
+            if Node.Enum = null then
+               return;
+            end if;
+            Node.Enum.Add_Value (Name, New_Value);
+            New_Value.Set_Location (Location);
+            New_Value.Number := Natural'Value (Value);
+
          when others =>
             Log.Error ("Scalar {0}: {1} not handled", Name, Value);
-      end case;
-   end Read_Scalar;
+         end case;
+      end Read_Scalar;
 
-   procedure Process_Mapping (Model    : in out Gen.Model.Packages.Model_Definition;
-                              Stack    : in out Node_Stack.Stack;
-                              File     : in String;
-                              Loc      : in Mark) is
+      procedure Process_Mapping (Model    : in out Gen.Model.Packages.Model_Definition;
+                                 Stack    : in out Node_Stack.Stack;
+                                 File     : in String;
+                                 Loc      : in Mark) is
 
-      function Location return String is
-         (File & ":" & Util.Strings.Image (Loc.Line) & ":"
-                     & Util.Strings.Image (Loc.Column));
+         function Location return String is
+           (File & ":" & Util.Strings.Image (Loc.Line) & ":"
+            & Util.Strings.Image (Loc.Column));
 
-      Node     : Node_Info_Access;
-      New_Node : Node_Info_Access;
-   begin
-      Node := Node_Stack.Current (Stack);
-      if Node.Has_Name then
-         Node.Has_Name := False;
-         case Node.State is
+         Node     : Node_Info_Access;
+         New_Node : Node_Info_Access;
+      begin
+         Node := Node_Stack.Current (Stack);
+         if Node.Has_Name then
+            Node.Has_Name := False;
+            case Node.State is
             when IN_ROOT =>
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
-               New_Node.Table := Gen.Model.Tables.Create_Table (Node.Name);
-               New_Node.Table.Set_Location (Location);
-               New_Node.State := IN_TABLE;
-               Model.Register_Table (New_Node.Table);
+               New_Node.Tag := Node.Name;
+               New_Node.State := IN_TYPE;
+               --  New_Node.Table := Gen.Model.Tables.Create_Table (Node.Name);
+               --  New_Node.Table.Set_Location (Location);
+               --  New_Node.State := IN_TABLE;
+               --  Model.Register_Table (New_Node.Table);
 
             when IN_TABLE =>
                if Node.Name = "fields" or Node.Name = "properties" then
@@ -184,24 +229,27 @@ package body Gen.Artifacts.Yaml is
                New_Node.Table := Node.Table;
                New_Node.State := IN_KEY;
 
+            when IN_ENUM =>
+               if Node.Name = "values" then
+                  Node_Stack.Push (Stack);
+                  New_Node := Node_Stack.Current (Stack);
+                  New_Node.Table := Node.Table;
+                  New_Node.State := IN_ENUM_VALUES;
+
+               end if;
+
             when others =>
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
                New_Node.State := IN_UNKOWN;
 
-         end case;
-      else
-         Node_Stack.Push (Stack);
+            end case;
+         else
+            Node_Stack.Push (Stack);
 
-      end if;
-   end Process_Mapping;
+         end if;
+      end Process_Mapping;
 
-   --  Read the UML/XMI model file.
-   procedure Read_Model (Handler       : in out Artifact;
-                         File          : in String;
-                         Model         : in out Gen.Model.Packages.Model_Definition;
-                         Context       : in out Generator'Class) is
-      pragma Unreferenced (Handler);
 
       Input : Source.Pointer;
       P     : Parser.Instance;
@@ -232,7 +280,7 @@ package body Gen.Artifacts.Yaml is
             when Scalar =>
                Node := Node_Stack.Current (Stack);
                if Node.Has_Name then
-                  Read_Scalar (Node, To_String (Node.Name), To_String (Cur.Content), Context);
+                  Read_Scalar (Node, To_String (Node.Name), To_String (Cur.Content), P.Current_Lexer_Token_Start);
                   Node.Has_Name := False;
                else
                   Node.Name := Cur.Content;
@@ -343,7 +391,7 @@ package body Gen.Artifacts.Yaml is
          Ada.Text_IO.Put (File, "      column: ");
          Write_Field (Col, "sqlName");
          if Col_Type /= null and then Col_Type.Nullable then
-            Ada.Text_IO.Put_Line (File, "       nullable: true");
+            Ada.Text_IO.Put_Line (File, "      nullable: true");
          end if;
          Ada.Text_IO.Put (File, "      not-null: ");
          Ada.Text_IO.Put_Line (File, (if Col.Not_Null then "true" else "false"));
@@ -394,8 +442,25 @@ package body Gen.Artifacts.Yaml is
          end loop;
       end Process_Table;
 
+      procedure Process_Enum (Enum : in out Gen.Model.Enums.Enum_Definition) is
+      begin
+         Ada.Text_IO.Put (File, Enum.Get_Name);
+         Ada.Text_IO.Put_Line (File, ":");
+         Ada.Text_IO.Put_Line (File, "  type: enum");
+         Ada.Text_IO.Put (File, "  values: ");
+         Ada.Text_IO.New_Line (File);
+
+         for Value of Enum.Values loop
+            Ada.Text_IO.Put (File, "    ");
+            Ada.Text_IO.Put (File, Value.Get_Name);
+            Ada.Text_IO.Put (File, ":");
+            Ada.Text_IO.Put_Line (File, Natural'Image (Value.Number));
+         end loop;
+      end Process_Enum;
+
    begin
       Ada.Text_IO.Create (File, Ada.Text_IO.Out_File, Path);
+      Model.Iterate_Enums (Process_Enum'Access);
       Model.Iterate_Tables (Process_Table'Access);
       Ada.Text_IO.Close (File);
    end Save_Model;
@@ -419,12 +484,12 @@ package body Gen.Artifacts.Yaml is
                           Model   => Model,
                           Context => Context);
       --
---        Iter := Gen.Model.Packages.First (Model);
---        while Gen.Model.Packages.Has_Element (Iter) loop
---           Pkg := Gen.Model.Packages.Element (Iter);
---
---           Gen.Model.Packages.Next (Iter);
---        end loop;
+      --        Iter := Gen.Model.Packages.First (Model);
+      --        while Gen.Model.Packages.Has_Element (Iter) loop
+      --           Pkg := Gen.Model.Packages.Element (Iter);
+      --
+      --           Gen.Model.Packages.Next (Iter);
+      --        end loop;
    end Prepare;
 
 end Gen.Artifacts.Yaml;

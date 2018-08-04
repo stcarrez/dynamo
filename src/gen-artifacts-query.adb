@@ -121,7 +121,7 @@ package body Gen.Artifacts.Query is
          Table.Add_Column (Name, C);
          C.Initialize (Name, Column);
 
-         C.Type_Name := To_Unbounded_String (Gen.Utils.Get_Normalized_Type (Column, "type"));
+         C.Set_Type (Gen.Utils.Get_Normalized_Type (Column, "type"));
 
          C.Is_Inserted := False;
          C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);

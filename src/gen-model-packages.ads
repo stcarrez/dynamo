@@ -165,6 +165,11 @@ package Gen.Model.Packages is
                              Process : not null access
                                procedure (Item : in out Tables.Table_Definition));
 
+   --  Iterate over the model enums.
+   procedure Iterate_Enums (Model   : in Model_Definition;
+                             Process : not null access
+                               procedure (Item : in out Enums.Enum_Definition));
+
    --  Prepare the generation of the package:
    --  o identify the column types which are used
    --  o build a list of package for the with clauses.

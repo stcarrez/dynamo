@@ -99,7 +99,7 @@ package body Gen.Model.Tables is
             T     : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
             Table : Table_Definition_Access;
          begin
-            if T.all in Table_Definition'Class then
+            if T /= null and then T.all in Table_Definition'Class then
                Table := Table_Definition'Class (T.all)'Access;
             end if;
             if Table /= null and then Table.Id_Column /= null then

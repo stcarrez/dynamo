@@ -882,7 +882,7 @@ package body Gen.Artifacts.XMI is
                  := Attribute_Element'Class (Column.all)'Access;
             begin
                if Attr.Data_Type /= null then
-                  C.Type_Name := To_Unbounded_String (Attr.Data_Type.Get_Qualified_Name);
+                  C.Set_Type (Attr.Data_Type.Get_Qualified_Name);
                end if;
                C.Not_Null     := Attr.Multiplicity_Lower > 0;
                C.Is_Key       := Column.Has_Stereotype (Handler.PK_Stereotype);
@@ -934,7 +934,7 @@ package body Gen.Artifacts.XMI is
                  := Attribute_Element'Class (Column.all)'Access;
             begin
                if Attr.Data_Type /= null then
-                  C.Type_Name := Attr.Data_Type.Name;
+                  C.Set_Type (To_String (Attr.Data_Type.Name));
                end if;
                C.Not_Null := Attr.Multiplicity_Lower > 0;
             end;
@@ -963,7 +963,7 @@ package body Gen.Artifacts.XMI is
          else
             Table.Add_Association (Assoc.Name, A);
             A.Set_Comment (Assoc.Get_Comment);
-            A.Type_Name := To_Unbounded_String (Assoc.Source_Element.Get_Qualified_Name);
+            A.Set_Type (Assoc.Source_Element.Get_Qualified_Name);
             A.Not_Null  := Assoc.Multiplicity_Lower > 0;
 
             --  If the <<use foreign key>> stereotype is set on the association, to not use

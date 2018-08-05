@@ -55,10 +55,7 @@
   <h:panelGroup rendered="#{column.type.isEnum and not column.isPrimaryKey}">
       Impl.#{fn:capitalize(column.name)} := #{g:adaType(column,1)}'First;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-      Impl.#{fn:capitalize(column.name)}.Is_Null := True;
-  </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isInteger and not column.isPrimaryKey and column.isNull}">
+  <h:panelGroup rendered="#{column.type.isNullable and not column.isPrimaryKey and column.isNull and not column.type.isIdentifier}">
       Impl.#{fn:capitalize(column.name)}.Is_Null := True;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
@@ -128,8 +125,12 @@
       ADO.Objects.Set_Field_Identifier (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
-    <h:panelGroup rendered="#{column.type.isString and column.name ne table.id.name}">
+    <h:panelGroup rendered="#{column.type.isString and column.name ne table.id.name and not column.type.isNullable}">
       ADO.Objects.Set_Field_Unbounded_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{column.type.isString and column.name ne table.id.name and column.type.isNullable}">
+      ADO.Objects.Set_Field_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type' or column.type.name eq 'ADO.Nullable_Entity_Type'}">
@@ -156,8 +157,20 @@
     <h:panelGroup rendered="#{column.type.isString}">
    function Get_#{fn:capitalize(column.name)} (Object : in #{fn:capitalize(table.type)}_Ref)
                  return String is
+      <h:panelGroup rendered="#{column.type.isNullable}">
+      Value : constant ADO.Nullable_String := Object.Get_#{fn:capitalize(column.name)};
+      </h:panelGroup>
    begin
+      <h:panelGroup rendered="#{not column.type.isNullable}">
       return Ada.Strings.Unbounded.To_String (Object.Get_#{fn:capitalize(column.name)});
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isNullable}">
+      if Value.Is_Null then
+          return "";
+      else
+          return Ada.Strings.Unbounded.To_String (Value.Value);
+      end if;
+      </h:panelGroup>
    end Get_#{fn:capitalize(column.name)};
     </h:panelGroup>
 
@@ -516,8 +529,11 @@
   <h:panelGroup rendered="#{column.type.isIdentifier}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isString}">
+  <h:panelGroup rendered="#{column.type.isString and not column.type.isNullable}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isString and column.type.isNullable}">
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_String (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isBoolean}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Boolean (#{column.index});

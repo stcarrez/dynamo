@@ -1,3 +1,7 @@
+Version 1.0     -
+  - Improvement and fixes in the YAML database model files
+  - Add support for Nullable_String type
+
 Version 0.9     - Jul 2018
   - New type ASF.Parts.Part in the Dynamo UML model
   - Add support to generate ASF Upload method in UML Ada beans

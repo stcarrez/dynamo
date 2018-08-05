@@ -120,6 +120,7 @@ package body Gen.Artifacts.Query is
       begin
          Table.Add_Column (Name, C);
          C.Initialize (Name, Column);
+         C.Set_Location (Path);
 
          C.Set_Type (Gen.Utils.Get_Normalized_Type (Column, "type"));
 
@@ -181,6 +182,7 @@ package body Gen.Artifacts.Query is
       begin
          Query.Initialize (Name, Node);
          Query.Set_Table_Name (To_String (Name));
+         Query.Set_Location (Path);
 
          if Name /= "" then
             Query.Set_Name (Name);
@@ -207,6 +209,7 @@ package body Gen.Artifacts.Query is
          C    : Gen.Model.Queries.Query_Definition_Access;
       begin
          Query.Add_Query (Name, C);
+         C.Set_Location (Path);
          Register_Sorts (Query_Definition (C.all), Node);
       end Register_Query;
 
@@ -227,6 +230,7 @@ package body Gen.Artifacts.Query is
          Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "table");
       begin
          Table.Initialize (Name, Node);
+         Table.Set_Location (Path);
          Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
          Table.Pkg_Name  := Pkg;
          Iterate_Mapping (Query_File_Definition (Table.all), Node, "class");

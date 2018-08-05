@@ -56,6 +56,8 @@ package body Gen.Model.Mappings is
          return Util.Beans.Objects.To_Object (From.Kind = T_ENUM);
       elsif Name = "isPrimitiveType" then
          return Util.Beans.Objects.To_Object (From.Kind /= T_TABLE and From.Kind /= T_BLOB);
+      elsif Name = "isNullable" then
+         return Util.Beans.Objects.To_Object (From.Nullable);
       else
          return Definition (From).Get_Value (Name);
       end if;

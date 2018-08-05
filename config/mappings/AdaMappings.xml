@@ -8,14 +8,6 @@
   under default namespace properties languageMappingsUri.
   See http://docs.andromda.org/mappings.html -->
 <mappings name="Ada05">
-    <mapping type="date" allow-null='true'>
-        <from>date</from>
-        <from>Nullable_Time</from>
-        <from>Nullable_Date</from>
-        <from>Nullable_DateTime</from>
-        <from>Nullable_Timestamp</from>
-        <to>ADO.Nullable_Time</to>
-    </mapping>
     <mapping type="date">
         <from>Time</from>
         <from>Date</from>
@@ -31,6 +23,16 @@
         <from>datatype::DateTime</from>
         <from>datatype::Timestamp</from>
         <to>Ada.Calendar.Time</to>
+    </mapping>
+    <mapping type="date" allow-null='true'>
+        <from>date</from>
+        <from>DateTime</from>
+        <from>Timestamp</from>
+        <from>Nullable_Time</from>
+        <from>Nullable_Date</from>
+        <from>Nullable_DateTime</from>
+        <from>Nullable_Timestamp</from>
+        <to>ADO.Nullable_Time</to>
     </mapping>
     <mapping type="integer">
         <from>int</from>

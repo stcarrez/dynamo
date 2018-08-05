@@ -9,6 +9,7 @@
   See http://docs.andromda.org/mappings.html -->
 <mappings name="Ada05">
     <mapping type="date" allow-null='true'>
+        <from>date</from>
         <from>Nullable_Time</from>
         <from>Nullable_Date</from>
         <from>Nullable_DateTime</from>
@@ -18,6 +19,7 @@
     <mapping type="date">
         <from>Time</from>
         <from>Date</from>
+        <from>date</from>
         <from>DateTime</from>
         <from>Timestamp</from>
         <from>PrimitiveTypes::Time</from>
@@ -46,6 +48,7 @@
     </mapping>
     <mapping type="integer" allow-null='true'>
         <from>int</from>
+        <from>integer</from>
         <from>Integer</from>
         <from>PrimitiveTypes::Integer</from>
         <from>datatype::Integer</from>
@@ -71,15 +74,16 @@
         <from>datatype::Identifier</from>
         <to>ADO.Identifier</to>
     </mapping>
-    <mapping type='integer'>
+    <mapping type='entity_type'>
         <from>ADO.Entity_Type</from>
         <from>ADO.Model.Entity_Type</from>
         <from>Entity_Type</from>
+        <from>entity_type</from>
         <from>PrimitiveTypes::Entity_Type</from>
         <from>datatype::Entity_Type</from>
         <to>ADO.Entity_Type</to>
     </mapping>
-    <mapping type='integer' allow-null='true'>
+    <mapping type='entity_type' allow-null='true'>
         <from>ADO.Entity_Type</from>
         <from>ADO.Model.Entity_Type</from>
         <from>Entity_Type</from>
@@ -103,6 +107,11 @@
         <from>String</from>
         <from>string</from>
         <to>Ada.Strings.Unbounded.Unbounded_String</to>
+    </mapping>
+    <mapping type="string" allow-null='true'>
+        <from>String</from>
+        <from>string</from>
+        <to>Nullable_String</to>
     </mapping>
     <mapping>
         <from>PrimitiveTypes::Double</from>

@@ -15,6 +15,7 @@
         <from>Nullable_DateTime</from>
         <from>Nullable_Timestamp</from>
         <from>Time</from>
+        <from>date</from>
         <from>DateTime</from>
         <from>PrimitiveTypes::Time</from>
         <from>PrimitiveTypes::DateTime</from>
@@ -99,10 +100,11 @@
         <from>datatype::Clob</from>
         <to>TEXT</to>
     </mapping>
-    <mapping>
+    <mapping type='entity_type'>
         <from>ADO.Model.Entity_Type</from>
         <from>ADO.Entity_Type</from>
         <from>Entity_Type</from>
+        <from>entity_type</from>
 	<to>INTEGER</to>
     </mapping>
     <mapping type='identifier'>

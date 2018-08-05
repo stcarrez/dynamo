@@ -96,7 +96,7 @@
         </property>
        <property name="entity_id" type="ADO.Identifier" update="false">
             <comment>an optional entity identifier to link the event to another database entity</comment>
-            <column name="entity_id" not-null="false" unique="false" sql-type="BIGINT"/>
+            <column name="entity_id" not-null="true" unique="false" sql-type="BIGINT"/>
         </property>
         <many-to-one name="user" class="Gen.Users.Models.User" foreign-key="ID" not-null="false" lazy="proxy" fetch="select">
             <comment>the user who triggered the message</comment>

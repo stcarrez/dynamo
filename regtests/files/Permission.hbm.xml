@@ -22,7 +22,7 @@
         </property>
         <property name="writeable" type="boolean">
             <comment>whether the entity is writeable</comment>
-            <column name="writeable" not-null="false" unique="false" sql-type="TINYINT"/>
+            <column name="writeable" not-null="true" unique="false" sql-type="TINYINT"/>
         </property>
     </class>
 </hibernate-mapping>

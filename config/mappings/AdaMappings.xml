@@ -76,6 +76,14 @@
         <from>datatype::Identifier</from>
         <to>ADO.Identifier</to>
     </mapping>
+    <mapping type="identifier" allow-null='true'>
+        <from>ADO.Identifier</from>
+        <from>Identifier</from>
+        <from>identifier</from>
+        <from>PrimitiveTypes::Identifier</from>
+        <from>datatype::Identifier</from>
+        <to>ADO.Identifier</to>
+    </mapping>
     <mapping type='entity_type'>
         <from>ADO.Entity_Type</from>
         <from>ADO.Model.Entity_Type</from>
@@ -113,7 +121,7 @@
     <mapping type="string" allow-null='true'>
         <from>String</from>
         <from>string</from>
-        <to>Nullable_String</to>
+        <to>ADO.Nullable_String</to>
     </mapping>
     <mapping>
         <from>PrimitiveTypes::Double</from>

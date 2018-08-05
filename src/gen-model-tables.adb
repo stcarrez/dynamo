@@ -26,6 +26,9 @@ with EL.Variables.Default;
 with Gen.Model.Enums;
 package body Gen.Model.Tables is
 
+   use type Gen.Model.Mappings.Basic_Type;
+   use type Gen.Model.Mappings.Mapping_Definition_Access;
+
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Tables");
 
    --  ------------------------------
@@ -35,7 +38,6 @@ package body Gen.Model.Tables is
    overriding
    function Get_Value (From : Column_Definition;
                        Name : String) return Util.Beans.Objects.Object is
-      use type Gen.Model.Mappings.Mapping_Definition_Access;
    begin
 
       if Name = "type" then
@@ -139,8 +141,6 @@ package body Gen.Model.Tables is
    --  Returns true if the column type is a basic type.
    --  ------------------------------
    function Is_Basic_Type (From : in Column_Definition) return Boolean is
-      use type Gen.Model.Mappings.Mapping_Definition_Access;
-      use type Gen.Model.Mappings.Basic_Type;
 
       T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
       Name : constant String := To_String (From.Type_Name);
@@ -159,11 +159,7 @@ package body Gen.Model.Tables is
    --  Returns true if the column is using a variable length (ex: a string).
    --  ------------------------------
    function Is_Variable_Length (From : Column_Definition) return Boolean is
-      use type Gen.Model.Mappings.Mapping_Definition_Access;
-      use type Gen.Model.Mappings.Basic_Type;
-
       T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
-      Name : constant String := To_String (From.Type_Name);
    begin
       if T /= null then
          return T.Kind = Gen.Model.Mappings.T_STRING;
@@ -176,7 +172,6 @@ package body Gen.Model.Tables is
    --  Returns the column type.
    --  ------------------------------
    function Get_Type (From : in Column_Definition) return String is
-      use type Gen.Model.Mappings.Mapping_Definition_Access;
       T : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
    begin
       if T /= null then
@@ -215,7 +210,6 @@ package body Gen.Model.Tables is
    --  ------------------------------
    function Get_Type_Mapping (From : in Column_Definition)
                               return Gen.Model.Mappings.Mapping_Definition_Access is
-      use type Mappings.Mapping_Definition_Access;
       use type Gen.Model.Packages.Package_Definition_Access;
 
       Result : Gen.Model.Mappings.Mapping_Definition_Access := null;
@@ -233,7 +227,10 @@ package body Gen.Model.Tables is
         and then Result.all in Table_Definition'Class
         and then Table_Definition'Class (Result.all).Id_Column /= null
       then
-         return Table_Definition'Class (Result.all).Id_Column.Get_Type_Mapping;
+         Result := Table_Definition'Class (Result.all).Id_Column.Get_Type_Mapping;
+         if Result /= null and then not From.Not_Null and then Result.Allow_Null /= null then
+            Result := Result.Allow_Null;
+         end if;
       end if;
       return Result;
    end Get_Type_Mapping;
@@ -254,33 +251,24 @@ package body Gen.Model.Tables is
    overriding
    procedure Validate (Def : in out Column_Definition;
                        Log : in out Util.Log.Logging'Class) is
-      use type Gen.Model.Mappings.Mapping_Definition_Access;
-      T : Gen.Model.Mappings.Mapping_Definition_Access := Def.Get_Type_Mapping;
+      T : constant Gen.Model.Mappings.Mapping_Definition_Access := Def.Get_Type_Mapping;
    begin
       Definition (Def).Validate (Log);
-      if Def.Type_Name = "DateTime" and not Def.Not_Null then
-         Def.Type_Name := To_Unbounded_String ("Nullable_DateTime");
-      elsif Def.Type_Name = "Time" and not Def.Not_Null then
-         Def.Type_Name := To_Unbounded_String ("Nullable_DateTime");
-      elsif Def.Type_Name = "Integer" and not Def.Not_Null then
-         Def.Type_Name := To_Unbounded_String ("Nullable_Integer");
-      elsif Def.Type_Name = "String" and not Def.Not_Null then
-         Def.Type_Name := To_Unbounded_String ("Nullable_String");
-      elsif not Def.Not_Null and then Def.Is_Basic_Type
-        and then T /= null and then T.Allow_Null = null
+      if not Def.Not_Null and then Def.Is_Basic_Type
+        and then T /= null and then not T.Nullable
       then
          Log.Error (Def.Get_Location &
                       ": In table " & To_String (Def.Table.Name) &
                       ", column '" & To_String (Def.Name) &
                       "' uses not nullable type '" & To_String (Def.Type_Name) & "'");
       end if;
-      if Def.Get_Type_Mapping = null then
+      if T = null then
          Log.Error (Def.Get_Location &
                       ": In table " & To_String (Def.Table.Name) &
                       ", column '" & To_String (Def.Name) &
                       "' uses unkown type '" & To_String (Def.Type_Name) & "'");
       end if;
-  end Validate;
+   end Validate;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -298,8 +286,6 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    procedure Prepare (O : in out Association_Definition) is
-      use type Gen.Model.Mappings.Mapping_Definition_Access;
-
       T     : constant Gen.Model.Mappings.Mapping_Definition_Access := O.Get_Type_Mapping;
       Table : Table_Definition_Access;
    begin
@@ -491,8 +477,6 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    procedure Prepare (O : in out Table_Definition) is
-      use type Gen.Model.Mappings.Mapping_Definition_Access;
-
       Iter : Column_List.Cursor := O.Members.First;
       C    : Column_Definition_Access;
       T    : Gen.Model.Mappings.Mapping_Definition_Access;

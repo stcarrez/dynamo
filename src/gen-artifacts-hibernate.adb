@@ -32,8 +32,6 @@ with Util.Log.Loggers;
 with Util.Strings.Sets;
 with Util.Encoders;
 
---  The <b>Gen.Artifacts</b> package represents the methods and process to prepare,
---  control and realize the code generation.
 package body Gen.Artifacts.Hibernate is
 
    use Ada.Strings.Unbounded;
@@ -43,194 +41,8 @@ package body Gen.Artifacts.Hibernate is
    use Gen.Configs;
 
    use type DOM.Core.Node;
-   use Util.Log;
 
-   Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Hibernate");
-
-   --  Register the column definition in the table
-   procedure Register_Column (Table  : in out Table_Definition;
-                              Column : in DOM.Core.Node);
-
-   --  Register the association definition in the table
-   procedure Register_Association (Table  : in out Table_Definition;
-                                   Column : in DOM.Core.Node);
-
-   --  Register all the columns defined in the table
-   procedure Register_Columns (Table : in out Table_Definition;
-                               Node  : in DOM.Core.Node);
-
-   procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
-                             Node : in DOM.Core.Node);
-
-   --  Register a new enum definition in the model.
-   procedure Register_Enum (O    : in out Gen.Model.Packages.Model_Definition;
-                            Node : in DOM.Core.Node);
-
-   --  Register the value definition in the enum
-   procedure Register_Enum_Value (Enum  : in out Enum_Definition;
-                                  Value : in DOM.Core.Node);
-
-   --  ------------------------------
-   --  Register the column definition in the table
-   --  ------------------------------
-   procedure Register_Column (Table  : in out Table_Definition;
-                              Column : in DOM.Core.Node) is
-      Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
-      G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
-      C    : Column_Definition_Access;
-   begin
-      Table.Add_Column (Name, C);
-      C.Initialize (Name, Column);
-      C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
-      C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
-
-      if Name = "version" then
-         C.Is_Version  := True;
-
-      elsif Name = "id" then
-         C.Is_Key := True;
-
-      end if;
-
-      if G /= null then
-         C.Generator := Gen.Utils.Get_Attribute (G, "class");
-      end if;
-
-      --  Get the SQL mapping from an optional <column> element.
-      declare
-         N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
-         T : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "type");
-      begin
-         if T /= null then
-            C.Set_Type (Gen.Utils.Get_Normalized_Type (T, "name"));
-         else
-            C.Set_Type (Gen.Utils.Get_Normalized_Type (Column, "type"));
-         end if;
-
-         Log.Debug ("Register column {0} of type {1}", Name, To_String (C.Type_Name));
-         if N /= null then
-            C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
-            C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");
-         else
-            N := Column;
-            C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
-            C.Sql_Type := C.Type_Name;
-         end if;
-         if C.Is_Version then
-            C.Not_Null := True;
-         else
-            C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
-         end if;
-         C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
-      end;
-   end Register_Column;
-
-   --  ------------------------------
-   --  Register the association definition in the table
-   --  ------------------------------
-   procedure Register_Association (Table  : in out Table_Definition;
-                                   Column : in DOM.Core.Node) is
-      Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
-      C    : Association_Definition_Access;
-   begin
-      Log.Debug ("Register association {0}", Name);
-
-      Table.Add_Association (Name, C);
-
-      C.Initialize (Name, Column);
-
-      --  Get the SQL mapping from an optional <column> element.
-      declare
-         N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
-      begin
-         C.Set_Type (Gen.Utils.Get_Attribute (Column, "class"));
-         if N /= null then
-            C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
-            C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");
-         else
-            N := Column;
-            C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
-            C.Sql_Type := C.Type_Name;
-         end if;
-         C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
-         C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
-      end;
-   end Register_Association;
-
-   --  ------------------------------
-   --  Register all the columns defined in the table
-   --  ------------------------------
-   procedure Register_Columns (Table : in out Table_Definition;
-                               Node  : in DOM.Core.Node) is
-      procedure Iterate is
-        new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
-                                     Process => Register_Column);
-      procedure Iterate_Association is
-        new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
-                                     Process => Register_Association);
-   begin
-      Log.Debug ("Register columns from table {0}", Table.Name);
-
-      Iterate (Table, Node, "id");
-      Iterate (Table, Node, "version");
-      Iterate (Table, Node, "property");
-      Iterate_Association (Table, Node, "many-to-one");
-   end Register_Columns;
-
-   --  ------------------------------
-   --  Register a new class definition in the model.
-   --  ------------------------------
-   procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
-                             Node : in DOM.Core.Node) is
-      Name       : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
-      Table_Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "table");
-      Table      : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
-   begin
-      Table.Initialize (Name, Node);
-      Log.Debug ("Register class {0}", Table.Name);
-
-      if Length (Table_Name) > 0 then
-         Table.Table_Name := Table_Name;
-      end if;
-      Table.Has_List := Gen.Utils.Get_Attribute (Node, "list", True);
-      O.Register_Table (Table);
-      Register_Columns (Table_Definition (Table.all), Node);
-   end Register_Class;
-
-   --  ------------------------------
-   --  Register the value definition in the enum
-   --  ------------------------------
-   procedure Register_Enum_Value (Enum  : in out Enum_Definition;
-                                  Value : in DOM.Core.Node) is
-      Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Value, "name");
-      V    : Value_Definition_Access;
-   begin
-      Log.Debug ("Register enum value {0}", Name);
-
-      Enum.Add_Value (To_String (Name), V);
-   end Register_Enum_Value;
-
-   --  ------------------------------
-   --  Register a new enum definition in the model.
-   --  ------------------------------
-   procedure Register_Enum (O    : in out Gen.Model.Packages.Model_Definition;
-                            Node : in DOM.Core.Node) is
-      procedure Iterate is
-        new Gen.Utils.Iterate_Nodes (T       => Enum_Definition,
-                                     Process => Register_Enum_Value);
-
-      Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
-      Enum  : constant Enum_Definition_Access := Gen.Model.Enums.Create_Enum (Name);
-   begin
-      Enum.Initialize (Name, Node);
-      Log.Debug ("Register enum {0}", Enum.Name);
-
-      O.Register_Enum (Enum);
-
-      Log.Debug ("Register enum values from enum {0}", Enum.Name);
-
-      Iterate (Enum_Definition (Enum.all), Node, "value");
-   end Register_Enum;
+   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Hibernate");
 
    --  ------------------------------
    --  After the configuration file is read, processes the node whose root
@@ -245,6 +57,195 @@ package body Gen.Artifacts.Hibernate is
 
       procedure Register_Mapping (Model : in out Gen.Model.Packages.Model_Definition;
                                   Node  : in DOM.Core.Node);
+
+      --  Register the column definition in the table
+      procedure Register_Column (Table  : in out Table_Definition;
+                                 Column : in DOM.Core.Node);
+
+      --  Register the association definition in the table
+      procedure Register_Association (Table  : in out Table_Definition;
+                                      Column : in DOM.Core.Node);
+
+      --  Register all the columns defined in the table
+      procedure Register_Columns (Table : in out Table_Definition;
+                                  Node  : in DOM.Core.Node);
+
+      procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
+                                Node : in DOM.Core.Node);
+
+      --  Register a new enum definition in the model.
+      procedure Register_Enum (O    : in out Gen.Model.Packages.Model_Definition;
+                               Node : in DOM.Core.Node);
+
+      --  Register the value definition in the enum
+      procedure Register_Enum_Value (Enum  : in out Enum_Definition;
+                                     Value : in DOM.Core.Node);
+
+      --  ------------------------------
+      --  Register the column definition in the table
+      --  ------------------------------
+      procedure Register_Column (Table  : in out Table_Definition;
+                                 Column : in DOM.Core.Node) is
+         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
+         G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
+         C    : Column_Definition_Access;
+      begin
+         Table.Add_Column (Name, C);
+         C.Initialize (Name, Column);
+         C.Set_Location (Path);
+         C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
+         C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
+
+         if Name = "version" then
+            C.Is_Version  := True;
+
+         elsif Name = "id" then
+            C.Is_Key := True;
+
+         end if;
+
+         if G /= null then
+            C.Generator := Gen.Utils.Get_Attribute (G, "class");
+         end if;
+
+         --  Get the SQL mapping from an optional <column> element.
+         declare
+            N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
+            T : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "type");
+         begin
+            if T /= null then
+               C.Set_Type (Gen.Utils.Get_Normalized_Type (T, "name"));
+            else
+               C.Set_Type (Gen.Utils.Get_Normalized_Type (Column, "type"));
+            end if;
+
+            Log.Debug ("Register column {0} of type {1}", Name, To_String (C.Type_Name));
+            if N /= null then
+               C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
+               C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");
+            else
+               N := Column;
+               C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
+               C.Sql_Type := C.Type_Name;
+            end if;
+            if C.Is_Version then
+               C.Not_Null := True;
+            else
+               C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
+            end if;
+            C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
+         end;
+      end Register_Column;
+
+      --  ------------------------------
+      --  Register the association definition in the table
+      --  ------------------------------
+      procedure Register_Association (Table  : in out Table_Definition;
+                                      Column : in DOM.Core.Node) is
+         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
+         C    : Association_Definition_Access;
+      begin
+         Log.Debug ("Register association {0}", Name);
+
+         Table.Add_Association (Name, C);
+
+         C.Initialize (Name, Column);
+         C.Set_Location (Path);
+
+         --  Get the SQL mapping from an optional <column> element.
+         declare
+            N : DOM.Core.Node := Gen.Utils.Get_Child (Column, "column");
+         begin
+            C.Set_Type (Gen.Utils.Get_Attribute (Column, "class"));
+            if N /= null then
+               C.Sql_Name := Gen.Utils.Get_Attribute (N, "name");
+               C.Sql_Type := Gen.Utils.Get_Attribute (N, "sql-type");
+            else
+               N := Column;
+               C.Sql_Name := Gen.Utils.Get_Attribute (N, "column");
+               C.Sql_Type := C.Type_Name;
+            end if;
+            C.Not_Null := Gen.Utils.Get_Attribute (N, "not-null");
+            C.Unique   := Gen.Utils.Get_Attribute (N, "unique");
+         end;
+      end Register_Association;
+
+      --  ------------------------------
+      --  Register all the columns defined in the table
+      --  ------------------------------
+      procedure Register_Columns (Table : in out Table_Definition;
+                                  Node  : in DOM.Core.Node) is
+         procedure Iterate is
+           new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
+                                        Process => Register_Column);
+         procedure Iterate_Association is
+           new Gen.Utils.Iterate_Nodes (T       => Table_Definition,
+                                        Process => Register_Association);
+      begin
+         Log.Debug ("Register columns from table {0}", Table.Name);
+
+         Iterate (Table, Node, "id");
+         Iterate (Table, Node, "version");
+         Iterate (Table, Node, "property");
+         Iterate_Association (Table, Node, "many-to-one");
+      end Register_Columns;
+
+      --  ------------------------------
+      --  Register a new class definition in the model.
+      --  ------------------------------
+      procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
+                                Node : in DOM.Core.Node) is
+         Name       : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Table_Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "table");
+         Table      : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
+      begin
+         Table.Initialize (Name, Node);
+         Table.Set_Location (Path);
+         Log.Debug ("Register class {0}", Table.Name);
+
+         if Length (Table_Name) > 0 then
+            Table.Table_Name := Table_Name;
+         end if;
+         Table.Has_List := Gen.Utils.Get_Attribute (Node, "list", True);
+         O.Register_Table (Table);
+         Register_Columns (Table_Definition (Table.all), Node);
+      end Register_Class;
+
+      --  ------------------------------
+      --  Register the value definition in the enum
+      --  ------------------------------
+      procedure Register_Enum_Value (Enum  : in out Enum_Definition;
+                                     Value : in DOM.Core.Node) is
+         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Value, "name");
+         V    : Value_Definition_Access;
+      begin
+         Log.Debug ("Register enum value {0}", Name);
+
+         Enum.Add_Value (To_String (Name), V);
+      end Register_Enum_Value;
+
+      --  ------------------------------
+      --  Register a new enum definition in the model.
+      --  ------------------------------
+      procedure Register_Enum (O    : in out Gen.Model.Packages.Model_Definition;
+                               Node : in DOM.Core.Node) is
+         procedure Iterate is
+           new Gen.Utils.Iterate_Nodes (T       => Enum_Definition,
+                                        Process => Register_Enum_Value);
+
+         Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Enum  : constant Enum_Definition_Access := Gen.Model.Enums.Create_Enum (Name);
+      begin
+         Enum.Initialize (Name, Node);
+         Enum.Set_Location (Path);
+         Log.Debug ("Register enum {0}", Enum.Name);
+
+         O.Register_Enum (Enum);
+
+         Log.Debug ("Register enum values from enum {0}", Enum.Name);
+
+         Iterate (Enum_Definition (Enum.all), Node, "value");
+      end Register_Enum;
 
       --  ------------------------------
       --  Register a model mapping

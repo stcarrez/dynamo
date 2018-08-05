@@ -2,9 +2,9 @@
 
 [![Build Status](https://img.shields.io/jenkins/s/http/jenkins.vacs.fr/Dynamo.svg)](http://jenkins.vacs.fr/job/Dynamo/)
 [![Test Status](https://img.shields.io/jenkins/t/http/jenkins.vacs.fr/Dynamo.svg)](http://jenkins.vacs.fr/job/Dynamo/)
-[![Download](https://img.shields.io/badge/download-0.8.0-brightgreen.svg)](http://download.vacs.fr/dynamo/dynamo-0.8.0.tar.gz)
+[![Download](https://img.shields.io/badge/download-0.9.0-brightgreen.svg)](http://download.vacs.fr/dynamo/dynamo-0.9.0.tar.gz)
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
-![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/0.8.0.svg)
+![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/0.9.0.svg)
 
 This Ada05 application is a code generator used to generate
 an Ada Web Application or database mappings from hibernate-like

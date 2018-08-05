@@ -876,6 +876,7 @@ package body Gen.Artifacts.XMI is
 
          Table.Add_Column (Column.Name, C);
          C.Set_Comment (Column.Get_Comment);
+         C.Set_Location (Column.Get_Location);
          if Column.all in Attribute_Element'Class then
             declare
                Attr : constant Attribute_Element_Access
@@ -928,6 +929,7 @@ package body Gen.Artifacts.XMI is
 
          Bean.Add_Attribute (Column.Name, C);
          C.Set_Comment (Column.Get_Comment);
+         C.Set_Location (Column.Get_Location);
          if Column.all in Attribute_Element'Class then
             declare
                Attr : constant Attribute_Element_Access
@@ -963,6 +965,7 @@ package body Gen.Artifacts.XMI is
          else
             Table.Add_Association (Assoc.Name, A);
             A.Set_Comment (Assoc.Get_Comment);
+            A.Set_Location (Assoc.Get_Location);
             A.Set_Type (Assoc.Source_Element.Get_Qualified_Name);
             A.Not_Null  := Assoc.Multiplicity_Lower > 0;
 
@@ -1006,6 +1009,8 @@ package body Gen.Artifacts.XMI is
             Context.Error (Op.Get_Location & ": " & Msg);
          end if;
          Table.Add_Operation (Op.Name, Operation);
+         Operation.Set_Location (Op.Get_Location);
+         Operation.Set_Comment (Op.Get_Comment);
          Iterate_For_Operation (Operation.all, Op.Elements, Prepare_Parameter'Access);
       end Prepare_Operation;
 
@@ -1030,6 +1035,7 @@ package body Gen.Artifacts.XMI is
             begin
                Log.Info ("Has list: {0}", Has_List);
                Table.Set_Comment (Item.Get_Comment);
+               Table.Set_Location (Item.Get_Location);
                Model.Register_Table (Table);
                Table.Has_List := Has_List = "true";
                Table.Is_Serializable := Item.Has_Stereotype (Handler.Serialize_Stereotype);
@@ -1039,7 +1045,6 @@ package body Gen.Artifacts.XMI is
                end if;
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);
---                 Iterate_For_Table (Table.all, Class.Operations, Prepare_Operation'Access);
             end;
 
          elsif Item.Has_Stereotype (Handler.Bean_Stereotype)
@@ -1051,6 +1056,7 @@ package body Gen.Artifacts.XMI is
             begin
                Model.Register_Bean (Bean);
                Bean.Set_Comment (Item.Get_Comment);
+               Bean.Set_Location (Item.Get_Location);
                Bean.Target := Name;
                Bean.Is_Limited := Item.Has_Stereotype (Handler.Limited_Bean_Stereotype);
                Bean.Is_Serializable := Item.Has_Stereotype (Handler.Serialize_Stereotype);
@@ -1084,6 +1090,7 @@ package body Gen.Artifacts.XMI is
          Log.Info ("Prepare enum literal {0}", Item.Name);
 
          Enum.Add_Value (To_String (Item.Name), Literal);
+
          if Value'Length > 0 then
             begin
                Literal.Number := Natural'Value (Value);
@@ -1116,6 +1123,7 @@ package body Gen.Artifacts.XMI is
          end if;
          Enum := Gen.Model.Enums.Create_Enum (To_Unbounded_String (Name));
          Enum.Set_Comment (Item.Get_Comment);
+         Enum.Set_Location (Item.Get_Location);
          Enum.Sql_Type := To_Unbounded_String (Sql);
          Model.Register_Enum (Enum);
 

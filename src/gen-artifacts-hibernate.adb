@@ -304,6 +304,10 @@ package body Gen.Artifacts.Hibernate is
                                  Mapping => Gen.Model.Mappings.SQLite_MAPPING);
          Context.Add_Generation (Name => GEN_SQLITE_DROP_SQL_FILE, Mode => ITERATION_TABLE,
                                  Mapping => Gen.Model.Mappings.SQLite_MAPPING);
+         Context.Add_Generation (Name => GEN_POSTGRESQL_SQL_FILE, Mode => ITERATION_TABLE,
+                                 Mapping => Gen.Model.Mappings.Postgresql_MAPPING);
+         Context.Add_Generation (Name => GEN_POSTGRESQL_DROP_SQL_FILE, Mode => ITERATION_TABLE,
+                                 Mapping => Gen.Model.Mappings.Postgresql_MAPPING);
       end if;
    end Prepare;
 
@@ -466,8 +470,10 @@ package body Gen.Artifacts.Hibernate is
    begin
       if not Project.Is_Plugin then
          Build_SQL_Schemas ("mysql", "", "create-" & Name, False);
+         Build_SQL_Schemas ("postgresql", "", "create-" & Name, False);
          Build_SQL_Schemas ("sqlite", "", "create-" & Name, False);
          Build_SQL_Schemas ("mysql", "drop-", "drop-" & Name, True);
+         Build_SQL_Schemas ("postgresql", "drop-", "drop-" & Name, True);
          Build_SQL_Schemas ("sqlite", "drop-", "drop-" & Name, True);
          Print_Info;
       end if;

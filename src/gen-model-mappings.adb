@@ -87,6 +87,9 @@ package body Gen.Model.Mappings is
          when T_ENTITY_TYPE =>
             return "entity_type";
 
+         when T_BLOB =>
+            return "blob";
+
          when T_ENUM =>
             return From.Get_Name;
 

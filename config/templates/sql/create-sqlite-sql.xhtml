@@ -4,7 +4,7 @@
         xmlns:u="http://code.google.com/p/ada-asf/util"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="db/#{model.dirname ne 'src' ? model.dirname + '/': ''}sqlite/#{projectName}-sqlite.sql">
+        file="db/#{model.dirname ne 'src' ? model.dirname : ''}#{model.dirname ne 'src' ? '/' : ''}sqlite/#{projectName}-sqlite.sql">
 /* File generated automatically by dynamo */
 <h:list value="#{model.tables}" var="table">
 /* #{table.comment} */

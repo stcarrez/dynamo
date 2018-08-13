@@ -716,10 +716,11 @@ package body Gen.Generator is
       end Read_Mapping;
 
    begin
-      --  Read the type mappings for Ada, MySQL and SQLite.
+      --  Read the type mappings for Ada, MySQL, Postgresql and SQLite.
       H.Type_Mapping_Loaded := True;
       Read_Mapping ("generator.mapping.ada", "AdaMappings.xml");
       Read_Mapping ("generator.mapping.mysql", "MySQLMappings.xml");
+      Read_Mapping ("generator.mapping.postgresql", "PostgresqlMappings.xml");
       Read_Mapping ("generator.mapping.sqlite", "SQLiteMappings.xml");
    end Read_Mappings;
 

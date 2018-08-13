@@ -795,7 +795,7 @@ package body Gen.Generator is
    procedure Read_Models (H : in out Handler;
                           Dirname : in String) is
       use Ada.Directories;
-      Path    : constant String := Util.Files.Compose (H.Get_Result_Directory, Dirname);
+      Path    : constant String := Dirname;
       Name    : constant String := Ada.Directories.Base_Name (Path);
       Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
       Search  : Search_Type;

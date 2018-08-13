@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-configs -- Configuration for code Generator
---  Copyright (C) 2009, 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +25,10 @@ package Gen.Configs is
    GEN_PACKAGE_SPEC         : constant String := "generator.template.package.spec";
    GEN_MYSQL_SQL_FILE       : constant String := "generator.template.sql.mysql";
    GEN_SQLITE_SQL_FILE      : constant String := "generator.template.sql.sqlite";
+   GEN_POSTGRESQL_SQL_FILE  : constant String := "generator.template.sql.postgresql";
    GEN_MYSQL_DROP_SQL_FILE  : constant String := "generator.template.drop.sql.mysql";
    GEN_SQLITE_DROP_SQL_FILE : constant String := "generator.template.drop.sql.sqlite";
+   GEN_POSTGRESQL_DROP_SQL_FILE : constant String := "generator.template.drop.sql.postgresql";
    GEN_UML_DIR              : constant String := "generator.uml.dir";
    GEN_UML_DEFAULT_TYPE     : constant String := "generator.uml.default_type";
    GEN_DEBUG_ENABLE         : constant String := "generator.debug";

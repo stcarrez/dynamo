@@ -7,7 +7,7 @@
 <h:list value="#{package.tables}" var="table">
    #{fn:toUpperCase(table.type)}_NAME : aliased constant String := "#{table.table}";
    <h:list value="#{table.members}" var="column">
-   COL_#{column.index}_#{table.rowIndex}_NAME : aliased constant String := "#{column.sqlName}";
+   COL_#{column.index}_#{table.rowIndex}_NAME : aliased constant String := "#{fn:toLowerCase(column.sqlName)}";
    </h:list>
 #{''}
    #{fn:toUpperCase(table.type)}_DEF : aliased constant ADO.Schemas.Class_Mapping :=

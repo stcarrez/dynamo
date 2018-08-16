@@ -3,7 +3,7 @@
   This is used to map the model types to 
   MySQL types for generated code.
 -->
-<mappings name="MySQL">
+<mappings name="Postgresql">
     <mapping type='string'>
         <from>String</from>
         <from>string</from>
@@ -11,17 +11,20 @@
         <to>VARCHAR(#{column.sqlLength}) BINARY</to>
     </mapping>
     <mapping type='date'>
+        <from>date</from>
+        <to>DATE</to>
+    </mapping>
+    <mapping type='date'>
         <from>Nullable_Time</from>
         <from>Nullable_DateTime</from>
         <from>Nullable_Timestamp</from>
         <from>Time</from>
-        <from>date</from>
         <from>DateTime</from>
         <from>PrimitiveTypes::Time</from>
         <from>PrimitiveTypes::DateTime</from>
         <from>datatype::Time</from>
         <from>datatype::DateTime</from>
-        <to>DATETIME</to>
+        <to>TIMESTAMP</to>
     </mapping>
     <mapping type='date'>
         <from>Nullable_Date</from>
@@ -116,6 +119,7 @@
     <mapping type='blob'>
         <from>datatype::Blob</from>
         <from>Blob</from>
-        <to>LONGBLOB</to>
+        <from>blob</from>
+        <to>BYTEA</to>
     </mapping>
 </mappings>

@@ -6,6 +6,6 @@
         file="db/#{model.dirname ne 'src' ? model.dirname : ''}#{model.dirname ne 'src' ? '/' : ''}postgresql/#{projectName}-drop-postgresql.sql">
 /* File generated automatically by dynamo */
 <h:list value="#{model.tables}" var="table" reverse="true">
-DROP TABLE IF EXISTS "#{table.table}";
+DROP TABLE IF EXISTS #{table.table};
 </h:list>
 </f:view>

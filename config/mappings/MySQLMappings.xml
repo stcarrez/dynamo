@@ -116,6 +116,7 @@
     <mapping type='blob'>
         <from>datatype::Blob</from>
         <from>Blob</from>
+        <from>blob</from>
         <to>LONGBLOB</to>
     </mapping>
 </mappings>

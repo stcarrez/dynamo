@@ -60,6 +60,9 @@ package Gen.Model.Mappings is
                        Allow_Null : in Boolean)
                        return Mapping_Definition_Access;
 
+   --  Get the type name according to the mapping definition.
+   function Get_Type_Name (Name : in Ada.Strings.Unbounded.Unbounded_String) return String;
+
    --  Get the type name.
    function Get_Type_Name (From : Mapping_Definition) return String;
 

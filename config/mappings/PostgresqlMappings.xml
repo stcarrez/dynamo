@@ -8,7 +8,7 @@
         <from>String</from>
         <from>string</from>
         <from>datatype::String</from>
-        <to>VARCHAR(#{column.sqlLength}) BINARY</to>
+        <to>VARCHAR(#{column.sqlLength})</to>
     </mapping>
     <mapping type='date'>
         <from>date</from>
@@ -90,7 +90,7 @@
         <from>Boolean</from>
         <from>datatype::boolean</from>
         <from>datatype::Boolean</from>
-        <to>TINYINT</to>
+        <to>BOOLEAN</to>
     </mapping>
     <mapping>
         <from>datatype::Decimal</from>
@@ -121,5 +121,9 @@
         <from>Blob</from>
         <from>blob</from>
         <to>BYTEA</to>
+    </mapping>
+    <mapping type='integer'>
+        <from>TINYINT</from>
+        <to>SMALLINT</to>
     </mapping>
 </mappings>

@@ -123,6 +123,19 @@ package body Gen.Model.Mappings is
       end if;
    end Find_Type;
 
+   --  ------------------------------
+   --  Get the type name according to the mapping definition.
+   --  ------------------------------
+   function Get_Type_Name (Name : in Ada.Strings.Unbounded.Unbounded_String) return String is
+      T : constant Mapping_Definition_Access := Find_Type (Name, False);
+   begin
+      if T = null then
+         return To_String (Name);
+      else
+         return To_String (T.Target);
+      end if;
+   end Get_Type_Name;
+
    procedure Register_Type (Name    : in String;
                             Mapping : in Mapping_Definition_Access;
                             Kind    : in Basic_Type) is

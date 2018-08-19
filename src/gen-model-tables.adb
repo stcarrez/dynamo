@@ -67,7 +67,7 @@ package body Gen.Model.Tables is
 
       elsif Name = "sqlType" then
          if Length (From.Sql_Type) > 0 then
-            return Util.Beans.Objects.To_Object (From.Sql_Type);
+            return Util.Beans.Objects.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
          end if;
          declare
             T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;

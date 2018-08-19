@@ -48,7 +48,7 @@ package body Gen.Model.Enums is
       elsif Name = "isEnum" then
          return Util.Beans.Objects.To_Object (True);
       elsif Name = "sqlType" then
-         return Util.Beans.Objects.To_Object (From.Sql_Type);
+         return Util.Beans.Objects.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
       else
          return Mappings.Mapping_Definition (From).Get_Value (Name);
       end if;

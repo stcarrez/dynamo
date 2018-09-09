@@ -37,7 +37,7 @@ package Gen.Commands.Templates is
 
    --  Write the help associated with the command.
    overriding
-   procedure Help (Cmd       : in Command;
+   procedure Help (Cmd       : in out Command;
                    Generator : in out Gen.Generator.Handler);
 
    --  Read the template commands defined in dynamo configuration directory.

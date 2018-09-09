@@ -237,7 +237,7 @@ package body Gen.Commands.Info is
    --  Write the help associated with the command.
    --  ------------------------------
    overriding
-   procedure Help (Cmd       : in Command;
+   procedure Help (Cmd       : in out Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);
    begin

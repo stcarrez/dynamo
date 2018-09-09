@@ -39,7 +39,7 @@ package body Gen.Commands.Model is
       Dir      : constant String := Util.Files.Compose (Root_Dir, "db");
    begin
       if Args.Get_Count = 0 or Args.Get_Count > 2 then
-         Cmd.Usage (Name);
+         Cmd.Usage (Name, Generator);
          return;
       end if;
 
@@ -89,7 +89,7 @@ package body Gen.Commands.Model is
    --  Write the help associated with the command.
    --  ------------------------------
    overriding
-   procedure Help (Cmd : in Command;
+   procedure Help (Cmd       : in out Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);
       use Ada.Text_IO;

@@ -134,7 +134,7 @@ package body Gen.Commands.Project is
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing project name");
-            Cmd.Usage (Name);
+            Cmd.Usage (Name, Generator);
             return;
          end if;
 
@@ -152,7 +152,7 @@ package body Gen.Commands.Project is
 
          elsif Arg3'Length > 0 then
             Generator.Error ("The last argument should be the author's email address.");
-            Cmd.Usage (Name);
+            Cmd.Usage (Name, Generator);
             return;
          end if;
 
@@ -204,7 +204,7 @@ package body Gen.Commands.Project is
    --  Write the help associated with the command.
    --  ------------------------------
    overriding
-   procedure Help (Cmd       : in Command;
+   procedure Help (Cmd       : in out Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);
       use Ada.Text_IO;

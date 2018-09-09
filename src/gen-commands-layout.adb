@@ -54,7 +54,7 @@ package body Gen.Commands.Layout is
       Page_Name : constant String := Get_Name;
    begin
       if Page_Name'Length = 0 then
-         Cmd.Usage (Name);
+         Cmd.Usage (Name, Generator);
          return;
       end if;
 
@@ -68,7 +68,7 @@ package body Gen.Commands.Layout is
    --  Write the help associated with the command.
    --  ------------------------------
    overriding
-   procedure Help (Cmd : in Command;
+   procedure Help (Cmd       : in out Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);
       use Ada.Text_IO;

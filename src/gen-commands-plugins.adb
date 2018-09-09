@@ -112,7 +112,7 @@ package body Gen.Commands.Plugins is
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing plugin name");
-            Cmd.Usage (Name);
+            Cmd.Usage (Name, Generator);
             return;
          end if;
          if Kind /= "ada" and Kind /= "web" then
@@ -175,7 +175,7 @@ package body Gen.Commands.Plugins is
    --  Write the help associated with the command.
    --  ------------------------------
    overriding
-   procedure Help (Cmd       : in Command;
+   procedure Help (Cmd       : in out Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);
       use Ada.Text_IO;

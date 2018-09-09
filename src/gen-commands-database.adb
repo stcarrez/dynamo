@@ -285,6 +285,8 @@ package body Gen.Commands.Database is
             Root_Hidden := Root_Connection;
             Append (Root_Connection, Password);
             Append (Root_Hidden, "XXXXXXXX");
+         else
+            Root_Config.Set_Property ("password", "");
          end if;
 
          Log.Info ("Connecting to {0} for database setup", Root_Hidden);
@@ -417,7 +419,7 @@ package body Gen.Commands.Database is
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
-   procedure Help (Cmd       : in Command;
+   procedure Help (Cmd       : in out Command;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Generator);
       use Ada.Text_IO;

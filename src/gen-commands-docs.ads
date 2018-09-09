@@ -34,7 +34,7 @@ package Gen.Commands.Docs is
 
    --  Write the help associated with the command.
    overriding
-   procedure Help (Cmd       : in Command;
+   procedure Help (Cmd       : in out Command;
                    Generator : in out Gen.Generator.Handler);
 
 end Gen.Commands.Docs;

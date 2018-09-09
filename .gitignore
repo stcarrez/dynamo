@@ -24,3 +24,4 @@ regtests/check_build/check_build.gpr
 src/gen-configs.ads
 test-app/
 dynamo_tests.gpr
+config/generator.properties

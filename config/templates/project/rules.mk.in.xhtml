@@ -157,10 +157,12 @@ rebuild: clean build
 #{''}
 
 # Rebuild the generated model files
-generate:  post-generate
+generate:  post-generate | db
 	$(DYNAMO) generate $(DYNAMO_ARGS)
 #{''}
-
+db:
+	$(MKDIR) $@
+#{''}
 install_static:
 	$(MAKE) LIBRARY_TYPE=static install_lib
 #{''}

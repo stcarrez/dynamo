@@ -8,7 +8,7 @@ app_search_dirs=\#{empty dynamo_search_dirs ? '.' : dynamo_search_dirs}
 
 app.modules.dir=\#{fn:composePath(app_search_dirs,'config')}
 app.config=awa.xml
-app.config.plugins#{projectName}.xml
+app.config.plugins=#{projectName}.xml
 contextPath=/#{fn:toLowerCase(projectName)}
 #{''}
 web.dir=\#{fn:composePath(app_search_dirs,'web')}
@@ -34,11 +34,11 @@ user.auth-filter.redirect=\#{contextPath}/auth/login.html
 #{''}
 
 # The base URL to construct URL to the application page.
-app_url_base=http://localhost:8080#{contextPath}
+app_url_base=http://localhost:8080\#{contextPath}
 #{''}
 
 # The application name
-app_name=\#{fn:capitalize(projectName)}
+app_name=#{fn:capitalize(projectName)}
 
 #{''}
 bundle.var.samplesMsg=samples
@@ -61,13 +61,16 @@ google-plus.secret=PUT-HERE_GOOGLE-SECRET
 # Configuration for log4j
 log4j.rootCategory=DEBUG,console,result
 
+#{''}
 log4j.appender.console=Console
 log4j.appender.console.level=DEBUG
 log4j.appender.console.layout=level-message
 
+#{''}
 log4j.appender.result=File
 log4j.appender.result.File=#{projectName}.log
 
+#{''}
 # Logger configuration
 log4j.logger.log=WARN
 
@@ -77,10 +80,12 @@ log4j.logger.Util=DEBUG
 log4j.logger.Util.Serialize.Mappers=WARN
 log4j.logger.Util.Serialize.IO=INFO
 
+#{''}
 log4j.logger.AWA=DEBUG
 log4j.logger.ASF=DEBUG
 log4j.logger.AWA.Modules=INFO
 
+#{''}
 log4j.logger.ADO.Databases=INFO
 log4j.logger.ASF.Views.Nodes.Reader=INFO
 log4j.logger.AWA.Applications.Configs=WARN

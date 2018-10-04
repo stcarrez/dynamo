@@ -9,7 +9,7 @@
 -----------------------------------------------------------------------
 with Ada.Exceptions;
 #{''}
-with Util.Log.loggers;
+with Util.Log.Loggers;
 #{''}
 with AWS.Config.Set;
 with ASF.Server.Web;
@@ -21,6 +21,8 @@ procedure #{fn:capitalize(projectName)}.Server is
    Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.Server");
 
    App     : constant #{fn:capitalize(projectName)}.Applications.Application_Access := new #{fn:capitalize(projectName)}.Applications.Application;
+#{''}
+   procedure Configure (Config : in out AWS.Config.Object);
 #{''}
    procedure Setup is
      new AWA.Setup.Applications.Configure (#{fn:capitalize(projectName)}.Applications.Application'Class,
@@ -51,7 +53,7 @@ begin
 
    App.Close;
 exception
-   when E: others =>
+   when E : others =>
       Log.Error ("Exception in server: " &amp;
                  Ada.Exceptions.Exception_Name (E) &amp; ": " &amp;
                  Ada.Exceptions.Exception_Message (E));

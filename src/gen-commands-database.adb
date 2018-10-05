@@ -334,6 +334,8 @@ package body Gen.Commands.Database is
          Path  : constant String := Config.Get_Database;
          Dir   : constant String := Util.Files.Compose (Model, "sqlite");
          File  : constant String := Util.Files.Compose (Dir, "create-" & Name & "-sqlite.sql");
+         Cfg   : constant String := Generator.Get_Config_Directory;
+         Cmd   : constant String := Util.Files.Compose (Cfg, "sqlite-exit.sql");
       begin
          if Ada.Directories.Exists (Path) then
             Log.Info ("Connecting to {0} for database setup", Database);
@@ -349,7 +351,7 @@ package body Gen.Commands.Database is
             return;
          end if;
 
-         Execute_Command ("sqlite3 --init " & File & " " & Path, "");
+         Execute_Command ("sqlite3 --batch --init " & File & " " & Path, Cmd);
       end Create_SQLite_Database;
 
       --  ------------------------------

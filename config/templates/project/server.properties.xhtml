@@ -41,6 +41,10 @@ app_url_base=http://localhost:8080\#{contextPath}
 app_name=#{fn:capitalize(projectName)}
 #{''}
 
+# The mail address of the application administrator
+app_mail_from=#{project.author_email}
+#{''}
+
 # SMTP mail server
 mail.smtp.host=localhost
 #{''}

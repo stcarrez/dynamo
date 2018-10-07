@@ -194,6 +194,12 @@ package body Gen.Commands.Project is
                GNAT.OS_Lib.Spawn (Path.all, Args, Status);
                if not Status then
                   Generator.Error ("Execution of {0} failed", Path.all);
+               else
+                  Log.Info ("");
+                  Ada.Text_IO.Put_Line ("Your project is now created.");
+                  Ada.Text_IO.Put_Line ("Run the following commands to build it:");
+                  Ada.Text_IO.Put_Line ("  ./configure");
+                  Ada.Text_IO.Put_Line ("  make generate build");
                end if;
             end if;
          end;

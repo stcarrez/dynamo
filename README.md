@@ -8,9 +8,19 @@
 
 This Ada05 application is a code generator used to generate
 an Ada Web Application or database mappings from hibernate-like
-XML description or UML models.  It provides various commands for the
+XML description, YAML doctrine model or UML models.  It provides various commands for the
 generation of a web application which uses the Ada Web Application framework
 (https://github.com/stcarrez/ada-awa/).
+
+To build Dynamo, you will need:
+
+* Ada Util     (https://github.com/stcarrez/ada-util          1.9.0)
+* Ada EL       (https://github.com/stcarrez/ada-el            1.6.1)
+* Ada Security (https://github.com/stcarrez/ada-security      1.2.0)
+* Ada Servlet  (https://github.com/stcarrez/ada-servlet       1.2.0)
+* Ada Server Faces (https://github.com/stcarrez/ada-asf       1.2.0)
+* Ada ADO      (https://github.com/stcarrez/ada-ado           1.2.0)
+* XML/Ada      (http://libre.adacore.com/libre/tools/xmlada/  4.3)
 
 Build with the following commands:
 ```

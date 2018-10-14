@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 
 with Ada.Directories;
+with Ada.Text_IO;
 
 with Util.Log.Loggers;
 with Util.Test_Caller;
@@ -123,34 +124,6 @@ package body Gen.Integration.Tests is
    end Add_Tests;
 
    --  ------------------------------
-   --  Change the working directory before running dynamo.
-   --  ------------------------------
-   overriding
-   procedure Set_Up (T : in out Test) is
-      pragma Unreferenced (T);
-
-      Test_Dir : constant String := Gen.Testsuite.Get_Test_Directory;
-      Dir      : constant String := Util.Files.Compose (Test_Dir, "test-app");
-   begin
-      Log.Debug ("Change {0}", Dir);
-      if Ada.Directories.Exists (Dir) then
-         Ada.Directories.Set_Directory (Dir);
-      else
-         Ada.Directories.Set_Directory (Gen.Testsuite.Get_Test_Directory);
-      end if;
-   end Set_Up;
-
-   --  ------------------------------
-   --  Restore the working directory after running dynamo.
-   --  ------------------------------
-   overriding
-   procedure Tear_Down (T : in out Test) is
-      pragma Unreferenced (T);
-   begin
-      Ada.Directories.Set_Directory (Gen.Testsuite.Get_Test_Directory);
-   end Tear_Down;
-
-   --  ------------------------------
    --  Get the dynamo executable path.
    --  ------------------------------
    function Dynamo return String is
@@ -165,10 +138,16 @@ package body Gen.Integration.Tests is
                       Command : in String;
                       Result  : out Ada.Strings.Unbounded.Unbounded_String;
                       Status  : in Natural := 0) is
-      P       : aliased Util.Streams.Pipes.Pipe_Stream;
-      Buffer  : Util.Streams.Buffered.Input_Buffer_Stream;
+      P        : aliased Util.Streams.Pipes.Pipe_Stream;
+      Buffer   : Util.Streams.Buffered.Input_Buffer_Stream;
+      Test_Dir : constant String := Gen.Testsuite.Get_Test_Directory;
+      Dir      : constant String := Util.Files.Compose (Test_Dir, "test-app");
    begin
       Log.Info ("Execute: {0}", Command);
+      if Ada.Directories.Exists (Dir) then
+         P.Set_Working_Directory (Dir);
+         Ada.Text_IO.Put_Line ("Set dir: " & Dir);
+      end if;
       P.Open (Command, Util.Processes.READ_ALL);
 
       --  Write on the process input stream.
@@ -176,6 +155,7 @@ package body Gen.Integration.Tests is
       Buffer.Initialize (P'Unchecked_Access, 8192);
       Buffer.Read (Result);
       P.Close;
+      Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Result));
       Log.Info ("Command result: {0}", Result);
       Util.Tests.Assert_Equals (T, Status, P.Get_Exit_Status, "Command '" & Command & "' failed");
    end Execute;
@@ -438,7 +418,7 @@ package body Gen.Integration.Tests is
    procedure Test_Dist (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      Clean_Directory ("../test-dist");
+      Clean_Directory ("test-dist");
       T.Execute (Dynamo & " dist ../test-dist", Result);
       Util.Tests.Assert_Matches (T,
                                  ".*Installing.*files with copy.*",
@@ -448,8 +428,8 @@ package body Gen.Integration.Tests is
                                  ".*Installing.*compressor.*",
                                  Result,
                                  "Invalid dist");
-      Util.Tests.Assert_Exists (T, "../test-dist/bundles/test.properties");
-      Util.Tests.Assert_Exists (T, "../test-dist/bundles/tuser.properties");
+      Util.Tests.Assert_Exists (T, "test-dist/bundles/test.properties");
+      Util.Tests.Assert_Exists (T, "test-dist/bundles/tuser.properties");
    end Test_Dist;
 
    --  ------------------------------
@@ -458,7 +438,7 @@ package body Gen.Integration.Tests is
    procedure Test_Dist_Exclude (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      Clean_Directory ("../test-dist");
+      Clean_Directory ("test-dist");
       T.Execute (Dynamo & " dist ../test-dist ../regtests/files/package.xml", Result);
       Util.Tests.Assert_Matches (T,
                                  ".*Installing.*files with copy.*",
@@ -468,8 +448,8 @@ package body Gen.Integration.Tests is
                                  ".*Installing.*compressor.*",
                                  Result,
                                  "Invalid dist");
-      Util.Tests.Assert_Exists (T, "../test-dist/bundles/test.properties");
-      T.Assert (not Ada.Directories.Exists ("../test-dir/bundles/tuser.properties"),
+      Util.Tests.Assert_Exists (T, "test-dist/bundles/test.properties");
+      T.Assert (not Ada.Directories.Exists ("test-dir/bundles/tuser.properties"),
                 "File should not be copied");
    end Test_Dist_Exclude;
 
@@ -499,8 +479,8 @@ package body Gen.Integration.Tests is
       T.Execute (Dynamo & " build-doc wiki", Result);
       Util.Tests.Assert_Equals (T, "", Result, "Invalid build-doc command");
 
-      Util.Tests.Assert_Exists (T, "wiki/tblog.wiki");
-      Util.Tests.Assert_Exists (T, "wiki/tuser-user_query.wiki");
+      Util.Tests.Assert_Exists (T, "test-app/wiki/tblog.wiki");
+      Util.Tests.Assert_Exists (T, "test-app/wiki/tuser-user_query.wiki");
    end Test_Build_Doc;
 
    --  ------------------------------
@@ -509,18 +489,18 @@ package body Gen.Integration.Tests is
    procedure Test_Generate_Hibernate (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      Ada.Directories.Copy_File (Source_Name => "../regtests/files/User.hbm.xml",
-                                 Target_Name => "db/User.hbm.xml");
-      Ada.Directories.Copy_File (Source_Name => "../regtests/files/Queues.hbm.xml",
-                                 Target_Name => "db/Queues.hbm.xml");
-      Ada.Directories.Copy_File (Source_Name => "../regtests/files/Permission.hbm.xml",
-                                 Target_Name => "db/Permission.hbm.xml");
-      Ada.Directories.Copy_File (Source_Name => "../regtests/files/permissions.xml",
-                                 Target_Name => "db/permissions.xml");
-      Ada.Directories.Copy_File (Source_Name => "../regtests/files/queue-messages.xml",
-                                 Target_Name => "db/queue-messages.xml");
-      Ada.Directories.Copy_File (Source_Name => "../regtests/files/serialize.xml",
-                                 Target_Name => "db/serialize.xml");
+      Ada.Directories.Copy_File (Source_Name => "regtests/files/User.hbm.xml",
+                                 Target_Name => "test-app/db/User.hbm.xml");
+      Ada.Directories.Copy_File (Source_Name => "regtests/files/Queues.hbm.xml",
+                                 Target_Name => "test-app/db/Queues.hbm.xml");
+      Ada.Directories.Copy_File (Source_Name => "regtests/files/Permission.hbm.xml",
+                                 Target_Name => "test-app/db/Permission.hbm.xml");
+      Ada.Directories.Copy_File (Source_Name => "regtests/files/permissions.xml",
+                                 Target_Name => "test-app/db/permissions.xml");
+      Ada.Directories.Copy_File (Source_Name => "regtests/files/queue-messages.xml",
+                                 Target_Name => "test-app/db/queue-messages.xml");
+      Ada.Directories.Copy_File (Source_Name => "regtests/files/serialize.xml",
+                                 Target_Name => "test-app/db/serialize.xml");
       T.Execute (Dynamo & " generate db", Result);
       Util.Tests.Assert_Matches (T,
                                  ".*Reading model file stored in .db.*",
@@ -534,14 +514,14 @@ package body Gen.Integration.Tests is
                                  ".*Generating file.*db/mysql/test-mysql.sql.*",
                                  Result,
                                  "Invalid generate");
-      Util.Tests.Assert_Exists (T, "src/model/gen-permissions-models.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-permissions-models.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-users-models.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-users-models.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-events-models.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-events-models.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-events-serialize.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-events-serialize.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-permissions-models.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-permissions-models.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-users-models.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-users-models.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-events-models.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-events-models.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-events-serialize.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-events-serialize.adb");
    end Test_Generate_Hibernate;
 
    --  ------------------------------
@@ -552,7 +532,7 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-enum.xmi", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-enums.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-enums.ads");
    end Test_Generate_XMI_Enum;
 
    --  ------------------------------
@@ -563,7 +543,7 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-beans.xmi", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-beans.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-beans.ads");
    end Test_Generate_XMI_Bean;
 
    --  ------------------------------
@@ -574,8 +554,8 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-table-beans.zargo", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-table_beans.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-table_beans.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-table_beans.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-table_beans.adb");
    end Test_Generate_XMI_Bean_Table;
 
    --  ------------------------------
@@ -586,8 +566,8 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-table.xmi", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-tables.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-tables.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-tables.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-tables.adb");
    end Test_Generate_XMI_Table;
 
    --  ------------------------------
@@ -598,8 +578,8 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-associations.xmi", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-associations.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-associations.adb");
    end Test_Generate_XMI_Association;
 
    --  ------------------------------
@@ -610,8 +590,8 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-associations.zargo", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-associations.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-associations.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-associations.adb");
    end Test_Generate_Zargo_Association;
 
    --  ------------------------------
@@ -622,8 +602,8 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-dependencies.zargo", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-dependencies.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-dependencies.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-dependencies.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-dependencies.adb");
    end Test_Generate_Zargo_Dependencies;
 
    --  ------------------------------
@@ -634,14 +614,14 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-packages.zargo", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-a.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-b.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-b.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-c.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-c.adb");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-packages-e.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-packages-a.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-packages-a.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-packages-b.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-packages-b.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-packages-c.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-packages-c.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-packages-e.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-packages-e.adb");
    end Test_Generate_Zargo_Packages;
 
    --  ------------------------------
@@ -652,8 +632,8 @@ package body Gen.Integration.Tests is
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-serialize.zargo", Result);
 
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-serialize.ads");
-      Util.Tests.Assert_Exists (T, "src/model/gen-tests-serialize.adb");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-serialize.ads");
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-serialize.adb");
    end Test_Generate_Zargo_Serialization;
 
    --  ------------------------------
@@ -693,9 +673,9 @@ package body Gen.Integration.Tests is
 
       pragma Warnings (Off, "condition is always False");
       if Util.Systems.Os.Directory_Separator = '\' then
-         Util.Tests.Assert_Exists (T, "bin/test-server.exe");
+         Util.Tests.Assert_Exists (T, "test-app/bin/test-server.exe");
       else
-         Util.Tests.Assert_Exists (T, "bin/test-server");
+         Util.Tests.Assert_Exists (T, "test-app/bin/test-server");
       end if;
       pragma Warnings (On, "condition is always False");
 
@@ -708,16 +688,16 @@ package body Gen.Integration.Tests is
 
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      Ada.Directories.Copy_File (Source_Name => "../regtests/check_build/check_build.gpr",
-                                 Target_Name => "check_build.gpr");
+      Ada.Directories.Copy_File (Source_Name => "regtests/check_build/check_build.gpr",
+                                 Target_Name => "test-app//check_build.gpr");
 
       T.Execute ("gnatmake -p -Pcheck_build", Result);
 
       pragma Warnings (Off, "condition is always False");
       if Util.Systems.Os.Directory_Separator = '\' then
-         Util.Tests.Assert_Exists (T, "bin/test-server.exe");
+         Util.Tests.Assert_Exists (T, "test-app/bin/test-server.exe");
       else
-         Util.Tests.Assert_Exists (T, "bin/test-server");
+         Util.Tests.Assert_Exists (T, "test-app/bin/test-server");
       end if;
       pragma Warnings (On, "condition is always False");
 

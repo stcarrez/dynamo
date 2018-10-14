@@ -84,7 +84,8 @@ doc:
 check test:	 build
 	-rm -rf test-app
 	-rm -f dynamo-junit.xml
-	bin/dynamo_harness -xml dynamo-aunit.xml
+	# The test 'Build generated model files (UML)' can take more than 1 minute.
+	bin/dynamo_harness -t 120 -xml dynamo-aunit.xml
 
 GENERATOR=dynamo
 

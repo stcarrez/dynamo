@@ -691,7 +691,7 @@ package body Gen.Integration.Tests is
       Ada.Directories.Copy_File (Source_Name => "regtests/check_build/check_build.gpr",
                                  Target_Name => "test-app//check_build.gpr");
 
-      T.Execute ("gnatmake -p -Pcheck_build", Result);
+      T.Execute ("gprbuild -p -Pcheck_build", Result);
 
       pragma Warnings (Off, "condition is always False");
       if Util.Systems.Os.Directory_Separator = '\' then

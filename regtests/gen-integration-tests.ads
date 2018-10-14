@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2016, 2017 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2016, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,14 +23,6 @@ package Gen.Integration.Tests is
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite);
 
    type Test is new Util.Tests.Test with null record;
-
-   --  Change the working directory before running dynamo.
-   overriding
-   procedure Set_Up (T : in out Test);
-
-   --  Restore the working directory after running dynamo.
-   overriding
-   procedure Tear_Down (T : in out Test);
 
    --  Execute the command and get the output in a string.
    procedure Execute (T       : in out Test;

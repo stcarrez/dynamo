@@ -5,9 +5,17 @@
         xmlns:f="http://java.sun.com/jsf/core">
 <h:list value="#{package.queries}" var="query">
   <h:panelGroup rendered="#{not empty query.operations or not empty query.members}">
-    <ui:include src="../beans/package-spec-bean-decl.xhtml">
-      <ui:param name="bean" value="#{query}"/>
-    </ui:include>
+    <h:panelGroup rendered="#{query.bean eq 'yes'}">
+      <ui:include src="../beans/package-spec-bean-decl.xhtml">
+        <ui:param name="bean" value="#{query}"/>
+      </ui:include>
+    </h:panelGroup>
+    <h:panelGroup rendered="#{query.bean eq 'no'}">
+      <ui:include src="package-spec-record-decl.xhtml">
+        <ui:param name="bean" value="#{query}"/>
+      </ui:include>
+    </h:panelGroup>
+
   </h:panelGroup>
   <h:panelGroup rendered="#{not empty query.operations and not empty query.members}">
    --  Read in the object the data from the query result and prepare to read the next row.

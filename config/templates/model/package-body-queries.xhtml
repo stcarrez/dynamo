@@ -91,6 +91,7 @@
    end Load;
 </h:panelGroup>
 <h:panelGroup rendered="#{empty query.operations}">
+  <h:panelGroup rendered="#{query.bean eq 'yes'}">
    --  --------------------
    --  Run the query controlled by &lt;b&gt;Context&lt;/b> and append the list in &lt;b>Object&lt;/b>.
    --  --------------------
@@ -101,6 +102,7 @@
       List (Object.List, Session, Context);
    end List;
 #{''}
+  </h:panelGroup>
    --  --------------------
    --  #{query.comment}
    --  --------------------

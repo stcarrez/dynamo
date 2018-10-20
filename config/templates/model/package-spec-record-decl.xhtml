@@ -1,0 +1,30 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core">
+
+ <h:panelGroup rendered="#{not empty bean.comment}">
+   --  --------------------
+   --  <h:outputText value="#{g:comment(bean.comment)}" escape="false"/>
+   --  --------------------
+ </h:panelGroup>
+   type #{bean.type} is record
+   <h:list value="#{bean.members}" var="attribute">
+<h:panelGroup rendered="#{not empty attribute.comment}">
+#{''}
+      --  #{attribute.comment}
+</h:panelGroup>
+      #{fn:capitalize(attribute.name)} : #{g:adaType(attribute,0)};
+   </h:list>
+#{not empty bean.members ? '   end record;' : ''}
+#{''}
+<h:panelGroup rendered="#{bean.isSerializable}">
+   --  Serialize the record member to a JSON/XML stream.
+   procedure Write (Stream : in out Util.Serialize.IO.Output_Stream'Class;
+                    Name   : in String;
+                    Item   : in #{fn:capitalize(bean.type)}#{bean.isBean ? '' : '_Ref'}'Class);
+#{''}
+</h:panelGroup>
+
+</ui:composition>

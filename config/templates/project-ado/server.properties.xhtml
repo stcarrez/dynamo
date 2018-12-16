@@ -6,9 +6,11 @@
         file="#{projectName}.properties">
 ado.queries.load=true
 ado.queries.paths=db
-ado.queries.load=true
+ado.drivers.load=false
 #{''}
 ado.database=mysql://localhost:3306/#{projectName}?user=#{projectName}
+#{'#'}ado.database=postgresql://localhost:5432/#{projectName}?user=#{projectName}
+#{'#'}ado.database=sqlite:///#{projectName}.db?synchronous=OFF&amp;encoding=UTF-8
 
 #{''}
 # Configuration for log4j
@@ -20,24 +22,17 @@ log4j.appender.console.layout=level-message
 
 log4j.appender.result=File
 log4j.appender.result.File=#{projectName}.log
+#{''}
 
 # Logger configuration
 log4j.logger.log=WARN
 
-log4j.logger.Util.Properties=DEBUG
-log4j.logger.Util.Log=WARN
-log4j.logger.Util=DEBUG
-log4j.logger.Util.Serialize.Mappers=WARN
-log4j.logger.Util.Serialize.IO=INFO
+log4j.logger.Util=WARN
 
-log4j.logger.AWA=DEBUG
-log4j.logger.ASF=DEBUG
-log4j.logger.AWA.Modules=INFO
-
-log4j.logger.ADO.Databases=INFO
-log4j.logger.ASF.Views.Nodes.Reader=INFO
-log4j.logger.AWA.Applications.Configs=WARN
-log4j.logger.AWA.Modules=WARN
+log4j.logger.ADO=INFO,result
+log4j.logger.ADO.Sessions=WARN
+log4j.logger.ADO.Statements=DEBUG
+#{''}
 #{''}
 
 </f:view>

@@ -160,6 +160,8 @@ package body Gen.Artifacts.Yaml is
                Node.Col.Is_Version := Value = "true" or Value = "yes";
             elsif Name = "readonly" then
                Node.Col.Is_Updated := Value = "false" or Value = "no";
+            elsif Name = "auditable" then
+               Node.Col.Is_Auditable := Value = "false" or Value = "no";
             elsif Name = "useForeignKey" and Node.Assoc /= null then
                Node.Assoc.Use_Foreign_Key_Type := Value = "true" or Value = "yes";
             end if;

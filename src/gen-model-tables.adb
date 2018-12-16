@@ -303,6 +303,8 @@ package body Gen.Model.Tables is
    begin
       O.Members_Bean := Util.Beans.Objects.To_Object (O.Members'Unchecked_Access,
                                                       Util.Beans.Objects.STATIC);
+      O.Auditables_Bean := Util.Beans.Objects.To_Object (O.Auditables'Unchecked_Access,
+                                                         Util.Beans.Objects.STATIC);
       O.Operations_Bean := Util.Beans.Objects.To_Object (O.Operations'Unchecked_Access,
                                                          Util.Beans.Objects.STATIC);
    end Initialize;
@@ -410,6 +412,9 @@ package body Gen.Model.Tables is
       elsif Name = "operations" then
          return From.Operations_Bean;
 
+      elsif Name = "auditables" then
+         return From.Auditables_Bean;
+
       elsif Name = "id" and From.Id_Column /= null then
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Id_Column.all'Access;
@@ -505,6 +510,7 @@ package body Gen.Model.Tables is
          end if;
          if C.Is_Auditable then
             O.Is_Auditable := True;
+            O.Auditables.Append (C);
          end if;
 
          --  Collect in the dependencies vectors the tables that we are using.

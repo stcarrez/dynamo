@@ -78,10 +78,10 @@
    begin
       Set_Field (Object, Impl);
     <h:panelGroup rendered="#{column.name ne table.id.name}">
-      ADO.Objects.Set_Field_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name eq table.id.name}">
-      ADO.Objects.Set_Field_Key_Value (Impl.all, #{column.index + 1}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Key_Value (Impl.all, #{column.index + 1}, Value);
     </h:panelGroup>
    end Set_#{fn:capitalize(column.name)};
     </h:panelGroup>
@@ -91,18 +91,18 @@
                   #{g:indent(column.name)} Value  : in #{g:adaType(column,1)}) is
      <h:panelGroup rendered="#{column.type.isEnum}">
       procedure Set_Field_Enum is
-         new ADO.Objects.Set_Field_Operation (#{column.type.name});
+         new ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Operation (#{column.type.name});
      </h:panelGroup>
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
       Set_Field (Object, Impl);
 
     <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isBoolean}">
-      ADO.Objects.Set_Field_Boolean (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Boolean (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isInteger and column.type.name ne 'ADO.Entity_Type' and column.type.name ne 'ADO.Nullable_Entity_Type'}">
-      ADO.Objects.Set_Field_Integer (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Integer (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.type.isEnum}">
@@ -110,43 +110,43 @@
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.type.isBlob}">
-      ADO.Objects.Set_Field_Blob (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Blob (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.name ne table.id.name and not column.isPrimitiveType and not column.type.isBoolean and not column.type.isEnum and not column.type.isBlob or column.type.isObject}">
-      ADO.Objects.Set_Field_Object (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Object (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.type.isDate}">
-      ADO.Objects.Set_Field_Time (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Time (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.type.isIdentifier and column.name ne table.id.name}">
-      ADO.Objects.Set_Field_Identifier (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Identifier (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.type.isString and column.name ne table.id.name and not column.type.isNullable}">
-      ADO.Objects.Set_Field_Unbounded_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Unbounded_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.type.isString and column.name ne table.id.name and column.type.isNullable}">
-      ADO.Objects.Set_Field_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_String (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type' or column.type.name eq 'ADO.Nullable_Entity_Type'}">
-      ADO.Objects.Set_Field_Entity_Type (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Entity_Type (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isEnum and not column.type.isDate and not column.type.isString and not column.type.isInteger and not column.type.isIdentifier and column.type.name ne 'ADO.Entity_Type' and not column.type.isObject}">
-      ADO.Objects.Set_Field_#{fn:capitalize(g:adaType(column,2))} (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_#{fn:capitalize(g:adaType(column,2))} (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
     <h:panelGroup rendered="#{column.name eq table.id.name}">
 <h:panelGroup rendered="#{table.id.type.isString or table.id.type.isIdentifier}">
-      ADO.Objects.Set_Field_Key_Value (Impl.all, #{column.index + 1}, Value);
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Key_Value (Impl.all, #{column.index + 1}, Value);
 </h:panelGroup>
 <h:panelGroup rendered="#{not table.id.type.isString and not table.id.type.isIdentifier}">
-      ADO.Objects.Set_Field_Key_Value (Impl.all, #{column.index + 1}, ADO.Identifier (Value));
+      ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Key_Value (Impl.all, #{column.index + 1}, ADO.Identifier (Value));
 </h:panelGroup>
     </h:panelGroup>
    end Set_#{fn:capitalize(column.name)};
@@ -416,6 +416,9 @@
 </h:panelGroup>
                end if;
             end if;
+<h:panelGroup rendered="#{table.isAuditable}">
+            ADO.Audits.Save (Object, Session);
+</h:panelGroup>
          end;
       end if;
    end Save;
@@ -459,6 +462,9 @@
       Query.Execute (Object.#{fn:capitalize(table.id.name)});
 </h:panelGroup>
       ADO.Objects.Set_Created (Object);
+<h:panelGroup rendered="#{table.isAuditable}">
+      ADO.Audits.Save (Object, Session);
+</h:panelGroup>
    end Create;
 #{''}
 

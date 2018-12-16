@@ -128,6 +128,48 @@ AC_DEFUN(AM_SHARED_LIBRARY_SUPPORT,
   AC_SUBST(BUILDS_SHARED)
 ])
 
+dnl Check whether the coverage support is enabled.
+AC_DEFUN(AM_COVERAGE_SUPPORT,
+[
+  AC_MSG_CHECKING([coverage support])
+  ac_enable_coverage=no
+  AC_ARG_ENABLE(coverage,
+    [  --enable-coverage       build with coverage support -fprofile-arcs -ftest-coverage (disabled)],
+    [case "${enableval}" in
+      no|none)  ac_enable_coverage=no ;;
+      *)        ac_enable_coverage=yes ;;
+    esac])dnl
+
+  AC_MSG_RESULT(${ac_enable_coverage})
+  BUILDS_COVERAGE=$ac_enable_coverage
+  AC_SUBST(BUILDS_COVERAGE)
+])
+
+dnl Check whether the distrib/debug build is enabled.
+AC_DEFUN(AM_DISTRIB_SUPPORT,
+[
+  AC_MSG_CHECKING([distribution build])
+  ac_enable_distrib=yes
+  ac_build_mode=distrib
+  AC_ARG_ENABLE(distrib,
+    [  --enable-distrib        build for distribution, optimized and strip symbols (enabled)],
+    [case "${enableval}" in
+      no|none)  ac_enable_distrib=no
+                ac_build_mode=debug
+                ;;
+      *)        ac_enable_distrib=yes
+                ac_build_mode=distrib
+                ;;
+    esac])dnl
+
+  AC_MSG_RESULT(${ac_enable_distrib})
+  BUILDS_DISTRIB=$ac_enable_distrib
+  AC_SUBST(BUILDS_DISTRIB)
+
+  MODE=$ac_build_mode
+  AC_SUBST(MODE)
+])
+
 dnl Check whether the AWS support is enabled and find the aws GNAT project.
 AC_DEFUN(AM_GNAT_CHECK_AWS,
 [
@@ -495,3 +537,30 @@ end Check;
 
    rm -f check.adb check
 ])
+
+# Prepare for using the GNAT project 
+# AM_GNAT_LIBRARY_PROJECT([name])
+AC_DEFUN(AM_GNAT_LIBRARY_PROJECT,
+[
+  # checking for local tools
+  AM_GNAT_CHECK_GPRBUILD
+
+  AC_PROG_MAKE_SET
+  AC_PROG_INSTALL
+  AC_PROG_LN_S
+  AM_SHARED_LIBRARY_SUPPORT
+  AM_DISTRIB_SUPPORT
+  AM_COVERAGE_SUPPORT
+
+  AC_MSG_CHECKING([number of processors])
+  NR_CPUS=`getconf _NPROCESSORS_CONF 2>/dev/null || getconf NPROCESSORS_CONF 2>/dev/null || echo 1`
+  AC_MSG_RESULT($NR_CPUS)
+  AC_SUBST(NR_CPUS)
+
+  AM_UTIL_CHECK_INSTALL
+
+  AC_MSG_CHECKING([preparing for GNAT project $1])
+  mkdir -p obj/$1/static obj/$1/relocatable lib/$1/static lib/$1/relocatable
+  AC_MSG_RESULT(done)
+])
+

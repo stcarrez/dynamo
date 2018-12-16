@@ -467,6 +467,9 @@ package body Gen.Model.Tables is
       elsif Name = "isSerializable" then
          return Util.Beans.Objects.To_Object (From.Is_Serializable);
 
+      elsif Name = "isAuditable" then
+         return Util.Beans.Objects.To_Object (From.Is_Auditable);
+
       else
          return Definition (From).Get_Value (Name);
       end if;
@@ -499,6 +502,9 @@ package body Gen.Model.Tables is
             --  For the <<Version>> columns, do not allow users to modify them.
             C.Is_Updated  := False;
             C.Is_Inserted := False;
+         end if;
+         if C.Is_Auditable then
+            O.Is_Auditable := True;
          end if;
 
          --  Collect in the dependencies vectors the tables that we are using.

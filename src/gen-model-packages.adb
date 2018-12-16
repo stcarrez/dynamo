@@ -385,6 +385,9 @@ package body Gen.Model.Packages is
             Used_Spec_Types.Include (To_Unbounded_String ("Util.Serialize.IO"));
             Used_Body_Types.Include (To_Unbounded_String ("ADO.Utils.Serialize"));
          end if;
+         if Table.Is_Auditable then
+            Used_Spec_Types.Include (To_Unbounded_String ("ADO.Audits"));
+         end if;
       end Prepare_Table;
 
       procedure Prepare_Definition (Def : in Definition_Access) is

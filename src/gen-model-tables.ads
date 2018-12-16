@@ -187,6 +187,9 @@ package Gen.Model.Tables is
 
       --  Whether the serialization operation have to be generated.
       Is_Serializable  : Boolean := False;
+
+      --  Whether the table contains auditable fields.
+      Is_Auditable     : Boolean := False;
    end record;
 
    --  Get the value identified by the name.

@@ -155,18 +155,20 @@ package Gen.Model.Tables is
    --  Table Definition
    --  ------------------------------
    type Table_Definition is new Mappings.Mapping_Definition with record
-      Members        : aliased Column_List.List_Definition;
-      Members_Bean   : Util.Beans.Objects.Object;
-      Operations     : aliased Operation_List.List_Definition;
-      Operations_Bean : Util.Beans.Objects.Object;
-      Parent         : Table_Definition_Access;
-      Parent_Name    : Unbounded_String;
-      Package_Def    : Gen.Model.Packages.Package_Definition_Access;
-      Type_Name      : Unbounded_String;
-      Pkg_Name       : Unbounded_String;
-      Table_Name     : Unbounded_String;
-      Version_Column : Column_Definition_Access;
-      Id_Column      : Column_Definition_Access;
+      Members          : aliased Column_List.List_Definition;
+      Members_Bean     : Util.Beans.Objects.Object;
+      Auditables       : aliased Column_List.List_Definition;
+      Auditables_Bean  : Util.Beans.Objects.Object;
+      Operations       : aliased Operation_List.List_Definition;
+      Operations_Bean  : Util.Beans.Objects.Object;
+      Parent           : Table_Definition_Access;
+      Parent_Name      : Unbounded_String;
+      Package_Def      : Gen.Model.Packages.Package_Definition_Access;
+      Type_Name        : Unbounded_String;
+      Pkg_Name         : Unbounded_String;
+      Table_Name       : Unbounded_String;
+      Version_Column   : Column_Definition_Access;
+      Id_Column        : Column_Definition_Access;
 
       --  The number of <<PK>> columns found.
       Key_Count        : Natural := 0;

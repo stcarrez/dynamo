@@ -4,12 +4,14 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{projectName}-main.adb">-----------------------------------------------------------------------
---  #{fn:capitalize(projectName)}-server -- Application server
+--  #{fn:capitalize(projectName)}-main -- Main tool
 <ui:include src="../../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 with Ada.Exceptions;
+with Ada.Command_Line;
+with Ada.Text_IO;
 #{''}
-with Util.Log.loggers;
+with Util.Log.Loggers;
 #{''}
 with ADO;
 with ADO.SQL;
@@ -37,5 +39,11 @@ begin
    DB := Factory.Get_Master_Session;
    DB.Begin_Transaction;
    DB.Commit;
+#{''}
+exception
+   when E : ADO.Drivers.Database_Error | ADO.Sessions.Connection_Error =>
+      Ada.Text_IO.Put_Line ("Cannot connect to database: "
+                              &amp; Ada.Exceptions.Exception_Message (E));
+      Ada.Command_Line.Set_Exit_Status (1);
 end #{fn:capitalize(projectName)}.Main;
 </f:view>

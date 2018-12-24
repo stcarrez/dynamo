@@ -22,4 +22,14 @@ INSERT INTO entity_type (name) VALUES
 #{table.rowIndex ge 2 ? ',' : ''}('#{table.table}')
 </h:list>;
 </h:panelGroup>
+<h:panelGroup rendered="#{not empty model.tables}">
+  <h:list value="#{model.tables}" var="table">
+    <h:list value="#{table.members}" var="column">
+      <h:panelGroup rendered="#{column.isAuditable}">
+INSERT INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "#{table.table}"), "#{column.name}");
+      </h:panelGroup>
+    </h:list>
+</h:list>
+</h:panelGroup>
 </f:view>

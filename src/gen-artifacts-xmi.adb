@@ -1248,7 +1248,7 @@ package body Gen.Artifacts.XMI is
                                                      Gen.Model.XMI.BY_NAME);
       Handler.Generator_Tag := Find_Tag_Definition (Handler.Nodes,
                                                     "Dynamo.xmi",
-                                                    "ADO.Table.@dynamo.table.generator",
+                                                    "ADO.PK.@dynamo.pk.generator",
                                                     Gen.Model.XMI.BY_NAME);
       Handler.Literal_Tag := Find_Tag_Definition (Handler.Nodes,
                                                     "Dynamo.xmi",

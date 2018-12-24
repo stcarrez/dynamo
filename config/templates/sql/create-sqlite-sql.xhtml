@@ -11,14 +11,29 @@
 CREATE TABLE #{table.table} (
 <h:list value="#{table.members}" var="column">
   /* #{column.comment} */
-  `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} #{not column.isNull ? 'NOT NULL' : ''}#{column.isPrimaryKey and (table.id.generator eq 'increment') ? ' AUTO_INCREMENT' : ''},
-</h:list><u:set var="counter" value="0"/>
+  `#{column.sqlName}` #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} #{not column.isNull ? 'NOT NULL' : ''}#{column.isPrimaryKey and (column.generator eq 'increment') ? ' PRIMARY KEY AUTOINCREMENT' : ''}<h:panelGroup rendered="#{1 + column.index lt table.members.size}">,
+</h:panelGroup>
+</h:list>
+<h:panelGroup rendered="#{table.id.generator ne 'increment'}">,
+
+<u:set var="counter" value="0"/>
   PRIMARY KEY (<h:list value="#{table.members}" var="column"><h:panelGroup rendered="#{column.isPrimaryKey}"><h:panelGroup rendered="#{counter ne 0}">, </h:panelGroup><u:set var="counter" value="#{counter + 1}"/>`#{column.sqlName}`</h:panelGroup></h:list>)
+</h:panelGroup>
 );
 </h:list>
 <h:panelGroup rendered="#{not empty model.tables}">
   <h:list value="#{model.tables}" var="table">
 INSERT INTO entity_type (name) VALUES ("#{table.table}");
+</h:list>
+</h:panelGroup>
+<h:panelGroup rendered="#{not empty model.tables}">
+  <h:list value="#{model.tables}" var="table">
+    <h:list value="#{table.members}" var="column">
+      <h:panelGroup rendered="#{column.isAuditable}">
+INSERT INTO awa_audit_field (entity_type, name)
+  VALUES ((SELECT id FROM entity_type WHERE name = "#{table.table}"), "#{column.name}");
+      </h:panelGroup>
+    </h:list>
 </h:list>
 </h:panelGroup>
 </f:view>

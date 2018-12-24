@@ -89,9 +89,14 @@
 
    procedure Set_#{fn:capitalize(column.name)} (Object : in out #{fn:capitalize(table.type)}_Ref;
                   #{g:indent(column.name)} Value  : in #{g:adaType(column,1)}) is
-     <h:panelGroup rendered="#{column.type.isEnum}">
+     <h:panelGroup rendered="#{column.type.isEnum and not column.isAuditable}">
       procedure Set_Field_Enum is
-         new ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Operation (#{column.type.name});
+         new ADO.Objects.Set_Field_Operation (#{column.type.name});
+     </h:panelGroup>
+     <h:panelGroup rendered="#{column.type.isEnum and column.isAuditable}">
+      procedure Set_Field_Enum is
+         new ADO.Audits.Set_Field_Operation (#{column.type.name},
+                                             #{column.type.name}_Objects.To_Object);
      </h:panelGroup>
       Impl : #{fn:capitalize(table.type)}_Access;
    begin

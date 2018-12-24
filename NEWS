@@ -2,6 +2,7 @@ Version 1.0     -
   - Improvement and fixes in the YAML database model files
   - Add support for Nullable_String type
   - Generate Postgresql SQL files from the model files
+  - Add support for database record auditing
 
 Version 0.9     - Jul 2018
   - New type ASF.Parts.Part in the Dynamo UML model

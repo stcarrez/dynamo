@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-enums -- Enum definitions
---  Copyright (C) 2011, 2012 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,6 +59,7 @@ package Gen.Model.Enums is
       Values_Bean    : Util.Beans.Objects.Object;
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
       Type_Name      : Unbounded_String;
+      Nullable_Type  : Unbounded_String;
       Pkg_Name       : Unbounded_String;
       Sql_Type       : Unbounded_String;
    end record;

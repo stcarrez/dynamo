@@ -107,6 +107,13 @@
         <from>Boolean</from>
         <to>Boolean</to>
     </mapping>
+    <mapping type="boolean" allow-null='true'>
+        <from>bool</from>
+        <from>boolean</from>
+        <from>Boolean</from>
+        <from>Nullable_Boolean</from>
+        <to>ADO.Nullable_Boolean</to>
+    </mapping>
     <mapping type='blob' allow-null='true'>
         <from>blob</from>
         <from>Blob</from>

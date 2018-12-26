@@ -109,9 +109,11 @@ package body Gen.Model.Enums is
          if Pos > 0 then
             Enum.Pkg_Name := Unbounded_Slice (Enum.Name, 1, Pos - 1);
             Enum.Type_Name := Unbounded_Slice (Enum.Name, Pos + 1, Length (Enum.Name));
+            Enum.Nullable_Type := "Nullable_" & Enum.Type_Name;
          else
             Enum.Pkg_Name := To_Unbounded_String ("ADO");
             Enum.Type_Name := Enum.Name;
+            Enum.Nullable_Type := "Nullable_" & Enum.Name;
          end if;
       end;
       return Enum;

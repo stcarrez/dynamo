@@ -43,6 +43,7 @@ with EL.Contexts.Default;
 with Gen.Utils;
 with Gen.Configs;
 with Gen.Model;
+with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
 with Gen.Commands.Templates;
@@ -124,7 +125,11 @@ package body Gen.Generator is
                return Util.Beans.Objects.To_Object (String '("Time"));
 
             elsif Type_Mapping.Kind = T_ENUM then
-               return Util.Beans.Objects.To_Object (Column.Type_Name);
+               if Column.Not_Null or Util.Beans.Objects.To_Integer (Param) = 2 then
+                  return Util.Beans.Objects.To_Object (Column.Type_Name);
+               else
+                  return Util.Beans.Objects.To_Object (Gen.Model.Enums.Enum_Definition (Type_Mapping.all).Nullable_Type);
+               end if;
 
             elsif Type_Mapping.Kind /= T_TABLE then
                return Util.Beans.Objects.To_Object (Type_Mapping.Target);

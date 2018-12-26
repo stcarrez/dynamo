@@ -23,10 +23,10 @@
       <h:panelGroup rendered="#{column.type.isInteger or column.type.isIdentifier}">
          return Util.Beans.Objects.To_Object (Long_Long_Integer (From.#{fn:capitalize(column.name)}));
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+      <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
          return Util.Beans.Objects.Time.To_Object (From.#{fn:capitalize(column.name)});
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+      <h:panelGroup rendered="#{column.type.isDate and column.isNull}">
          if From.#{fn:capitalize(column.name)}.Is_Null then
             return Util.Beans.Objects.Null_Object;
          else
@@ -34,7 +34,7 @@
          end if;
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isEnum}">
-         return #{g:adaType(column)}_Objects.To_Object (From.#{fn:capitalize(column.name)});
+         return #{g:adaType(column,2)}_Objects.To_Object (From.#{fn:capitalize(column.name)});
       </h:panelGroup>
       <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate}">
          return Util.Beans.Objects.To_Object (From.#{fn:capitalize(column.name)});
@@ -62,13 +62,31 @@
   <h:panelGroup rendered="#{column.type.isIdentifier}">
       Into.#{fn:capitalize(column.name)} := Stmt.Get_Identifier (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isString}">
+  <h:panelGroup rendered="#{column.type.isString and not column.isNull}">
       Into.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isEnum}">
-      Into.#{fn:capitalize(column.name)} := #{g:adaType(column)}'Val (Stmt.Get_Integer (#{column.index}));
+  <h:panelGroup rendered="#{column.type.isString and column.isNull}">
+      Into.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_String (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{not column.type.isIdentifier and not column.type.isString and not column.type.isEnum}">
+  <h:panelGroup rendered="#{column.type.isBoolean and column.isNull}">
+      Into.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_Boolean (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isInteger and column.isNull}">
+      Into.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_Integer (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isDate and column.isNull}">
+      Into.#{fn:capitalize(column.name)} := Stmt.Get_Time (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isEnum and column.isNull}">
+      Into.#{fn:capitalize(column.name)}.Is_Null := Stmt.Is_Null (#{column.index});
+      if not Into.#{fn:capitalize(column.name)}.Is_Null then
+         Into.#{fn:capitalize(column.name)}.Value := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
+      end if;
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isEnum and not column.isNull}">
+      Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
+  </h:panelGroup>
+  <h:panelGroup rendered="#{not column.isNull and not column.type.isIdentifier and not column.type.isString and not column.type.isEnum}">
       Into.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
   </h:panelGroup>
 </h:list>
@@ -125,7 +143,7 @@
          Into.#{fn:capitalize(column.name)} := Stmt.Get_Unbounded_String (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isEnum}">
-         Into.#{fn:capitalize(column.name)} := #{g:adaType(column)}'Val (Stmt.Get_Integer (#{column.index}));
+         Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
   <h:panelGroup rendered="#{not column.type.isIdentifier and not column.type.isString and not column.type.isEnum}">
          Into.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});

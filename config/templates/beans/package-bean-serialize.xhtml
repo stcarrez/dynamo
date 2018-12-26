@@ -13,10 +13,10 @@
     <h:panelGroup rendered="#{column.type.isInteger}">
       Stream.Write_Entity ("#{column.name}", Item.#{fn:capitalize(column.name)});
     </h:panelGroup>
-    <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+    <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
       Stream.Write_Entity ("#{column.name}", Item.#{fn:capitalize(column.name)});
     </h:panelGroup>
-    <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+    <h:panelGroup rendered="#{column.type.isDate and column.isNull}">
       ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.#{fn:capitalize(column.name)});
     </h:panelGroup>
     <h:panelGroup rendered="#{column.type.isEnum}">
@@ -39,14 +39,14 @@
     <h:panelGroup rendered="#{column.type.isInteger and column.type.name ne 'ADO.Entity_Type'}">
       Stream.Write_Entity ("#{column.name}", Item.Get_#{fn:capitalize(column.name)});
     </h:panelGroup>
-    <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+    <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
       Stream.Write_Entity ("#{column.name}", Item.Get_#{fn:capitalize(column.name)});
     </h:panelGroup>
     <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type'}">
       ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.Get_#{fn:capitalize(column.name)});
          Item.Set_#{fn:capitalize(column.name)} (ADO.Entity_Type (Util.Beans.Objects.To_Integer (Value)));
     </h:panelGroup>
-    <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+    <h:panelGroup rendered="#{column.type.isDate and column.isNull}">
       ADO.Utils.Serialize.Write_Entity (Stream, "#{column.name}", Item.Get_#{fn:capitalize(column.name)});
          if Util.Beans.Objects.Is_Null (Value) then
             Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => True, others => &lt;&gt;));

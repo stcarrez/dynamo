@@ -12,27 +12,39 @@
       <h:panelGroup rendered="#{column.type.isIdentifier}">
          Item.#{fn:capitalize(column.name)} := ADO.Identifier (Util.Beans.Objects.To_Long_Long_Integer (Value));
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isInteger}">
-         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Integer (Value);
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
-         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.Time.To_Time (Value);
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-         if Util.Beans.Objects.Is_Null (Value) then
-            Item.#{fn:capitalize(column.name)} := ADO.Nullable_Time '(Is_Null => True, others => &lt;&gt;);
-         else
-            Item.#{fn:capitalize(column.name)} := ADO.Nullable_Time '(Is_Null => False,
-                                        Value   => Util.Beans.Objects.Time.To_Time (Value));
+      <h:panelGroup rendered="#{column.isNull and not column.type.isIdentifier}">
+         Item.#{fn:capitalize(column.name)}.Is_Null := Util.Beans.Objects.Is_Null (Value);
+         if not Item.#{fn:capitalize(column.name)}.Is_Null then
+            <h:panelGroup rendered="#{column.type.isInteger}">
+            Item.#{fn:capitalize(column.name)}.Value := Util.Beans.Objects.To_Integer (Value);
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isDate}">
+            Item.#{fn:capitalize(column.name)}.Value := Util.Beans.Objects.Time.To_Time (Value);
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isBoolean}">
+            Item.#{fn:capitalize(column.name)}.Value := Util.Beans.Objects.To_Boolean (Value);
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isString}">
+            Item.#{fn:capitalize(column.name)}.Value := Util.Beans.Objects.To_Unbounded_String (Value);
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isEnum}">
+            Item.#{fn:capitalize(column.name)}.Value := #{column.type.name}_Objects.To_Value (Value);
+            </h:panelGroup>
          end if;
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isEnum}">
+      <h:panelGroup rendered="#{column.type.isInteger and not column.isNull}">
+         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Integer (Value);
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
+         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.Time.To_Time (Value);
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isEnum and not column.isNull}">
          Item.#{fn:capitalize(column.name)} := #{g:adaType(column,0)}_Objects.To_Value (Value);
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isBoolean}">
+      <h:panelGroup rendered="#{column.type.isBoolean and not column.isNull}">
          Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Boolean (Value);
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isString}">
+      <h:panelGroup rendered="#{column.type.isString and not column.isNull}">
          Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Unbounded_String (Value);
       </h:panelGroup>
     </h:panelGroup>
@@ -43,13 +55,13 @@
       <h:panelGroup rendered="#{column.type.isInteger and column.type.name ne 'ADO.Entity_Type'}">
          Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.To_Integer (Value));
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+      <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
          Item.Set_#{fn:capitalize(column.name)} (Util.Beans.Objects.Time.To_Time (Value));
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.name eq 'ADO.Entity_Type'}">
          Item.Set_#{fn:capitalize(column.name)} (ADO.Entity_Type (Util.Beans.Objects.To_Integer (Value)));
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
+      <h:panelGroup rendered="#{column.type.isDate and column.isNull}">
          if Util.Beans.Objects.Is_Null (Value) then
             Item.Set_#{fn:capitalize(column.name)} (ADO.Nullable_Time '(Is_Null => True, others => &lt;&gt;));
          else

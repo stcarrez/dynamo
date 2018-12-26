@@ -29,48 +29,47 @@
     <h:panelGroup rendered="#{column.name eq bean.id.name}">
          return ADO.Objects.To_Object (#{impl}.Get_Key);
     </h:panelGroup>
-    <h:panelGroup rendered="#{column.type.isEnum}">
+    <h:panelGroup rendered="#{not column.isNull and column.type.isEnum}">
          return #{g:adaType(column,0)}_Objects.To_Object (#{impl}.#{fn:capitalize(column.name)});
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name ne bean.id.name}">
-      <h:panelGroup rendered="#{(column.type.isInteger or column.type.isIdentifier) and column.type.name ne 'ADO.Nullable_Entity_Type' and column.type.name ne 'ADO.Nullable_Integer'}">
+      <h:panelGroup rendered="#{column.isNull and not column.type.isIdentifier}">
+         if #{impl}.#{fn:capitalize(column.name)}.Is_Null then
+            return Util.Beans.Objects.Null_Object;
+         else
+            <h:panelGroup rendered="#{column.type.isInteger}">
+            return Util.Beans.Objects.To_Object (Long_Long_Integer (#{impl}.#{fn:capitalize(column.name)}.Value));
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isDate}">
+            return Util.Beans.Objects.Time.To_Object (#{impl}.#{fn:capitalize(column.name)}.Value);
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isString}">
+            return Util.Beans.Objects.To_Object (#{impl}.#{fn:capitalize(column.name)}.Value);
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isBoolean}">
+            return Util.Beans.Objects.To_Object (#{impl}.#{fn:capitalize(column.name)}.Value);
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isEnum}">
+            return #{column.type.name}_Objects.To_Object (#{impl}.#{fn:capitalize(column.name)}.Value);
+            </h:panelGroup>
+         end if;
+      </h:panelGroup>
+      <h:panelGroup rendered="#{not column.isNull and column.type.isInteger}">
          return Util.Beans.Objects.To_Object (Long_Long_Integer (#{impl}.#{fn:capitalize(column.name)}));
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+      <h:panelGroup rendered="#{column.type.isIdentifier}">
+         return Util.Beans.Objects.To_Object (Long_Long_Integer (#{impl}.#{fn:capitalize(column.name)}));
+      </h:panelGroup>
+      <h:panelGroup rendered="#{not column.isNull and column.type.isDate}">
          return Util.Beans.Objects.Time.To_Object (#{impl}.#{fn:capitalize(column.name)});
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) eq 'ADO.Nullable_Time'}">
-         if #{impl}.#{fn:capitalize(column.name)}.Is_Null then
-            return Util.Beans.Objects.Null_Object;
-         else
-            return Util.Beans.Objects.Time.To_Object (#{impl}.#{fn:capitalize(column.name)}.Value);
-         end if;
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isInteger and g:adaType(column,1) eq 'ADO.Nullable_Integer'}">
-         if #{impl}.#{fn:capitalize(column.name)}.Is_Null then
-            return Util.Beans.Objects.Null_Object;
-         else
-            return Util.Beans.Objects.To_Object (Long_Long_Integer (#{impl}.#{fn:capitalize(column.name)}.Value));
-         end if;
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isString and column.type.isNullable}">
-         if #{impl}.#{fn:capitalize(column.name)}.Is_Null then
-            return Util.Beans.Objects.Null_Object;
-         else
-            return Util.Beans.Objects.To_Object (#{impl}.#{fn:capitalize(column.name)}.Value);
-         end if;
-      </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isString and not column.type.isNullable}">
+      <h:panelGroup rendered="#{not column.isNull and column.type.isString}">
          return Util.Beans.Objects.To_Object (#{impl}.#{fn:capitalize(column.name)});
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.name eq 'ADO.Nullable_Entity_Type'}">
-         if #{impl}.#{fn:capitalize(column.name)}.Is_Null then
-            return Util.Beans.Objects.Null_Object;
-         else
-            return Util.Beans.Objects.To_Object (Long_Long_Integer (#{impl}.#{fn:capitalize(column.name)}.Value));
-         end if;
+      <h:panelGroup rendered="#{not column.isNull and column.type.isBoolean}">
+         return Util.Beans.Objects.To_Object (#{impl}.#{fn:capitalize(column.name)});
       </h:panelGroup>
-    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate and not column.type.isString}">
+    <h:panelGroup rendered="#{not column.type.isInteger and not column.type.isEnum and not column.type.isIdentifier and not column.type.isDate and not column.type.isString and not column.type.isBoolean}">
          return Util.Beans.Objects.To_Object (#{impl}.#{fn:capitalize(column.name)});
   </h:panelGroup>
 </h:panelGroup>

@@ -58,7 +58,7 @@
   <h:panelGroup rendered="#{column.type.isNullable and not column.isPrimaryKey and not column.type.isIdentifier and not column.type.isBlob}">
       Impl.#{fn:capitalize(column.name)}.Is_Null := True;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isDate and g:adaType(column,1) ne 'ADO.Nullable_Time'}">
+  <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
       Impl.#{fn:capitalize(column.name)} := ADO.DEFAULT_TIME;
   </h:panelGroup>
 </h:list>

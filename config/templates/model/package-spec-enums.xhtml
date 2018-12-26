@@ -14,5 +14,10 @@
    package #{enum.name}_Objects is
       new Util.Beans.Objects.Enums (#{enum.name});
 #{''}
+   type Nullable_#{enum.name} is record
+      Is_Null : Boolean := True;
+      Value   : #{enum.name};
+   end record;
+#{''}
   </h:list>
 </ui:composition>

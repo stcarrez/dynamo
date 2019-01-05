@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model -- Model for Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2018 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -98,7 +98,8 @@ package body Gen.Model is
    --  ------------------------------
    procedure Set_Comment (Def     : in out Definition;
                           Comment : in String) is
-      Trimmed_Comment : constant String := Ada.Strings.Fixed.Trim (Comment, Trim_Chars, Trim_Chars);
+      Trimmed_Comment : constant String
+        := Ada.Strings.Fixed.Trim (Comment, Trim_Chars, Trim_Chars);
    begin
       Def.Comment := Util.Beans.Objects.To_Object (Trimmed_Comment);
    end Set_Comment;

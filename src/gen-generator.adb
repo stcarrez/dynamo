@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -128,7 +128,8 @@ package body Gen.Generator is
                if Column.Not_Null or Util.Beans.Objects.To_Integer (Param) = 2 then
                   return Util.Beans.Objects.To_Object (Column.Type_Name);
                else
-                  return Util.Beans.Objects.To_Object (Gen.Model.Enums.Enum_Definition (Type_Mapping.all).Nullable_Type);
+                  return Util.Beans.Objects.To_Object
+                    (Gen.Model.Enums.Enum_Definition (Type_Mapping.all).Nullable_Type);
                end if;
 
             elsif Type_Mapping.Kind /= T_TABLE then

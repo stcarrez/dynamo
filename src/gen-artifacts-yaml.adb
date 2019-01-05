@@ -26,7 +26,6 @@ with Text;
 with Yaml.Source.File;
 with Yaml.Parser;
 
-with Gen.Configs;
 with Gen.Model.Enums;
 with Gen.Model.Tables;
 with Gen.Model.Mappings;
@@ -44,7 +43,6 @@ package body Gen.Artifacts.Yaml is
    use Ada.Strings.Unbounded;
    use Gen.Model;
    use Gen.Model.Tables;
-   use Gen.Configs;
 
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Yaml");
 
@@ -183,6 +181,7 @@ package body Gen.Artifacts.Yaml is
                                  Stack    : in out Node_Stack.Stack;
                                  File     : in String;
                                  Loc      : in Mark) is
+         pragma Unreferenced (Model);
 
          function Location return String is
            (File & ":" & Util.Strings.Image (Loc.Line) & ":"
@@ -304,7 +303,8 @@ package body Gen.Artifacts.Yaml is
             when Scalar =>
                Node := Node_Stack.Current (Stack);
                if Node.Has_Name then
-                  Read_Scalar (Node, To_String (Node.Name), To_String (Cur.Content), P.Current_Lexer_Token_Start);
+                  Read_Scalar (Node, To_String (Node.Name), To_String (Cur.Content),
+                               P.Current_Lexer_Token_Start);
                   Node.Has_Name := False;
                else
                   Node.Name := Cur.Content;
@@ -347,9 +347,17 @@ package body Gen.Artifacts.Yaml is
                          Path    : in String;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
+      pragma Unreferenced (Handler, Context);
 
       procedure Write_Description (Comment : in Util.Beans.Objects.Object;
                                    Indent  : in Ada.Text_IO.Count);
+      procedure Write_Field (Item  : in Gen.Model.Definition'Class;
+                             Name  : in String);
+      procedure Write_Column (Col : in Gen.Model.Tables.Column_Definition'Class);
+      procedure Write_Association (Col : in Gen.Model.Tables.Association_Definition'Class);
+
+      procedure Process_Table (Table : in out Gen.Model.Tables.Table_Definition);
+      procedure Process_Enum (Enum : in out Gen.Model.Enums.Enum_Definition);
 
       File : Ada.Text_IO.File_Type;
 
@@ -473,11 +481,7 @@ package body Gen.Artifacts.Yaml is
       end Write_Association;
 
       procedure Process_Table (Table : in out Gen.Model.Tables.Table_Definition) is
-
-         Iter : Gen.Model.Tables.Column_List.Cursor := Table.Members.First;
-         Col  : Gen.Model.Tables.Column_Definition_Access;
       begin
-
          Ada.Text_IO.Put (File, Table.Get_Name);
          Ada.Text_IO.Put_Line (File, ":");
          Ada.Text_IO.Put_Line (File, "  type: entity");
@@ -511,7 +515,7 @@ package body Gen.Artifacts.Yaml is
          if Table.Has_Associations then
             Ada.Text_IO.Put_Line (File, "  oneToMany:");
             for Col of Table.Members loop
-               if (Col.all in Gen.Model.Tables.Association_Definition'Class) then
+               if Col.all in Gen.Model.Tables.Association_Definition'Class then
                   Write_Association (Gen.Model.Tables.Association_Definition'Class (Col.all));
                end if;
             end loop;
@@ -550,22 +554,12 @@ package body Gen.Artifacts.Yaml is
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
                       Context : in out Generator'Class) is
-      Iter : Gen.Model.Packages.Package_Cursor;
-      Pkg  : Gen.Model.Packages.Package_Definition_Access;
-
    begin
-      Log.Debug ("Preparing the model for query");
+      Log.Debug ("Saving the model in YAML");
 
       Handler.Save_Model (Path    => "model.yaml",
                           Model   => Model,
                           Context => Context);
-      --
-      --        Iter := Gen.Model.Packages.First (Model);
-      --        while Gen.Model.Packages.Has_Element (Iter) loop
-      --           Pkg := Gen.Model.Packages.Element (Iter);
-      --
-      --           Gen.Model.Packages.Next (Iter);
-      --        end loop;
    end Prepare;
 
 end Gen.Artifacts.Yaml;

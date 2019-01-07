@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-yaml -- Query artifact for Code Generator
---  Copyright (C) 2018 Stephane Carrez
+--  Copyright (C) 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,6 +57,7 @@ package body Gen.Artifacts.Yaml is
                        IN_COLUMN,
                        IN_ASSOCIATION,
                        IN_KEY,
+                       IN_GENERATOR,
                        IN_UNKOWN);
 
    type Node_Info is record
@@ -164,6 +165,14 @@ package body Gen.Artifacts.Yaml is
                Node.Assoc.Use_Foreign_Key_Type := Value = "true" or Value = "yes";
             end if;
 
+         when IN_GENERATOR =>
+            if Node.Col = null then
+               return;
+            end if;
+            if Name = "strategy" then
+               Node.Col.Generator := Util.Beans.Objects.To_Object (Value);
+            end if;
+
          when IN_ENUM_VALUES =>
             if Node.Enum = null then
                return;
@@ -252,13 +261,21 @@ package body Gen.Artifacts.Yaml is
                New_Node.Table := Node.Table;
                New_Node.State := IN_KEY;
 
+            when IN_KEY =>
+               if Node.Name = "generator" then
+                  Node_Stack.Push (Stack);
+                  New_Node := Node_Stack.Current (Stack);
+                  New_Node.Table := Node.Table;
+                  New_Node.Col := Node.Col;
+                  New_Node.State := IN_GENERATOR;
+               end if;
+
             when IN_ENUM =>
                if Node.Name = "values" then
                   Node_Stack.Push (Stack);
                   New_Node := Node_Stack.Current (Stack);
                   New_Node.Table := Node.Table;
                   New_Node.State := IN_ENUM_VALUES;
-
                end if;
 
             when others =>

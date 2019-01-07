@@ -26,7 +26,7 @@ CREATE TABLE #{table.table} (
 INSERT INTO entity_type (name) VALUES ("#{table.table}");
 </h:list>
 </h:panelGroup>
-<h:panelGroup rendered="#{not empty model.tables}">
+<h:panelGroup rendered="#{not empty model.tables and project.skip_awa_audit_field ne 'yes'}">
   <h:list value="#{model.tables}" var="table">
     <h:list value="#{table.members}" var="column">
       <h:panelGroup rendered="#{column.isAuditable}">

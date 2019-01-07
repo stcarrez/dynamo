@@ -46,7 +46,7 @@
   <h:panelGroup rendered="#{column.name ne table.id.name and column.type.isIdentifier}">
       Impl.#{fn:capitalize(column.name)} := ADO.NO_IDENTIFIER;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isBoolean and not column.isPrimaryKey}">
+  <h:panelGroup rendered="#{column.type.isBoolean and not column.isPrimaryKey and not column.isNull}">
       Impl.#{fn:capitalize(column.name)} := False;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isInteger and not column.isPrimaryKey and not column.isNull}">
@@ -55,7 +55,7 @@
   <h:panelGroup rendered="#{column.type.isEnum and not column.isPrimaryKey}">
       Impl.#{fn:capitalize(column.name)} := #{g:adaType(column,1)}'First;
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isNullable and not column.isPrimaryKey and not column.type.isIdentifier and not column.type.isBlob}">
+  <h:panelGroup rendered="#{column.isNull and not column.isPrimaryKey and not column.type.isIdentifier and not column.type.isBlob}">
       Impl.#{fn:capitalize(column.name)}.Is_Null := True;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
@@ -142,7 +142,7 @@
       ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_Entity_Type (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
-    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isEnum and not column.type.isDate and not column.type.isString and not column.type.isInteger and not column.type.isIdentifier and column.type.name ne 'ADO.Entity_Type' and not column.type.isObject}">
+    <h:panelGroup rendered="#{column.name ne table.id.name and column.isPrimitiveType and not column.type.isEnum and not column.type.isDate and not column.type.isString and not column.type.isInteger and not column.type.isBoolean and not column.type.isIdentifier and column.type.name ne 'ADO.Entity_Type' and not column.type.isObject}">
       ADO.#{column.isAuditable ? 'Audits' : 'Objects'}.Set_Field_#{fn:capitalize(g:adaType(column,2))} (Impl.all, #{column.index + 1}, Impl.#{fn:capitalize(column.name)}, Value);
     </h:panelGroup>
 
@@ -438,6 +438,7 @@
 <h:panelGroup rendered="#{not empty table.version}">
       Object.#{fn:capitalize(table.version.name)} := 1;
 </h:panelGroup>
+
 <h:list value="#{table.members}" var="column">
   <h:panelGroup rendered="#{table.keyCount eq 1 and table.id.generator ne 'native' and table.id.name eq column.name and table.id.generator ne 'none'}">
       Session.Allocate (Id => Object);
@@ -546,8 +547,11 @@
   <h:panelGroup rendered="#{column.type.isString and column.type.isNullable}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_String (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isBoolean}">
+  <h:panelGroup rendered="#{column.type.isBoolean and not column.isNull}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Boolean (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isBoolean and column.isNull}">
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_Boolean (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isDate}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Time (#{column.index});
@@ -567,7 +571,7 @@
   <h:panelGroup rendered="#{column.type.name eq 'ADO.Nullable_Integer'}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_Integer (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isEnum and not column.type.isBlob and not column.type.isIdentifier and not column.type.isString and not column.type.isDate and column.type.name ne 'ADO.Entity_Type' and column.type.name ne 'ADO.Nullable_Entity_Type' and column.type.name ne 'ADO.Nullable_Integer' and not column.type.isObject}">
+  <h:panelGroup rendered="#{column.isPrimitiveType and not column.type.isEnum and not column.type.isBlob and not column.type.isIdentifier and not column.type.isString and not column.type.isDate and not column.type.isBoolean and column.type.name ne 'ADO.Entity_Type' and column.type.name ne 'ADO.Nullable_Entity_Type' and column.type.name ne 'ADO.Nullable_Integer' and not column.type.isObject}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
   </h:panelGroup>
 </h:panelGroup>

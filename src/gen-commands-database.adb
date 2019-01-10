@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-database -- Database creation from application model
---  Copyright (C) 2011, 2012, 2016, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2016, 2017, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@
 
 with Ada.Text_IO;
 with Ada.Strings.Fixed;
-with Ada.IO_Exceptions;
 with Ada.Directories;
 with Ada.Exceptions;
 

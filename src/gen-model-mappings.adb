@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012, 2015, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -83,6 +83,9 @@ package body Gen.Model.Mappings is
 
          when T_STRING =>
             return "string";
+
+         when T_FLOAT =>
+            return "float";
 
          when T_ENTITY_TYPE =>
             return "entity_type";

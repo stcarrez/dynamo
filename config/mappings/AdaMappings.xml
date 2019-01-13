@@ -130,13 +130,14 @@
         <from>string</from>
         <to>ADO.Nullable_String</to>
     </mapping>
-    <mapping>
+    <mapping type="float">
         <from>PrimitiveTypes::Double</from>
         <from>double</from>
         <to>Double</to>
     </mapping>
-    <mapping>
-        <from>PrimitiveTypes::Double</from>
+    <mapping type="float">
+        <from>PrimitiveTypes::Float</from>
+        <from>datatype::float</from>
         <from>float</from>
         <to>Float</to>
     </mapping>

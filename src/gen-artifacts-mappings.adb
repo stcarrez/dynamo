@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-mappings -- Type mapping artifact for Code Generator
---  Copyright (C) 2011, 2012, 2015, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,6 +87,9 @@ package body Gen.Artifacts.Mappings is
 
          elsif Kind = "boolean" then
             Kind_Type := Gen.Model.Mappings.T_BOOLEAN;
+
+         elsif Kind = "float" then
+            Kind_Type := Gen.Model.Mappings.T_FLOAT;
 
          elsif Kind = "string" or To = "Ada.Strings.Unbounded.Unbounded_String" then
             Kind_Type := Gen.Model.Mappings.T_STRING;

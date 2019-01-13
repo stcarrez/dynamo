@@ -18,6 +18,9 @@
             <h:panelGroup rendered="#{column.type.isInteger}">
             Item.#{fn:capitalize(column.name)}.Value := Util.Beans.Objects.To_Integer (Value);
             </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isFloat}">
+            Item.#{fn:capitalize(column.name)}.Value := Util.Beans.Objects.To_Float (Value);
+            </h:panelGroup>
             <h:panelGroup rendered="#{column.type.isDate}">
             Item.#{fn:capitalize(column.name)}.Value := Util.Beans.Objects.Time.To_Time (Value);
             </h:panelGroup>
@@ -34,6 +37,9 @@
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isInteger and not column.isNull}">
          Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Integer (Value);
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isFloat and not column.isNull}">
+         Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Float (Value);
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
          Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.Time.To_Time (Value);

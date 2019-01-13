@@ -44,6 +44,8 @@ package body Gen.Model.Mappings is
          return Util.Beans.Objects.To_Object (From.Kind = T_BOOLEAN);
       elsif Name = "isInteger" then
          return Util.Beans.Objects.To_Object (From.Kind = T_INTEGER or From.Kind = T_ENTITY_TYPE);
+      elsif Name = "isFloat" then
+         return Util.Beans.Objects.To_Object (From.Kind = T_FLOAT);
       elsif Name = "isString" then
          return Util.Beans.Objects.To_Object (From.Kind = T_STRING);
       elsif Name = "isIdentifier" then

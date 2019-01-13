@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012, 2015, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,8 @@ package Gen.Model.Mappings is
 
    Postgresql_MAPPING : constant String := "Postgresql";
 
-   type Basic_Type is (T_BOOLEAN, T_INTEGER, T_DATE, T_ENUM, T_IDENTIFIER, T_STRING, T_BLOB,
+   type Basic_Type is (T_BOOLEAN, T_INTEGER, T_DATE, T_ENUM, T_IDENTIFIER,
+                       T_STRING, T_FLOAT, T_BLOB,
                        T_ENTITY_TYPE, T_BEAN, T_TABLE);
 
    --  ------------------------------

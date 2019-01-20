@@ -3,6 +3,7 @@ Version 1.0     -
   - Add support for Nullable_String type
   - Generate Postgresql SQL files from the model files
   - Add support for database record auditing
+  - Add support for floating point
 
 Version 0.9     - Jul 2018
   - New type ASF.Parts.Part in the Dynamo UML model

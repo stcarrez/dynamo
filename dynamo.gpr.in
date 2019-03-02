@@ -1,10 +1,10 @@
 with "@UTIL_DIR@config";
 with "xmlada";
-with "@UTIL_DIR@util";
-with "@EL_DIR@el";
-with "@ASF_DIR@asf";
-with "@SERVLET_DIR@servlet_core";
-with "@ADO_DIR@ado";
+with "@UTIL_DIR@utilada_sys";
+with "@EL_DIR@elada";
+with "@ASF_DIR@asf_core";
+with "@SERVLET_DIR@servletada_core";
+with "@ADO_DIR@ado_all";
 @WITH_ADO_MYSQL@
 @WITH_ADO_SQLITE@
 @WITH_GPR@

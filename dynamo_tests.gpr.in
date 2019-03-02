@@ -1,8 +1,8 @@
 with "@UTIL_DIR@config";
-with "@UTIL_DIR@util";
-with "@UTIL_DIR@util_unit";
-with "@EL_DIR@el";
-with "@ASF_DIR@asf";
+with "@UTIL_DIR@utilada_sys";
+with "@UTIL_DIR@utilada_unit";
+with "@EL_DIR@elada";
+with "@ASF_DIR@asf_core";
 with "@ADO_DIR@ado";
 with "dynamo";
 

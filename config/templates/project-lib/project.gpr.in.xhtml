@@ -5,13 +5,13 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{projectName}.gpr.in">
 with "@UTIL_DIR@config";
-with "@UTIL_DIR@util";
+with "@UTIL_DIR@utilada_sys";
 #{''}
 
 library project #{projectName} is
 #{''}
    Version := "@#{fn:toUpperCase(projectName)}_VERSION@";
-   Library_Dir := "@#{fn:toUpperCase(projectName)}_LIBDIR@";
+   Library_Dir := "lib";
    Library_Type : Config.Library_Type_Type := external ("#{fn:toUpperCase(projectName)}_LIBRARY_TYPE", "static");
 #{''}
 

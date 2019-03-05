@@ -1,6 +1,6 @@
-with "@UTIL_DIR@util";
-with "@UTIL_DIR@util_unit";
-with "@EL_DIR@el";
+with "@UTIL_DIR@utilada_sys";
+with "@UTIL_DIR@utilada_unit";
+with "@EL_DIR@elada";
 with "@ASF_DIR@asf";
 with "@ADO_DIR@ado";
 
@@ -15,7 +15,7 @@ project Check_Build is
    for Source_Dirs use ("src/model", "../regtests/check_build");
    
    for Library_Dir use Library_Dir & "/check-code/" & Project'Library_Kind;
-   for Object_Dir use "./" & Util'Object_Dir & "/obj/check-code/" & Project'Library_Kind;
-   for Exec_Dir use "./" & Util'Exec_Dir & "/bin";
+   for Object_Dir use "./" & UtilAda_Sys'Object_Dir & "/obj/check-code/" & Project'Library_Kind;
+   for Exec_Dir use "./" & UtilAda_Sys'Exec_Dir & "/bin";
 
 end Check_Build;

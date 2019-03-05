@@ -3,135 +3,40 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="Makefile.in"><![CDATA[
+        file="Makefile"><![CDATA[
 NAME=#{projectName}
 #{''}
 
-# You may edit this makefile as long as you keep these original 
-# target names defined.
-MODE=debug
-GNATMAKE=@GNATMAKE@
-GNATCLEAN=gnatclean
-GPRINSTALL=@GPRINSTALL@
-INSTALL=@INSTALL@
-LN_S=@LN_S@
-MKDIR=mkdir
-CP=cp
-LN=ln -s
-#{''}
-
-GPRPATH:=\${NAME}.gpr
-#{''}
-
-BUILDS_SHARED=@BUILDS_SHARED@
+-include Makefile.conf
 
 #{''}
-version=@#{fn:toUpperCase(projectName)}_VERSION@
+STATIC_MAKE_ARGS = $(MAKE_ARGS) -X#{fn:toUpperCase(projectName)}_LIBRARY_TYPE=static
+SHARED_MAKE_ARGS = $(MAKE_ARGS) -X#{fn:toUpperCase(projectName)}_LIBRARY_TYPE=relocatable
+SHARED_MAKE_ARGS += -XUTILADA_BASE_BUILD=relocatable -XUTIL_LIBRARY_TYPE=relocatable
+SHARED_MAKE_ARGS += -XXMLADA_BUILD=relocatable
+SHARED_MAKE_ARGS += -XLIBRARY_TYPE=relocatable
 
 #{''}
-distdir=#{projectName}-@#{fn:toUpperCase(projectName)}_VERSION@
+include Makefile.defaults
 
 #{''}
-DIST_FILE=#{projectName}-@#{fn:toUpperCase(projectName)}_VERSION@.tar.gz
-#{''}
-
-ifeq (${OS},Windows_NT)
-LIBEXT=dll
-LIBVER=dll
-else
-LIBEXT=so
-LIBVER=so.$(version)
-endif
-
-#{''}
-
-srcdir = .
-bindir = @bindir@
-sbindir = @sbindir@
-top_srcdir = @top_srcdir@
-VPATH = @srcdir@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
-top_builddir = .
-
-#{''}
-
-PROCESSORS=@NR_CPUS@
-MAKE_ARGS=-XMODE=${MODE} -X#{fn:toUpperCase(projectName)}_LIBRARY_TYPE=$(#{fn:toUpperCase(projectName)}_LIBRARY_TYPE) -XPROCESSORS=$(PROCESSORS)
-ifeq ($(#{fn:toUpperCase(projectName)}_LIBRARY_TYPE),relocatable)
-MAKE_ARGS += -XUTIL_BUILD=relocatable -XUTIL_LIBRARY_TYPE=relocatable
-endif
-MAKE_ARGS=-XMODE=\${MODE}
-#{''}
-
-ifeq (${BUILDS_SHARED},yes)
-all:     static shared
-install: install_static install_shared
-else
-all:     static
-install: install_static
-endif
-#{''}
-static:
-	$(MAKE) #{fn:toUpperCase(projectName)}_LIBRARY_TYPE=static build-test
-#{''}
-shared:
-	$(MAKE) #{fn:toUpperCase(projectName)}_LIBRARY_TYPE=relocatable build-test
-
 # Build executables for all mains defined by the project.
-build:
-	$(GNATMAKE) -p -P "$(GPRPATH)" $(MAKE_ARGS)
-#{''}
-build-test:  build
-#{''}
+build-test::	setup
+	# $(GNATMAKE) $(GPRFLAGS) -p -P$(NAME)_tests $(MAKE_ARGS)
 
-# Not intended for manual invocation.
-# Invoked if automatic builds are enabled.
-# Analyzes only on those sources that have changed.
-# Does not build executables.
-autobuild:
-	$(GNATMAKE) -gnatc -c -k  -P "$(GPRPATH)"
 #{''}
+# Build and run the unit tests
+test:	build
+	# bin/#{projectName}_harness -xml #{projectName}-aunit.xml
 
-# Clean the root project of all build products.
-clean:
-	-rm -rf lib obj bin
 #{''}
+install-samples:
+	$(MKDIR) -p $(samplesdir)/samples
+	cp -rp $(srcdir)/samples/*.ad[sb] $(samplesdir)/samples/
+	cp -p $(srcdir)/samples.gpr $(samplesdir)
+	cp -p $(srcdir)/config.gpr $(samplesdir)
 
-# Clean root project and all imported projects too.
-clean_tree:
-	$(GNATCLEAN) -P "$(GPRPATH)" -r
 #{''}
-
-# Check *all* sources for errors, even those not changed.
-# Does not build executables.
-analyze:
-	$(GNATMAKE) -f  -gnatc -c -k  -P "$(GPRPATH)"
-#{''}
-
-# Clean, then build executables for all mains defined by the project.
-rebuild: clean build
-#{''}
-
-dist:
-	git archive -o $(DIST_FILE) --prefix=$(distdir)/ HEAD
-#{''}
-
-install_static:
-	$(MAKE) #{fn:toUpperCase(projectName)}_LIBRARY_TYPE=static install_lib
-#{''}
-
-install_shared:
-	$(MAKE) #{fn:toUpperCase(projectName)}_LIBRARY_TYPE=relocatable install_lib
-#{''}
-
-install_lib:
-	$(GPRINSTALL) -p -f --prefix=${prefix} $(MAKE_ARGS) \
-		--build-name=$(#{fn:toUpperCase(projectName)}_LIBRARY_TYPE) $(GPRPATH)
-#{''}
-
-uninstall:
-	-$(GPRINSTALL) -q -f --prefix=${prefix} $(MAKE_ARGS) --uninstall $(GPRPATH)
-
+$(eval $(call ada_library,$(NAME)))
 ]]>
 </f:view>

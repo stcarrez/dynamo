@@ -17,6 +17,8 @@ with ADO;
 with ADO.SQL;
 with ADO.Objects;
 with ADO.Drivers;
+with ADO.Configs;
+with ADO.Connections;
 with ADO.Sessions;
 with ADO.Sessions.Factory;
 with ADO.Statements;
@@ -35,13 +37,13 @@ begin
 #{''}
    --  Initialize the session factory to connect to the
    --  database defined by 'ado.database' property.
-   Factory.Create (ADO.Drivers.Get_Config ("ado.database"));
+   Factory.Create (ADO.Configs.Get_Config ("ado.database"));
    DB := Factory.Get_Master_Session;
    DB.Begin_Transaction;
    DB.Commit;
 #{''}
 exception
-   when E : ADO.Drivers.Database_Error | ADO.Sessions.Connection_Error =>
+   when E : ADO.Connections.Database_Error | ADO.Sessions.Connection_Error =>
       Ada.Text_IO.Put_Line ("Cannot connect to database: "
                               &amp; Ada.Exceptions.Exception_Message (E));
       Ada.Command_Line.Set_Exit_Status (1);

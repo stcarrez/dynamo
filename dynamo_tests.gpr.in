@@ -2,7 +2,7 @@ with "@UTIL_DIR@config";
 with "@UTIL_DIR@utilada_sys";
 with "@UTIL_DIR@utilada_unit";
 with "@EL_DIR@elada";
-with "@ASF_DIR@asf_core";
+with "@ASF_DIR@asf";
 with "@ADO_DIR@ado";
 with "dynamo";
 

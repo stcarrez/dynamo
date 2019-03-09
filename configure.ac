@@ -136,11 +136,11 @@ AC_SUBST(EL_DIR)
 ##########################################
 # Ada Server Faces library
 ##########################################
-AM_GNAT_FIND_PROJECT([ada-asf],[Ada Server Faces],[asf_core],
+AM_GNAT_FIND_PROJECT([ada-asf],[Ada Server Faces],[asf],
   [git@github.com:stcarrez/ada-asf.git],
   [Building Dynamo requires the Ada Server Faces Library.],
   [
-    ASF_DIR=${gnat_project_dir_asf_core}
+    ASF_DIR=${gnat_project_dir_asf}
   ])
 AC_SUBST(ASF_DIR)
 

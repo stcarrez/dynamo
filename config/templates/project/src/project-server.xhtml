@@ -14,6 +14,8 @@ with Util.Log.Loggers;
 with AWS.Config.Set;
 with ASF.Server.Web;
 with AWA.Setup.Applications;
+with ADO.Drivers;
+--  with ADO.Sqlite;
 #{''}
 with #{fn:capitalize(projectName)}.Applications;
 procedure #{fn:capitalize(projectName)}.Server is
@@ -42,6 +44,9 @@ procedure #{fn:capitalize(projectName)}.Server is
    end Configure;
 #{''}
 begin
+   --  Initialize the database drivers (all of them or specific ones).
+   ADO.Drivers.Initialize;
+   --  ADO.Sqlite.Initialize;
    WS.Configure (Configure'Access);
    WS.Start;
    Log.Info ("Connect you browser to: http://localhost:8080{0}/index.html",

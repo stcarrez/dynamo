@@ -2,7 +2,7 @@ with "@UTIL_DIR@config";
 with "xmlada";
 with "@UTIL_DIR@utilada_sys";
 with "@EL_DIR@elada";
-with "@ASF_DIR@asf_core";
+with "@ASF_DIR@asf";
 with "@SERVLET_DIR@servletada";
 with "@ADO_DIR@ado_all";
 @WITH_ADO_MYSQL@

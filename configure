@@ -3464,25 +3464,25 @@ $as_echo_n "checking Ada Server Faces... " >&6; }
 # Check whether --with-ada-asf was given.
 if test "${with_ada_asf+set}" = set; then :
   withval=$with_ada_asf;
-      gnat_project_name_asf_core=${withval}/
+      gnat_project_name_asf=${withval}/
       if test -d "${withval}"; then
-	    gnat_project_name_asf_core=${withval}/asf_core
+	    gnat_project_name_asf=${withval}/asf
 	  fi
 
 else
 
-      gnat_project_name_asf_core=asf_core
+      gnat_project_name_asf=asf
 
 fi
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: trying ${gnat_project_name_asf_core}" >&5
-$as_echo "trying ${gnat_project_name_asf_core}" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: trying ${gnat_project_name_asf}" >&5
+$as_echo "trying ${gnat_project_name_asf}" >&6; }
 
   rm -f conftest.gpr
   # Search in the GNAT project path.
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${gnat_project_name_asf_core} project exists in gnatmake's search path" >&5
-$as_echo_n "checking whether ${gnat_project_name_asf_core} project exists in gnatmake's search path... " >&6; }
-  echo "with \"${gnat_project_name_asf_core}\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${gnat_project_name_asf} project exists in gnatmake's search path" >&5
+$as_echo_n "checking whether ${gnat_project_name_asf} project exists in gnatmake's search path... " >&6; }
+  echo "with \"${gnat_project_name_asf}\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
   if { ac_try='gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out'
   { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
   (eval $ac_try) 2>&5
@@ -3490,16 +3490,16 @@ $as_echo_n "checking whether ${gnat_project_name_asf_core} project exists in gna
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; }
   then
-    gnat_project_asf_core=yes
+    gnat_project_asf=yes
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
   else
-    gnat_project_asf_core=no
+    gnat_project_asf=no
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
-    # Search in ../ada-asf-*/asf_core.gpr
-    files=`ls -r ../ada-asf/asf_core.gpr ../asf_core/asf_core.gpr ../ada-asf-*/asf_core.gpr 2>/dev/null`
+    # Search in ../ada-asf-*/asf.gpr
+    files=`ls -r ../ada-asf/asf.gpr ../asf/asf.gpr ../ada-asf-*/asf.gpr 2>/dev/null`
     for name in $files; do
       dir=`dirname $name`
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Ada Server Faces project in ${dir}" >&5
@@ -3512,39 +3512,39 @@ $as_echo_n "checking for Ada Server Faces project in ${dir}... " >&6; }
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; }
       then
-         gnat_project_asf_core=yes
-		 gnat_project_name_asf_core=${name}
+         gnat_project_asf=yes
+		 gnat_project_name_asf=${name}
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
          break
       else
-         gnat_project_asf_core=no
+         gnat_project_asf=no
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
       fi
     done
   fi
   rm -f conftest.gpr
-  if test x${gnat_project_asf_core} = xyes; then
-    gnat_project_with_asf_core="with \"${gnat_project_name_asf_core}\";";
-    gnat_project_dir_asf_core=`dirname ${gnat_project_name_asf_core}`
-    if test ${gnat_project_dir_asf_core} = . ; then
-       gnat_project_dir_asf_core=
+  if test x${gnat_project_asf} = xyes; then
+    gnat_project_with_asf="with \"${gnat_project_name_asf}\";";
+    gnat_project_dir_asf=`dirname ${gnat_project_name_asf}`
+    if test ${gnat_project_dir_asf} = . ; then
+       gnat_project_dir_asf=
     else
-       gnat_project_dir_asf_core="${gnat_project_dir_asf_core}/"
+       gnat_project_dir_asf="${gnat_project_dir_asf}/"
     fi
 
-    ASF_DIR=${gnat_project_dir_asf_core}
+    ASF_DIR=${gnat_project_dir_asf}
 
   else
-    gnat_project_dir_asf_core=
-    gnat_project_name_asf_core=
+    gnat_project_dir_asf=
+    gnat_project_name_asf=
     if test x"Building Dynamo requires the Ada Server Faces Library." != x; then
       as_fn_error $? "Building Dynamo requires the Ada Server Faces Library.
   You should build and install the Ada Server Faces component.
   It must be available and found by ${GNATMAKE}.
   This project was not found in the ADA_PROJECT_PATH environment variable.
-  This project was not found in ../asf_core nor in ../ada-asf-*.
+  This project was not found in ../asf nor in ../ada-asf-*.
   The component is available at git@github.com:stcarrez/ada-asf.git.
   Please, download and configure Ada Server Faces.
   The current configuration was using:

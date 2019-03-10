@@ -101,32 +101,32 @@ src/gen-configs.ads:   Makefile src/gen-configs.gpb
 		  src/gen-configs.gpb src/gen-configs.ads
 
 install:	  install_dirs
-	$(INSTALL) bin/dynamo $(prefix)/bin/dynamo
-	$(INSTALL) doc/dynamo.1 $(prefix)/share/man/man1/dynamo.1
-	$(CP) config/*.properties $(prefix)/share/dynamo/base
-	$(CP) config/*.xsl $(prefix)/share/dynamo/base
-	$(CP) config/*.sql $(prefix)/share/dynamo/base
-	-rm -rf $(prefix)/share/dynamo/base/templates
-	-rm -rf $(prefix)/share/dynamo/base/commands
-	-rm -rf $(prefix)/share/dynamo/base/mappings
-	-rm -rf $(prefix)/share/dynamo/base/uml
-	$(CP) -r config/uml $(prefix)/share/dynamo/base
-	$(CP) -r config/mappings $(prefix)/share/dynamo/base
-	$(CP) -r config/templates $(prefix)/share/dynamo/base
-	$(CP) -r config/commands $(prefix)/share/dynamo/base
-	$(CP) config/db/*.xml $(prefix)/share/dynamo/base/db
+	$(INSTALL) bin/dynamo $(DESTDIR)$(prefix)/bin/dynamo
+	$(INSTALL) doc/dynamo.1 $(DESTDIR)$(prefix)/share/man/man1/dynamo.1
+	$(CP) config/*.properties $(DESTDIR)$(prefix)/share/dynamo/base
+	$(CP) config/*.xsl $(DESTDIR)$(prefix)/share/dynamo/base
+	$(CP) config/*.sql $(DESTDIR)$(prefix)/share/dynamo/base
+	-rm -rf $(DESTDIR)$(prefix)/share/dynamo/base/templates
+	-rm -rf $(DESTDIR)$(prefix)/share/dynamo/base/commands
+	-rm -rf $(DESTDIR)$(prefix)/share/dynamo/base/mappings
+	-rm -rf $(DESTDIR)$(prefix)/share/dynamo/base/uml
+	$(CP) -r config/uml $(DESTDIR)$(prefix)/share/dynamo/base
+	$(CP) -r config/mappings $(DESTDIR)$(prefix)/share/dynamo/base
+	$(CP) -r config/templates $(DESTDIR)$(prefix)/share/dynamo/base
+	$(CP) -r config/commands $(DESTDIR)$(prefix)/share/dynamo/base
+	$(CP) config/db/*.xml $(DESTDIR)$(prefix)/share/dynamo/base/db
 
 install_dirs:
-	${MKDIR} -p ${bindir}
-	${MKDIR} -p ${prefix}/share/dynamo/base
-	${MKDIR} -p ${prefix}/share/dynamo/base/db
-	${MKDIR} -p ${prefix}/share/dynamo/base/mappings
-	${MKDIR} -p ${prefix}/share/dynamo/base/commands
-	${MKDIR} -p ${prefix}/share/man/man1
+	${MKDIR} -p $(DESTDIR)${bindir}
+	${MKDIR} -p $(DESTDIR)${prefix}/share/dynamo/base
+	${MKDIR} -p $(DESTDIR)${prefix}/share/dynamo/base/db
+	${MKDIR} -p $(DESTDIR)${prefix}/share/dynamo/base/mappings
+	${MKDIR} -p $(DESTDIR)${prefix}/share/dynamo/base/commands
+	${MKDIR} -p $(DESTDIR)${prefix}/share/man/man1
 
 uninstall:
-	rm -rf ${prefix}/share/dynamo/base
-	rm -f ${bindir}/dynamo
-	rm -f $(prefix)/share/man/man1/dynamo.1
+	rm -rf $(DESTDIR)${prefix}/share/dynamo/base
+	rm -f $(DESTDIR)${bindir}/dynamo
+	rm -f $(DESTDIR)$(prefix)/share/man/man1/dynamo.1
 
 .PHONY: doc

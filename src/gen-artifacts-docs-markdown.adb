@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs-markdown -- Artifact for GitHub Markdown documentation format
---  Copyright (C) 2015, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2015, 2017, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ package body Gen.Artifacts.Docs.Markdown is
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.Docs.Mark");
 
    Marker : constant Ada.Strings.Maps.Character_Set
-     := Ada.Strings.Maps.To_Set (" .,;:!?")
+     := Ada.Strings.Maps.To_Set (" .,;:!?)")
      or Ada.Strings.Maps.To_Set (ASCII.HT)
      or Ada.Strings.Maps.To_Set (ASCII.VT)
      or Ada.Strings.Maps.To_Set (ASCII.CR)

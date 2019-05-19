@@ -30,8 +30,14 @@ ROOTDIR=.
 #{''}
 
 $(foreach PLUGIN,$(PLUGINS),$(eval include plugins/$(PLUGIN)/Makefile))
+#{''}
 
 build::
 	$(GNATMAKE) -m -p -P "$(GPRPATH)" $(MAKE_ARGS)
+#{''}
+
+generate::
+	mkdir -p db
+	$(DYNAMO) generate $(DYNAMO_ARGS)
 
 </f:view>

@@ -1,10 +1,12 @@
 # You may edit this makefile as long as you keep these original 
 # target names defined.
 MODE=debug
+NAME=dynamo
 GNATMAKE=gprbuild
 GNATCLEAN=gprclean
 GPRINSTALL=@GPRINSTALL@
-GPRPATH=dynamo.gpr
+GPRPATH=$(DYNAMO).gpr
+GPRFLAGS=-m @BUILDS_QUIET@
 
 distdir=dynamo-@GEN_VERSION@
 
@@ -47,10 +49,10 @@ CP=cp
 build:	local-build build-tests
 
 local-build: src/gen-configs.ads
-	$(GNATMAKE) -p -P "$(GPRPATH)" $(MAKE_ARGS)
+	$(GNATMAKE) $(GPRFLAGS) -p -P$(NAME) $(MAKE_ARGS)
 
 build-tests:
-	$(GNATMAKE) -p -Pdynamo_tests $(MAKE_ARGS)
+	$(GNATMAKE) $(GPRFLAGS) -p -P$(NAME)_tests $(MAKE_ARGS)
 
 bin/dynamo:  local-build
 bin/dynamo_harness:  bin/dynamo build-tests
@@ -60,7 +62,7 @@ bin/dynamo_harness:  bin/dynamo build-tests
 # Analyzes only on those sources that have changed.
 # Does not build executables.
 autobuild:
-	$(GNATMAKE) $(MAKE_ARGS) -gnatc -c -k  -P "$(GPRPATH)"
+	$(GNATMAKE) $(MAKE_ARGS) -gnatc -c -k  -P$(NAME)
 
 # Clean the root project of all build products.
 clean:
@@ -68,12 +70,12 @@ clean:
 
 # Clean root project and all imported projects too.
 clean_tree:
-	$(GNATCLEAN) -q -P "$(GPRPATH)" -r
+	$(GNATCLEAN) -q -P$(NAME) -r
 
 # Check *all* sources for errors, even those not changed.
 # Does not build executables.
 analyze:
-	$(GNATMAKE) $(MAKE_ARGS) -f  -gnatc -c -k  -P "$(GPRPATH)"
+	$(GNATMAKE) $(MAKE_ARGS) -f  -gnatc -c -k  -P$(NAME)
 
 # Clean, then build executables for all mains defined by the project.
 rebuild: clean build

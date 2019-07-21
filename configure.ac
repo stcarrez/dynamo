@@ -18,28 +18,16 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/gen.ads)
 
-AC_CANONICAL_HOST
-AC_EXEEXT
-
 # Current release settings
 GEN_MAJOR_VERSION=1
 GEN_MINOR_VERSION=0
 GEN_MICRO_VERSION=0
 GEN_VERSION=$GEN_MAJOR_VERSION.$GEN_MINOR_VERSION.$GEN_MICRO_VERSION
 
-AC_MSG_CHECKING([number of processors])
-NR_CPUS=`getconf _NPROCESSORS_CONF 2>/dev/null || getconf _NPROCESSORS_CONF 2>/dev/null || echo 1`
-AC_MSG_RESULT($NR_CPUS)
-AC_SUBST(NR_CPUS)
-
-AM_GNAT_CHECK_GPRBUILD
+AM_GNAT_LIBRARY_PROJECT
 
 # checking for local tools
 AC_PROG_CC
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
-AC_PROG_RANLIB
-AC_PROG_LN_S
 AC_CHECK_PROG(UNZIP_CHECK,unzip,yes)
 if test x"$UNZIP_CHECK" != x"yes" ; then
     AC_MSG_ERROR([Please install unzip before installing Dynamo.])

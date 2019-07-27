@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-plugins -- Plugin creation and management commands for dynamo
---  Copyright (C) 2012, 2015, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -105,10 +105,11 @@ package body Gen.Commands.Plugins is
          end case;
       end loop;
       declare
-         Name  : constant String := Get_Argument;
-         Kind  : constant String := Get_Argument;
-         Dir   : constant String := Generator.Get_Plugin_Directory;
-         Path  : constant String := Util.Files.Compose (Dir, Get_Directory_Name (Name, Name_Dir));
+         Name       : constant String := Get_Argument;
+         Kind       : constant String := Get_Argument;
+         Dir        : constant String := Generator.Get_Plugin_Directory;
+         Plugin_Dir : constant String := Get_Directory_Name (Name, Name_Dir);
+         Path       : constant String := Util.Files.Compose (Dir, Plugin_Dir);
       begin
          if Name'Length = 0 then
             Generator.Error ("Missing plugin name");
@@ -158,6 +159,7 @@ package body Gen.Commands.Plugins is
          --  Generate the new plugin content.
          Generator.Set_Force_Save (False);
          Generator.Set_Global ("pluginName", Name);
+         Generator.Set_Global ("pluginDir", Plugin_Dir);
          Gen.Generator.Generate_All (Generator, Gen.Artifacts.ITERATION_TABLE,
                                      "create-plugin-" & Kind);
 

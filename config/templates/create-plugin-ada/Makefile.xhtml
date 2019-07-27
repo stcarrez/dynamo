@@ -4,14 +4,16 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="Makefile">
-NAME=#{projectName}_#{g:replace(pluginName,'-','_')}
+ROOTDIR ?= ../..
 #{''}
 
-LIBNAME=lib\${NAME}
+include $(ROOTDIR)/Makefile.defaults
 #{''}
 
-include ../../rules.mk
+#{projectName}_#{g:replace(pluginName,'-','_')}_dir=$(ROOTDIR)/plugins/#{pluginDir}
+#{projectName}_#{g:replace(pluginName,'-','_')}_dynamo=
+#{projectName}_#{g:replace(pluginName,'-','_')}_install_dirs=
 #{''}
 
-GPRPATH=#{projectName}_#{g:replace(pluginName,'-','_')}.gpr
+$(eval $(call awa_plugin,#{projectName}_#{g:replace(pluginName,'-','_')}))
 </f:view>

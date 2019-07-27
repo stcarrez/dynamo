@@ -20,12 +20,10 @@ project #{projectName}_#{g:replace(pluginName,'-','_')} is
 
    for Library_Dir use "lib/" &amp; Name &amp; "/" &amp; Project'Library_Kind;
    for Object_Dir use "obj/" &amp; Name &amp; "/" &amp; Project'Library_Kind;
-   for Exec_Dir use #{projectName}.Exec_Dir;
 
    package Binder renames #{projectName}.Binder;
    package Builder renames #{projectName}.Builder;
    package Compiler renames #{projectName}.Compiler;
-   package Linker renames #{projectName}.Linker;
 
 end #{projectName}_#{g:replace(pluginName,'-','_')};
 </f:view>

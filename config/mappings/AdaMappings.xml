@@ -26,6 +26,7 @@
     </mapping>
     <mapping type="date" allow-null='true'>
         <from>date</from>
+        <from>Date</from>
         <from>DateTime</from>
         <from>Timestamp</from>
         <from>Nullable_Time</from>

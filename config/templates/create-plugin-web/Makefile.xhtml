@@ -4,9 +4,16 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="Makefile">
-NAME=#{projectName}_#{pluginName}
+ROOTDIR ?= ../..
 #{''}
 
-include ../../rules.mk
+include $(ROOTDIR)/Makefile.defaults
 #{''}
+
+#{projectName}_#{g:replace(pluginName,'-','_')}_dir=$(ROOTDIR)/plugins/#{pluginDir}
+#{projectName}_#{g:replace(pluginName,'-','_')}_install_dirs=bundles web
+#{projectName}_#{g:replace(pluginName,'-','_')}_install_files=
+#{''}
+
+$(eval $(call awa_install_plugin,#{projectName}_#{g:replace(pluginName,'-','_')}))
 </f:view>

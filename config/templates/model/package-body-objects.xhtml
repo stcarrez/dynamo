@@ -553,7 +553,10 @@
   <h:panelGroup rendered="#{column.type.isBoolean and column.isNull}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_Boolean (#{column.index});
   </h:panelGroup>
-  <h:panelGroup rendered="#{column.type.isDate}">
+  <h:panelGroup rendered="#{column.type.isDate and column.isNull}">
+      Object.#{fn:capitalize(column.name)} := Stmt.Get_Nullable_Time (#{column.index});
+  </h:panelGroup>
+  <h:panelGroup rendered="#{column.type.isDate and not column.isNull}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Time (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isEnum}">

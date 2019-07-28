@@ -1,0 +1,37 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="Makefile"><![CDATA[
+NAME=#{projectName}
+#{''}
+
+-include Makefile.conf
+
+#{''}
+STATIC_MAKE_ARGS = $(MAKE_ARGS) -X#{fn:toUpperCase(projectName)}_LIBRARY_TYPE=static
+SHARED_MAKE_ARGS = $(MAKE_ARGS) -X#{fn:toUpperCase(projectName)}_LIBRARY_TYPE=relocatable
+SHARED_MAKE_ARGS += -XUTILADA_BASE_BUILD=relocatable -XUTIL_LIBRARY_TYPE=relocatable
+SHARED_MAKE_ARGS += -XXMLADA_BUILD=relocatable
+SHARED_MAKE_ARGS += -XLIBRARY_TYPE=relocatable
+
+#{''}
+include Makefile.defaults
+
+#{''}
+# Build executables for all mains defined by the project.
+build-test::	setup
+	# $(GNATMAKE) $(GPRFLAGS) -p -P$(NAME)_tests $(MAKE_ARGS)
+
+#{''}
+# Build and run the unit tests
+test:	build
+	# bin/#{projectName}_harness -xml #{projectName}-aunit.xml
+
+#{''}
+
+#{''}
+$(eval $(call ada_library,$(NAME)))
+]]>
+</f:view>

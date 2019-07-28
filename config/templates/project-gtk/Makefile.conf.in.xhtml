@@ -1,0 +1,24 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="Makefile.conf.in"><![CDATA[
+MODE=@MODE@
+GNATMAKE=@GNATMAKE@
+GPRINSTALL=@GPRINSTALL@
+GPRFLAGS=-m @BUILDS_QUIET@
+INSTALL=@INSTALL@
+BUILDS_SHARED=@BUILDS_SHARED@
+VERSION=@#{fn:toUpperCase(projectName)}_VERSION@
+SO_VERSION=@#{fn:toUpperCase(projectName)}_VERSION@
+DIST_DIR=#{fn:toLowerCase(projectName)}-@#{fn:toUpperCase(projectName)}_VERSION@
+DIST_FILE=#{fn:toLowerCase(projectName)}-@#{fn:toUpperCase(projectName)}_VERSION@.tar.gz
+LN_S=@LN_S@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+PROCESSORS=@NR_CPUS@
+COVERAGE=@BUILDS_COVERAGE@
+]]>
+</f:view>

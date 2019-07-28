@@ -1,0 +1,37 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="Makefile">
+NAME=#{projectName}
+GPRPATH=\${NAME}.gpr
+#{''}
+
+-include Makefile.conf
+#{''}
+
+include Makefile.defaults
+#{''}
+
+LIBNAME=lib\${NAME}
+
+#{''}
+# Model generation arguments with Dynamo
+# --package XXX.XXX.Models db uml/xxx.zargo
+DYNAMO_ARGS=db
+
+#{''}
+
+ROOTDIR=.
+#{''}
+
+build::
+	$(GNATMAKE) -m -p -P "$(GPRPATH)" $(MAKE_ARGS)
+#{''}
+
+generate::
+	mkdir -p db
+	$(DYNAMO) generate $(DYNAMO_ARGS)
+
+</f:view>

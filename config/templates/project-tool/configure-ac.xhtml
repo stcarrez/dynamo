@@ -32,18 +32,14 @@ AM_GNAT_LIBRARY_PROJECT(#{projectName})
 AC_PROG_CC
 #{''}
 
-##########################################
-# Ada Util library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-util],[Ada Utility Library],[utilada_sys],
-  [git@github.com:stcarrez/ada-util.git],
-  [Building #{projectName} requires the Ada Utility Library.],
-  [
-    UTIL_DIR=\${gnat_project_dir_utilada_sys}
-  ])
-AC_SUBST(UTIL_DIR)
-#{''}
-
+AM_GNAT_FIND_ADA_UTIL([#{projectName}])
+dnl AM_GNAT_FIND_ADA_EL([#{projectName}])
+dnl AM_GNAT_FIND_ADA_SECURITY([#{projectName}])
+dnl AM_GNAT_FIND_ADA_SERVLET([#{projectName}])
+dnl AM_GNAT_FIND_ADA_SERVER_FACES([#{projectName}])
+dnl AM_GNAT_FIND_ADA_ADO([#{projectName}])
+dnl AM_GNAT_FIND_ADA_WIKI([#{projectName}])
+dnl AM_GNAT_FIND_ADA_SWAGGER([#{projectName}])
 
 AC_OUTPUT(
 Makefile.conf

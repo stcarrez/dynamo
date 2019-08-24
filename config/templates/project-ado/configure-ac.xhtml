@@ -23,39 +23,20 @@ AC_SUBST(#{fn:toUpperCase(projectName)}_MINOR_VERSION)
 AC_SUBST(#{fn:toUpperCase(projectName)}_MICRO_VERSION)
 #{''}
 
-EXEC_PREFIX="$prefix"
-AC_SUBST(EXEC_PREFIX)
-
 AM_GNAT_LIBRARY_PROJECT(#{projectName})
 
 # checking for local tools
 AC_PROG_CC
 #{''}
 
-##########################################
-# Ada Util library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-util],[Ada Utility Library],[utilada_sys],
-  [git@github.com:stcarrez/ada-util.git],
-  [Building #{projectName} requires the Ada Utility Library.],
-  [
-    UTIL_DIR=\${gnat_project_dir_utilada_sys}
-  ])
-AC_SUBST(UTIL_DIR)
-#{''}
-
-
-##########################################
-# Ada Database Objects library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-ado],[Ada Database Objects],[ado],
-  [git@github.com:stcarrez/ada-ado.git],
-  [Building #{projectName} requires the Ada Database Objects Library.],
-  [
-    ADO_DIR=\${gnat_project_dir_ado}
-  ])
-AC_SUBST(ADO_DIR)
-
+AM_GNAT_FIND_ADA_UTIL([#{projectName}])
+AM_GNAT_FIND_ADA_ADO([#{projectName}])
+dnl AM_GNAT_FIND_ADA_EL([#{projectName}])
+dnl AM_GNAT_FIND_ADA_SECURITY([#{projectName}])
+dnl AM_GNAT_FIND_ADA_SERVLET([#{projectName}])
+dnl AM_GNAT_FIND_ADA_SERVER_FACES([#{projectName}])
+dnl AM_GNAT_FIND_ADA_WIKI([#{projectName}])
+dnl AM_GNAT_FIND_ADA_SWAGGER([#{projectName}])
 
 AC_OUTPUT(
 Makefile.conf

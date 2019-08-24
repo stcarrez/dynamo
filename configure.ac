@@ -39,9 +39,6 @@ AC_SUBST(GEN_MAJOR_VERSION)
 AC_SUBST(GEN_MINOR_VERSION)
 AC_SUBST(GEN_MICRO_VERSION)
 
-EXEC_PREFIX="$prefix"
-AC_SUBST(EXEC_PREFIX)
-
 GEN_LIBDIR="lib"
 AC_SUBST(GEN_LIBDIR)
 
@@ -88,82 +85,12 @@ fi
 AC_SUBST(DYNAMO_HAVE_GPR)
 AC_SUBST(WITH_GPR)
 
-##########################################
-# Ada Util library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-util],[Ada Utility Library],[utilada_base],
-  [git@github.com:stcarrez/ada-util.git],
-  [Building Dynamo requires the Ada Utility Library.],
-  [
-    UTIL_DIR=${gnat_project_dir_utilada_base}
-  ])
-AC_SUBST(UTIL_DIR)
-
-##########################################
-# Ada Yaml
-##########################################
-#AM_GNAT_FIND_PROJECT([yaml],[AdaYaml Library],[yaml],
-#  [git@github.com:yaml/AdaYaml.git],
-#  [Building Dynamo requires the Ada Yaml Library.],
-#  [
-#    YAML_DIR=${gnat_project_dir_yaml}
-#  ])
-#AC_SUBST(YAML_DIR)
-
-##########################################
-# Ada Expression Language library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-el],[Ada Expression Language Library],[elada],
-  [git@github.com:stcarrez/ada-el.git],
-  [Building Dynamo requires the Ada EL Library.],
-  [
-    EL_DIR=${gnat_project_dir_elada}
-  ])
-AC_SUBST(EL_DIR)
-
-##########################################
-# Ada Server Faces library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-asf],[Ada Server Faces],[asf],
-  [git@github.com:stcarrez/ada-asf.git],
-  [Building Dynamo requires the Ada Server Faces Library.],
-  [
-    ASF_DIR=${gnat_project_dir_asf}
-  ])
-AC_SUBST(ASF_DIR)
-
-##########################################
-# Ada Security library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-security],[Ada Security Library],[security],
-  [git@github.com:stcarrez/ada-security.git],
-  [Building Dynamo requires the Ada Security Library.],
-  [
-    SECURITY_DIR=${gnat_project_dir_security}
-  ])
-AC_SUBST(SECURITY_DIR)
-
-##########################################
-# Ada Servlet library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-servlet],[Ada Servlet Library],[servletada],
-  [git@github.com:stcarrez/ada-servlet.git],
-  [Building Dynamo requires the Ada Servlet Library.],
-  [
-    SERVLET_DIR=${gnat_project_dir_servletada}
-  ])
-AC_SUBST(SERVLET_DIR)
-
-##########################################
-# Ada Database Objects library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-ado],[Ada Database Objects],[ado],
-  [git@github.com:stcarrez/ada-ado.git],
-  [Building Dynamo requires the Ada Database Objects Library.],
-  [
-    ADO_DIR=${gnat_project_dir_ado}
-  ])
-AC_SUBST(ADO_DIR)
+AM_GNAT_FIND_ADA_UTIL([Dynamo])
+AM_GNAT_FIND_ADA_EL([Dynamo])
+AM_GNAT_FIND_ADA_SECURITY([Dynamo])
+AM_GNAT_FIND_ADA_SERVLET([Dynamo])
+AM_GNAT_FIND_ADA_SERVER_FACES([Dynamo])
+AM_GNAT_FIND_ADA_ADO([Dynamo])
 
 AM_GNAT_CHECK_PROJECT([ado_mysql],[${ADO_DIR}ado_mysql])
 if test T$gnat_project_ado_mysql = Tno; then
@@ -189,7 +116,7 @@ AC_SUBST(WITH_ADO_SQLITE)
 
 AC_SUBST(mkdir_p)
 
-AM_UTIL_CHECK_INSTALL
+# AM_UTIL_CHECK_INSTALL
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT(

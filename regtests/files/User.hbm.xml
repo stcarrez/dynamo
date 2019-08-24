@@ -97,7 +97,7 @@
         <property name="start_date" update="false">
             <comment>the session start date</comment>
             <column name="start_date" not-null="true" unique="false" sql-type="DATETIME"/>
-            <type name="Nullable_Time"/>
+            <type name="Time"/>
         </property>
         <property name="end_date" insert="false">
             <comment>the session start date</comment>

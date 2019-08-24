@@ -40,17 +40,7 @@ AM_GNAT_FIND_ADA_SERVER_FACES([#{projectName}])
 AM_GNAT_FIND_ADA_ADO([#{projectName}])
 AM_GNAT_FIND_ADA_WIKI([#{projectName}])
 AM_GNAT_FIND_ADA_SWAGGER([#{projectName}])
-
-##########################################
-# Ada Web Application library
-##########################################
-AM_GNAT_FIND_PROJECT([ada-awa],[Ada Web Application],[awa],
-  [git@github.com:stcarrez/ada-awa.git],
-  [Building #{projectName} requires the Ada Web Application Library.],
-  [
-    AWA_DIR=\${gnat_project_dir_awa}
-  ])
-AC_SUBST(AWA_DIR)
+AM_GNAT_FIND_ADA_AWA([#{projectName}])
 #{''}
 
 AC_OUTPUT(

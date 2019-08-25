@@ -75,7 +75,7 @@ AM_GNAT_CHECK_PROJECT([gpr],[gpr])
 UTIL_HAVE_PRJ_DIRECTORIES=${gnat_project_gpr}
 AC_SUBST(UTIL_HAVE_PRJ_DIRECTORIES)
 
-if test T$gnat_project_gpr = Tno; then
+if test T$ac_cv_gnat_project_gpr = Tno; then
   WITH_GPR='';
   DYNAMO_HAVE_GPR='no';
 else
@@ -91,28 +91,6 @@ AM_GNAT_FIND_ADA_SECURITY([Dynamo])
 AM_GNAT_FIND_ADA_SERVLET([Dynamo])
 AM_GNAT_FIND_ADA_SERVER_FACES([Dynamo])
 AM_GNAT_FIND_ADA_ADO([Dynamo])
-
-AM_GNAT_CHECK_PROJECT([ado_mysql],[${ADO_DIR}ado_mysql])
-if test T$gnat_project_ado_mysql = Tno; then
-  WITH_ADO_MYSQL='';
-  DYNAMO_HAVE_MYSQL='no';
-else
-  WITH_ADO_MYSQL="with \"${ADO_DIR}ado_mysql\";";
-  DYNAMO_HAVE_MYSQL='yes';
-fi
-AC_SUBST(DYNAMO_HAVE_MYSQL)
-AC_SUBST(WITH_ADO_MYSQL)
-
-AM_GNAT_CHECK_PROJECT([ado_sqlite],[${ADO_DIR}ado_sqlite])
-if test T$gnat_project_ado_sqlite = Tno; then
-  WITH_ADO_SQLITE='';
-  DYNAMO_HAVE_SQLITE='no';
-else
-  WITH_ADO_SQLITE="with \"${ADO_DIR}ado_sqlite\";";
-  DYNAMO_HAVE_SQLITE='yes';
-fi
-AC_SUBST(DYNAMO_HAVE_SQLITE)
-AC_SUBST(WITH_ADO_SQLITE)
 
 AC_SUBST(mkdir_p)
 

@@ -585,10 +585,6 @@ ac_unique_file="src/gen.ads"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 mkdir_p
-WITH_ADO_SQLITE
-DYNAMO_HAVE_SQLITE
-WITH_ADO_MYSQL
-DYNAMO_HAVE_MYSQL
 ADO_DIR
 ASF_DIR
 SERVLET_DIR
@@ -3390,7 +3386,7 @@ $as_echo "$ac_cv_gnat_project_gpr" >&6; }
 UTIL_HAVE_PRJ_DIRECTORIES=${gnat_project_gpr}
 
 
-if test T$gnat_project_gpr = Tno; then
+if test T$ac_cv_gnat_project_gpr = Tno; then
   WITH_GPR='';
   DYNAMO_HAVE_GPR='no';
 else
@@ -4028,76 +4024,6 @@ $as_echo "no" >&6; }
     fi
   fi
 
-
-
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ado_mysql project exists" >&5
-$as_echo_n "checking whether ado_mysql project exists... " >&6; }
-if ${ac_cv_gnat_project_ado_mysql+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-    echo "with \"${ADO_DIR}ado_mysql\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
-    if { ac_try='gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out'
-  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }
-    then
-      ac_cv_gnat_project_ado_mysql=yes
-      ac_cv_gnat_project_with_ado_mysql="with \"${ADO_DIR}ado_mysql\";";
-    else
-      ac_cv_gnat_project_ado_mysql=no
-    fi
-    rm -f conftest.gpr
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_gnat_project_ado_mysql" >&5
-$as_echo "$ac_cv_gnat_project_ado_mysql" >&6; }
-
-if test T$gnat_project_ado_mysql = Tno; then
-  WITH_ADO_MYSQL='';
-  DYNAMO_HAVE_MYSQL='no';
-else
-  WITH_ADO_MYSQL="with \"${ADO_DIR}ado_mysql\";";
-  DYNAMO_HAVE_MYSQL='yes';
-fi
-
-
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ado_sqlite project exists" >&5
-$as_echo_n "checking whether ado_sqlite project exists... " >&6; }
-if ${ac_cv_gnat_project_ado_sqlite+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-    echo "with \"${ADO_DIR}ado_sqlite\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
-    if { ac_try='gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out'
-  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }
-    then
-      ac_cv_gnat_project_ado_sqlite=yes
-      ac_cv_gnat_project_with_ado_sqlite="with \"${ADO_DIR}ado_sqlite\";";
-    else
-      ac_cv_gnat_project_ado_sqlite=no
-    fi
-    rm -f conftest.gpr
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_gnat_project_ado_sqlite" >&5
-$as_echo "$ac_cv_gnat_project_ado_sqlite" >&6; }
-
-if test T$gnat_project_ado_sqlite = Tno; then
-  WITH_ADO_SQLITE='';
-  DYNAMO_HAVE_SQLITE='no';
-else
-  WITH_ADO_SQLITE="with \"${ADO_DIR}ado_sqlite\";";
-  DYNAMO_HAVE_SQLITE='yes';
-fi
 
 
 

@@ -102,7 +102,9 @@ src/gen-configs.ads:   Makefile src/gen-configs.gpb
 	gnatprep -DCONFIG_DIR='"$(config_dir)/base"' -DVERSION='"@GEN_VERSION@"' \
 		  src/gen-configs.gpb src/gen-configs.ads
 
-install:	  install_dirs
+install: install-data
+
+install-data:	  install_dirs
 	$(INSTALL) bin/dynamo $(DESTDIR)$(prefix)/bin/dynamo
 	$(INSTALL) doc/dynamo.1 $(DESTDIR)$(prefix)/share/man/man1/dynamo.1
 	$(CP) config/*.properties $(DESTDIR)$(prefix)/share/dynamo/base

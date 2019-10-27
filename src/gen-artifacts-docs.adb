@@ -305,7 +305,7 @@ package body Gen.Artifacts.Docs is
 
                Doc.Print_Footer := Handler.Print_Footer;
                Doc.Formatter := Handler.Formatter;
-               if Name (Pos .. Name'Last) = ".ads" then
+               if Name (Pos .. Name'Last) = ".ads" or Name (Pos .. Name'Last) = ".adb" then
                   Handler.Read_Ada_File (Full_Path, Doc);
 
                elsif Name (Pos .. Name'Last) = ".xml" then
@@ -613,7 +613,7 @@ package body Gen.Artifacts.Docs is
    end Set_Title;
 
    --  ------------------------------
-   --  Read the Ada specification file and collect the useful documentation.
+   --  Read the Ada specification/body file and collect the useful documentation.
    --  To keep the implementation simple, we don't use the ASIS packages to scan and extract
    --  the documentation.  We don't need to look at the Ada specification itself.  Instead,
    --  we assume that the Ada source follows some Ada style guidelines.
@@ -668,7 +668,13 @@ package body Gen.Artifacts.Docs is
                   Pos := Ada.Strings.Fixed.Index (Line, " ", Pos);
                   if Pos > 0 then
                      Last := Ada.Strings.Fixed.Index (Line, " ", Pos + 1);
-                     Set_Name (Result,  Line (Pos .. Last));
+                     if Ada.Strings.Fixed.Index (Line (Pos .. Last), "body") = 0 then
+                        Set_Name (Result,  Line (Pos .. Last));
+                     else
+                        Pos := Last;
+                        Last := Ada.Strings.Fixed.Index (Line, " ", Pos + 1);
+                        Set_Name (Result,  Line (Pos .. Last));
+                     end if;
                   end if;
                end if;
             end;

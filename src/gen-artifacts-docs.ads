@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2015, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -214,7 +214,7 @@ private
                          Path    : in String;
                          Docs    : in out Doc_Maps.Map);
 
-   --  Read the Ada specification file and collect the useful documentation.
+   --  Read the Ada specification/body file and collect the useful documentation.
    --  To keep the implementation simple, we don't use the ASIS packages to scan and extract
    --  the documentation.  We don't need to look at the Ada specification itself.  Instead,
    --  we assume that the Ada source follows some Ada style guidelines.

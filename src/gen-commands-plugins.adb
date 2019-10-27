@@ -178,8 +178,9 @@ package body Gen.Commands.Plugins is
    --  ------------------------------
    overriding
    procedure Help (Cmd       : in out Command;
+                   Name      : in String;
                    Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Generator);
+      pragma Unreferenced (Cmd, Name, Generator);
       use Ada.Text_IO;
    begin
       Put_Line ("create-plugin: Create a new plugin for the current project");

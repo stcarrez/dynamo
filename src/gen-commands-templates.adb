@@ -377,12 +377,13 @@ package body Gen.Commands.Templates is
    --  ------------------------------
    overriding
    procedure Help (Cmd       : in out Command;
+                   Name      : in String;
                    Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Generator);
 
       use Ada.Text_IO;
    begin
-      Put_Line (To_String (Cmd.Name) & ": " & To_String (Cmd.Title));
+      Put_Line (Name & ": " & To_String (Cmd.Title));
       Put_Line ("Usage: " & To_String (Cmd.Usage));
       New_Line;
       Put_Line (To_String (Cmd.Help_Msg));

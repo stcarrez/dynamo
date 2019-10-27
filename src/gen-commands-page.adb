@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-page -- Page creation command for dynamo
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,8 +86,9 @@ package body Gen.Commands.Page is
    --  ------------------------------
    overriding
    procedure Help (Cmd       : in out Command;
+                   Name      : in String;
                    Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd);
+      pragma Unreferenced (Cmd, Name);
       use Ada.Text_IO;
       use Ada.Directories;
 

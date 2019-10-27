@@ -86,8 +86,9 @@ package body Gen.Commands.Docs is
    --  ------------------------------
    overriding
    procedure Help (Cmd       : in out Command;
+                   Name      : in String;
                    Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Generator);
+      pragma Unreferenced (Cmd, Name, Generator);
       use Ada.Text_IO;
    begin
       Put_Line ("build-doc: Extract and generate the project documentation");

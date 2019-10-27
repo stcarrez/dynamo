@@ -152,8 +152,9 @@ package body Gen.Commands.Database is
    --  Write the help associated with the command.
    --  ------------------------------
    procedure Help (Cmd       : in out Command;
+                   Name      : in String;
                    Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Generator);
+      pragma Unreferenced (Cmd, Name, Generator);
       use Ada.Text_IO;
    begin
       Put_Line ("create-database: Creates the database");

@@ -68,6 +68,9 @@ autobuild:
 clean:
 	-rm -rf lib obj bin
 
+dist-clean: clean
+	-rm -f config.status *.log *~
+
 # Clean root project and all imported projects too.
 clean_tree:
 	$(GNATCLEAN) -q -P$(NAME) -r

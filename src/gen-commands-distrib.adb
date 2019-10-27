@@ -56,8 +56,9 @@ package body Gen.Commands.Distrib is
    --  ------------------------------
    overriding
    procedure Help (Cmd       : in out Command;
+                   Name      : in String;
                    Generator : in out Gen.Generator.Handler) is
-      pragma Unreferenced (Cmd, Generator);
+      pragma Unreferenced (Cmd, Name, Generator);
       use Ada.Text_IO;
    begin
       Put_Line ("dist: Build the distribution files to prepare the server installation");

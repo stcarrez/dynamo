@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-docs -- Extract and generate documentation for the project
---  Copyright (C) 2012, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2017, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,6 +35,7 @@ package Gen.Commands.Docs is
    --  Write the help associated with the command.
    overriding
    procedure Help (Cmd       : in out Command;
+                   Name      : in String;
                    Generator : in out Gen.Generator.Handler);
 
 end Gen.Commands.Docs;

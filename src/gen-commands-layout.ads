@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-layout -- Layout creation command for dynamo
---  Copyright (C) 2011, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2017, 2018, 2019 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@ package Gen.Commands.Layout is
    --  Write the help associated with the command.
    overriding
    procedure Help (Cmd       : in out Command;
+                   Name      : in String;
                    Generator : in out Gen.Generator.Handler);
 
 end Gen.Commands.Layout;

@@ -4,7 +4,7 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="Makefile.conf.in"><![CDATA[
-MODE=@MODE@
+BUILD=@BUILD@
 GNATMAKE=@GNATMAKE@
 GPRINSTALL=@GPRINSTALL@
 GPRFLAGS=-m @BUILDS_QUIET@
@@ -20,6 +20,5 @@ VPATH = @srcdir@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 PROCESSORS=@NR_CPUS@
-COVERAGE=@BUILDS_COVERAGE@
 ]]>
 </f:view>

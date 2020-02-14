@@ -1,8 +1,8 @@
 # You may edit this makefile as long as you keep these original 
 # target names defined.
-MODE=debug
+BUILD=@BUILD@
 NAME=dynamo
-GNATMAKE=gprbuild
+GNATMAKE=@GNATMAKE@
 GNATCLEAN=gprclean
 GPRINSTALL=@GPRINSTALL@
 GPRPATH=$(DYNAMO).gpr
@@ -40,7 +40,7 @@ top_builddir = .
 config_dir=${datadir}/dynamo
 
 CPUS := @NR_CPUS@
-MAKE_ARGS=-XMODE=${MODE} -XPROCESSORS=$(CPUS)
+MAKE_ARGS=-XBUILD=${BUILD} -XPROCESSORS=$(CPUS)
 
 MKDIR=mkdir
 CP=cp

@@ -1,11 +1,9 @@
 #!/bin/sh
-lcov --base-directory . --directory . -c -o dynamo.cov
-bin/dynamo_harness -xml dynamo-aunit.xml
-lcov --base-directory . --directory . -c -o dynamo.cov
-lcov --remove dynamo.cov "/usr*" -o dynamo.cov
-lcov --remove dynamo.cov "regtests*" -o dynamo.cov
-lcov --remove dynamo.cov "src/gnat/*" -o dynamo.cov
-lcov --remove dynamo.cov dynamo/b__dynamo.adb -o dynamo.cov
+NAME=dynamo.cov
+lcov --base-directory . --directory . -c --include "*/dynamo/src/*" -o $NAME
+lcov --remove $NAME "*/src/gpr/*" -o $NAME
+lcov --remove $NAME "*/src/gnat/*" -o $NAME
+lcov --remove $NAME "*/src/yaml/*" -o $NAME
 rm -rf cover
-genhtml -o ./cover -t "test coverage" --num-spaces 4 dynamo.cov
+genhtml --ignore-errors source -o ./cover -t "test coverage" --num-spaces 4 $NAME
  

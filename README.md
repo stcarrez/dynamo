@@ -1,7 +1,8 @@
 # Dynamo Ada Generator
 
-[![Build Status](https://img.shields.io/jenkins/s/http/jenkins.vacs.fr/Dynamo.svg)](https://jenkins.vacs.fr/job/Dynamo/)
-[![Test Status](https://img.shields.io/jenkins/t/http/jenkins.vacs.fr/Dynamo.svg)](https://jenkins.vacs.fr/job/Dynamo/)
+[![Build Status](https://img.shields.io/jenkins/s/https/jenkins.vacs.fr/Bionic-Dynamo.svg)](https://jenkins.vacs.fr/job/Bionic-Dynamo/)
+[![Test Status](https://img.shields.io/jenkins/t/https/jenkins.vacs.fr/Bionic-Dynamo.svg)](https://jenkins.vacs.fr/job/Bionic-Dynamo/)
+[![codecov](https://codecov.io/gh/stcarrez/dynamo/branch/master/graph/badge.svg)](https://codecov.io/gh/stcarrez/dynamo)
 [![Download](https://img.shields.io/badge/download-0.9.0-brightgreen.svg)](https://download.vacs.fr/dynamo/dynamo-0.9.0.tar.gz)
 [![License](https://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
 ![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/0.9.0.svg)

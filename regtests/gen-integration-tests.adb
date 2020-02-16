@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -218,7 +218,7 @@ package body Gen.Integration.Tests is
    procedure Test_Configure (T : in out Test) is
       Result : Ada.Strings.Unbounded.Unbounded_String;
    begin
-      T.Execute ("./configure", Result);
+      T.Execute ("./configure --enable-coverage", Result);
       Util.Tests.Assert_Matches (T, ".*checking build system.*", Result,
                                  "Invalid configure");
       Util.Tests.Assert_Matches (T, ".*config.status: creating Makefile.*", Result,

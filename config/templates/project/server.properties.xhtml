@@ -4,21 +4,40 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
         file="#{projectName}.properties">
+# Global directory search paths
 app_search_dirs=\#{empty dynamo_search_dirs ? '.' : dynamo_search_dirs}
+#{''}
 
+# AWA module configuration directory search paths
 app.modules.dir=\#{fn:composePath(app_search_dirs,'config')}
+#{''}
+
+# Main XML configuration files that are read to configure the application.
 app.config=awa.xml
+#{''}
+
+# Additional XML configuration files that are read after 'app.config'
 app.config.plugins=#{projectName}.xml
+#{''}
+
+# The main application context path.
 contextPath=/#{fn:toLowerCase(projectName)}
 #{''}
+# Directory search paths for web files.
 web.dir=\#{fn:composePath(app_search_dirs,'web')}
+#{''}
+# Directory search paths for web files.
 view.dir=\#{fn:composePath(app_search_dirs,'web')}
+#{''}
+# Directory search paths for bundle files.
 bundle.dir=\#{fn:composePath(app_search_dirs,'bundles')}
 
 #{''}
+# Number of tasks dedicated to async job and event dispatching.
 awa_dispatcher_count=0
 
 #{''}
+# AWA counters module configuration
 counters.counter_age_limit=1
 counters.counter_limit=10
 
@@ -73,17 +92,19 @@ openid.provider.myopenid=http://www.myopenid.com/server
 facebook.client_id=PUT-HERE-YOUR-FACEBOOK-CLIENT-ID
 facebook.secret=PUT-HERE-YOUR-FACEBOOK-API-SECRET
 facebook.scope=email
+#{''}
 
-# Get an account on Google+
+# Get an account on Google+ and setup your own client_id and secret.
 google-plus.client_id=PUT-HERE-GOOGLE-CLIENT-ID.apps.googleusercontent.com
 google-plus.secret=PUT-HERE_GOOGLE-SECRET
+
 #{''}
 # Configuration for log4j
-log4j.rootCategory=DEBUG,console,result
+log4j.rootCategory=INFO,console,result
 
 #{''}
 log4j.appender.console=Console
-log4j.appender.console.level=DEBUG
+log4j.appender.console.level=ERROR
 log4j.appender.console.layout=level-message
 
 #{''}

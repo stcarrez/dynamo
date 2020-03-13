@@ -16,7 +16,6 @@ with Servlet.Security.Servlets;
 #{''}
 with ASF.Servlets.Faces;
 with ASF.Servlets.Ajax;
-with ASF.Applications;
 with ASF.Converters.Sizes;
 #{''}
 with AWA.Users.Servlets;
@@ -42,10 +41,6 @@ package #{fn:capitalize(projectName)}.Applications is
 #{''}
    type Application is new AWA.Applications.Application with private;
    type Application_Access is access all Application'Class;
-#{''}
-   --  Initialize the application.
-   procedure Initialize (App    : in Application_Access;
-                         Config : in ASF.Applications.Config);
 #{''}
    --  Initialize the servlets provided by the application.
    --  This procedure is called by <b>Initialize</b>.

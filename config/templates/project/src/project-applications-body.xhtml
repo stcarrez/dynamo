@@ -10,30 +10,11 @@
 #{''}
 with Util.Log.Loggers;
 #{''}
-with AWA.Applications.Factory;
-#{''}
 package body #{fn:capitalize(projectName)}.Applications is
 #{''}
    use AWA.Applications;
 #{''}
    Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}");
-#{''}
-   --  ------------------------------
-   --  Initialize the application:
-   --  &lt;ul&gt;
-   --     &lt;li&gt;Register the servlets and filters.
-   --     &lt;li&gt;Register the application modules.
-   --     &lt;li&gt;Define the servlet and filter mappings.
-   --  &lt;/ul&gt;
-   --  ------------------------------
-   procedure Initialize (App    : in Application_Access;
-                         Config : in ASF.Applications.Config) is
-      Fact  : AWA.Applications.Factory.Application_Factory;
-   begin
-      App.Self := App;
-      App.Initialize (Config, Fact);
-      App.Set_Global ("contextPath", CONTEXT_PATH);
-   end Initialize;
 #{''}
    --  ------------------------------
    --  Initialize the servlets provided by the application.
@@ -45,6 +26,7 @@ package body #{fn:capitalize(projectName)}.Applications is
    begin
       Log.Info ("Initializing application servlets...");
 #{''}
+      App.Self := App'Unchecked_Access;
       AWA.Applications.Application (App).Initialize_Servlets;
       App.Add_Servlet (Name => "faces", Server => App.Self.Faces'Access);
       App.Add_Servlet (Name => "files", Server => App.Self.Files'Access);
@@ -69,6 +51,7 @@ package body #{fn:capitalize(projectName)}.Applications is
       App.Add_Filter (Name => "measures", Filter => App.Self.Measures'Access);
       App.Add_Filter (Name => "service", Filter => App.Self.Service_Filter'Access);
       App.Add_Filter (Name => "no-cache", Filter => App.Self.No_Cache'Access);
+      App.Set_Global ("contextPath", CONTEXT_PATH);
    end Initialize_Filters;
 #{''}
    --  ------------------------------

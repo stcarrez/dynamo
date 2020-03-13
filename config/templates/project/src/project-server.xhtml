@@ -7,60 +7,57 @@
 --  #{fn:capitalize(projectName)}-server -- Application server
 <ui:include src="../../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
-with Ada.Exceptions;
-#{''}
 with Util.Log.Loggers;
+with Util.Commands;
 #{''}
-with AWS.Config.Set;
-with ASF.Server.Web;
+with Servlet.Server.Web;
+#{''}
 with AWA.Setup.Applications;
+with AWA.Commands.Drivers;
+with AWA.Commands.Start;
+with AWA.Commands.Setup;
+with AWA.Commands.Stop;
+with AWA.Commands.List;
+#{''}
 with ADO.Drivers;
 --  with ADO.Sqlite;
+--  with ADO.Mysql;
+--  with ADO.Postgresql;
 #{''}
 with #{fn:capitalize(projectName)}.Applications;
 procedure #{fn:capitalize(projectName)}.Server is
 #{''}
-   Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.Server");
+   package Server_Commands is
+     new AWA.Commands.Drivers (Driver_Name => "#{projectName}",
+                               Container_Type => Servlet.Server.Web.AWS_Container);
+#{''}
+   package List_Command is new AWA.Commands.List (Server_Commands);
+   package Start_Command is new AWA.Commands.Start (Server_Commands);
+   package Stop_Command is new AWA.Commands.Stop (Server_Commands);
+   package Setup_Command is new AWA.Commands.Setup (Start_Command);
+#{''}
+   Log       : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.Server");
 
-   App     : constant #{fn:capitalize(projectName)}.Applications.Application_Access := new #{fn:capitalize(projectName)}.Applications.Application;
-#{''}
-   procedure Configure (Config : in out AWS.Config.Object);
-#{''}
-   procedure Setup is
-     new AWA.Setup.Applications.Configure (#{fn:capitalize(projectName)}.Applications.Application'Class,
-                                           #{fn:capitalize(projectName)}.Applications.Application_Access,
-                                           #{fn:capitalize(projectName)}.Applications.Initialize);
-#{''}
-
-   WS      : ASF.Server.Web.AWS_Container;
-#{''}
-   procedure Configure (Config : in out AWS.Config.Object) is
-   begin
-      AWS.Config.Set.Input_Line_Size_Limit (1_000_000);
-      AWS.Config.Set.Max_Connection (Config, 2);
-      AWS.Config.Set.Accept_Queue_Size (Config, 100);
-      AWS.Config.Set.Send_Buffer_Size (Config, 128 * 1024);
-      AWS.Config.Set.Upload_Size_Limit (Config, 100_000_000);
-   end Configure;
-#{''}
+   App       : constant #{fn:capitalize(projectName)}.Applications.Application_Access := new #{fn:capitalize(projectName)}.Applications.Application;
+   WS        : Servlet.Server.Web.AWS_Container renames Server_Commands.WS;
+   Context   : AWA.Commands.Context_Type;
+   Arguments : Util.Commands.Dynamic_Argument_List;
 begin
    --  Initialize the database drivers (all of them or specific ones).
    ADO.Drivers.Initialize;
    --  ADO.Sqlite.Initialize;
-   WS.Configure (Configure'Access);
-   WS.Start;
+   --  ADO.Mysql.Initialize;
+   --  ADO.Postgresql.Initialize;
    Log.Info ("Connect you browser to: http://localhost:8080{0}/index.html",
              #{fn:capitalize(projectName)}.Applications.CONTEXT_PATH);
-   Setup (WS, App, #{fn:capitalize(projectName)}.Applications.CONFIG_PATH,
-          #{fn:capitalize(projectName)}.Applications.CONTEXT_PATH);
+   WS.Register_Application (#{fn:capitalize(projectName)}.Applications.CONTEXT_PATH, App.all'Access);
+#{''}
 
-   delay 365.0 * 24.0 * 3600.0;
+   Server_Commands.Run (Context, Arguments);
+#{''}
 
-   App.Close;
 exception
    when E : others =>
-      Log.Error ("Exception in server: " &amp;
-                 Ada.Exceptions.Exception_Name (E) &amp; ": " &amp;
-                 Ada.Exceptions.Exception_Message (E));
+      Context.Print (E);
 end #{fn:capitalize(projectName)}.Server;
 </f:view>

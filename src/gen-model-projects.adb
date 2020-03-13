@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,6 @@ with Util.Log.Loggers;
 with Util.Serialize.IO.XML;
 with Util.Serialize.Mappers.Record_Mapper;
 with Util.Streams.Texts;
-with Util.Strings.Transforms;
 with Util.Strings.Vectors;
 
 package body Gen.Model.Projects is
@@ -525,8 +524,7 @@ package body Gen.Model.Projects is
             Output.Start_Entity (Name => "property");
             Output.Write_Attribute (Name  => "name",
                                     Value => Util.Beans.Objects.To_Object (Name));
-            Output.Write_String (Value => Util.Strings.Transforms.Escape_Xml
-                                 (To_String (Project.Props.Get (Name))));
+            Output.Write_String (Value => To_String (Project.Props.Get (Name)));
             Output.End_Entity (Name => "property");
             Prop_Output.Write ("dynamo_");
             Prop_Output.Write (Name);

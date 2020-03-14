@@ -8,6 +8,7 @@
 
     <xsl:template match="/module">
       <xsl:if test="count(managed-bean) &gt; 0">
+### Beans
 | Name           | Description                                                               |
 |:---------------|:--------------------------------------------------------------------------|
 <xsl:apply-templates select="managed-bean"/>          

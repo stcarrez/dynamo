@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2013, 2014, 2015, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2018, 2019, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -736,9 +736,11 @@ package body Gen.Artifacts.Docs is
             Current_Mode := Mode;
             return;
          end if;
-         Result.Lines (Current_Mode).Append (Line_Type '(Len  => Trimmed'Length,
-                                                         Kind => L_TEXT,
-                                                         Content => Trimmed));
+         if Current_Mode /= L_INCLUDE then
+            Result.Lines (Current_Mode).Append (Line_Type '(Len  => Trimmed'Length,
+                                                            Kind => L_TEXT,
+                                                            Content => Trimmed));
+         end if;
       end Append;
 
       Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;

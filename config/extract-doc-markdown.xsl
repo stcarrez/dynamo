@@ -9,6 +9,7 @@
     <xsl:template match="/module">
       <xsl:if test="count(managed-bean) &gt; 0">
 ### Beans
+
 | Name           | Description                                                               |
 |:---------------|:--------------------------------------------------------------------------|
 <xsl:apply-templates select="managed-bean"/>          
@@ -16,6 +17,7 @@
 
       <xsl:if test="count(entity-permission) &gt; 0">
 ### Permissions
+
 | Name           | Entity type  | Description                                                |
 |:---------------|:-------------|:-----------------------------------------------------------|
           <xsl:apply-templates select="entity-permission"/>          
@@ -23,6 +25,7 @@
 
       <xsl:if test="count(context-param) &gt; 0">
 ### Configuration
+
 | Name                      | Description                                                    |
 |:--------------------------|:---------------------------------------------------------------|
 <xsl:apply-templates select="context-param"/>
@@ -42,6 +45,7 @@
 
       <xsl:if test="count(query) &gt; 0">
 ### Queries
+
 | Name              | Description                                                           |
 |:------------------|:----------------------------------------------------------------------|
 <xsl:for-each select="query">|<xsl:value-of select="@name"/>|<xsl:value-of select="comment"/>|
@@ -69,14 +73,14 @@
 
     </xsl:template>
 
-    <xsl:template match="managed-bean">|<xsl:value-of select="managed-bean-name"/>|<xsl:value-of select="description"/>|
+    <xsl:template match="managed-bean">|<xsl:value-of select="managed-bean-name"/>|<xsl:value-of select="normalize-space(description)"/>|
 </xsl:template>
 
     <xsl:template match="context-param">|<xsl:value-of select="param-name"/>|<xsl:call-template name="string-trim"><xsl:with-param name="string" select="normalize-space(description)"/></xsl:call-template>|
 | |<xsl:value-of select="param-value"/>|
 </xsl:template>
 
-    <xsl:template match="entity-permission">|<xsl:value-of select="name"/>|<xsl:value-of select="entity-type"/>|<xsl:value-of select="description"/>|
+    <xsl:template match="entity-permission">|<xsl:value-of select="name"/>|<xsl:value-of select="entity-type"/>|<xsl:value-of select="normalize-space(description)"/>|
 </xsl:template>
 
     <xsl:template match="class">

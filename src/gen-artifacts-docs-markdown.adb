@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs-markdown -- Artifact for GitHub Markdown documentation format
---  Copyright (C) 2015, 2017, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2015, 2017, 2018, 2019, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -149,6 +149,7 @@ package body Gen.Artifacts.Docs.Markdown is
       Start    : Natural := Text'First;
       End_Pos  : Natural;
       Last_Pos : Natural;
+      Link     : Util.Strings.Maps.Cursor;
    begin
       --  Transform links
       --  [Link]   -> [[Link]]
@@ -221,11 +222,15 @@ package body Gen.Artifacts.Docs.Markdown is
                Ada.Text_IO.Put (File, ")");
             else
                Last_Pos := Last_Pos - 1;
-               Ada.Text_IO.Put (File, "[[");
-               Ada.Text_IO.Put (File, Text (End_Pos + 1 .. Last_Pos));
-               Ada.Text_IO.Put (File, "|");
-               Ada.Text_IO.Put (File, Text (Pos .. End_Pos));
-               Ada.Text_IO.Put (File, "]");
+               Link := Formatter.Links.Find (Text (Pos .. Last_Pos));
+               if Util.Strings.Maps.Has_Element (Link) then
+                  Ada.Text_IO.Put (File, "[");
+                  Ada.Text_IO.Put (File, Util.Strings.Maps.Element (Link));
+                  Ada.Text_IO.Put (File, "]");
+               else
+                  Ada.Text_IO.Put (File, "[");
+                  Ada.Text_IO.Put (File, Text (Pos .. Last_Pos));
+               end if;
             end if;
             Start := Last_Pos + 1;
          end if;

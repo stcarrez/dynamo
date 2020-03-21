@@ -21,6 +21,7 @@ with Util.Strings;
 with Util.Log.Loggers;
 package body Gen.Artifacts.Docs.Markdown is
 
+   use type Ada.Text_IO.Positive_Count;
    use type Ada.Strings.Maps.Character_Set;
 
    function Has_Scheme (Link : in String) return Boolean;
@@ -222,11 +223,15 @@ package body Gen.Artifacts.Docs.Markdown is
                Ada.Text_IO.Put (File, ")");
             else
                Last_Pos := Last_Pos - 1;
+               Log.Info ("Check link {0}", Text (Pos .. Last_Pos));
                Link := Formatter.Links.Find (Text (Pos .. Last_Pos));
                if Util.Strings.Maps.Has_Element (Link) then
                   Ada.Text_IO.Put (File, "[");
+                  Ada.Text_IO.Put (File, Text (Pos .. Last_Pos));
+                  Ada.Text_IO.Put (File, "](");
                   Ada.Text_IO.Put (File, Util.Strings.Maps.Element (Link));
-                  Ada.Text_IO.Put (File, "]");
+                  Ada.Text_IO.Put (File, ")");
+                  Last_Pos := Last_Pos + 1;
                else
                   Ada.Text_IO.Put (File, "[");
                   Ada.Text_IO.Put (File, Text (Pos .. Last_Pos));
@@ -252,11 +257,19 @@ package body Gen.Artifacts.Docs.Markdown is
         and then Line (Line'First .. Line'First + 1) = "  "
       then
          Ada.Text_IO.Put_Line (File, Line (Line'First + 2 .. Line'Last));
-      elsif Formatter.Mode = L_TEXT then
-         Formatter.Write_Text (File, Line);
-         Ada.Text_IO.New_Line (File);
       else
-         Ada.Text_IO.Put_Line (File, Line);
+         case Formatter.Mode is
+            when L_TEXT =>
+               Formatter.Write_Text (File, Line);
+               Ada.Text_IO.New_Line (File);
+
+            when L_LIST | L_LIST_ITEM =>
+               Formatter.Write_Text (File, Line);
+
+            when others =>
+               Ada.Text_IO.Put_Line (File, Line);
+
+         end case;
       end if;
    end Write_Line;
 
@@ -271,13 +284,20 @@ package body Gen.Artifacts.Docs.Markdown is
       case Line.Kind is
          when L_LIST =>
             Ada.Text_IO.New_Line (File);
-            Ada.Text_IO.Put (File, Line.Content);
-            Formatter.Need_Newline := True;
+            --  Ada.Text_IO.Put (File, Line.Content);
+            Formatter.Write_Line (File, Line.Content);
+            if Ada.Text_IO.Col (File) /= 1 then
+               Formatter.Need_Newline := True;
+            end if;
             Formatter.Mode := Line.Kind;
 
          when L_LIST_ITEM =>
-            Ada.Text_IO.Put (File, Line.Content);
-            Formatter.Need_Newline := True;
+            Formatter.Write_Line (File, Line.Content);
+            --  Ada.Text_IO.Put (File, Line.Content);
+            --  Formatter.Need_Newline := True;
+            if Ada.Text_IO.Col (File) /= 1 then
+               Formatter.Need_Newline := True;
+            end if;
 
          when L_START_CODE =>
             Formatter.Mode := Line.Kind;

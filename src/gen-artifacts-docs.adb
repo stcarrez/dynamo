@@ -166,6 +166,37 @@ package body Gen.Artifacts.Docs is
    end Include;
 
    --  ------------------------------
+   --  Include the document extract represented by <b>Name</b> into the document <b>Into</b>.
+   --  The included document is marked so that it will not be generated.
+   --  ------------------------------
+   procedure Include (Docs     : in out Doc_Maps.Map;
+                      Into     : in out File_Document;
+                      Name     : in String;
+                      Position : in Natural) is
+      procedure Do_Include (Line : in String);
+
+      Pos : Natural := Position;
+
+      procedure Do_Include (Line : in String) is
+      begin
+         Into.Lines (L_INCLUDE).Insert (Before => Pos,
+                                        New_Item => (Len => Line'Length,
+                                                     Kind => L_TEXT,
+                                                     Content => Line));
+         Pos := Pos + 1;
+      end Do_Include;
+
+   begin
+      if not Ada.Directories.Exists (Name) then
+         Log.Error ("{0}: Cannot include document: {1}",
+                    Ada.Strings.Unbounded.To_String (Into.Name), Name);
+         return;
+      end if;
+      Util.Files.Read_File (Path     => Name,
+                            Process  => Do_Include'Access);
+   end Include;
+
+   --  ------------------------------
    --  Generate the project documentation that was collected in <b>Docs</b>.
    --  The documentation is merged so that the @include tags are replaced by the matching
    --  document extracts.
@@ -199,6 +230,9 @@ package body Gen.Artifacts.Docs is
                then
                   Line_Vectors.Delete (Doc.Lines (L_INCLUDE), Pos);
                   Include (Docs, Doc, L.Content, L.Kind, Pos);
+               elsif L.Kind = L_INCLUDE_DOC then
+                  Line_Vectors.Delete (Doc.Lines (L_INCLUDE), Pos);
+                  Include (Docs, Doc, L.Content, Pos);
                else
                   Pos := Pos + 1;
                end if;
@@ -483,6 +517,11 @@ package body Gen.Artifacts.Docs is
          elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE_QUERY then
             Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
                                           Kind    => L_INCLUDE_QUERY,
+                                          Content => Value));
+
+         elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE_DOC then
+            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
+                                          Kind    => L_INCLUDE_DOC,
                                           Content => Value));
 
          else

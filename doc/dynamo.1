@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Feb 7, 2018" "Ada Web Application"
+.TH DYNAMO 1 "Mar 21, 2020" "Ada Web Application"
 .SH NAME
 dynamo - Ada Application Generator
 .SH SYNOPSIS
@@ -55,7 +55,8 @@ To deploy an application on a production server, the
 .B dist
 command can be used to prepare the distribution tree, merge various files and directories,
 perform CSS and Javascript compression by using the
-.B yui-compressor
+.BR yui-compressor ,
+.B closure
 or other tools.
 .\"
 .PP
@@ -102,7 +103,7 @@ directory specified by the
 option.  The project name should be a valid Ada identifier.  It represents the Ada root
 package name for the project.  The command creates a set of Ada files, a configure script,
 a Makefile as well as a
-.I gnatmake
+.I gprbuild
 build file.  The application can be immediately compiled to obtain a web server that is ready
 to run.  The
 .B -l
@@ -154,7 +155,9 @@ do some transformation on the source file and prepare it for the installation.
 For example the
 .I package.xml
 description can compress the Javascript and CSS files by using the
-.B yui-compressor
+.BR yui-compressor ,
+or
+.B closure
 tool.  Images can be optimized by using
 .B pngcrush
 or
@@ -377,6 +380,47 @@ option generates the documentation using the Markdown Wiki syntax and the
 .I -google
 option generates a Google Code Wiki syntax.
 .\"
+.PP
+While extracting the documentation from Ada source files, a set of pre-defined
+tags are recognized:
+.\"
+.PP
+.I @include {name}.ads
+can be used to include the documentation from the Ada source file.
+.\"
+.PP
+.I @include-doc {path}.md
+can be used to include the external documentation by reading the file.
+The file is read and included without changes.
+.\"
+.PP
+The
+.I @include-bean {path}.xml
+is dedicated to the inclusion of the
+.I managed-bean
+documentation from the XML configuration files.
+.\"
+.PP
+The
+.I @include-permission {path}.xml
+is dedicated to the inclusion of the
+.I permission
+documentation from the XML configuration files.
+.\"
+.PP
+The
+.I @include-config {path}.xml
+is dedicated to the inclusion of the
+.I context-param
+documentation from the XML configuration files.
+.\"
+.PP
+The
+.I @include-query {path}.xml
+is dedicated to the inclusion of the
+.I SQL query
+documentation from the XML configuration files.
+.\"
 .SS The info command
 .RS 0
 dynamo \fBinfo\fR
@@ -518,7 +562,7 @@ This directory contains the UML profiles that
 reads to obtain global definitions.
 .\"
 .SH SEE ALSO
-\fIgnatmake(1)\fR, \fIgcc(1)\fR, \fIyui-compressor(1)\fR, \fIpngcrush(1)\fR, \fIjpegtran(1)\fR
+\fIgprbuild(1)\fR, \fIgcc(1)\fR, \fIyui-compressor(1)\fR, \fIpngcrush(1)\fR, \fIjpegtran(1)\fR
 .\"
 .SH AUTHOR
 Written by Stephane Carrez.

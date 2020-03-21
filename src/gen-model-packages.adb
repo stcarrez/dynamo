@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009 - 2018 Stephane Carrez
+--  Copyright (C) 2009 - 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -361,7 +361,7 @@ package body Gen.Model.Packages is
                         O.Uses_Calendar_Time := True;
 
                      when Model.Mappings.T_ENUM | Model.Mappings.T_BEAN | Model.Mappings.T_TABLE =>
-                        if Pkg'Length > 0 and Pkg /= O.Name then
+                        if Pkg'Length > 0 and Pkg /= O.Name and not Col.Use_Foreign_Key_Type then
                            Used_Spec_Types.Include (To_Unbounded_String (Pkg));
                         end if;
 

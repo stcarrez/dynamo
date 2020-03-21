@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2015, 2017, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2019, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,6 +72,7 @@ package Gen.Artifacts.Docs is
    TAG_INCLUDE_BEAN   : constant String := "include-bean";
    TAG_INCLUDE_QUERY  : constant String := "include-query";
    TAG_INCLUDE_PERM   : constant String := "include-permission";
+   TAG_INCLUDE_DOC    : constant String := "include-doc";
    TAG_SEE            : constant String := "see";
 
    Unknown_Tag : exception;
@@ -104,6 +105,7 @@ private
 
    type Line_Kind is (L_TEXT, L_LIST, L_LIST_ITEM, L_SEE, L_INCLUDE, L_INCLUDE_CONFIG,
                       L_INCLUDE_BEAN, L_INCLUDE_PERMISSION, L_INCLUDE_QUERY,
+                      L_INCLUDE_DOC,
                       L_START_CODE, L_END_CODE,
                       L_HEADER_1, L_HEADER_2, L_HEADER_3, L_HEADER_4);
 
@@ -170,6 +172,11 @@ private
                       Into     : in out File_Document;
                       Name     : in String;
                       Mode     : in Line_Include_Kind;
+                      Position : in Natural);
+
+   procedure Include (Docs     : in out Doc_Maps.Map;
+                      Into     : in out File_Document;
+                      Name     : in String;
                       Position : in Natural);
 
    --  Generate the project documentation that was collected in <b>Docs</b>.

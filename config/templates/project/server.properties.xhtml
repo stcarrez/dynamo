@@ -24,9 +24,6 @@ app.config.plugins=#{projectName}.xml
 contextPath=/#{fn:toLowerCase(projectName)}
 #{''}
 # Directory search paths for web files.
-web.dir=\#{fn:composePath(app_search_dirs,'web')}
-#{''}
-# Directory search paths for web files.
 view.dir=\#{fn:composePath(app_search_dirs,'web')}
 #{''}
 # Directory search paths for bundle files.
@@ -42,7 +39,6 @@ counters.counter_age_limit=1
 counters.counter_limit=10
 
 #{''}
-view.debug=true
 view.ignore_spaces=false
 view.escape_unknown_tags=true
 view.ext=.html

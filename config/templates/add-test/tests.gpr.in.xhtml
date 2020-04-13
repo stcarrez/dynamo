@@ -4,8 +4,8 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
 	mode="once"
-        file="tests.gpr.in">
-with "config";
+        file="#{projectName}_tests.gpr.in">
+with "@UTIL_DIR@config";
 with "@UTIL_DIR@utilada_sys";
 with "@UTIL_DIR@utilada_unit";
 with "@EL_DIR@elada";
@@ -22,7 +22,7 @@ with "@AWA_DIR@awa_storages";
 with "#{projectName}";
 #{''}
 
-project Tests is
+project #{projectName}_Tests is
 #{''}
 
    Mains := ("#{projectName}_harness.adb");
@@ -41,5 +41,5 @@ project Tests is
    package Linker renames Config.Linker;
 #{''}
 
-end Tests;
+end #{projectName}_Tests;
 </f:view>

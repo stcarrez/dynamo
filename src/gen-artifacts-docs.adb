@@ -173,6 +173,7 @@ package body Gen.Artifacts.Docs is
                       Into     : in out File_Document;
                       Name     : in String;
                       Position : in Natural) is
+      pragma Unreferenced (Docs);
       procedure Do_Include (Line : in String);
 
       Pos : Natural := Position;

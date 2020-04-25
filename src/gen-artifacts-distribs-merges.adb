@@ -20,6 +20,7 @@ with Ada.Strings.Fixed;
 with Ada.Streams.Stream_IO;
 with Ada.Exceptions;
 with Ada.IO_Exceptions;
+with Ada.Unchecked_Deallocation;
 
 with Util.Beans.Objects;
 with Util.Log.Loggers;
@@ -27,6 +28,7 @@ with Util.Files;
 with Util.Strings;
 with Util.Streams.Files;
 with Util.Streams.Texts;
+with Util.Streams.Buffered;
 
 with EL.Expressions;
 
@@ -84,8 +86,19 @@ package body Gen.Artifacts.Distribs.Merges is
       end;
    end Process_Property;
 
+   procedure Process_Replace (Rule : in out Merge_Rule;
+                              Node : in DOM.Core.Node) is
+      From : constant String := Gen.Utils.Get_Data_Content (Node, "from");
+      To   : constant String := Gen.Utils.Get_Data_Content (Node, "to");
+   begin
+      Rule.Replace.Include (From, To);
+   end Process_Replace;
+
    procedure Iterate_Properties is
       new Gen.Utils.Iterate_Nodes (Merge_Rule, Process_Property);
+
+   procedure Iterate_Replace is
+      new Gen.Utils.Iterate_Nodes (Merge_Rule, Process_Replace);
 
    --  ------------------------------
    --  Create a distribution rule to copy a set of files or directories.
@@ -94,6 +107,7 @@ package body Gen.Artifacts.Distribs.Merges is
       Result : constant Merge_Rule_Access := new Merge_Rule;
    begin
       Iterate_Properties (Result.all, Node, "property", False);
+      Iterate_Replace (Result.all, Node, "replace", False);
       Result.Context.Set_Variable_Mapper (Result.Variables'Access);
       return Result.all'Access;
    end Create_Rule;
@@ -113,6 +127,8 @@ package body Gen.Artifacts.Distribs.Merges is
                       Path    : in String;
                       Files   : in File_Vector;
                       Context : in out Generator'Class) is
+
+      use Ada.Streams;
 
       type Mode_Type is (MERGE_NONE, MERGE_LINK, MERGE_SCRIPT);
 
@@ -225,17 +241,78 @@ package body Gen.Artifacts.Distribs.Merges is
                        Name => Path);
       end Prepare_Merge;
 
+      Current_Match : Util.Strings.Maps.Cursor;
+
+      function Find_Match (Buffer : in Stream_Element_Array) return Stream_Element_Offset is
+         Iter  : Util.Strings.Maps.Cursor := Rule.Replace.First;
+         First : Stream_Element_Offset := Buffer'Last + 1;
+      begin
+         while Util.Strings.Maps.Has_Element (Iter) loop
+            declare
+               Value : constant String := Util.Strings.Maps.Key (Iter);
+               Match : Stream_Element_Array (1 .. Value'Length);
+               for Match'Address use Value'Address;
+               Pos   : Stream_Element_Offset;
+            begin
+               Pos := Buffer'First;
+               while Pos + Match'Length < Buffer'Last loop
+                  if Buffer (Pos .. Pos + Match'Length - 1) = Match then
+                     if First > Pos then
+                        First := Pos;
+                        Current_Match := Iter;
+                     end if;
+                     exit;
+                  end if;
+                  Pos := Pos + 1;
+               end loop;
+            end;
+            Util.Strings.Maps.Next (Iter);
+         end loop;
+         return First;
+      end Find_Match;
+
+      procedure Free is
+        new Ada.Unchecked_Deallocation (Object => Ada.Streams.Stream_Element_Array,
+                                        Name   => Util.Streams.Buffered.Buffer_Access);
+
       procedure Include (Source : in String) is
          Target : constant String := Get_Target_Path (Source);
          Input  : Util.Streams.Files.File_Stream;
+         Size   : Stream_Element_Offset;
+         Last   : Stream_Element_Offset;
+         Pos    : Stream_Element_Offset;
+         Next   : Stream_Element_Offset;
+         Buffer : Util.Streams.Buffered.Buffer_Access;
       begin
          if Rule.Level >= Util.Log.INFO_LEVEL then
             Log.Info ("    include {0}", Target);
          end if;
 
          Input.Open (Name => Target, Mode => Ada.Streams.Stream_IO.In_File);
-         Util.Streams.Copy (From => Input, Into => Merge);
+
+         Size := Stream_Element_Offset (Ada.Directories.Size (Target));
+         Buffer := new Stream_Element_Array (1 .. Size);
+         Input.Read (Buffer.all, Last);
          Input.Close;
+
+         Pos := 1;
+         while Pos < Last loop
+            Next := Find_Match (Buffer (Pos .. Last));
+            if Next > Pos then
+               Merge.Write (Buffer (Pos .. Next - 1));
+            end if;
+            exit when Next >= Last;
+            declare
+               Value   : constant String := Util.Strings.Maps.Key (Current_Match);
+               Replace : constant String := Util.Strings.Maps.Element (Current_Match);
+               Content : Stream_Element_Array (1 .. Replace'Length);
+               for Content'Address use Replace'Address;
+            begin
+               Merge.Write (Content);
+               Pos := Next + Value'Length;
+            end;
+         end loop;
+         Free (Buffer);
 
       exception
          when Ex : Ada.IO_Exceptions.Name_Error =>

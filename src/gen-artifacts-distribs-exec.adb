@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-exec -- External command based distribution artifact
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,7 +91,9 @@ package body Gen.Artifacts.Distribs.Exec is
       Source    : constant String := Get_Source_Path (Files);
       Dir       : constant String := Ada.Directories.Containing_Directory (Path);
    begin
-      Log.Print (Rule.Level, "install {0} to {1}", Source, Path);
+      if Rule.Level >= Util.Log.INFO_LEVEL then
+         Log.Info ("install {0} to {1}", Source, Path);
+      end if;
 
       Variables.Bind ("src", Util.Beans.Objects.To_Object (Source));
       Variables.Bind ("dst", Util.Beans.Objects.To_Object (Path));

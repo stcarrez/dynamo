@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs -- Artifact for distributions
---  Copyright (C) 2012, 2013, 2015 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@ with Gen.Artifacts.Distribs.Exec;
 with Gen.Artifacts.Distribs.Concat;
 with Gen.Artifacts.Distribs.Libs;
 with Gen.Artifacts.Distribs.Bundles;
+with Gen.Artifacts.Distribs.Merges;
 
 --  The <b>Gen.Artifacts.Distribs</b> package is an artifact for the generation of
 --  application distributions.
@@ -61,6 +62,8 @@ package body Gen.Artifacts.Distribs is
          return Gen.Artifacts.Distribs.Concat.Create_Rule (Node);
       elsif Kind = "bundle" then
          return Gen.Artifacts.Distribs.Bundles.Create_Rule (Node);
+      elsif Kind = "merge" then
+         return Gen.Artifacts.Distribs.Merges.Create_Rule (Node);
       elsif Kind = "libs" then
          return Gen.Artifacts.Distribs.Libs.Create_Rule (Node);
       else
@@ -110,6 +113,7 @@ package body Gen.Artifacts.Distribs is
 
          Dir   : constant String := To_String (Gen.Utils.Get_Attribute (Node, "dir"));
          Mode  : constant String := To_String (Gen.Utils.Get_Attribute (Node, "mode"));
+         Level : constant String := To_String (Gen.Utils.Get_Attribute (Node, "log"));
          Rule  : Distrib_Rule_Access := Create_Rule (Kind => Mode, Node => Node);
          Match : Match_Rule;
 
@@ -176,6 +180,13 @@ package body Gen.Artifacts.Distribs is
 
          if Rule /= null then
             Rule.Dir := To_Unbounded_String (Dir);
+            if Level = "info" then
+               Rule.Level := Util.Log.INFO_LEVEL;
+            elsif Level = "debug" then
+               Rule.Level := Util.Log.DEBUG_LEVEL;
+            else
+               Rule.Level := Util.Log.WARN_LEVEL;
+            end if;
             Handler.Rules.Append (Rule);
             Iterate (Rule, Node, "include", False);
             Iterate_Excludes (Rule, Node, "exclude", False);

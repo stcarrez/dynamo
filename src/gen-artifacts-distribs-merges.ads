@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with EL.Variables.Default;
 with EL.Contexts.Default;
+with Util.Strings.Maps;
 with Util.Beans.Objects.Maps;
 
 --  === Distribution: webmerge ===
@@ -95,6 +96,7 @@ private
       Params    : Util.Beans.Objects.Maps.Map_Bean;
       Context   : EL.Contexts.Default.Default_Context;
       Variables : aliased EL.Variables.Default.Default_Variable_Mapper;
+      Replace   : Util.Strings.Maps.Map;
    end record;
 
 end Gen.Artifacts.Distribs.Merges;

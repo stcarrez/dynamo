@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-libs -- Unix shared library extraction and distribution
---  Copyright (C) 2012, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2018, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -139,7 +139,9 @@ package body Gen.Artifacts.Distribs.Libs is
       Variables : aliased EL.Variables.Default.Default_Variable_Mapper;
       Source    : constant String := Get_Source_Path (Files);
    begin
-      Log.Info ("install {0} to {1}", Source, Path);
+      if Rule.Level >= Util.Log.INFO_LEVEL then
+         Log.Info ("install {0} to {1}", Source, Path);
+      end if;
 
       Variables.Bind ("src", Util.Beans.Objects.To_Object (Source));
 

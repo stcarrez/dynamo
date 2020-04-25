@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-concat -- Concatenate based distribution artifact
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,14 +72,17 @@ package body Gen.Artifacts.Distribs.Concat is
          File_Path : constant String := Rule.Get_Source_Path (File);
          Input     : Util.Streams.Files.File_Stream;
       begin
-         Log.Info ("concat {0} to {1}", File_Path, Path);
+         if Rule.Level >= Util.Log.INFO_LEVEL then
+            Log.Info ("  concat {0} to {1}", File_Path, Path);
+         end if;
          Input.Open (Name => File_Path, Mode => Ada.Streams.Stream_IO.In_File);
          Util.Streams.Copy (From => Input, Into => Output);
          Input.Close;
 
       exception
          when Ex : Ada.IO_Exceptions.Name_Error =>
-            Context.Error ("Cannot read {0}: ", File_Path, Ada.Exceptions.Exception_Message (Ex));
+            Context.Error ("Cannot read {0}: ", File_Path,
+                           Ada.Exceptions.Exception_Message (Ex));
 
       end Concat_File;
 

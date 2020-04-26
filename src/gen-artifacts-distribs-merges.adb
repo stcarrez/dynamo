@@ -42,6 +42,8 @@ package body Gen.Artifacts.Distribs.Merges is
 
    procedure Process_Property (Rule : in out Merge_Rule;
                                Node : in DOM.Core.Node);
+   procedure Process_Replace (Rule : in out Merge_Rule;
+                              Node : in DOM.Core.Node);
 
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Artifacts.Distribs.Merges");
 
@@ -137,6 +139,7 @@ package body Gen.Artifacts.Distribs.Merges is
       function Get_Filename (Line : in String) return String;
       function Get_Source (Line : in String;
                            Tag  : in String) return String;
+      function Find_Match (Buffer : in Stream_Element_Array) return Stream_Element_Offset;
       procedure Prepare_Merge (Line : in String);
       procedure Include (Source : in String);
       procedure Process (Line : in String);
@@ -146,6 +149,7 @@ package body Gen.Artifacts.Distribs.Merges is
                             To_String (Rule.Dir));
       Source   : constant String := Get_Source_Path (Files, False);
       Dir      : constant String := Ada.Directories.Containing_Directory (Path);
+      Build    : constant String := Context.Get_Parameter ("dynamo.build");
       Output   : aliased Util.Streams.Files.File_Stream;
       Merge    : aliased Util.Streams.Files.File_Stream;
       Text     : Util.Streams.Texts.Print_Stream;
@@ -223,11 +227,15 @@ package body Gen.Artifacts.Distribs.Merges is
                Text.Write ("<link media='screen' type='text/css' rel='stylesheet'"
                            & " href='");
                Text.Write (Name);
+               Text.Write ("?build=");
+               Text.Write (Build);
                Text.Write ("'/>" & ASCII.LF);
 
             when MERGE_SCRIPT =>
                Text.Write ("<script type='text/javascript' src='");
                Text.Write (Name);
+               Text.Write ("?build=");
+               Text.Write (Build);
                Text.Write ("'></script>" & ASCII.LF);
 
             when MERGE_NONE =>

@@ -14,6 +14,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <!-- DYNAMO-MERGE-START link=\#{contextPath}/css/#{projectName}.css -->
     <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/grids/reset.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/grids/fluid_grid.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/asf.css"/>
@@ -28,6 +29,7 @@
     <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/wikis.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/jquery.tagedit.css"/>
     <link media="screen" type="text/css" rel="stylesheet" href="\#{contextPath}/css/main.css"/>
+    <!-- DYNAMO-MERGE-END -->
     <ui:insert name="pageHeader"/>
     <title><h:outputText value="\#{title}"/></title>
 </head>
@@ -45,6 +47,7 @@
 <ui:include src="footer.xhtml"/>
 #{''}
 
+<!-- DYNAMO-MERGE-START script=\#{contextPath}/js/#{projectName}.js -->
 <script type="text/javascript" src="\#{jquery.path}"></script>
 <script type="text/javascript" src="\#{jquery.uiPath}core.js"></script>
 <script type="text/javascript" src="\#{jquery.uiPath}widget.js"></script>
@@ -70,6 +73,7 @@
 <script type="text/javascript" src="\#{contextPath}/js/jquery.autoGrowInput.js"></script>
 <script type="text/javascript" src="\#{contextPath}/js/jquery.tagedit.js"></script>
 <script type="text/javascript" src="\#{contextPath}/js/awa.js"></script>
+<!-- DYNAMO-MERGE-END -->
 <ui:insert name="pageScript"/>
 <!--DEV_START-->
 <ui:debug/>

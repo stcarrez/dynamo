@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-distrib -- Distrib command for dynamo
---  Copyright (C) 2012, 2013, 2014, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2017, 2018, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,38 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with Ada.Strings.Unbounded;
 with Ada.Text_IO;
+with GNAT.Regpat;
+with Util.Strings;
 package body Gen.Commands.Distrib is
+
+   use Ada.Strings.Unbounded;
+
+   procedure Increment_Build (Generator : in out Gen.Generator.Handler);
+
+   procedure Increment_Build (Generator : in out Gen.Generator.Handler) is
+      Pattern : constant GNAT.Regpat.Pattern_Matcher := GNAT.Regpat.Compile (".*([0-9]+).*");
+      Matches : GNAT.Regpat.Match_Array (0 .. 1);
+      Build   : constant String := Generator.Get_Project_Property ("build", "1");
+      Number  : Natural := 0;
+      Result  : Unbounded_String;
+   begin
+      if GNAT.Regpat.Match (Pattern, Build) then
+         GNAT.Regpat.Match (Pattern, Build, Matches);
+         Number := Natural'Value (Build (Matches (1).First .. Matches (1).Last));
+         Number := Number + 1;
+         if Matches (1).First > Build'First then
+            Append (Result, Build (Build'First .. Matches (1).First - 1));
+         end if;
+         Append (Result, Util.Strings.Image (Number));
+         if Matches (1).Last < Build'Last then
+            Append (Result, Build (Matches (1).Last + 1 .. Build'Last));
+         end if;
+         Generator.Set_Project_Property ("build", To_String (Result));
+      end if;
+      Generator.Save_Project;
+   end Increment_Build;
 
    --  ------------------------------
    --  Execute the command with the arguments.
@@ -34,6 +64,7 @@ package body Gen.Commands.Distrib is
          return;
       end if;
       Generator.Read_Project ("dynamo.xml", True);
+      Increment_Build (Generator);
 
       --  Setup the target directory where the distribution is created.
       Generator.Set_Result_Directory (Args.Get_Argument (1));

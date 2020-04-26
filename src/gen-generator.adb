@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  Gen -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2009 - 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -498,6 +498,9 @@ package body Gen.Generator is
                            Name    : in String;
                            Default : in String := "") return String is
    begin
+      if Util.Strings.Starts_With (Name, "dynamo.") then
+         return H.Get_Project_Property (Name (Name'First + 7 .. Name'Last), Default);
+      end if;
       return H.Conf.Get (Name, Default);
    end Get_Parameter;
 

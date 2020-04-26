@@ -49,16 +49,21 @@
           <include name="**/*.xhtml"/>
           <include name="**/*.html"/> 
           <include name="WEB-INF/**"/>
+          <exclude name="preview/**"/>
+          <exclude name="WEB-INF/layouts/**"/>
        </fileset>
      </install>
 
      <install mode='exec' dir='web'>
-       <command>yui-compressor --type js --charset UTF-8 -o \#{dst} \#{src}</command>
+       <command slow='true'>closure --charset UTF-8 \#{src} --js_output_file \#{dst}</command>
        <fileset dir="web">
          <include name="**/*.js"/>
        </fileset>
        <fileset dir="samples/web">
           <include name="**/*.js"/>
+         <exclude name="js/jquery-chosen-1.4.2/**"/>
+         <exclude name="js/jquery-ui-1.11.4/**"/>
+         <exclude name="js/jquery-1.11.3.js"/>
        </fileset>
      </install>
 
@@ -69,6 +74,25 @@
        </fileset>
        <fileset dir="samples/web">
           <include name="**/*.css"/>
+       </fileset>
+     </install>
+
+     <install mode='merge' dir='web' log='info'>
+       <property name="contextPath"></property>
+       <property name="jquery.path">/js/jquery-3.4.1.js</property>
+       <property name="jquery.uiCssPath">/css/redmond/jquery-ui-1.12.1.css</property>
+       <property name="jquery.chosenCssPath">/css/jquery-chosen-1.8.7/chosen.css</property>
+       <property name="jquery.uiPath">/js/jquery-ui-1.12.1/</property>
+       <replace>
+         <from>url("images/</from>
+         <to>url("redmond/images/</to>
+       </replace>
+       <replace>
+         <from>url(../../images/</from>
+         <to>url(../images/</to>
+       </replace>
+       <fileset dir="web">
+          <include name="WEB-INF/layouts/*.xhtml"/>
        </fileset>
      </install>
 

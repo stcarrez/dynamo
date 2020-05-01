@@ -1,4 +1,4 @@
-Version 1.0     -
+Version 1.0     - May 2020
   - Improvement and fixes in the YAML database model files
   - Add support for Nullable_String type
   - Generate Postgresql SQL files from the model files

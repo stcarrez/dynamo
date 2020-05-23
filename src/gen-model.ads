@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model -- Model for Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2018 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -89,6 +89,9 @@ package Gen.Model is
                        Log : in out Util.Log.Logging'Class);
 
 private
+
+   procedure Set_Index (Def   : in out Definition;
+                        Index : in Natural);
 
    type Definition is new Ada.Finalization.Limited_Controlled
      and Util.Beans.Basic.Readonly_Bean with record

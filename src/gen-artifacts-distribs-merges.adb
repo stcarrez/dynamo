@@ -79,7 +79,7 @@ package body Gen.Artifacts.Distribs.Merges is
             Val := To_Object (Child);
             Rule.Params.Set_Value (Param, Val);
          else
-            Child := To_Bean (Val);
+            Child := Map_Bean_Access (To_Bean (Val));
          end if;
          Child.Set_Value (Name (Pos + 1 .. Name'Last), To_Object (Value));
          if Var.Is_Null then

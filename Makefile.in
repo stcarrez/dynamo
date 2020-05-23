@@ -89,7 +89,10 @@ doc:
 check test:	 build
 	-rm -rf test-app
 	-rm -f dynamo-junit.xml
+	chmod +x regtests/support/yui-compressor
+	chmod +x regtests/support/pngcrush
 	# The test 'Build generated model files (UML)' can take more than 1 minute.
+	export PATH=`pwd`/regtests/support:$$PATH ; \
 	bin/dynamo_harness -t 120 -xml dynamo-aunit.xml
 
 GENERATOR=dynamo

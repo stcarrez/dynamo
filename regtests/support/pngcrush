@@ -1,0 +1,36 @@
+#!/bin/sh
+DST=
+SRC=
+while test $# -ne 0; do
+  case $1 in
+   -q)
+     shift
+     ;;
+   -fix)
+     shift
+     ;;
+   -no_cc)
+     shift
+     ;;
+   -reduce)
+     shift
+     ;;
+   -brute)
+     shift
+     ;;
+   -rem)
+     shift
+     shift
+     ;;
+   -*)
+     shift
+     ;;
+    *)
+     SRC=$1
+     shift
+     DST=$1
+     shift
+     ;;
+  esac
+done
+exec cp $SRC $DST

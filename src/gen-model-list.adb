@@ -95,7 +95,7 @@ package body Gen.Model.List is
             Current : constant T_Access := From.Nodes.Element (Index - 1);
             Bean    : constant Util.Beans.Basic.Readonly_Bean_Access := Current.all'Access;
          begin
-            Current.Row_Index := Index;
+            Current.Set_Index (Index);
             From.Value_Bean := Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
          end;
       else

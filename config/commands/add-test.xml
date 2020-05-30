@@ -9,7 +9,7 @@
   generates the test harness, testsuite framework and a test case for the module.
   The following files are created:
   
-    tests.gpr.in
+    <project>_tests.gpr.in
     regtests/<project>_harness.adb
     regtests/<project>-testsuite.ads
     regtests/<project>-testsuite.adb

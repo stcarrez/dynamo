@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  dynamo -- Ada Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2015, 2017 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2015, 2017, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +50,8 @@ procedure Dynamo is
    --  Print environment variable setup
    procedure Print_Environment (Generator : in Gen.Generator.Handler;
                                 C_Env     : in Boolean := False);
+
+   function Get_Installation_Directory return String;
 
    Out_Dir      : Unbounded_String;
    Config_Dir   : Unbounded_String;
@@ -120,6 +122,17 @@ procedure Dynamo is
       Config_Dir := To_Unbounded_String (Path);
    end Set_Config_Directory;
 
+   function Get_Installation_Directory return String is
+      Name : constant String := Ada.Command_Line.Command_Name;
+      Path : constant String := Ada.Directories.Containing_Directory (Name);
+   begin
+      if Path = "." then
+         return ".";
+      else
+         return Ada.Directories.Containing_Directory (Path);
+      end if;
+   end Get_Installation_Directory;
+
 begin
    Initialize_Option_Scan (Stop_At_First_Non_Switch => True, Section_Delimiters => "targs");
    --  Parse the command line
@@ -162,9 +175,7 @@ begin
 
    if Length (Config_Dir) = 0 then
       declare
-         Name : constant String := Ada.Command_Line.Command_Name;
-         Path : constant String := Ada.Directories.Containing_Directory (Name);
-         Dir  : constant String := Containing_Directory (Path);
+         Dir  : constant String := Get_Installation_Directory;
       begin
          Set_Config_Directory (Compose (Dir, "config"), True);
          Set_Config_Directory (Util.Files.Compose (Dir, "share/dynamo/base"), True);

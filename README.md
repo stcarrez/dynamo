@@ -23,14 +23,10 @@ To build Dynamo, you will need:
 * Ada ADO      (https://github.com/stcarrez/ada-ado           2.1.0)
 * XML/Ada      (https://libre.adacore.com/libre/tools/xmlada/  4.4)
 
-## Version 1.0.0 - May 2020
+## Version 1.1.0 - June 2020
 
-- Improvement and fixes in the YAML database model files
-- Add support for Nullable_String type
-- Generate Postgresql SQL files from the model files
-- Add support for database record auditing
-- Add support for floating point
-- Add support for CSS and Javascript merge in the dist command
+- Fix compilation with GNAT 2020
+- Integrate ArgoUML 0.35.2-2020-06-20
 
 [List all versions](https://github.com/stcarrez/dynamo/blob/master/NEWS.md)
 
@@ -67,3 +63,7 @@ The Dynamo core implementation is distributed under the Apache 2.0 license.
 The Dynamo templates are distributed under the Apache 2.0 license.
 
 The Dynamo generated code can be distributed under whatever license you like.
+
+To help users in using UML modeling together with Dynamo, the [ArgoUML](https://github.com/argouml-tigris-org/argouml)
+application is integrated, it is distributed under the Eclipse Public License and the BSD license.
+

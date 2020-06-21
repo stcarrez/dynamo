@@ -26,7 +26,11 @@ while [ -h "$PRG" ] ; do
 done
 
 DIR=`dirname $PRG`/../share/dynamo/base/
-CONFIG="-Dlog4j.configuration=org/argouml/resource/full_console.lcf -Djava.util.logging.config.file=$DIR/argouml.properties -Dargouml.modules=org.argouml.activity2.ActivityDiagramModule;org.argouml.sequence2.SequenceDiagramModule;org.argouml.core.propertypanels.module.XmlPropertyPanelsModule;org.argouml.transformer.TransformerModule"
+if [ ! -d $DIR ] ; then
+    echo "Cannot find ArgoUML-Dynamo configuration directory: $DIR does not exist"
+    exit 1
+fi
+CONFIG="-Dargouml.profiles.directory=$DIR/uml/ -Dlog4j.configuration=org/argouml/resource/full_console.lcf -Djava.util.logging.config.file=$DIR/argouml.properties -Dargouml.modules=org.argouml.activity2.ActivityDiagramModule;org.argouml.sequence2.SequenceDiagramModule;org.argouml.core.propertypanels.module.XmlPropertyPanelsModule;org.argouml.transformer.TransformerModule"
 
-java -Xms64m -Xmx512m $CONFIG -jar $DIR/argouml-0.35.2.jar "$@"
+exec java -Xms64m -Xmx512m $CONFIG -jar $DIR/argouml-0.35.2.jar "$@"
 

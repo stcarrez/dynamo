@@ -1,3 +1,7 @@
+Version 1.1     - June 2020
+  - Fix compilation with GNAT 2020
+  - Integrate ArgoUML 0.35.2-2020-06-20
+
 Version 1.0     - May 2020
   - Improvement and fixes in the YAML database model files
   - Add support for Nullable_String type

@@ -11,10 +11,10 @@
 CREATE TABLE #{table.table} (
 <h:list value="#{table.members}" var="column">
   /* #{column.comment} */
-<h:panelGroup rendered="#{column.isPrimaryKey and column.generator eq 'increment'}">
+<h:panelGroup rendered="#{column.isPrimaryKey and column.generator eq 'auto'}">
   "#{fn:toLowerCase(column.sqlName)}" SERIAL,
 </h:panelGroup>
-<h:panelGroup rendered="#{not column.isPrimaryKey or column.generator ne 'increment'}">
+<h:panelGroup rendered="#{not column.isPrimaryKey or column.generator ne 'auto'}">
   "#{fn:toLowerCase(column.sqlName)}" #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} #{not column.isNull ? 'NOT NULL' : ''},
 </h:panelGroup>
 </h:list><u:set var="counter" value="0"/>

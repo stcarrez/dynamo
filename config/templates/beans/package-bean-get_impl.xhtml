@@ -22,10 +22,10 @@
 </h:panelGroup>
 <h:panelGroup rendered="#{bean.isBean}">
    begin
-</h:panelGroup>
+</h:panelGroup><u:set var="counter" value="0"/>
 <h:list value="#{bean.members}" var="column">
-  <h:panelGroup rendered="#{not column.isVersion and (column.type.isPrimitiveType or column.type.isEnum)}">
-      #{column.rowIndex ge 2 ? 'els' : ''}if Name = "#{column.name}" then
+  <h:panelGroup rendered="#{not column.isVersion and (column.type.isPrimitiveType or column.type.isEnum)}"><u:set var="counter" value="#{counter + 1}"/>
+      #{counter ge 2 ? 'els' : ''}if Name = "#{column.name}" then
     <h:panelGroup rendered="#{column.name eq bean.id.name}">
          return ADO.Objects.To_Object (#{impl}.Get_Key);
     </h:panelGroup>

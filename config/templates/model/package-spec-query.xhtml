@@ -46,7 +46,7 @@
   </h:panelGroup>
   <h:panelGroup rendered="#{query.bean ne 'yes'}">
    package #{fn:capitalize(query.type)}_Vectors is
-      new Ada.Containers.Vectors (Index_Type   => Natural,
+      new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => #{fn:capitalize(query.type)},
                                   "="          => "=");
   </h:panelGroup>

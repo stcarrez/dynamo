@@ -117,7 +117,7 @@
 #{''}
 <h:panelGroup rendered="#{table.hasList}">
    package #{fn:capitalize(table.type)}_Vectors is
-      new Ada.Containers.Vectors (Index_Type   => Natural,
+      new Ada.Containers.Vectors (Index_Type   => Positive,
                                   Element_Type => #{fn:capitalize(table.type)}_Ref,
                                   "="          => "=");
    subtype #{fn:capitalize(table.type)}_Vector is #{fn:capitalize(table.type)}_Vectors.Vector;

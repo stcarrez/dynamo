@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS #{table.table} (
   "#{fn:toLowerCase(column.sqlName)}" SERIAL,
 </h:panelGroup>
 <h:panelGroup rendered="#{not column.isPrimaryKey or column.generator ne 'auto'}">
-  "#{fn:toLowerCase(column.sqlName)}" #{column.sqlType}#{column.unique ? ' UNIQUE' : ''} #{not column.isNull ? 'NOT NULL' : ''},
+  "#{fn:toLowerCase(column.sqlName)}" #{column.sqlType}#{column.isUnique ? ' UNIQUE' : ''} #{not column.isNull ? 'NOT NULL' : ''},
 </h:panelGroup>
 </h:list><u:set var="counter" value="0"/>
   PRIMARY KEY (<h:list value="#{table.members}" var="column"><h:panelGroup rendered="#{column.isPrimaryKey}"><h:panelGroup rendered="#{counter ne 0}">, </h:panelGroup><u:set var="counter" value="#{counter + 1}"/>"#{fn:toLowerCase(column.sqlName)}"</h:panelGroup></h:list>)
@@ -23,9 +23,8 @@ CREATE TABLE IF NOT EXISTS #{table.table} (
 </h:list>
 <h:panelGroup rendered="#{not empty model.tables}">
 INSERT INTO entity_type (name) VALUES
-  <h:list value="#{model.tables}" var="table">
-  #{table.rowIndex ge 2 ? ',' : ''}('#{table.table}')
-  ON CONFLICT DO NOTHING</h:list>;
+  <h:list value="#{model.tables}" var="table">#{table.rowIndex ge 2 ? ', ' : ''}('#{table.table}')</h:list>
+  ON CONFLICT DO NOTHING;
 </h:panelGroup>
 <h:panelGroup rendered="#{not empty model.tables and project.skip_awa_audit_field ne 'yes'}">
   <h:list value="#{model.tables}" var="table">

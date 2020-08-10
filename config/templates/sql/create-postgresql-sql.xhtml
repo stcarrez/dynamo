@@ -8,7 +8,7 @@
 /* File generated automatically by dynamo */
 <h:list value="#{model.tables}" var="table">
 /* #{table.comment} */
-CREATE TABLE #{table.table} (
+CREATE TABLE IF NOT EXISTS #{table.table} (
 <h:list value="#{table.members}" var="column">
   /* #{column.comment} */
 <h:panelGroup rendered="#{column.isPrimaryKey and column.generator eq 'auto'}">
@@ -24,15 +24,16 @@ CREATE TABLE #{table.table} (
 <h:panelGroup rendered="#{not empty model.tables}">
 INSERT INTO entity_type (name) VALUES
   <h:list value="#{model.tables}" var="table">
-#{table.rowIndex ge 2 ? ',' : ''}('#{table.table}')
-</h:list>;
+  #{table.rowIndex ge 2 ? ',' : ''}('#{table.table}')
+  ON CONFLICT DO NOTHING</h:list>;
 </h:panelGroup>
 <h:panelGroup rendered="#{not empty model.tables and project.skip_awa_audit_field ne 'yes'}">
   <h:list value="#{model.tables}" var="table">
     <h:list value="#{table.members}" var="column">
       <h:panelGroup rendered="#{column.isAuditable}">
 INSERT INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM entity_type WHERE name = '#{table.table}'), '#{column.name}');
+  VALUES ((SELECT id FROM entity_type WHERE name = '#{table.table}'), '#{column.name}')
+  ON CONFLICT DO NOTHING;
       </h:panelGroup>
     </h:list>
 </h:list>

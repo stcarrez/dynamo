@@ -1,3 +1,9 @@
+Version 1.2     - August 2020
+  - Integrate ArgoUML 0.35.2-2020-07-05
+  - Fix SQL generation with 'auto' generator
+  - Fix XML Hibernate mapping support
+  - Improvement in SQL schema generation
+
 Version 1.1     - June 2020
   - Fix compilation with GNAT 2020
   - Integrate ArgoUML 0.35.2-2020-06-20

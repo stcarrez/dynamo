@@ -23,10 +23,12 @@ To build Dynamo, you will need:
 * Ada ADO      (https://github.com/stcarrez/ada-ado           2.1.0)
 * XML/Ada      (https://libre.adacore.com/libre/tools/xmlada/  4.4)
 
-## Version 1.1.0 - June 2020
+## Version 1.2.0 - August 2020
 
-- Fix compilation with GNAT 2020
-- Integrate ArgoUML 0.35.2-2020-06-20
+- Integrate ArgoUML 0.35.2-2020-07-05
+- Fix SQL generation with 'auto' generator
+- Fix XML Hibernate mapping support
+- Improvement in SQL schema generation
 
 [List all versions](https://github.com/stcarrez/dynamo/blob/master/NEWS.md)
 

@@ -17,7 +17,6 @@ autom4te.cache
 *.txt
 lib/
 obj/
-bin/
 dynamo-aunit.xml
 dynamo-tests.xml
 regtests/check_build/check_build.gpr

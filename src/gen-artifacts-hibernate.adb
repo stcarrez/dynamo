@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-hibernate -- Hibernate artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2020 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,6 +81,9 @@ package body Gen.Artifacts.Hibernate is
       procedure Register_Enum_Value (Enum  : in out Enum_Definition;
                                      Value : in DOM.Core.Node);
 
+      Is_Version : Boolean := False;
+      Is_Key     : Boolean := False;
+
       --  ------------------------------
       --  Register the column definition in the table
       --  ------------------------------
@@ -95,14 +98,8 @@ package body Gen.Artifacts.Hibernate is
          C.Set_Location (Path);
          C.Is_Inserted := Gen.Utils.Get_Attribute (Column, "insert", True);
          C.Is_Updated  := Gen.Utils.Get_Attribute (Column, "update", True);
-
-         if Name = "version" then
-            C.Is_Version  := True;
-
-         elsif Name = "id" then
-            C.Is_Key := True;
-
-         end if;
+         C.Is_Version  := Is_Version;
+         C.Is_Key := Is_Key;
 
          if G /= null then
             C.Generator := Gen.Utils.Get_Attribute (G, "class");
@@ -184,8 +181,16 @@ package body Gen.Artifacts.Hibernate is
       begin
          Log.Debug ("Register columns from table {0}", Table.Name);
 
+         Is_Key := True;
+         Is_Version := False;
          Iterate (Table, Node, "id");
+
+         Is_Key := False;
+         Is_Version := True;
          Iterate (Table, Node, "version");
+
+         Is_Key := False;
+         Is_Version := False;
          Iterate (Table, Node, "property");
          Iterate_Association (Table, Node, "many-to-one");
       end Register_Columns;

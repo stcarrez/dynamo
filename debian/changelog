@@ -1,3 +1,15 @@
+dynamo (1.2.0) unstable; urgency=low
+
+  * Update for Dynamo 1.2.0
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 8 Nov 2020 19:13:03 +0100
+
+dynamo (0.9.0) unstable; urgency=low
+
+  * Update for Dynamo 0.9.0
+
+ -- Stephane Carrez <Stephane.Carrez@gmail.com>  Sun, 24 Jun 2018 14:43:06 +0200
+
 dynamo (0.7.1) testing; urgency=low
 
   * Fix build for XmlAda 2014

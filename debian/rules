@@ -17,23 +17,15 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 %:
 	dh $@ 
 
-dynamo:
-	$(MAKE) prefix=$(CURDIR)/debian/tmp/usr install
-	dh_installdirs -p$@ \
-		usr/bin \
-		usr/share/dynamo
-	chrpath -d $(CURDIR)/debian/tmp/usr/bin/dynamo
-	dh_install -p$@ debian/tmp/usr/bin/dynamo /usr/bin
-	dh_installman -p$@ debian/tmp/usr/share/man/man1/dynamo.1
-	dh_strip -p$@
-	dirs=`cd $(CURDIR)/debian/tmp/usr/share/dynamo && find base -type d`; \
-	for i in $$dirs; do \
-		dh_installdirs -p$@ usr/share/dynamo/$$i ; \
-	done
-	files=`cd $(CURDIR)/debian/tmp/usr/share/dynamo && find base -type f`; \
-	for i in $$files; do \
-		dir=`dirname $$i`; \
-		dh_install -p$@ usr/share/dynamo/$$i usr/share/dynamo/$$dir ; \
-	done
+override_dh_install::
+	$(MAKE) DESTDIR=$(CURDIR)/debian/dynamo install
+	dh_installdirs --package=dynamo-argouml usr/share/dynamo/base
+	dh_installdirs --package=dynamo-argouml usr/bin
+	dh_install -pdynamo-argouml usr/bin/argouml usr/bin
+	dh_install -pdynamo-argouml config/argouml-0.35.2.jar usr/share/dynamo/base
+	dh_install -pdynamo-argouml config/argouml.properties usr/share/dynamo/base
+	rm -f $(CURDIR)/debian/dynamo/usr/bin/argouml
+	rm -f $(CURDIR)/debian/dynamo/usr/share/dynamo/base/argouml-0.35.2.jar
+	rm -f $(CURDIR)/debian/dynamo/usr/share/dynamo/base/argouml.properties
 
 override_dh_auto_test::

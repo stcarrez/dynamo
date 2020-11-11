@@ -22,7 +22,18 @@ Package: dynamo
 Section: devel
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: dynamo-argouml
 Description: Ada Application Generator
  Dynamo is a command to help developers write an Ada Application
  using the ASF, ADO, AWA or Gtk libraries.  It provides several commands to
  setup a new project, generate the Ada code from UML models.
+
+Package: dynamo-argouml
+Section: devel
+Architecture: any
+Depends: ${misc:Depends}, openjdk-11-jre, dynamo
+Description: ArgoUML modeling tool for Ada Applications
+ ArgoUML is a UML modeling tool and Dynamo is a command to help developers
+ write Ada Applications.  It provides UML modeling support that
+ allows Dynamo to generate the Ada Application.
+

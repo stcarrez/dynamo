@@ -71,7 +71,7 @@ GNAT_PROJECT_PATHS=${gnat_project_paths}
 AC_SUBST(GNAT_PROJECT_PATHS)
 
 # directories GNAT project gives the installation paths
-AM_GNAT_CHECK_PROJECT([gpr],[gpr])
+AM_GNAT_CHECK_PROJECT([gnatprj],[gnatprj])
 UTIL_HAVE_PRJ_DIRECTORIES=${gnat_project_gpr}
 AC_SUBST(UTIL_HAVE_PRJ_DIRECTORIES)
 
@@ -79,7 +79,7 @@ if test T$ac_cv_gnat_project_gpr = Tno; then
   WITH_GPR='';
   DYNAMO_HAVE_GPR='no';
 else
-  WITH_GPR="with \"${GPR_DIR}gpr\";";
+  WITH_GPR="with \"${GPR_DIR}gnatprj\";";
   DYNAMO_HAVE_GPR='yes';
 fi
 AC_SUBST(DYNAMO_HAVE_GPR)

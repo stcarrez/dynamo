@@ -72,16 +72,23 @@ AC_SUBST(GNAT_PROJECT_PATHS)
 
 # directories GNAT project gives the installation paths
 AM_GNAT_CHECK_PROJECT([gnatprj],[gnatprj])
-UTIL_HAVE_PRJ_DIRECTORIES=${gnat_project_gpr}
-AC_SUBST(UTIL_HAVE_PRJ_DIRECTORIES)
 
+if test T$ac_cv_gnat_project_gnatprj = Tno; then
+
+AM_GNAT_CHECK_PROJECT([gpr],[gpr])
 if test T$ac_cv_gnat_project_gpr = Tno; then
   WITH_GPR='';
   DYNAMO_HAVE_GPR='no';
 else
+  WITH_GPR="with \"${GPR_DIR}gpr\";";
+  DYNAMO_HAVE_GPR='yes';
+fi
+
+else
   WITH_GPR="with \"${GPR_DIR}gnatprj\";";
   DYNAMO_HAVE_GPR='yes';
 fi
+
 AC_SUBST(DYNAMO_HAVE_GPR)
 AC_SUBST(WITH_GPR)
 
@@ -93,8 +100,6 @@ AM_GNAT_FIND_ADA_SERVER_FACES([Dynamo])
 AM_GNAT_FIND_ADA_ADO([Dynamo])
 
 AC_SUBST(mkdir_p)
-
-# AM_UTIL_CHECK_INSTALL
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT(

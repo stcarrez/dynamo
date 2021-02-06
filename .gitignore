@@ -22,5 +22,11 @@ dynamo-tests.xml
 regtests/check_build/check_build.gpr
 src/gen-configs.ads
 test-app/
+test-dist
 dynamo_tests.gpr
 config/generator.properties
+wiki
+cover
+alire
+regtests/results
+dynamo.cov

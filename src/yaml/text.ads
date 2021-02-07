@@ -5,7 +5,6 @@ with Ada.Containers;
 with Ada.Strings.UTF_Encoding;
 with Ada.Strings.Unbounded;
 with System.Storage_Elements;
-private with Ada.Unchecked_Conversion;
 
 package Text is
    --  this package defines a reference-counted string pointer type. it is used
@@ -169,9 +168,6 @@ private
          Hold : Reference;
       end record;
 
-   function To_UTF_8_String_Access is new Ada.Unchecked_Conversion
-     (System.Address, UTF_8_String_Access);
-
    Empty : constant Reference := Ada.Strings.Unbounded.Null_Unbounded_String;
 
    --  it is important that all allocated strings are aligned to the header
@@ -185,4 +181,3 @@ private
      ((Length + Header_Size - 1) / Header_Size * Header_Size);
 
 end Text;
-

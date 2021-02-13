@@ -3,9 +3,9 @@
 [![Build Status](https://img.shields.io/jenkins/s/https/jenkins.vacs.fr/Bionic-Dynamo.svg)](https://jenkins.vacs.fr/job/Bionic-Dynamo/)
 [![Test Status](https://img.shields.io/jenkins/t/https/jenkins.vacs.fr/Bionic-Dynamo.svg)](https://jenkins.vacs.fr/job/Bionic-Dynamo/)
 [![codecov](https://codecov.io/gh/stcarrez/dynamo/branch/master/graph/badge.svg)](https://codecov.io/gh/stcarrez/dynamo)
-[![Download](https://img.shields.io/badge/download-1.2.0-brightgreen.svg)](https://download.vacs.fr/dynamo/dynamo-1.2.0.tar.gz)
+[![Download](https://img.shields.io/badge/download-1.2.1-brightgreen.svg)](https://download.vacs.fr/dynamo/dynamo-1.2.1.tar.gz)
 [![License](https://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
-![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/1.2.0.svg)
+![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/1.2.1.svg)
 
 This Ada05 application is a code generator used to generate
 an Ada Web Application or database mappings from hibernate-like
@@ -15,7 +15,7 @@ generation of a web application which uses the Ada Web Application framework
 
 To build Dynamo, you will need:
 
-* Ada Util     (https://github.com/stcarrez/ada-util          2.3.0)
+* Ada Util     (https://github.com/stcarrez/ada-util          2.4.0)
 * Ada EL       (https://github.com/stcarrez/ada-el            1.8.1)
 * Ada Security (https://github.com/stcarrez/ada-security      1.3.1)
 * Ada Servlet  (https://github.com/stcarrez/ada-servlet       1.5.0)
@@ -23,12 +23,8 @@ To build Dynamo, you will need:
 * Ada ADO      (https://github.com/stcarrez/ada-ado           2.1.1)
 * XML/Ada      (https://libre.adacore.com/libre/tools/xmlada/  4.4)
 
-## Version 1.2.0 - August 2020
-
-- Integrate ArgoUML 0.35.2-2020-07-05
-- Fix SQL generation with 'auto' generator
-- Fix XML Hibernate mapping support
-- Improvement in SQL schema generation
+## Version 1.2.1   - Feb 2021
+- Fix uninitialized float values in generated code
 
 [List all versions](https://github.com/stcarrez/dynamo/blob/master/NEWS.md)
 

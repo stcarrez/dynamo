@@ -1,3 +1,6 @@
+Version 1.2.1   - Feb 2021
+  - Fix uninitialized float values in generated code
+
 Version 1.2     - August 2020
   - Integrate ArgoUML 0.35.2-2020-07-05
   - Fix SQL generation with 'auto' generator

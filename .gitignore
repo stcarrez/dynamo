@@ -30,3 +30,13 @@ cover
 alire
 regtests/results
 dynamo.cov
+debian/.debhelper/
+debian/autoreconf.after
+debian/autoreconf.before
+debian/debhelper-build-stamp
+debian/dynamo-argouml.substvars
+debian/dynamo-argouml/
+debian/dynamo.substvars
+debian/dynamo/
+debian/files
+debian/tmp/

@@ -8,10 +8,10 @@ Build-Depends: debhelper (>= 10), autotools-dev,
  gprbuild (>= 2015-2),
 # 2015-2 is compatible with gnat-6
  libxmlada-sax9-dev,
- libutilada-sys2-dev,
- libutilada-xml2-dev,
- libasf2-dev,
- libado2-dev,
+ libutilada-sys3-dev,
+ libutilada-xml3-dev,
+ libasf3-dev,
+ libado3-dev,
  libgnatprj7-dev
 Standards-Version: 4.1.4
 Homepage: https://github.com/stcarrez/dynamo/

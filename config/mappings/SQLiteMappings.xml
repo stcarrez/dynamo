@@ -75,6 +75,7 @@
         <from>PrimitiveTypes::Float</from>
         <from>datatype::float</from>
         <from>datatype::Float</from>
+        <from>float</from>
         <to>FLOAT</to>
     </mapping>
     <mapping>

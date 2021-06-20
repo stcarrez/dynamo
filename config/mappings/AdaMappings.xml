@@ -98,6 +98,7 @@
         <from>ADO.Entity_Type</from>
         <from>ADO.Model.Entity_Type</from>
         <from>Entity_Type</from>
+        <from>entity_type</from>
         <from>PrimitiveTypes::Entity_Type</from>
         <from>datatype::Entity_Type</from>
         <to>ADO.Nullable_Entity_Type</to>
@@ -134,7 +135,7 @@
     <mapping type="float">
         <from>PrimitiveTypes::Double</from>
         <from>double</from>
-        <to>Double</to>
+        <to>Long_Float</to>
     </mapping>
     <mapping type="float">
         <from>PrimitiveTypes::Float</from>

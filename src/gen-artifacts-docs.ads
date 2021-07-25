@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2015, 2017, 2018, 2019, 2020 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2019, 2020, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -109,7 +109,7 @@ private
                       L_START_CODE, L_END_CODE,
                       L_HEADER_1, L_HEADER_2, L_HEADER_3, L_HEADER_4);
 
-   subtype Line_Include_Kind is Line_Kind range L_INCLUDE .. L_INCLUDE_QUERY;
+   subtype Line_Include_Kind is Line_Kind range L_INCLUDE .. L_INCLUDE_DOC;
 
    type Line_Type (Len : Natural) is record
       Kind    : Line_Kind := L_TEXT;
@@ -169,21 +169,18 @@ private
    --  Include the document extract represented by <b>Name</b> into the document <b>Into</b>.
    --  The included document is marked so that it will not be generated.
    procedure Include (Docs     : in out Doc_Maps.Map;
+                      Source   : in String;
                       Into     : in out File_Document;
                       Name     : in String;
                       Mode     : in Line_Include_Kind;
                       Position : in Natural);
 
-   procedure Include (Docs     : in out Doc_Maps.Map;
-                      Into     : in out File_Document;
-                      Name     : in String;
-                      Position : in Natural);
-
    --  Generate the project documentation that was collected in <b>Docs</b>.
    --  The documentation is merged so that the @include tags are replaced by the matching
    --  document extracts.
-   procedure Generate (Docs : in out Doc_Maps.Map;
-                       Dir  : in String);
+   procedure Generate (Handler : in out Artifact;
+                       Docs    : in out Doc_Maps.Map;
+                       Dir     : in String);
 
    --  Returns True if the line indicates a bullet or numbered list.
    function Is_List (Line : in String) return Boolean;
@@ -230,6 +227,13 @@ private
                             Result  : in out File_Document);
 
    procedure Read_Xml_File (Handler : in out Artifact;
+                            File    : in String;
+                            Result  : in out File_Document);
+
+   --  Read some general purpose documentation files.  The documentation file
+   --  can be integrated and merged by using the @include-doc tags and it may
+   --  contain various @ tags.
+   procedure Read_Doc_File (Handler : in out Artifact;
                             File    : in String;
                             Result  : in out File_Document);
 

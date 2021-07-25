@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009 - 2018 Stephane Carrez
+--  Copyright (C) 2009 - 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -295,6 +295,7 @@ package body Gen.Model.Tables is
       T     : constant Gen.Model.Mappings.Mapping_Definition_Access := O.Get_Type_Mapping;
       Table : Table_Definition_Access;
    begin
+      Column_Definition (O).Prepare;
       if T = null then
          Table := Create_Table (O.Type_Name);
          O.Type_Mapping := Table.all'Access;

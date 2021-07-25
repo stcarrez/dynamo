@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2013, 2014, 2015, 2018, 2019, 2020 Stephane Carrez
+--  Copyright (C) 2012 - 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 with Util.Files;
 with Util.Log.Loggers;
 with Util.Strings;
+with Util.Strings.Vectors;
 with Util.Streams.Pipes;
 with Util.Streams.Texts;
 with Util.Processes;
@@ -66,7 +67,7 @@ package body Gen.Artifacts.Docs is
                       Context : in out Generator'Class) is
       pragma Unreferenced (Model);
 
-      Docs   : Doc_Maps.Map;
+      Docs    : Doc_Maps.Map;
       Name    : constant String := (if Handler.Format = DOC_WIKI_GOOGLE
                                     then "generator.doc.xslt.command"
                                     else "generator.markdown.xslt.command");
@@ -79,7 +80,7 @@ package body Gen.Artifacts.Docs is
       Handler.Scan_Files ("config", Docs);
       Handler.Scan_Files ("db", Docs);
       Handler.Scan_Files ("plugins", Docs);
-      Generate (Docs, Context.Get_Result_Directory);
+      Handler.Generate (Docs, Context.Get_Result_Directory);
    end Prepare;
 
    --  ------------------------------
@@ -130,6 +131,7 @@ package body Gen.Artifacts.Docs is
    --  The included document is marked so that it will not be generated.
    --  ------------------------------
    procedure Include (Docs     : in out Doc_Maps.Map;
+                      Source   : in String;
                       Into     : in out File_Document;
                       Name     : in String;
                       Mode     : in Line_Include_Kind;
@@ -146,8 +148,8 @@ package body Gen.Artifacts.Docs is
          Iter : Line_Vectors.Cursor := Doc.Lines (Mode).Last;
       begin
          Log.Debug ("Merge {0} in {1}", Source, Ada.Strings.Unbounded.To_String (Into.Name));
-         Into.Lines (L_INCLUDE).Insert (Before => Position,
-                                        New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
+--         Into.Lines (L_INCLUDE).Insert (Before => Position,
+--                                        New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
          while Line_Vectors.Has_Element (Iter) loop
             Into.Lines (L_INCLUDE).Insert (Before   => Position,
                                            New_Item => Line_Vectors.Element (Iter));
@@ -156,45 +158,16 @@ package body Gen.Artifacts.Docs is
          Doc.Was_Included := True;
       end Do_Include;
 
-      Pos : constant Doc_Maps.Cursor := Docs.Find (Name);
+      Pos  : constant Doc_Maps.Cursor := Docs.Find (Name);
+      Line : Natural;
    begin
       if not Doc_Maps.Has_Element (Pos) then
-         Log.Error ("Cannot include document '{0}'", Name);
+         Line := Into.Line_Number + Natural (Into.Lines (L_INCLUDE).Length) - Position;
+         Log.Error ("{0}:{1}: Cannot include document '{2}'",
+                    Source, Util.Strings.Image (Line), Name);
          return;
       end if;
       Docs.Update_Element (Pos, Do_Include'Access);
-   end Include;
-
-   --  ------------------------------
-   --  Include the document extract represented by <b>Name</b> into the document <b>Into</b>.
-   --  The included document is marked so that it will not be generated.
-   --  ------------------------------
-   procedure Include (Docs     : in out Doc_Maps.Map;
-                      Into     : in out File_Document;
-                      Name     : in String;
-                      Position : in Natural) is
-      pragma Unreferenced (Docs);
-      procedure Do_Include (Line : in String);
-
-      Pos : Natural := Position;
-
-      procedure Do_Include (Line : in String) is
-      begin
-         Into.Lines (L_INCLUDE).Insert (Before => Pos,
-                                        New_Item => (Len => Line'Length,
-                                                     Kind => L_TEXT,
-                                                     Content => Line));
-         Pos := Pos + 1;
-      end Do_Include;
-
-   begin
-      if not Ada.Directories.Exists (Name) then
-         Log.Error ("{0}: Cannot include document: {1}",
-                    Ada.Strings.Unbounded.To_String (Into.Name), Name);
-         return;
-      end if;
-      Util.Files.Read_File (Path     => Name,
-                            Process  => Do_Include'Access);
    end Include;
 
    --  ------------------------------
@@ -202,8 +175,13 @@ package body Gen.Artifacts.Docs is
    --  The documentation is merged so that the @include tags are replaced by the matching
    --  document extracts.
    --  ------------------------------
-   procedure Generate (Docs : in out Doc_Maps.Map;
-                       Dir  : in String) is
+   procedure Generate (Handler : in out Artifact;
+                       Docs    : in out Doc_Maps.Map;
+                       Dir     : in String) is
+
+      --  Scan for external documents to include.
+      procedure Scan_For_Documents (Docs : in out Doc_Maps.Map);
+
       --  Merge the documentation.
       procedure Merge (Source : in String;
                        Doc    : in out File_Document);
@@ -217,8 +195,6 @@ package body Gen.Artifacts.Docs is
       --  ------------------------------
       procedure Merge (Source : in String;
                        Doc    : in out File_Document) is
-         pragma Unreferenced (Source);
-
          Pos : Natural := 1;
       begin
          while Pos <= Natural (Doc.Lines (L_INCLUDE).Length) loop
@@ -230,10 +206,10 @@ package body Gen.Artifacts.Docs is
                L_INCLUDE_BEAN
                then
                   Line_Vectors.Delete (Doc.Lines (L_INCLUDE), Pos);
-                  Include (Docs, Doc, L.Content, L.Kind, Pos);
+                  Include (Docs, Source, Doc, L.Content, L.Kind, Pos);
                elsif L.Kind = L_INCLUDE_DOC then
                   Line_Vectors.Delete (Doc.Lines (L_INCLUDE), Pos);
-                  Include (Docs, Doc, L.Content, Pos);
+                  Include (Docs, Source, Doc, L.Content, L_INCLUDE, Pos);
                else
                   Pos := Pos + 1;
                end if;
@@ -284,9 +260,64 @@ package body Gen.Artifacts.Docs is
          Ada.Text_IO.Close (File);
       end Generate;
 
-      Iter : Doc_Maps.Cursor := Docs.First;
+      procedure Scan_For_Documents (Docs : in out Doc_Maps.Map) is
+         procedure Scan (Doc : in out File_Document);
+
+         Scan_List : Doc_Maps.Map := Docs;
+         List      : Util.Strings.Vectors.Vector;
+
+         procedure Scan (Doc : in out File_Document) is
+            Pos : Natural := 1;
+         begin
+            while Pos <= Natural (Doc.Lines (L_INCLUDE).Length) loop
+               declare
+                  L : constant Line_Type := Line_Vectors.Element (Doc.Lines (L_INCLUDE), Pos);
+               begin
+                  if L.Kind = L_INCLUDE_DOC and then not Docs.Contains (L.Content) then
+                     if not Ada.Directories.Exists (L.Content) then
+                        Log.Error ("{0}: Cannot include document: {1}",
+                                   Ada.Strings.Unbounded.To_String (Doc.Name), L.Content);
+                        Line_Vectors.Delete (Doc.Lines (L_INCLUDE), Pos);
+                     else
+                        List.Append (L.Content);
+                        Pos := Pos + 1;
+                     end if;
+                  else
+                     Pos := Pos + 1;
+                  end if;
+               end;
+            end loop;
+         end Scan;
+
+      begin
+         loop
+            for Doc of Scan_List loop
+               Scan (Doc);
+            end loop;
+            exit when List.Is_Empty;
+
+            Scan_List.Clear;
+            for Path of List loop
+               declare
+                  Doc       : File_Document;
+               begin
+                  Doc.Print_Footer := Handler.Print_Footer;
+                  Doc.Formatter := Handler.Formatter;
+                  Handler.Read_Doc_File (Path, Doc);
+                  Docs.Include (Path, Doc);
+                  Scan_List.Include (Path, Doc);
+               end;
+            end loop;
+            List.Clear;
+         end loop;
+      end Scan_For_Documents;
+
+      Iter : Doc_Maps.Cursor;
    begin
+      Scan_For_Documents (Docs);
+
       --  First pass: merge the documentation.
+      Iter := Docs.First;
       while Doc_Maps.Has_Element (Iter) loop
          Docs.Update_Element (Position => Iter, Process => Merge'Access);
          Doc_Maps.Next (Iter);
@@ -479,6 +510,48 @@ package body Gen.Artifacts.Docs is
       use Ada.Strings.Unbounded;
       use Ada.Strings;
 
+      --  Scan for document files matching a pattern and include them.
+      procedure Include_Files (Path    : in String;
+                               Pattern : in String);
+
+      procedure Include_Files (Path    : in String;
+                               Pattern : in String) is
+         use Ada.Directories;
+
+         File_Filter  : constant Filter_Type := (Ordinary_File => True,
+                                                 Directory     => False,
+                                                 others        => False);
+         Ent     : Ada.Directories.Directory_Entry_Type;
+         Search  : Search_Type;
+         Files   : Gen.Utils.String_Set.Set;
+      begin
+         Log.Info ("Scanning {0} for document files matching {1}", Path, Pattern);
+
+         if not Ada.Directories.Exists (Path) then
+            Log.Error ("Cannot search documents from '{0}'", Path);
+            return;
+         end if;
+
+         --  Step #1: collect the files matching the pattern.
+         Start_Search (Search, Directory => Path,
+                       Pattern => Pattern, Filter => File_Filter);
+         while More_Entries (Search) loop
+            Get_Next_Entry (Search, Ent);
+            Files.Include (To_Unbounded_String (Ada.Directories.Full_Name (Ent)));
+         end loop;
+
+         --  Step #2: iterate on the list of files sorted on their path
+         for File of Files loop
+            declare
+               Path : constant String := To_String (File);
+            begin
+               Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Path'Length,
+                                                         Kind    => L_INCLUDE_DOC,
+                                                         Content => Path));
+            end;
+         end loop;
+      end Include_Files;
+
       Pos : constant Natural := Util.Strings.Index (Tag, ' ');
    begin
       if Pos = 0 then
@@ -521,9 +594,18 @@ package body Gen.Artifacts.Docs is
                                           Content => Value));
 
          elsif Tag (Tag'First .. Pos - 1) = TAG_INCLUDE_DOC then
-            Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
-                                          Kind    => L_INCLUDE_DOC,
-                                          Content => Value));
+            declare
+               Sep : constant Natural := Util.Strings.Index (Value, '*');
+            begin
+               if Sep = 0 then
+                  Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
+                                                            Kind    => L_INCLUDE_DOC,
+                                                            Content => Value));
+               else
+                  Include_Files (Value (Value'First .. Sep - 1),
+                                 Value (Sep .. Value'Last));
+               end if;
+            end;
 
          else
             raise Unknown_Tag with Tag (Tag'First .. Pos - 1);
@@ -670,11 +752,12 @@ package body Gen.Artifacts.Docs is
 
       procedure Process (Line : in String) is
       begin
-         Result.Line_Number := Result.Line_Number + 1;
          if Done then
             return;
+         end if;
 
-         elsif Line'Length <= 1 then
+         Result.Line_Number := Result.Line_Number + 1;
+         if Line'Length <= 1 then
             Doc_Block := False;
 
          elsif Line (Line'Last) = ASCII.CR then
@@ -817,5 +900,35 @@ package body Gen.Artifacts.Docs is
       when E : Util.Processes.Process_Error =>
          Log.Error ("Command {0} failed: {1}", Command, Ada.Exceptions.Exception_Message (E));
    end Read_Xml_File;
+
+   --  ------------------------------
+   --  Read some general purpose documentation files.  The documentation file
+   --  can be integrated and merged by using the @include-doc tags and it may
+   --  contain various @ tags.
+   --  ------------------------------
+   procedure Read_Doc_File (Handler : in out Artifact;
+                            File    : in String;
+                            Result  : in out File_Document) is
+      pragma Unreferenced (Handler);
+
+      procedure Process (Line : in String);
+
+      procedure Process (Line : in String) is
+      begin
+         Result.Line_Number := Result.Line_Number + 1;
+         Append (Result, Line);
+         Result.State := IN_PARA;
+
+      exception
+         when E : Unknown_Tag =>
+            Log.Error ("{0}:{1}: Unkown comment tag '@{2}'",
+                       Ada.Directories.Base_Name (File),
+                       Util.Strings.Image (Result.Line_Number),
+                       Ada.Exceptions.Exception_Message (E));
+      end Process;
+   begin
+      Util.Files.Read_File (File, Process'Access);
+      Finish (Result);
+   end Read_Doc_File;
 
 end Gen.Artifacts.Docs;

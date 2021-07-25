@@ -15,16 +15,18 @@ generation of a web application which uses the Ada Web Application framework
 
 To build Dynamo, you will need:
 
-* Ada Util     (https://github.com/stcarrez/ada-util          2.4.0)
-* Ada EL       (https://github.com/stcarrez/ada-el            1.8.1)
+* Ada Util     (https://github.com/stcarrez/ada-util          2.4.1)
+* Ada EL       (https://github.com/stcarrez/ada-el            1.8.3)
 * Ada Security (https://github.com/stcarrez/ada-security      1.3.1)
-* Ada Servlet  (https://github.com/stcarrez/ada-servlet       1.5.0)
-* Ada Server Faces (https://github.com/stcarrez/ada-asf       1.4.1)
-* Ada ADO      (https://github.com/stcarrez/ada-ado           2.1.1)
+* Ada Servlet  (https://github.com/stcarrez/ada-servlet       1.5.2)
+* Ada Server Faces (https://github.com/stcarrez/ada-asf       1.4.3)
+* Ada ADO      (https://github.com/stcarrez/ada-ado           2.2.0)
 * XML/Ada      (https://libre.adacore.com/libre/tools/xmlada/  4.4)
 
-## Version 1.2.1   - Feb 2021
-- Fix uninitialized float values in generated code
+## Version 1.2.2   - Jul 2021
+- Fix the SQL type definition for double on PostgreSQL
+- Fix double support and nullable entity_type
+- Fix SQL generation for a foreign key with variable lenght
 
 [List all versions](https://github.com/stcarrez/dynamo/blob/master/NEWS.md)
 

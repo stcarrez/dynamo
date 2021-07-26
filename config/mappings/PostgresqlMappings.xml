@@ -86,7 +86,7 @@
         <from>datatype::Double</from>
         <from>datatype::Money</from>
         <from>double</from>
-        <to>DOUBLE</to>
+        <to>DOUBLE PRECISION</to>
     </mapping>
     <mapping type='boolean'>
         <from>bool</from>

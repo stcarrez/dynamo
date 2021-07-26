@@ -1,3 +1,8 @@
+Version 1.2.2   - Jul 2021
+  - Fix the SQL type definition for double on PostgreSQL
+  - Fix double support and nullable entity_type
+  - Fix SQL generation for a foreign key with variable lenght
+
 Version 1.2.1   - Feb 2021
   - Fix uninitialized float values in generated code
 

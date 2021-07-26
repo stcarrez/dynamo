@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 10), autotools-dev,
  libutilada-xml2-dev,
  libasf2-dev,
  libado2-dev,
- libgnatprj7-dev
+ libgpr2-dev
 Standards-Version: 4.1.4
 Homepage: https://github.com/stcarrez/dynamo/
 Vcs-Git: https://github.com/stcarrez/dynamo.git -b debian-gnat-8

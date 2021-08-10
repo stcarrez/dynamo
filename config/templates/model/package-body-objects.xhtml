@@ -94,12 +94,14 @@
                   #{g:indent(column.name)} Value  : in #{g:adaType(column,1)}) is
      <h:panelGroup rendered="#{column.type.isEnum and not column.isAuditable}">
       procedure Set_Field_Enum is
-         new ADO.Objects.Set_Field_Operation (#{column.type.name});
+        new ADO.Objects.Set_Field_Operation
+          (#{g:adaType(column,1)});
      </h:panelGroup>
      <h:panelGroup rendered="#{column.type.isEnum and column.isAuditable}">
       procedure Set_Field_Enum is
-         new ADO.Audits.Set_Field_Operation (#{column.type.name},
-                                             #{column.type.name}_Objects.To_Object);
+        new ADO.Audits.Set_Field_Operation
+          (#{g:adaType(column,1)},
+           #{g:adaType(column,1)}_Objects.To_Object);
      </h:panelGroup>
       Impl : #{fn:capitalize(table.type)}_Access;
    begin
@@ -379,7 +381,7 @@
       if Object.Is_Modified (#{column.index + 1}) then
       <h:panelGroup rendered="#{column.type.isEnum}">
          Stmt.Save_Field (Name  => COL_#{column.index}_#{table.rowIndex}_NAME, --  #{column.sqlName}
-                          Value => Integer (#{column.type.name}'Pos (Object.#{fn:capitalize(column.name)})));
+                          Value => Integer (#{g:adaType(column,1)}'Pos (Object.#{fn:capitalize(column.name)})));
       </h:panelGroup>
       <h:panelGroup rendered="#{column.name ne table.id.name and not column.type.isEnum}">
          Stmt.Save_Field (Name  => COL_#{column.index}_#{table.rowIndex}_NAME, --  #{column.sqlName}
@@ -449,7 +451,7 @@
   <h:panelGroup rendered="#{table.id.generator ne 'native' or table.id.name ne column.name}">
     <h:panelGroup rendered="#{column.type.isEnum and column.isInserted}">
       Query.Save_Field (Name  => COL_#{column.index}_#{table.rowIndex}_NAME, --  #{column.sqlName}
-                        Value => Integer (#{column.type.name}'Pos (Object.#{fn:capitalize(column.name)})));
+                        Value => Integer (#{g:adaType(column,1)}'Pos (Object.#{fn:capitalize(column.name)})));
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name ne table.id.name and (column.isInserted or column.isVersion) and not column.type.isEnum}">
       Query.Save_Field (Name  => COL_#{column.index}_#{table.rowIndex}_NAME, --  #{column.sqlName}
@@ -563,7 +565,7 @@
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Time (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isEnum}">
-      Object.#{fn:capitalize(column.name)} := #{column.type.name}'Val (Stmt.Get_Integer (#{column.index}));
+      Object.#{fn:capitalize(column.name)} := #{g:adaType(column,1)}'Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isBlob}">
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Blob (#{column.index});

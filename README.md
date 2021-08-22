@@ -23,6 +23,9 @@ To build Dynamo, you will need:
 * Ada ADO      (https://github.com/stcarrez/ada-ado           2.2.0)
 * XML/Ada      (https://libre.adacore.com/libre/tools/xmlada/  4.4)
 
+## Version 1.2.2   - Under Development
+- Fix #5: Generated body does not compile when an enumeration of another UML package is used
+
 ## Version 1.2.2   - Jul 2021
 - Fix the SQL type definition for double on PostgreSQL
 - Fix double support and nullable entity_type

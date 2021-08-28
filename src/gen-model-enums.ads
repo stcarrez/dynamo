@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-enums -- Enum definitions
---  Copyright (C) 2011, 2012, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ package Gen.Model.Enums is
 
    use Ada.Strings.Unbounded;
 
-   type Enum_Definition;
+   type Enum_Definition is tagged;
    type Enum_Definition_Access is access all Enum_Definition'Class;
 
    --  ------------------------------

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@ package Gen.Model.Projects is
 
    use Ada.Strings.Unbounded;
 
-   type Project_Definition;
+   type Project_Definition is tagged;
    type Project_Definition_Access is access all Project_Definition'Class;
 
    type Dependency_Type is (NONE, DIRECT, INDIRECT, BOTH);

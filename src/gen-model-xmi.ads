@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012, 2013, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,9 +58,9 @@ package Gen.Model.XMI is
 
    type Parameter_Type is (PARAM_IN, PARAM_OUT, PARAM_INOUT, PARAM_RETURN);
 
-   type Model_Element;
-   type Tagged_Value_Element;
-   type Tag_Definition_Element;
+   type Model_Element is tagged;
+   type Tagged_Value_Element is tagged;
+   type Tag_Definition_Element is tagged;
    type Model_Element_Access is access all Model_Element'Class;
    type Tagged_Value_Element_Access is access all Tagged_Value_Element'Class;
    type Tag_Definition_Element_Access is access all Tag_Definition_Element'Class;
@@ -499,7 +499,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  A package
    --  ------------------------------
-   type Package_Element;
+   type Package_Element is tagged;
    type Package_Element_Access is access all Package_Element'Class;
 
    type Package_Element is new Model_Element with record

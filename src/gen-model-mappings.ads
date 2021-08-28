@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012, 2015, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018, 2019, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,7 @@ package Gen.Model.Mappings is
    --  ------------------------------
    --  Mapping Definition
    --  ------------------------------
-   type Mapping_Definition;
+   type Mapping_Definition is tagged;
    type Mapping_Definition_Access is access all Mapping_Definition'Class;
 
    type Mapping_Definition is new Definition with record

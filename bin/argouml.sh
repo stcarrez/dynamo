@@ -32,5 +32,7 @@ if [ ! -d $DIR ] ; then
 fi
 CONFIG="-Dargouml.profiles.directory=$DIR/uml/ -Dlog4j.configuration=org/argouml/resource/full_console.lcf -Djava.util.logging.config.file=$DIR/argouml.properties -Dargouml.modules=org.argouml.activity2.ActivityDiagramModule;org.argouml.sequence2.SequenceDiagramModule;org.argouml.core.propertypanels.module.XmlPropertyPanelsModule;org.argouml.transformer.TransformerModule"
 
+CONFIG="$CONFIG -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.plaf.metal.windowTitleFont=Sans-17 -Dswing.plaf.metal.systemTextFont=Sans-17 -Dswing.plaf.metal.menuTextFont=Sans-17 -Dswing.plaf.metal.controlFont=Sans-24 -Dswing.plaf.metal.userFont=Sans-24 -Dawt.useSystemAAFontSettings=on -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.plaf.metal.userTextFont=Sans-24 -Dswing.plaf.metal.subTextFont=Sans-24"
+
 exec java -Xms64m -Xmx512m $CONFIG -jar $DIR/argouml-0.35.2.jar "$@"
 

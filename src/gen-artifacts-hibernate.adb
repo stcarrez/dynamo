@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-hibernate -- Hibernate artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2020 Stephane Carrez
+--  Copyright (C) 2011 - 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -415,6 +415,9 @@ package body Gen.Artifacts.Hibernate is
          SHA_Files.Clear;
          if Driver = "sqlite" then
             Append (SQL_Content, "pragma synchronous=OFF;" & ASCII.LF);
+         end if;
+         if Prefix = "" then
+            Collect_SQL (Project, Model_Dir, Driver, "pre-", "", SQL_Content);
          end if;
          if Is_Reverse then
             Pos  := Project.Dynamo_Files.Last_Index;

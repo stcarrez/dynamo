@@ -14,6 +14,7 @@
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 
+pragma Warnings (Off);
 with Ada.Unchecked_Deallocation;
 <h:panelGroup rendered="#{package.useCalendarTime}">
 with Util.Beans.Objects.Time;
@@ -21,15 +22,19 @@ with Util.Beans.Objects.Time;
 <h:list value="#{package.usedBodyTypes}" var="type">
 with #{type};
 </h:list>
+pragma Warnings (On);
 
 package body #{package.name} is
+#{''}
+   pragma Style_Checks ("-mr");
+   pragma Warnings (Off, "formal parameter * is not referenced");
 <h:panelGroup rendered="#{not empty package.queries or not empty package.tables}">
+   pragma Warnings (Off, "use clause for type *");
+   pragma Warnings (Off, "use clause for private type *");
 #{''}
    use type ADO.Objects.Object_Record_Access;
    use type ADO.Objects.Object_Ref;
 </h:panelGroup>
-#{''}
-   pragma Warnings (Off, "formal parameter * is not referenced");
 #{''}
   <ui:include src="package-body-objects.xhtml"/>
 

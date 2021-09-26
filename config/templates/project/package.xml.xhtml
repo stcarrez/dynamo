@@ -55,15 +55,24 @@
      </install>
 
      <install mode='exec' dir='web'>
-       <command slow='true'>closure --charset UTF-8 \#{src} --js_output_file \#{dst}</command>
+       <command slow='true'>closure --warning_level QUIET --charset UTF-8 \#{src} --js_output_file \#{dst}</command>
        <fileset dir="web">
          <include name="**/*.js"/>
+         <exclude name="js/highlight.pack.js"/>
+         <exclude name="js/trumbowyg/trumbowyg.js"/>
        </fileset>
        <fileset dir="samples/web">
           <include name="**/*.js"/>
          <exclude name="js/jquery-chosen-1.4.2/**"/>
          <exclude name="js/jquery-ui-1.11.4/**"/>
          <exclude name="js/jquery-1.11.3.js"/>
+       </fileset>
+     </install>
+
+     <install mode='copy' dir='web'>
+       <fileset dir="web">
+         <include name="js/highlight.pack.js"/>
+         <include name="js/trumbowyg/trumbowyg.js"/>
        </fileset>
      </install>
 

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-yaml -- Yaml database model files
---  Copyright (C) 2018 Stephane Carrez
+--  Copyright (C) 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ package Gen.Artifacts.Yaml is
    overriding
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                       Context : in out Generator'Class);
 
    --  Read the UML/XMI model file.

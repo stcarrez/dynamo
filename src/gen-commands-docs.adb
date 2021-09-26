@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-docs -- Extract and generate documentation for the project
---  Copyright (C) 2012, 2015, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@ with Ada.Text_IO;
 with Ada.Directories;
 
 with Gen.Artifacts.Docs;
-with Gen.Model.Packages;
 package body Gen.Commands.Docs is
 
    use GNAT.Command_Line;
@@ -38,7 +37,6 @@ package body Gen.Commands.Docs is
       pragma Unreferenced (Cmd, Name, Args);
 
       Doc    : Gen.Artifacts.Docs.Artifact;
-      M      : Gen.Model.Packages.Model_Definition;
       Arg1   : constant String := Get_Argument;
       Arg2   : constant String := Get_Argument;
       Footer : Boolean := True;
@@ -78,7 +76,7 @@ package body Gen.Commands.Docs is
       end if;
       Doc.Set_Format (Fmt, Footer);
       Doc.Read_Links (Generator.Get_Project_Property ("links", "links.txt"));
-      Doc.Prepare (M, Generator);
+      Doc.Generate (Generator);
    end Execute;
 
    --  ------------------------------

@@ -64,9 +64,15 @@ package body Gen.Artifacts.Docs is
    overriding
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                       Context : in out Generator'Class) is
-      pragma Unreferenced (Model);
+      pragma Unreferenced (Model, Project);
+   begin
+      Handler.Generate (Context);
+   end Prepare;
 
+   procedure Generate (Handler : in out Artifact;
+                       Context : in out Generator'Class) is
       Docs    : Doc_Maps.Map;
       Name    : constant String := (if Handler.Format = DOC_WIKI_GOOGLE
                                     then "generator.doc.xslt.command"
@@ -81,7 +87,7 @@ package body Gen.Artifacts.Docs is
       Handler.Scan_Files ("db", Docs);
       Handler.Scan_Files ("plugins", Docs);
       Handler.Generate (Docs, Context.Get_Result_Directory);
-   end Prepare;
+   end Generate;
 
    --  ------------------------------
    --  Set the output document format to generate.

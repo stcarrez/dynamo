@@ -264,8 +264,9 @@ package body Gen.Artifacts.Query is
    overriding
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                       Context : in out Generator'Class) is
-      pragma Unreferenced (Handler);
+      pragma Unreferenced (Handler, Project);
    begin
       Log.Debug ("Preparing the model for query");
 

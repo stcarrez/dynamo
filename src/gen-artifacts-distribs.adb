@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs -- Artifact for distributions
---  Copyright (C) 2012, 2013, 2015, 2020 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015, 2020, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -235,13 +235,13 @@ package body Gen.Artifacts.Distribs is
    overriding
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                       Context : in out Generator'Class) is
-      pragma Unreferenced (Model);
+      pragma Unreferenced (Model, Project);
 
       procedure Scan_Rule (Pos : in Distrib_Rule_Vectors.Cursor);
       procedure Scan_Directory (Dir : in String);
       procedure Execute_Rule (Pos : in Distrib_Rule_Vectors.Cursor);
-
 
       --  ------------------------------
       --  Process the rule by scaning the directory tree and detecting files that are concerned.

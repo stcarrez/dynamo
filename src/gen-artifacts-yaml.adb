@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-yaml -- Query artifact for Code Generator
---  Copyright (C) 2018, 2019 Stephane Carrez
+--  Copyright (C) 2018, 2019, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -570,7 +570,9 @@ package body Gen.Artifacts.Yaml is
    overriding
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                       Context : in out Generator'Class) is
+      pragma Unreferenced (Project);
    begin
       Log.Debug ("Saving the model in YAML");
 

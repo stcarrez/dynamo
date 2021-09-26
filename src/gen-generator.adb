@@ -894,20 +894,20 @@ package body Gen.Generator is
    procedure Prepare (H : in out Handler) is
    begin
       if H.XMI.Is_Initialized then
-         H.XMI.Prepare (Model => H.Model, Context => H);
+         H.XMI.Prepare (Model => H.Model, Project => H.Project, Context => H);
       end if;
       if H.Yaml.Is_Initialized then
-         H.Yaml.Prepare (Model => H.Model, Context => H);
+         H.Yaml.Prepare (Model => H.Model, Project => H.Project, Context => H);
       end if;
       H.Model.Prepare;
       if H.Hibernate.Is_Initialized then
-         H.Hibernate.Prepare (Model => H.Model, Context => H);
+         H.Hibernate.Prepare (Model => H.Model, Project => H.Project, Context => H);
       end if;
       if H.Query.Is_Initialized then
-         H.Query.Prepare (Model => H.Model, Context => H);
+         H.Query.Prepare (Model => H.Model, Project => H.Project, Context => H);
       end if;
       if H.Distrib.Is_Initialized then
-         H.Distrib.Prepare (Model => H.Model, Context => H);
+         H.Distrib.Prepare (Model => H.Model, Project => H.Project, Context => H);
       end if;
       H.Model.Validate (H);
    end Prepare;

@@ -75,6 +75,11 @@ package Gen.Model.Projects is
 
       --  Whether this project is a plugin.
       Is_Plugin      : Boolean := False;
+
+      --  Whether the project needs the generation for the different databases
+      Use_Mysql      : Boolean := True;
+      Use_Sqlite     : Boolean := True;
+      Use_Postgresql : Boolean := True;
    end record;
 
    --  Get the value identified by the name.

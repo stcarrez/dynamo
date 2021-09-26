@@ -534,6 +534,18 @@ that contains links to external documentation.  The syntax of the file is
 very basic: each line describes a link with the text of the link followed
 by the link itself.
 .\"
+.SS use_sqlite
+This boolean property controls the generation of SQLite schema files
+(the default is true).
+.\"
+.SS use_mysql
+This boolean property controls the generation of MySQL schema files
+(the default is true).
+.\"
+.SS use_postgresql
+This boolean property controls the generation of PostgreSQL schema files
+(the default is true).
+.\"
 .SH FILES
 .SS /usr/share/dynamo/base/generator.properties
 This configuration file is read by

@@ -25,6 +25,7 @@ To build Dynamo, you will need:
 
 ## Version 1.2.2   - Under Development
 - Fix #5: Generated body does not compile when an enumeration of another UML package is used
+- Fix #9: Option or configuration to disable some SQL generation
 
 ## Version 1.2.2   - Jul 2021
 - Fix the SQL type definition for double on PostgreSQL

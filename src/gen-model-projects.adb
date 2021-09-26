@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2020 Stephane Carrez
+--  Copyright (C) 2011 - 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,25 @@ package body Gen.Model.Projects is
    function Get_Dynamo_Path (Name         : in String;
                              Project_Path : in String;
                              Install_Dir  : in String) return String;
+
+   function Get (Project : in Project_Definition;
+                 Name    : in String;
+                 Default : in Boolean) return Boolean;
+
+   function Get (Project : in Project_Definition;
+                 Name    : in String;
+                 Default : in Boolean) return Boolean is
+   begin
+      if not Project.Props.Exists (Name) then
+         return Default;
+      else
+         declare
+            Value : constant String := Project.Props.Get (Name);
+         begin
+            return Value = "TRUE" or Value = "true" or Value = "1";
+         end;
+      end if;
+   end Get;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -452,6 +471,7 @@ package body Gen.Model.Projects is
       procedure Save_Dependency (Pos : in Project_Vectors.Cursor);
       procedure Save_Module (Pos : in Project_Vectors.Cursor);
       procedure Read_Property_Line (Line : in String);
+      function Is_Default_Value (Name : in String) return Boolean;
 
       Buffer      : aliased Util.Streams.Texts.Print_Stream;
       Output      : Util.Serialize.IO.XML.Output_Stream;
@@ -493,6 +513,15 @@ package body Gen.Model.Projects is
          end if;
       end Read_Property_Line;
 
+      function Is_Default_Value (Name : in String) return Boolean is
+      begin
+         if Name /= "use_mysql" and Name /= "use_sqlite" and Name /= "use_postgresql" then
+            return False;
+         end if;
+
+         return Get (Project, Name, True) = True;
+      end Is_Default_Value;
+
       Dir       : constant String := Ada.Directories.Containing_Directory (Path);
       Name      : constant String := Project.Get_Project_Name;
       Prop_Name : constant String := Name & ".properties";
@@ -520,12 +549,14 @@ package body Gen.Model.Projects is
       begin
          Project.Props.Get_Names (Names);
          for Name of Names loop
-            Output.Write_String (ASCII.LF & "    ");
-            Output.Start_Entity (Name => "property");
-            Output.Write_Attribute (Name  => "name",
-                                    Value => Util.Beans.Objects.To_Object (Name));
-            Output.Write_String (Value => To_String (Project.Props.Get (Name)));
-            Output.End_Entity (Name => "property");
+            if not Is_Default_Value (Name) then
+               Output.Write_String (ASCII.LF & "    ");
+               Output.Start_Entity (Name => "property");
+               Output.Write_Attribute (Name  => "name",
+                                       Value => Util.Beans.Objects.To_Object (Name));
+               Output.Write_String (Value => To_String (Project.Props.Get (Name)));
+               Output.End_Entity (Name => "property");
+            end if;
             Prop_Output.Write ("dynamo_");
             Prop_Output.Write (Name);
             Prop_Output.Write ("=");
@@ -549,10 +580,11 @@ package body Gen.Model.Projects is
    --  Update the project definition from the properties.
    --  ------------------------------
    procedure Update_From_Properties (Project : in out Project_Definition) is
-      Is_Plugin  : constant String := Project.Props.Get ("is_plugin", "FALSE");
    begin
-      Project.Is_Plugin
-        := Is_Plugin = "TRUE" or Is_Plugin = "true" or Is_Plugin = "1";
+      Project.Is_Plugin := Get (Project, "is_plugin", Project.Is_Plugin);
+      Project.Use_Mysql := Get (Project, "use_mysql", Project.Use_Mysql);
+      Project.Use_Postgresql := Get (Project, "use_postgresql", Project.Use_Postgresql);
+      Project.Use_Sqlite := Get (Project, "use_sqlite", Project.Use_Sqlite);
    end Update_From_Properties;
 
    --  ------------------------------

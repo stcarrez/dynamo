@@ -291,6 +291,7 @@ package body Gen.Artifacts.Hibernate is
    overriding
    procedure Prepare (Handler : in out Artifact;
                       Model   : in out Gen.Model.Packages.Model_Definition'Class;
+                      Project : in out Gen.Model.Projects.Project_Definition'Class;
                       Context : in out Generator'Class) is
       pragma Unreferenced (Handler);
    begin
@@ -301,18 +302,24 @@ package body Gen.Artifacts.Hibernate is
                                  Mapping => Gen.Model.Mappings.ADA_MAPPING);
          Context.Add_Generation (Name => GEN_PACKAGE_BODY, Mode => ITERATION_PACKAGE,
                                  Mapping => Gen.Model.Mappings.ADA_MAPPING);
-         Context.Add_Generation (Name => GEN_MYSQL_SQL_FILE, Mode => ITERATION_TABLE,
-                                 Mapping => Gen.Model.Mappings.MySQL_MAPPING);
-         Context.Add_Generation (Name => GEN_MYSQL_DROP_SQL_FILE, Mode => ITERATION_TABLE,
-                                 Mapping => Gen.Model.Mappings.MySQL_MAPPING);
-         Context.Add_Generation (Name => GEN_SQLITE_SQL_FILE, Mode => ITERATION_TABLE,
-                                 Mapping => Gen.Model.Mappings.SQLite_MAPPING);
-         Context.Add_Generation (Name => GEN_SQLITE_DROP_SQL_FILE, Mode => ITERATION_TABLE,
-                                 Mapping => Gen.Model.Mappings.SQLite_MAPPING);
-         Context.Add_Generation (Name => GEN_POSTGRESQL_SQL_FILE, Mode => ITERATION_TABLE,
-                                 Mapping => Gen.Model.Mappings.Postgresql_MAPPING);
-         Context.Add_Generation (Name => GEN_POSTGRESQL_DROP_SQL_FILE, Mode => ITERATION_TABLE,
-                                 Mapping => Gen.Model.Mappings.Postgresql_MAPPING);
+         if Project.Use_Mysql then
+            Context.Add_Generation (Name => GEN_MYSQL_SQL_FILE, Mode => ITERATION_TABLE,
+                                    Mapping => Gen.Model.Mappings.MySQL_MAPPING);
+            Context.Add_Generation (Name => GEN_MYSQL_DROP_SQL_FILE, Mode => ITERATION_TABLE,
+                                    Mapping => Gen.Model.Mappings.MySQL_MAPPING);
+         end if;
+         if Project.Use_Sqlite then
+            Context.Add_Generation (Name => GEN_SQLITE_SQL_FILE, Mode => ITERATION_TABLE,
+                                    Mapping => Gen.Model.Mappings.SQLite_MAPPING);
+            Context.Add_Generation (Name => GEN_SQLITE_DROP_SQL_FILE, Mode => ITERATION_TABLE,
+                                    Mapping => Gen.Model.Mappings.SQLite_MAPPING);
+         end if;
+         if Project.Use_Postgresql then
+            Context.Add_Generation (Name => GEN_POSTGRESQL_SQL_FILE, Mode => ITERATION_TABLE,
+                                    Mapping => Gen.Model.Mappings.Postgresql_MAPPING);
+            Context.Add_Generation (Name => GEN_POSTGRESQL_DROP_SQL_FILE, Mode => ITERATION_TABLE,
+                                    Mapping => Gen.Model.Mappings.Postgresql_MAPPING);
+         end if;
       end if;
    end Prepare;
 
@@ -477,12 +484,24 @@ package body Gen.Artifacts.Hibernate is
       Name       : constant String := Project.Get_Project_Name;
    begin
       if not Project.Is_Plugin then
-         Build_SQL_Schemas ("mysql", "", "create-" & Name, False);
-         Build_SQL_Schemas ("postgresql", "", "create-" & Name, False);
-         Build_SQL_Schemas ("sqlite", "", "create-" & Name, False);
-         Build_SQL_Schemas ("mysql", "drop-", "drop-" & Name, True);
-         Build_SQL_Schemas ("postgresql", "drop-", "drop-" & Name, True);
-         Build_SQL_Schemas ("sqlite", "drop-", "drop-" & Name, True);
+         if Project.Use_Mysql then
+            Build_SQL_Schemas ("mysql", "", "create-" & Name, False);
+         end if;
+         if Project.Use_Postgresql then
+            Build_SQL_Schemas ("postgresql", "", "create-" & Name, False);
+         end if;
+         if Project.Use_Sqlite then
+            Build_SQL_Schemas ("sqlite", "", "create-" & Name, False);
+         end if;
+         if Project.Use_Mysql then
+            Build_SQL_Schemas ("mysql", "drop-", "drop-" & Name, True);
+         end if;
+         if Project.Use_Postgresql then
+            Build_SQL_Schemas ("postgresql", "drop-", "drop-" & Name, True);
+         end if;
+         if Project.Use_Sqlite then
+            Build_SQL_Schemas ("sqlite", "drop-", "drop-" & Name, True);
+         end if;
          Print_Info;
       end if;
    end Finish;

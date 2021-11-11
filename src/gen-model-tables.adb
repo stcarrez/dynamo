@@ -266,7 +266,7 @@ package body Gen.Model.Tables is
          Log.Error (Def.Get_Location &
                       ": In table " & To_String (Def.Table.Name) &
                       ", column '" & To_String (Def.Name) &
-                      "' uses unkown type '" & To_String (Def.Type_Name) & "'");
+                      "' uses unknown type '" & To_String (Def.Type_Name) & "'");
       end if;
       if T /= null and then T.Nullable and then Def.Not_Null then
          Log.Error (Def.Get_Location &

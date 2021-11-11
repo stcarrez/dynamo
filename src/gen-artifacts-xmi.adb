@@ -44,17 +44,19 @@ package body Gen.Artifacts.XMI is
    use Gen.Model;
    use Gen.Configs;
 
+   package UBO renames Util.Beans.Objects;
+
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Artifacts.XMI");
 
    --  Get the visibility from the XMI visibility value.
-   function Get_Visibility (Value : in Util.Beans.Objects.Object) return Model.XMI.Visibility_Type;
+   function Get_Visibility (Value : in UBO.Object) return Model.XMI.Visibility_Type;
 
    --  Get the changeability from the XMI visibility value.
-   function Get_Changeability (Value : in Util.Beans.Objects.Object)
+   function Get_Changeability (Value : in UBO.Object)
                                return Model.XMI.Changeability_Type;
 
    --  Get the parameter kind from the XMI parameter kind value.
-   function Get_Parameter_Type (Value : in Util.Beans.Objects.Object)
+   function Get_Parameter_Type (Value : in UBO.Object)
                                 return Model.XMI.Parameter_Type;
 
    procedure Iterate_For_Table is
@@ -144,6 +146,7 @@ package body Gen.Artifacts.XMI is
                        FIELD_TAG_DEFINITION_ID,
                        FIELD_TAG_DEFINITION_NAME,
 
+                       FIELD_TAGGED_ID,
                        FIELD_TAGGED_VALUE,
 
                        FIELD_ENUMERATION,
@@ -160,48 +163,49 @@ package body Gen.Artifacts.XMI is
       Is_Profile           : Boolean := False;
 
       Class_Element        : Gen.Model.XMI.Class_Element_Access;
-      Class_Name           : Util.Beans.Objects.Object;
+      Class_Name           : UBO.Object;
       Class_Visibility     : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
-      Class_Id             : Util.Beans.Objects.Object;
+      Class_Id             : UBO.Object;
 
       --  UML Generalization.
-      Child_Id             : Util.Beans.Objects.Object;
-      Parent_Id            : Util.Beans.Objects.Object;
-      Generalization_Id    : Util.Beans.Objects.Object;
+      Child_Id             : UBO.Object;
+      Parent_Id            : UBO.Object;
+      Generalization_Id    : UBO.Object;
       Generalization       : Gen.Model.XMI.Generalization_Element_Access;
 
       Package_Element      : Gen.Model.XMI.Package_Element_Access;
-      Package_Id           : Util.Beans.Objects.Object;
+      Package_Id           : UBO.Object;
 
-      Attr_Id              : Util.Beans.Objects.Object;
+      Attr_Id              : UBO.Object;
       Attr_Element         : Gen.Model.XMI.Attribute_Element_Access;
       Attr_Visibility      : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
       Attr_Changeability   : Gen.Model.XMI.Changeability_Type
         := Gen.Model.XMI.CHANGEABILITY_CHANGEABLE;
-      Attr_Value           : Util.Beans.Objects.Object;
+      Attr_Value           : UBO.Object;
       Multiplicity_Lower   : Integer := 0;
       Multiplicity_Upper   : Integer := 0;
 
       Association          : Gen.Model.XMI.Association_Element_Access;
       Assos_End_Element    : Gen.Model.XMI.Association_End_Element_Access;
-      Assos_End_Name       : Util.Beans.Objects.Object;
+      Assos_End_Name       : UBO.Object;
       Assos_End_Visibility : Gen.Model.XMI.Visibility_Type := Gen.Model.XMI.VISIBILITY_PUBLIC;
       Assos_End_Navigable  : Boolean := False;
 
-      Operation_Id         : Util.Beans.Objects.Object;
+      Operation_Id         : UBO.Object;
       Operation            : Gen.Model.XMI.Operation_Element_Access;
       Parameter            : Gen.Model.XMI.Parameter_Element_Access;
       Parameter_Type       : Gen.Model.XMI.Parameter_Type;
 
-      Name                 : Util.Beans.Objects.Object;
-      Id                   : Util.Beans.Objects.Object;
-      Ref_Id               : Util.Beans.Objects.Object;
-      Value                : Util.Beans.Objects.Object;
-      Href                 : Util.Beans.Objects.Object;
-      Tag_Name             : Util.Beans.Objects.Object;
+      Name                 : UBO.Object;
+      Id                   : UBO.Object;
+      Ref_Id               : UBO.Object;
+      Value                : UBO.Object;
+      Href                 : UBO.Object;
+      Tag_Name             : UBO.Object;
+      Tagged_Id            : UBO.Object;
 
-      Association_Id       : Util.Beans.Objects.Object;
-      Stereotype_Id        : Util.Beans.Objects.Object;
+      Association_Id       : UBO.Object;
+      Stereotype_Id        : UBO.Object;
       Data_Type            : Gen.Model.XMI.Data_Type_Element_Access;
       Enumeration          : Gen.Model.XMI.Enum_Element_Access;
       Enumeration_Literal  : Gen.Model.XMI.Literal_Element_Access;
@@ -220,12 +224,12 @@ package body Gen.Artifacts.XMI is
 
    procedure Set_Member (P     : in out XMI_Info;
                          Field : in XMI_Fields;
-                         Value : in Util.Beans.Objects.Object);
+                         Value : in UBO.Object);
 
    --  Set the package name and or XMI id.
    procedure Set_Package (P    : in out XMI_Info;
-                          Name : in Util.Beans.Objects.Object;
-                          Id   : in Util.Beans.Objects.Object);
+                          Name : in UBO.Object;
+                          Id   : in UBO.Object);
 
    use type Gen.Model.XMI.Model_Element_Access;
    use type Gen.Model.XMI.Attribute_Element_Access;
@@ -244,9 +248,9 @@ package body Gen.Artifacts.XMI is
    --  ------------------------------
    --  Get the visibility from the XMI visibility value.
    --  ------------------------------
-   function Get_Visibility (Value : in Util.Beans.Objects.Object)
+   function Get_Visibility (Value : in UBO.Object)
                             return Model.XMI.Visibility_Type is
-      S : constant String := Util.Beans.Objects.To_String (Value);
+      S : constant String := UBO.To_String (Value);
    begin
       if S = "public" then
          return Model.XMI.VISIBILITY_PUBLIC;
@@ -268,9 +272,9 @@ package body Gen.Artifacts.XMI is
    --  ------------------------------
    --  Get the changeability from the XMI visibility value.
    --  ------------------------------
-   function Get_Changeability (Value : in Util.Beans.Objects.Object)
+   function Get_Changeability (Value : in UBO.Object)
                             return Model.XMI.Changeability_Type is
-      S : constant String := Util.Beans.Objects.To_String (Value);
+      S : constant String := UBO.To_String (Value);
    begin
       if S = "frozen" then
          return Model.XMI.CHANGEABILITY_FROZEN;
@@ -289,9 +293,9 @@ package body Gen.Artifacts.XMI is
    --  ------------------------------
    --  Get the parameter kind from the XMI parameter kind value.
    --  ------------------------------
-   function Get_Parameter_Type (Value : in Util.Beans.Objects.Object)
+   function Get_Parameter_Type (Value : in UBO.Object)
                                 return Model.XMI.Parameter_Type is
-      S : constant String := Util.Beans.Objects.To_String (Value);
+      S : constant String := UBO.To_String (Value);
    begin
       if S = "return" then
          return Model.XMI.PARAM_RETURN;
@@ -311,20 +315,22 @@ package body Gen.Artifacts.XMI is
    end Get_Parameter_Type;
 
    procedure Add_Tagged_Value (P : in out XMI_Info) is
+      Id    : constant Unbounded_String := UBO.To_Unbounded_String (P.Tagged_Id);
+      Value : constant Unbounded_String := UBO.To_Unbounded_String (P.Value);
       Tagged_Value : constant Model.XMI.Tagged_Value_Element_Access
         := new Model.XMI.Tagged_Value_Element (P.Model);
    begin
-      Log.Info ("Add tag {0} - {1}",
-                Util.Beans.Objects.To_String (P.Id),
-                Util.Beans.Objects.To_String (P.Ref_Id));
+      Log.Info ("Add tag {0} - {1}", Id, To_String (Value));
 
-      Tagged_Value.Value  := Util.Beans.Objects.To_Unbounded_String (P.Value);
-      if not Util.Beans.Objects.Is_Null (P.Ref_Id) then
-         Tagged_Value.Set_Reference_Id (Util.Beans.Objects.To_String (P.Ref_Id), P.Profiles.all);
+      Tagged_Value.Value  := Value;
+      if not UBO.Is_Null (P.Ref_Id) then
+         Tagged_Value.Set_Reference_Id (UBO.To_String (P.Ref_Id), P.Profiles.all);
+         P.Ref_Id := UBO.Null_Object;
       else
-         Tagged_Value.Set_Reference_Id (Util.Beans.Objects.To_String (P.Href), P.Profiles.all);
+         Tagged_Value.Set_Reference_Id (UBO.To_String (P.Href), P.Profiles.all);
+         P.Href := UBO.Null_Object;
       end if;
-      Tagged_Value.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+      Tagged_Value.XMI_Id := Id;
       P.Model.Insert (Tagged_Value.XMI_Id, Tagged_Value.all'Access);
 
       --  Insert the tag value into the current element.
@@ -338,6 +344,7 @@ package body Gen.Artifacts.XMI is
          P.Attr_Element.Tagged_Values.Append (Tagged_Value.all'Access);
 
       elsif P.Class_Element /= null then
+         Log.Info ("Adding in {0}", To_String (P.Class_Element.Name));
          P.Class_Element.Tagged_Values.Append (Tagged_Value.all'Access);
 
       elsif P.Enumeration_Literal /= null then
@@ -353,7 +360,7 @@ package body Gen.Artifacts.XMI is
          P.Tag_Definition.Tagged_Values.Append (Tagged_Value.all'Access);
 
       else
-         Log.Info ("Tagged value {0} ignored", Util.Beans.Objects.To_String (P.Id));
+         Log.Info ("Tagged value {0} ignored", Id);
       end if;
    end Add_Tagged_Value;
 
@@ -361,8 +368,8 @@ package body Gen.Artifacts.XMI is
    --  Set the package name and or XMI id.
    --  ------------------------------
    procedure Set_Package (P    : in out XMI_Info;
-                          Name : in Util.Beans.Objects.Object;
-                          Id   : in Util.Beans.Objects.Object) is
+                          Name : in UBO.Object;
+                          Id   : in UBO.Object) is
       Parent : constant Gen.Model.XMI.Package_Element_Access := P.Package_Element;
    begin
       --  This is a new nested package, create it.
@@ -381,12 +388,12 @@ package body Gen.Artifacts.XMI is
          P.Has_Package_Name := False;
          P.Has_Package_Id := False;
       end if;
-      if not Util.Beans.Objects.Is_Null (Id) then
+      if not UBO.Is_Null (Id) then
          P.Package_Element.Set_XMI_Id (Id);
          P.Model.Include (P.Package_Element.XMI_Id, P.Package_Element.all'Access);
          P.Has_Package_Id := True;
       end if;
-      if not Util.Beans.Objects.Is_Null (Name) then
+      if not UBO.Is_Null (Name) then
          P.Package_Element.Set_Name (Name);
          P.Has_Package_Name := True;
       end if;
@@ -394,7 +401,7 @@ package body Gen.Artifacts.XMI is
 
    procedure Set_Member (P     : in out XMI_Info;
                          Field : in XMI_Fields;
-                         Value : in Util.Beans.Objects.Object) is
+                         Value : in UBO.Object) is
    begin
       case Field is
          when FIELD_NAME =>
@@ -402,8 +409,8 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_ID =>
             P.Id     := Value;
-            P.Ref_Id := Util.Beans.Objects.Null_Object;
-            P.Href   := Util.Beans.Objects.Null_Object;
+            P.Ref_Id := UBO.Null_Object;
+            P.Href   := UBO.Null_Object;
 
          when FIELD_ID_REF =>
             P.Ref_Id := Value;
@@ -415,15 +422,17 @@ package body Gen.Artifacts.XMI is
             P.Href := Value;
 
          when FIELD_MULTIPLICITY_LOWER =>
-            P.Multiplicity_Lower := Util.Beans.Objects.To_Integer (Value);
+            P.Multiplicity_Lower := UBO.To_Integer (Value);
 
          when FIELD_MULTIPLICITY_UPPER =>
-            P.Multiplicity_Upper := Util.Beans.Objects.To_Integer (Value);
+            P.Multiplicity_Upper := UBO.To_Integer (Value);
 
          when FIELD_CLASS_NAME =>
             P.Class_Element := new Gen.Model.XMI.Class_Element (P.Model);
             P.Class_Element.Set_Name (Value);
             P.Class_Element.Set_Location (To_String (P.File) & P.Parser.Get_Location);
+            P.Ref_Id := UBO.Null_Object;
+            P.Href   := UBO.Null_Object;
 
          when FIELD_CLASS_VISIBILITY =>
             P.Class_Visibility := Get_Visibility (Value);
@@ -433,9 +442,10 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_CLASS_END =>
             if P.Class_Element /= null then
-               P.Class_Element.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Class_Id);
+               P.Class_Element.XMI_Id := UBO.To_Unbounded_String (P.Class_Id);
                P.Class_Element.Visibility := P.Class_Visibility;
-               Log.Info ("Adding class {0}", P.Class_Element.XMI_Id);
+               Log.Info ("Adding class {0} - {1}",
+                         P.Class_Element.XMI_Id, To_String (P.Class_Element.Name));
                P.Model.Insert (P.Class_Element.XMI_Id, P.Class_Element.all'Access);
                if P.Package_Element /= null then
                   P.Package_Element.Classes.Append (P.Class_Element.all'Access);
@@ -456,20 +466,20 @@ package body Gen.Artifacts.XMI is
             P.Generalization_Id := Value;
 
          when FIELD_GENERALIZATION_END =>
-            if not Util.Beans.Objects.Is_Null (P.Child_Id)
-              and not Util.Beans.Objects.Is_Null (P.Parent_Id)
-              and not Util.Beans.Objects.Is_Null (P.Generalization_Id)
+            if not UBO.Is_Null (P.Child_Id)
+              and not UBO.Is_Null (P.Parent_Id)
+              and not UBO.Is_Null (P.Generalization_Id)
             then
                P.Generalization := new Gen.Model.XMI.Generalization_Element (P.Model);
                P.Generalization.Set_XMI_Id (P.Generalization_Id);
                P.Model.Insert (P.Generalization.XMI_Id, P.Generalization.all'Access);
-               P.Generalization.Set_Reference_Id (Util.Beans.Objects.To_String (P.Parent_Id),
+               P.Generalization.Set_Reference_Id (UBO.To_String (P.Parent_Id),
                                                 P.Profiles.all);
-               P.Generalization.Child_Id := Util.Beans.Objects.To_Unbounded_String (P.Child_Id);
+               P.Generalization.Child_Id := UBO.To_Unbounded_String (P.Child_Id);
             end if;
-            P.Child_Id          := Util.Beans.Objects.Null_Object;
-            P.Generalization_Id := Util.Beans.Objects.Null_Object;
-            P.Parent_Id         := Util.Beans.Objects.Null_Object;
+            P.Child_Id          := UBO.Null_Object;
+            P.Generalization_Id := UBO.Null_Object;
+            P.Parent_Id         := UBO.Null_Object;
 
          when FIELD_OPERATION_ID =>
             P.Operation_Id := Value;
@@ -570,7 +580,7 @@ package body Gen.Artifacts.XMI is
             P.Assos_End_Visibility := Get_Visibility (Value);
 
          when FIELD_ASSOCIATION_END_NAVIGABLE =>
-            P.Assos_End_Navigable := Util.Beans.Objects.To_Boolean (Value);
+            P.Assos_End_Navigable := UBO.To_Boolean (Value);
 
          when FIELD_ASSOCIATION_END_ID =>
             P.Assos_End_Element := new Gen.Model.XMI.Association_End_Element (P.Model);
@@ -580,7 +590,7 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_ASSOCIATION_CLASS_ID =>
             if P.Assos_End_Element /= null then
-               P.Assos_End_Element.Set_Reference_Id (Util.Beans.Objects.To_String (Value),
+               P.Assos_End_Element.Set_Reference_Id (UBO.To_String (Value),
                                                      P.Profiles.all);
             end if;
 
@@ -603,7 +613,7 @@ package body Gen.Artifacts.XMI is
             end if;
             P.Multiplicity_Lower := 0;
             P.Multiplicity_Upper := 0;
-            P.Assos_End_Name := Util.Beans.Objects.Null_Object;
+            P.Assos_End_Name := UBO.Null_Object;
             P.Assos_End_Navigable := False;
             if P.Association = null then
                raise Util.Serialize.Mappers.Field_Error with "invalid association";
@@ -621,10 +631,10 @@ package body Gen.Artifacts.XMI is
             P.Association := null;
 
          when FIELD_PACKAGE_ID =>
-            Set_Package (P, Util.Beans.Objects.Null_Object, Value);
+            Set_Package (P, UBO.Null_Object, Value);
 
          when FIELD_PACKAGE_NAME =>
-            Set_Package (P, Value, Util.Beans.Objects.Null_Object);
+            Set_Package (P, Value, UBO.Null_Object);
 
          when FIELD_PACKAGE_END =>
             if P.Package_Element /= null then
@@ -636,6 +646,9 @@ package body Gen.Artifacts.XMI is
                end if;
             end if;
 
+         when FIELD_TAGGED_ID =>
+            P.Tagged_Id     := Value;
+
             --  Tagged value associated with an attribute, operation, class, package.
          when FIELD_TAGGED_VALUE =>
             Add_Tagged_Value (P);
@@ -646,13 +659,13 @@ package body Gen.Artifacts.XMI is
                P.Data_Type := new Gen.Model.XMI.Data_Type_Element (P.Model);
                P.Data_Type.Set_Name (P.Name);
                P.Data_Type.Set_Location (To_String (P.File) & P.Parser.Get_Location);
-               P.Data_Type.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+               P.Data_Type.XMI_Id := UBO.To_Unbounded_String (P.Id);
                P.Model.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
             end if;
 
          when FIELD_DATA_TYPE_HREF | FIELD_ENUMERATION_HREF | FIELD_CLASSIFIER_HREF =>
             if P.Attr_Element /= null then
-               P.Attr_Element.Set_Reference_Id (Util.Beans.Objects.To_String (Value),
+               P.Attr_Element.Set_Reference_Id (UBO.To_String (Value),
                                                 P.Profiles.all);
                Log.Debug ("Attribute {0} has type {1}",
                           P.Attr_Element.Name, P.Attr_Element.Ref_Id);
@@ -663,7 +676,7 @@ package body Gen.Artifacts.XMI is
             P.Enumeration := new Gen.Model.XMI.Enum_Element (P.Model);
             P.Enumeration.Set_Name (Value);
             P.Enumeration.Set_Location (To_String (P.File) & P.Parser.Get_Location);
-            P.Enumeration.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Id);
+            P.Enumeration.XMI_Id := UBO.To_Unbounded_String (P.Id);
             if P.Package_Element /= null then
                P.Enumeration.Parent := P.Package_Element.all'Access;
             end if;
@@ -690,8 +703,8 @@ package body Gen.Artifacts.XMI is
 
             --  Stereotype mapping.
          when FIELD_STEREOTYPE =>
-            if not Util.Beans.Objects.Is_Null (P.Stereotype_Id) and P.Stereotype /= null then
-               P.Stereotype.XMI_Id := Util.Beans.Objects.To_Unbounded_String (P.Stereotype_Id);
+            if not UBO.Is_Null (P.Stereotype_Id) and P.Stereotype /= null then
+               P.Stereotype.XMI_Id := UBO.To_Unbounded_String (P.Stereotype_Id);
                P.Model.Insert (P.Stereotype.XMI_Id, P.Stereotype.all'Access);
                if P.Class_Element /= null then
                   P.Class_Element.Elements.Append (P.Stereotype.all'Access);
@@ -707,12 +720,12 @@ package body Gen.Artifacts.XMI is
                  := new Gen.Model.XMI.Ref_Type_Element (P.Model);
             begin
                S.Set_Location (To_String (P.File) & P.Parser.Get_Location);
-               S.Set_Reference_Id (Util.Beans.Objects.To_String (Value), P.Profiles.all);
+               S.Set_Reference_Id (UBO.To_String (Value), P.Profiles.all);
 
                if P.Enumeration_Literal /= null then
                   P.Enumeration_Literal.Stereotypes.Append (S.all'Access);
                elsif P.Assos_End_Element /= null then
-                  Log.Info ("Stereotype {0} added", Util.Beans.Objects.To_String (Value));
+                  Log.Info ("Stereotype {0} added", UBO.To_String (Value));
                   P.Assos_End_Element.Stereotypes.Append (S.all'Access);
                elsif P.Association /= null then
                   P.Association.Stereotypes.Append (S.all'Access);
@@ -723,7 +736,7 @@ package body Gen.Artifacts.XMI is
                elsif P.Package_Element /= null then
                   P.Package_Element.Stereotypes.Append (S.all'Access);
                else
-                  Log.Info ("Stereotype {0} ignored", Util.Beans.Objects.To_String (Value));
+                  Log.Info ("Stereotype {0} ignored", UBO.To_String (Value));
                end if;
             end;
 
@@ -752,16 +765,17 @@ package body Gen.Artifacts.XMI is
          when FIELD_COMMENT_ID =>
             P.Comment := new Gen.Model.XMI.Comment_Element (P.Model);
             P.Comment.Set_Location (To_String (P.File) & P.Parser.Get_Location);
-            P.Comment.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Value);
-            P.Ref_Id := Util.Beans.Objects.Null_Object;
+            P.Comment.XMI_Id := UBO.To_Unbounded_String (Value);
+            P.Ref_Id := UBO.Null_Object;
 
             --  Comment mapping.
          when FIELD_COMMENT =>
             if P.Comment /= null then
-               P.Comment.Text    := Util.Beans.Objects.To_Unbounded_String (P.Value);
-               P.Comment.Ref_Id  := Util.Beans.Objects.To_Unbounded_String (P.Ref_Id);
+               P.Comment.Text    := UBO.To_Unbounded_String (P.Value);
+               P.Comment.Ref_Id  := UBO.To_Unbounded_String (P.Ref_Id);
                P.Model.Insert (P.Comment.XMI_Id, P.Comment.all'Access);
             end if;
+            P.Ref_Id := UBO.Null_Object;
             P.Comment := null;
 
       end case;
@@ -772,7 +786,7 @@ package body Gen.Artifacts.XMI is
 
       when E : others =>
          Log.Error ("Extraction of field {0} with value '{1}' failed",
-                    XMI_Fields'Image (Field), Util.Beans.Objects.To_String (Value));
+                    XMI_Fields'Image (Field), UBO.To_String (Value));
          Log.Error ("Cause", E);
          raise;
    end Set_Member;
@@ -1474,7 +1488,7 @@ begin
    XMI_Mapping.Add_Mapping ("**/Comment", FIELD_COMMENT);
 
    --  Tagged value mapping.
-   XMI_Mapping.Add_Mapping ("**/TaggedValue/@xmi.id", FIELD_ID);
+   XMI_Mapping.Add_Mapping ("**/TaggedValue/@xmi.id", FIELD_TAGGED_ID);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.dataValue", FIELD_VALUE);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/@xmi.idref", FIELD_ID_REF);
    XMI_Mapping.Add_Mapping ("**/TaggedValue/TaggedValue.type/TagDefinition/@xmi.idref",

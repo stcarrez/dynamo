@@ -1,6 +1,7 @@
 Version 1.2.3   -
   - Fix #5: Generated body does not compile when an enumeration of another UML package is used
   - Fix #9: Option or configuration to disable some SQL generation
+  - Fix #10: Definition of an UML datatype with a tagged value raises an exception
 
 Version 1.2.2   - Jul 2021
   - Fix the SQL type definition for double on PostgreSQL

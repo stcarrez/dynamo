@@ -250,7 +250,9 @@ package Gen.Model.XMI is
    --  ------------------------------
    --  Data type
    --  ------------------------------
-   type Data_Type_Element is new Model_Element with null record;
+   type Data_Type_Element is new Model_Element with record
+      Parent_Type : Ref_Type_Element_Access;
+   end record;
    type Data_Type_Element_Access is access all Data_Type_Element'Class;
 
    --  Get the element type.
@@ -506,6 +508,7 @@ package Gen.Model.XMI is
       Classes      : Model_Vector;
       Enums        : Model_Vector;
       Associations : Model_Vector;
+      Types        : Model_Vector;
       Is_Profile   : Boolean := False;
    end record;
 

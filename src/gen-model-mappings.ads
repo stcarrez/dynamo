@@ -33,9 +33,17 @@ package Gen.Model.Mappings is
 
    Postgresql_MAPPING : constant String := "Postgresql";
 
-   type Basic_Type is (T_BOOLEAN, T_INTEGER, T_DATE, T_ENUM, T_IDENTIFIER,
-                       T_STRING, T_FLOAT, T_BLOB,
-                       T_ENTITY_TYPE, T_BEAN, T_TABLE);
+   type Basic_Type is (T_BOOLEAN,
+                       T_INTEGER,
+                       T_DATE,
+                       T_ENUM,
+                       T_IDENTIFIER,
+                       T_STRING,
+                       T_FLOAT,
+                       T_BLOB,
+                       T_ENTITY_TYPE,
+                       T_BEAN,
+                       T_TABLE);
 
    --  ------------------------------
    --  Mapping Definition

@@ -92,6 +92,8 @@ package body Gen.Integration.Tests is
                        Test_Info'Access);
       Caller.Add_Test (Suite, "Build Doc",
                        Test_Build_Doc'Access);
+      Caller.Add_Test (Suite, "Build Pandoc",
+                       Test_Build_Pandoc'Access);
       Caller.Add_Test (Suite, "Generate from Hibernate XML model",
                        Test_Generate_Hibernate'Access);
       Caller.Add_Test (Suite, "Generate XMI Enum",
@@ -484,6 +486,19 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "test-app/wiki/tblog.wiki");
       Util.Tests.Assert_Exists (T, "test-app/wiki/tuser-user_query.wiki");
    end Test_Build_Doc;
+
+   --  ------------------------------
+   --  Test build-doc command with -pandoc.
+   --  ------------------------------
+   procedure Test_Build_Pandoc (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " build-doc -pandoc docs", Result);
+      Util.Tests.Assert_Equals (T, "", Result, "Invalid build-doc -pandoc command");
+
+      Util.Tests.Assert_Exists (T, "test-app/docs/tblog.md");
+      Util.Tests.Assert_Exists (T, "test-app/docs/tuser-user_query.md");
+   end Test_Build_Pandoc;
 
    --  ------------------------------
    --  Test generate command with Hibernate XML mapping files.

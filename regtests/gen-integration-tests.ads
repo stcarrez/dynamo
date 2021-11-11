@@ -90,6 +90,9 @@ package Gen.Integration.Tests is
    --  Test build-doc command.
    procedure Test_Build_Doc (T : in out Test);
 
+   --  Test build-doc command with -pandoc.
+   procedure Test_Build_Pandoc (T : in out Test);
+
    --  Test generate command with Hibernate XML mapping files.
    procedure Test_Generate_Hibernate (T : in out Test);
 

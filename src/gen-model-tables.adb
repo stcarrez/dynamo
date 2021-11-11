@@ -466,6 +466,7 @@ package body Gen.Model.Tables is
 
       elsif Name = "isVersion" or Name = "isPrimaryKey" or Name = "isBean"
         or Name = "isPrimitiveType" or Name = "isEnum" or Name = "isIdentifier"
+        or Name = "isDiscrete" or Name = "isNewDiscrete"
         or Name = "isBoolean" or Name = "isBlob" or Name = "isDate" or Name = "isString"
       then
          return Util.Beans.Objects.To_Object (False);

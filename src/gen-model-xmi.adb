@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012, 2013, 2015, 2016 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015, 2016, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -851,6 +851,8 @@ package body Gen.Model.XMI is
       if Node.Child_Class /= null then
          if Node.Child_Class.all in Class_Element'Class then
             Class_Element'Class (Node.Child_Class.all).Parent_Class := Node'Unchecked_Access;
+         elsif Node.Child_Class.all in Data_Type_Element'Class then
+            Data_Type_Element'Class (Node.Child_Class.all).Parent_Type := Node'Unchecked_Access;
          end if;
       end if;
    end Reconcile;

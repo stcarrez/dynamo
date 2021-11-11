@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2016, 2018 Stephane Carrez
+--  Copyright (C) 2009 - 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ limited with Gen.Model.Enums;
 limited with Gen.Model.Tables;
 limited with Gen.Model.Queries;
 limited with Gen.Model.Beans;
+limited with Gen.Model.Stypes;
 package Gen.Model.Packages is
 
    use Ada.Strings.Unbounded;
@@ -112,6 +113,10 @@ package Gen.Model.Packages is
    --  Register the declaration of the given enum in the model.
    procedure Register_Enum (O    : in out Model_Definition;
                             Enum : access Gen.Model.Enums.Enum_Definition'Class);
+
+   --  Register the declaration of the given data type in the model.
+   procedure Register_Stype (O     : in out Model_Definition;
+                             Stype : access Gen.Model.Stypes.Stype_Definition'Class);
 
    --  Register the declaration of the given table in the model.
    procedure Register_Table (O     : in out Model_Definition;
@@ -214,6 +219,8 @@ private
 
    subtype Table_List_Definition is Table_List.List_Definition;
    subtype Enum_List_Definition is Table_List.List_Definition;
+   subtype Types_List_Definition is Table_List.List_Definition;
+   subtype Stype_List_Definition is Table_List.List_Definition;
 
    type List_Object is new Util.Beans.Basic.List_Bean with record
       Values     : Util.Beans.Objects.Vectors.Vector;
@@ -244,6 +251,10 @@ private
       --  Enums defined in the package.
       Enums        : aliased Enum_List_Definition;
       Enums_Bean   : Util.Beans.Objects.Object;
+
+      --  Simple data types defined in the package.
+      Stypes       : aliased Stype_List_Definition;
+      Stypes_Bean  : Util.Beans.Objects.Object;
 
       --  Hibernate tables
       Tables       : aliased Table_List_Definition;
@@ -285,6 +296,10 @@ private
       --  List of all enums.
       Enums        : aliased Enum_List_Definition;
       Enums_Bean   : Util.Beans.Objects.Object;
+
+      --  Simple data types defined in the package.
+      Stypes       : aliased Stype_List_Definition;
+      Stypes_Bean  : Util.Beans.Objects.Object;
 
       --  List of all tables.
       Tables       : aliased Table_List_Definition;

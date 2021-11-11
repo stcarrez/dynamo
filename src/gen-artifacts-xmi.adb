@@ -26,6 +26,7 @@ with Gen.Model.Enums;
 with Gen.Model.Mappings;
 with Gen.Model.Beans;
 with Gen.Model.Operations;
+with Gen.Model.Stypes;
 
 with Util.Log.Loggers;
 with Util.Strings;
@@ -655,12 +656,21 @@ package body Gen.Artifacts.XMI is
 
             --  Data type mapping.
          when FIELD_DATA_TYPE =>
-            if P.Attr_Element = null and P.Operation = null then
+            if P.Attr_Element = null
+              and P.Operation = null
+              and UBO.Is_Null (P.Generalization_Id)
+            then
                P.Data_Type := new Gen.Model.XMI.Data_Type_Element (P.Model);
                P.Data_Type.Set_Name (P.Name);
                P.Data_Type.Set_Location (To_String (P.File) & P.Parser.Get_Location);
                P.Data_Type.XMI_Id := UBO.To_Unbounded_String (P.Id);
+               if P.Package_Element /= null and not P.Is_Profile then
+                  P.Data_Type.Parent := P.Package_Element.all'Access;
+               end if;
                P.Model.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
+               if not UBO.Is_Null (P.Name) and P.Package_Element /= null and not P.Is_Profile then
+                  P.Package_Element.Types.Append (P.Data_Type.all'Access);
+               end if;
             end if;
 
          when FIELD_DATA_TYPE_HREF | FIELD_ENUMERATION_HREF | FIELD_CLASSIFIER_HREF =>
@@ -865,12 +875,18 @@ package body Gen.Artifacts.XMI is
       procedure Prepare_Class (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
                                Item : in Gen.Model.XMI.Model_Element_Access);
 
+      procedure Prepare_Type (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
+                              Item : in Gen.Model.XMI.Model_Element_Access);
+
       --  Scan the package for the model generation.
       procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
                                  Item : in Gen.Model.XMI.Model_Element_Access);
 
       procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                                Model : in out Gen.Model.XMI.Model_Map.Map);
+
+      procedure Prepare_Profile (Id   : in Ada.Strings.Unbounded.Unbounded_String;
+                                 Item : in Gen.Model.XMI.Model_Element_Access);
 
       --  ------------------------------
       --  Register the attribute in the table
@@ -1123,6 +1139,45 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       --  Register the enum in the model for the generation.
       --  ------------------------------
+      procedure Prepare_Type (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
+                              Item : in Gen.Model.XMI.Model_Element_Access) is
+         Data_Type : constant Data_Type_Element_Access
+           := Data_Type_Element'Class (Item.all)'Access;
+         Name      : constant String := Data_Type.Get_Qualified_Name;
+         Msg       : constant String := Data_Type.Get_Error_Message;
+         Sql       : constant String := Data_Type.Find_Tag_Value (Handler.Sql_Type_Tag, "");
+         Stype     : Gen.Model.Stypes.Stype_Definition_Access;
+      begin
+         Log.Info ("Prepare data type {0}", Name);
+
+         if Msg'Length > 0 then
+            Context.Error (Item.Get_Location & ": " & Msg);
+         end if;
+         if Data_Type.Parent_Type /= null then
+            Stype := Gen.Model.Stypes.Create_Stype
+              (To_Unbounded_String (Name),
+               To_Unbounded_String (Data_Type.Parent_Type.Get_Qualified_Name));
+         else
+            Stype := Gen.Model.Stypes.Create_Stype (To_Unbounded_String (Name),
+                                                    Null_Unbounded_String);
+         end if;
+         Stype.Set_Comment (Item.Get_Comment);
+         Stype.Set_Location (Item.Get_Location);
+         Stype.Sql_Type := To_Unbounded_String (Sql);
+         Model.Register_Stype (Stype);
+
+      exception
+         when Gen.Model.Name_Exist =>
+            --  Ignore the Name_Exist exception for pre-defined package
+            --  because the type is already defined through a XML mapping definition.
+            if not Pkg.Is_Predefined then
+               raise;
+            end if;
+      end Prepare_Type;
+
+      --  ------------------------------
+      --  Register the enum in the model for the generation.
+      --  ------------------------------
       procedure Prepare_Enum (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
                               Item : in Gen.Model.XMI.Model_Element_Access) is
          pragma Unreferenced (Pkg);
@@ -1157,6 +1212,10 @@ package body Gen.Artifacts.XMI is
          Name : constant String := Pkg.Get_Qualified_Name;
          P    : Gen.Model.Packages.Package_Definition_Access;
       begin
+         if Pkg.Is_Profile then
+            return;
+         end if;
+
          Log.Info ("Prepare package {0}", Name);
 
          Model.Register_Package (To_Unbounded_String (Name), P);
@@ -1172,13 +1231,37 @@ package body Gen.Artifacts.XMI is
             P.Set_Predefined;
          end if;
 
-         if Pkg.Is_Profile then
-            P.Set_Predefined;
-         end if;
          P.Set_Comment (Pkg.Get_Comment);
+         Iterate_For_Package (P.all, Pkg.Types, Prepare_Type'Access);
          Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
          Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
       end Prepare_Package;
+
+      --  ------------------------------
+      --  Scan the profile packages for the model generation.
+      --  ------------------------------
+      procedure Prepare_Profile (Id   : in Ada.Strings.Unbounded.Unbounded_String;
+                                 Item : in Gen.Model.XMI.Model_Element_Access) is
+         pragma Unreferenced (Id);
+
+         Pkg  : constant Package_Element_Access := Package_Element'Class (Item.all)'Access;
+         Name : constant String := Pkg.Get_Qualified_Name;
+         P    : Gen.Model.Packages.Package_Definition_Access;
+      begin
+         if not Pkg.Is_Profile then
+            return;
+         end if;
+
+         Log.Info ("Prepare profile package {0}", Name);
+
+         Model.Register_Package (To_Unbounded_String (Name), P);
+
+         P.Set_Predefined;
+         P.Set_Comment (Pkg.Get_Comment);
+         --  Iterate_For_Package (P.all, Pkg.Types, Prepare_Type'Access);
+         Iterate_For_Package (P.all, Pkg.Enums, Prepare_Enum'Access);
+         Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
+      end Prepare_Profile;
 
       procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
                                Model : in out Gen.Model.XMI.Model_Map.Map) is
@@ -1270,6 +1353,12 @@ package body Gen.Artifacts.XMI is
                                                     "Dynamo.xmi",
                                                     "ADO.Literal.@dynamo.literal",
                                                     Gen.Model.XMI.BY_NAME);
+
+      for Model of Handler.Nodes loop
+         Gen.Model.XMI.Iterate (Model   => Model,
+                                On      => Gen.Model.XMI.XMI_PACKAGE,
+                                Process => Prepare_Profile'Access);
+      end loop;
 
       while Gen.Model.XMI.UML_Model_Map.Has_Element (Iter) loop
          Handler.Nodes.Update_Element (Iter, Prepare_Model'Access);
@@ -1428,6 +1517,12 @@ begin
    XMI_Mapping.Add_Mapping ("**/Generalization/Generalization.child/Class/@xmi.idref",
                             FIELD_GENERALIZATION_CHILD_ID);
    XMI_Mapping.Add_Mapping ("**/Generalization/Generalization.parent/Class/@xmi.idref",
+                            FIELD_GENERALIZATION_PARENT_ID);
+   XMI_Mapping.Add_Mapping ("**/Generalization/Generalization.child/DataType/@xmi.idref",
+                            FIELD_GENERALIZATION_CHILD_ID);
+   XMI_Mapping.Add_Mapping ("**/Generalization/Generalization.parent/DataType/@xmi.idref",
+                            FIELD_GENERALIZATION_PARENT_ID);
+   XMI_Mapping.Add_Mapping ("**/Generalization/Generalization.parent/DataType/@href",
                             FIELD_GENERALIZATION_PARENT_ID);
    XMI_Mapping.Add_Mapping ("**/Generalization", FIELD_GENERALIZATION_END);
 

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
---  Gen -- Code Generator
---  Copyright (C) 2009 - 2020 Stephane Carrez
+--  gen-generator -- Code Generator
+--  Copyright (C) 2009 - 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -133,7 +133,11 @@ package body Gen.Generator is
                end if;
 
             elsif Type_Mapping.Kind /= T_TABLE then
-               return Util.Beans.Objects.To_Object (Type_Mapping.Target);
+               if Length (Type_Mapping.Target) > 0 then
+                  return Util.Beans.Objects.To_Object (Type_Mapping.Target);
+               else
+                  return Util.Beans.Objects.To_Object (Type_Mapping.Name);
+               end if;
 
             elsif Column.Use_Foreign_Key_Type then
                return Util.Beans.Objects.To_Object (Type_Mapping.Target);

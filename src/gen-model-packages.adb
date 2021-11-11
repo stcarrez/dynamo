@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009 - 2020 Stephane Carrez
+--  Copyright (C) 2009 - 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ with Ada.Strings.Maps;
 
 with Gen.Utils;
 with Gen.Model.Enums;
+with Gen.Model.Stypes;
 with Gen.Model.Tables;
 with Gen.Model.Queries;
 with Gen.Model.Beans;
@@ -52,6 +53,9 @@ package body Gen.Model.Packages is
 
       elsif Name = "enums" then
          return From.Enums_Bean;
+
+      elsif Name = "types" then
+         return From.Stypes_Bean;
 
       elsif Name = "queries" then
          return From.Queries_Bean;
@@ -140,6 +144,37 @@ package body Gen.Model.Packages is
       Gen.Model.Mappings.Register_Type (Enum.Get_Name, Enum.all'Access,
                                         Gen.Model.Mappings.T_ENUM);
    end Register_Enum;
+
+   --  ------------------------------
+   --  Register the declaration of the given data type in the model.
+   --  ------------------------------
+   procedure Register_Stype (O     : in out Model_Definition;
+                             Stype : access Gen.Model.Stypes.Stype_Definition'Class) is
+      use type Mappings.Mapping_Definition_Access;
+
+      Name : constant String := Stype.Get_Name;
+      Result : Gen.Model.Mappings.Mapping_Definition_Access := null;
+      Kind   : Mappings.Basic_Type := Mappings.T_INTEGER;
+   begin
+      Log.Info ("Registering simple data type {0}", Name);
+
+      O.Register_Package (Stype.Pkg_Name, Stype.Package_Def);
+      if Stype.Package_Def.Stypes.Find (Name) /= null then
+         raise Name_Exist with "Data type '" & Name & "' already defined";
+      end if;
+      Stype.Package_Def.Stypes.Append (Stype.all'Access);
+      Stype.Package_Def.Types.Include (Stype.Name, Stype.all'Access);
+      O.Stypes.Append (Stype.all'Access);
+
+      if Length (Stype.Parent_Type) > 0 then
+         Result := Gen.Model.Mappings.Find_Type (Stype.Parent_Type, false);
+         if Result /= null then
+            Kind := Result.Kind;
+         end if;
+      end if;
+      Gen.Model.Mappings.Register_Type (Stype.Get_Name, Stype.all'Access,
+                                        Kind);
+   end Register_Stype;
 
    --  ------------------------------
    --  Register the declaration of the given table in the model.
@@ -470,6 +505,7 @@ package body Gen.Model.Packages is
       use Util.Beans.Objects;
    begin
       O.Enums_Bean   := Util.Beans.Objects.To_Object (O.Enums'Unchecked_Access, STATIC);
+      O.Stypes_Bean  := Util.Beans.Objects.To_Object (O.Stypes'Unchecked_Access, STATIC);
       O.Tables_Bean  := Util.Beans.Objects.To_Object (O.Tables'Unchecked_Access, STATIC);
       O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access, STATIC);
       O.Beans_Bean   := Util.Beans.Objects.To_Object (O.Beans'Unchecked_Access, STATIC);

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2016, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2016, 2017, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -107,6 +107,9 @@ package Gen.Integration.Tests is
 
    --  Test generate command (XMI Associations between Tables).
    procedure Test_Generate_XMI_Association (T : in out Test);
+
+   --  Test generate command (XMI Datatype).
+   procedure Test_Generate_XMI_Datatype (T : in out Test);
 
    --  Test generate command using the ArgoUML file directly (runs unzip -cq and parse the output).
    procedure Test_Generate_Zargo_Association (T : in out Test);

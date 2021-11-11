@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2020 Stephane Carrez
+--  Copyright (C) 2012 - 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -108,6 +108,8 @@ package body Gen.Integration.Tests is
                        Test_Generate_Zargo_Association'Access);
       Caller.Add_Test (Suite, "Generate ArgoUML Association (dependencies)",
                        Test_Generate_Zargo_Dependencies'Access);
+      Caller.Add_Test (Suite, "Generate XMI Datatypes",
+                       Test_Generate_XMI_Datatype'Access);
       Caller.Add_Test (Suite, "Generate ArgoUML several packages",
                        Test_Generate_Zargo_Packages'Access);
       Caller.Add_Test (Suite, "Generate ArgoUML serialization",
@@ -593,6 +595,17 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-associations.ads");
       Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-associations.adb");
    end Test_Generate_Zargo_Association;
+
+   --  ------------------------------
+   --  Test generate command (XMI Datatype).
+   --  ------------------------------
+   procedure Test_Generate_XMI_Datatype (T : in out Test) is
+      Result : Ada.Strings.Unbounded.Unbounded_String;
+   begin
+      T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-types.xmi", Result);
+
+      Util.Tests.Assert_Exists (T, "test-app/src/model/gen-tests-types.ads");
+   end Test_Generate_XMI_Datatype;
 
    --  ------------------------------
    --  Test UML with several tables that have dependencies between each of them (non circular).

@@ -1,0 +1,164 @@
+<?xml version = '1.0' encoding = 'UTF-8' ?>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Thu Nov 11 10:33:41 CET 2021'>
+  <XMI.header>    <XMI.documentation>
+      <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
+      <XMI.exporterVersion>0.35.2-2020-07-05(6) revised on $Date$ </XMI.exporterVersion>
+    </XMI.documentation>
+    <XMI.metamodel xmi.name="UML" xmi.version="1.4"/></XMI.header>
+  <XMI.content>
+    <UML:Model xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C8'
+      name = 'DynamoTest' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+      isAbstract = 'false'>
+      <UML:ModelElement.stereotype>
+        <UML:Stereotype xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C9'/>
+      </UML:ModelElement.stereotype>
+      <UML:Namespace.ownedElement>
+        <UML:Stereotype xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000020C9'
+          name = 'profile' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'/>
+        <UML:Package xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024E6'
+          name = 'Gen' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+          isAbstract = 'false'>
+          <UML:Namespace.ownedElement>
+            <UML:Package xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024E7'
+              name = 'Tests' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+              isAbstract = 'false'>
+              <UML:Namespace.ownedElement>
+                <UML:Package xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024F3'
+                  name = 'Types' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:ModelElement.stereotype>
+                    <UML:Stereotype href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F83'/>
+                  </UML:ModelElement.stereotype>
+                  <UML:Namespace.ownedElement>
+                    <UML:Comment xmi.id = '127-0-1-1-30027d73:13a36cb0cd4:-8000:0000000000001E7E'
+                      isSpecification = 'false' body = 'Title: Test for UML with an database table&#10;Date: 2012-10-12'/>
+                    <UML:Comment xmi.id = '127-0-1-1-30027d73:13a36cb0cd4:-8000:0000000000001E7F'
+                      isSpecification = 'false' body = 'A note associated with the enum type.&#10;(=&gt; comment)'/>
+                    <UML:Class xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001679'
+                      name = 'Test_Table' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                      isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
+                      <UML:ModelElement.comment>
+                        <UML:Comment xmi.idref = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001684'/>
+                      </UML:ModelElement.comment>
+                      <UML:ModelElement.stereotype>
+                        <UML:Stereotype href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D4F'/>
+                      </UML:ModelElement.stereotype>
+                      <UML:Classifier.feature>
+                        <UML:Attribute xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:000000000000167A'
+                          name = 'table_id' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                          changeability = 'changeable' targetScope = 'instance'>
+                          <UML:StructuralFeature.multiplicity>
+                            <UML:Multiplicity xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:000000000000167B'>
+                              <UML:Multiplicity.range>
+                                <UML:MultiplicityRange xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:000000000000167C'
+                                  lower = '1' upper = '1'/>
+                              </UML:Multiplicity.range>
+                            </UML:Multiplicity>
+                          </UML:StructuralFeature.multiplicity>
+                          <UML:ModelElement.stereotype>
+                            <UML:Stereotype href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D50'/>
+                          </UML:ModelElement.stereotype>
+                          <UML:ModelElement.taggedValue>
+                            <UML:TaggedValue xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:000000000000167D'
+                              isSpecification = 'false'>
+                              <UML:TaggedValue.dataValue>The table unique identifier (the primary key)</UML:TaggedValue.dataValue>
+                              <UML:TaggedValue.type>
+                                <UML:TagDefinition xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'/>
+                              </UML:TaggedValue.type>
+                            </UML:TaggedValue>
+                          </UML:ModelElement.taggedValue>
+                          <UML:StructuralFeature.type>
+                            <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087C'/>
+                          </UML:StructuralFeature.type>
+                        </UML:Attribute>
+                        <UML:Attribute xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:000000000000167E'
+                          name = 'name' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                          changeability = 'changeable' targetScope = 'instance'>
+                          <UML:StructuralFeature.multiplicity>
+                            <UML:Multiplicity xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:000000000000167F'>
+                              <UML:Multiplicity.range>
+                                <UML:MultiplicityRange xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001680'
+                                  lower = '1' upper = '1'/>
+                              </UML:Multiplicity.range>
+                            </UML:Multiplicity>
+                          </UML:StructuralFeature.multiplicity>
+                          <UML:ModelElement.taggedValue>
+                            <UML:TaggedValue xmi.id = '127-0-1-1-99d947:13a56f02657:-8000:0000000000000ECD'
+                              isSpecification = 'false'>
+                              <UML:TaggedValue.dataValue>the test name</UML:TaggedValue.dataValue>
+                              <UML:TaggedValue.type>
+                                <UML:TagDefinition xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'/>
+                              </UML:TaggedValue.type>
+                            </UML:TaggedValue>
+                          </UML:ModelElement.taggedValue>
+                          <UML:StructuralFeature.type>
+                            <UML:DataType href = 'http://argouml.org/profiles/uml14/default-uml14.xmi#-84-17--56-5-43645a83:11466542d86:-8000:000000000000087E'/>
+                          </UML:StructuralFeature.type>
+                        </UML:Attribute>
+                        <UML:Attribute xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001681'
+                          name = 'count' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                          changeability = 'addOnly' targetScope = 'instance'>
+                          <UML:StructuralFeature.multiplicity>
+                            <UML:Multiplicity xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001682'>
+                              <UML:Multiplicity.range>
+                                <UML:MultiplicityRange xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001683'
+                                  lower = '1' upper = '1'/>
+                              </UML:Multiplicity.range>
+                            </UML:Multiplicity>
+                          </UML:StructuralFeature.multiplicity>
+                          <UML:ModelElement.taggedValue>
+                            <UML:TaggedValue xmi.id = '127-0-1-1-99d947:13a56f02657:-8000:0000000000000ECE'
+                              isSpecification = 'false'>
+                              <UML:TaggedValue.dataValue>Number of times it has been executed</UML:TaggedValue.dataValue>
+                              <UML:TaggedValue.type>
+                                <UML:TagDefinition xmi.idref = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'/>
+                              </UML:TaggedValue.type>
+                            </UML:TaggedValue>
+                          </UML:ModelElement.taggedValue>
+                          <UML:StructuralFeature.type>
+                            <UML:DataType xmi.idref = '127-0-1-1--319725d1:17cec8073fb:-8000:0000000000001E0D'/>
+                          </UML:StructuralFeature.type>
+                        </UML:Attribute>
+                      </UML:Classifier.feature>
+                    </UML:Class>
+                    <UML:Comment xmi.id = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001684'
+                      isSpecification = 'false' body = 'The test table is a simple table with an integer primary key.&#10;'>
+                      <UML:Comment.annotatedElement>
+                        <UML:Class xmi.idref = '127-0-1-1-2c074c3b:13a37b7fde0:-8000:0000000000001679'/>
+                      </UML:Comment.annotatedElement>
+                    </UML:Comment>
+                  </UML:Namespace.ownedElement>
+                </UML:Package>
+                <UML:DataType xmi.id = '127-0-1-1--319725d1:17cec8073fb:-8000:0000000000001E0D'
+                  name = 'Millisecond_Type' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
+                  isAbstract = 'false'>
+                  <UML:ModelElement.taggedValue>
+                    <UML:TaggedValue xmi.id = '127-0-1-1--319725d1:17cec8073fb:-8000:0000000000001E0E'
+                      isSpecification = 'false'>
+                      <UML:TaggedValue.dataValue>int</UML:TaggedValue.dataValue>
+                      <UML:TaggedValue.type>
+                        <UML:TagDefinition href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1-416ec9ab:13b39addf6a:-8000:00000000000022C0'/>
+                      </UML:TaggedValue.type>
+                    </UML:TaggedValue>
+                  </UML:ModelElement.taggedValue>
+                </UML:DataType>
+              </UML:Namespace.ownedElement>
+            </UML:Package>
+          </UML:Namespace.ownedElement>
+        </UML:Package>
+        <UML:TagDefinition xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EC'
+          name = 'documentation' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024EE'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1--7d2a1d38:13a09398fe2:-8000:00000000000024ED'
+                  lower = '0' upper = '0'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+      </UML:Namespace.ownedElement>
+    </UML:Model>
+  </XMI.content>
+</XMI>

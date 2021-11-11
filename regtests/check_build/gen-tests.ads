@@ -18,4 +18,6 @@
 
 package Gen.Tests is
 
+   type Millisecond_Type is new Integer;
+
 end Gen.Tests;

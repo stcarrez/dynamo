@@ -35,7 +35,11 @@ package body Gen.Model.Stypes is
       elsif Name = "isDiscrete" or Name = "isNewDiscrete" then
          return UBO.To_Object (True);
       elsif Name = "sqlType" then
-         return UBO.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
+         if Length (From.Sql_Type) > 0 then
+            return UBO.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
+         else
+            return UBO.To_Object (Mappings.Get_Type_Name (From.Parent_Type));
+         end if;
       else
          return Mappings.Mapping_Definition (From).Get_Value (Name);
       end if;

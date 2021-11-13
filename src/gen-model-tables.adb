@@ -24,6 +24,7 @@ with EL.Contexts.Default;
 with EL.Utils;
 with EL.Variables.Default;
 with Gen.Model.Enums;
+with Gen.Model.Stypes;
 package body Gen.Model.Tables is
 
    use Ada.Strings.Unbounded;
@@ -81,6 +82,8 @@ package body Gen.Model.Tables is
             then
                return Table_Definition'Class (T.all).Id_Column.Get_Value (Name);
             elsif T.all in Enums.Enum_Definition'Class then
+               return T.Get_Value ("sqlType");
+            elsif T.all in Stypes.Stype_Definition'Class then
                return T.Get_Value ("sqlType");
             else
                declare

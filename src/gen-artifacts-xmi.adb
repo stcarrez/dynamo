@@ -111,6 +111,7 @@ package body Gen.Artifacts.XMI is
                        FIELD_PACKAGE_END,
                        FIELD_CLASS_VISIBILITY,
                        FIELD_DATA_TYPE,
+                       FIELD_DATA_TYPE_NAME,
                        FIELD_DATA_TYPE_HREF,
                        FIELD_CLASS_END,
                        FIELD_ASSOCIATION_NAME,
@@ -244,6 +245,7 @@ package body Gen.Artifacts.XMI is
    use type Gen.Model.XMI.Operation_Element_Access;
    use type Gen.Model.XMI.Association_Element_Access;
    use type Gen.Model.XMI.Ref_Type_Element_Access;
+   use type Gen.Model.XMI.Data_Type_Element_Access;
 
    --  ------------------------------
    --  Get the visibility from the XMI visibility value.
@@ -334,7 +336,10 @@ package body Gen.Artifacts.XMI is
       P.Model.Insert (Tagged_Value.XMI_Id, Tagged_Value.all'Access);
 
       --  Insert the tag value into the current element.
-      if P.Assos_End_Element /= null then
+      if P.Data_Type /= null then
+         P.Data_Type.Tagged_Values.Append (Tagged_Value.all'Access);
+
+      elsif P.Assos_End_Element /= null then
          P.Assos_End_Element.Tagged_Values.Append (Tagged_Value.all'Access);
 
       elsif P.Association /= null then
@@ -654,23 +659,29 @@ package body Gen.Artifacts.XMI is
             Add_Tagged_Value (P);
 
             --  Data type mapping.
+         when FIELD_DATA_TYPE_NAME =>
+            P.Data_Type := new Gen.Model.XMI.Data_Type_Element (P.Model);
+            P.Data_Type.Set_Name (Value);
+            P.Data_Type.Set_Location (To_String (P.File) & P.Parser.Get_Location);
+            P.Data_Type.XMI_Id := UBO.To_Unbounded_String (P.Id);
+            P.Ref_Id := UBO.Null_Object;
+            P.Href   := UBO.Null_Object;
+
          when FIELD_DATA_TYPE =>
             if P.Attr_Element = null
               and P.Operation = null
               and UBO.Is_Null (P.Generalization_Id)
+              and P.Data_Type /= null
             then
-               P.Data_Type := new Gen.Model.XMI.Data_Type_Element (P.Model);
-               P.Data_Type.Set_Name (P.Name);
-               P.Data_Type.Set_Location (To_String (P.File) & P.Parser.Get_Location);
-               P.Data_Type.XMI_Id := UBO.To_Unbounded_String (P.Id);
                if P.Package_Element /= null and not P.Is_Profile then
                   P.Data_Type.Parent := P.Package_Element.all'Access;
                end if;
                P.Model.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
-               if not UBO.Is_Null (P.Name) and P.Package_Element /= null and not P.Is_Profile then
+               if P.Package_Element /= null and not P.Is_Profile then
                   P.Package_Element.Types.Append (P.Data_Type.all'Access);
                end if;
             end if;
+            P.Data_Type := null;
 
          when FIELD_DATA_TYPE_HREF | FIELD_ENUMERATION_HREF | FIELD_CLASSIFIER_HREF =>
             if P.Attr_Element /= null then
@@ -1147,7 +1158,7 @@ package body Gen.Artifacts.XMI is
          Sql       : constant String := Data_Type.Find_Tag_Value (Handler.Sql_Type_Tag, "");
          Stype     : Gen.Model.Stypes.Stype_Definition_Access;
       begin
-         Log.Info ("Prepare data type {0}", Name);
+         Log.Info ("Prepare data type {0} - {1}", Name, Sql);
 
          if Msg'Length > 0 then
             Context.Error (Item.Get_Location & ": " & Msg);
@@ -1620,7 +1631,7 @@ begin
 
    --  Data type mapping.
    XMI_Mapping.Add_Mapping ("**/DataType/@xmi.id", FIELD_ID);
-   XMI_Mapping.Add_Mapping ("**/DataType/@name", FIELD_NAME);
+   XMI_Mapping.Add_Mapping ("**/DataType/@name", FIELD_DATA_TYPE_NAME);
    XMI_Mapping.Add_Mapping ("**/DataType", FIELD_DATA_TYPE);
    XMI_Mapping.Add_Mapping ("**/DataType/@href", FIELD_DATA_TYPE_HREF);
    XMI_Mapping.Add_Mapping ("**/DataType/@xmi.idref", FIELD_DATA_TYPE_HREF);

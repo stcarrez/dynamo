@@ -123,4 +123,8 @@
         <from>blob</from>
         <to>LONGBLOB</to>
     </mapping>
+    <mapping>
+        <from>enum</from>
+        <to>TINYINT</to>
+    </mapping>
 </mappings>

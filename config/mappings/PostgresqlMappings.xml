@@ -130,4 +130,8 @@
         <from>TINYINT</from>
         <to>SMALLINT</to>
     </mapping>
+    <mapping>
+        <from>enum</from>
+        <to>SMALLINT</to>
+    </mapping>
 </mappings>

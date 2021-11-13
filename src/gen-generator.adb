@@ -165,17 +165,17 @@ package body Gen.Generator is
                return UBO.To_Object (Type_Mapping.Target);
 
             elsif UBO.To_Integer (Param) = 1 then
-               return UBO.To_Object (Type_Mapping.Target & "_Ref'Class");
+               return UBO.To_Object (Get_Ada_Type (Type_Mapping.Target) & "_Ref'Class");
 
             else
-               return UBO.To_Object (Type_Mapping.Target & "_Ref");
+               return UBO.To_Object (Get_Ada_Type (Type_Mapping.Target) & "_Ref");
             end if;
          elsif Column.Is_Basic_Type then
             return UBO.To_Object (Column.Get_Type);
          elsif UBO.To_Integer (Param) = 1 then
-            return UBO.To_Object (Column.Get_Type & "_Ref'Class");
+            return UBO.To_Object (Get_Ada_Type (To_UString (Column.Get_Type)) & "_Ref'Class");
          else
-            return UBO.To_Object (Column.Get_Type & "_Ref");
+            return UBO.To_Object (Get_Ada_Type (To_UString (Column.Get_Type)) & "_Ref");
          end if;
       else
          return Value;
@@ -1051,7 +1051,6 @@ package body Gen.Generator is
       Log.Debug ("With template '{0}'", File);
 
       Current_Package := To_UString (Model.Get_Name);
-      Log.Error ("Current package '{0}'", To_String (Current_Package));
 
       Req.Set_Method ("GET");
       Req.Set_Attribute (Name => "project", Value => Prj_Bean);

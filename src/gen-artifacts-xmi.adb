@@ -1485,7 +1485,7 @@ package body Gen.Artifacts.XMI is
       end Read;
 
       UML  : Gen.Model.XMI.Model_Map.Map;
-      Name : constant Ustring := To_UString (Ada.Directories.Simple_Name (File));
+      Name : constant UString := To_UString (Ada.Directories.Simple_Name (File));
    begin
       Log.Info ("Reading XMI {0}", File);
 

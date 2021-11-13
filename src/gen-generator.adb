@@ -1059,8 +1059,8 @@ package body Gen.Generator is
       Req.Set_Attribute (Name => "project", Value => Prj_Bean);
       Req.Set_Attribute (Name => "package", Value => Bean);
       Req.Set_Attribute (Name => "model", Value => Model_Bean);
-      Req.Set_Attribute (Name => "genRevision", Value => Util.Beans.Objects.To_Object (SVN_REV));
-      Req.Set_Attribute (Name => "genURL", Value => Util.Beans.Objects.To_Object (SVN_URL));
+      Req.Set_Attribute (Name => "genRevision", Value => Util.Beans.Objects.To_Object (Configs.VERSION));
+      Req.Set_Attribute (Name => "genURL", Value => Util.Beans.Objects.To_Object (Configs.GIT_URL));
       Req.Set_Attribute (Name => "date",
                          Value => Util.Beans.Objects.Time.To_Object (Ada.Calendar.Clock));
 

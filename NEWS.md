@@ -1,5 +1,6 @@
 Version 1.2.3   -
   - Fix #5: Generated body does not compile when an enumeration of another UML package is used
+  - Fix #7: No default type for SQL generation of a column that uses an enumeration
   - Fix #9: Option or configuration to disable some SQL generation
   - Fix #10: Definition of an UML datatype with a tagged value raises an exception
 

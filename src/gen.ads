@@ -18,12 +18,6 @@
 with Ada.Strings.Unbounded;
 package Gen is
 
-   --  Library SVN identification
-   SVN_URL : constant String := "https://ada-gen.googlecode.com/svn/trunk";
-
-   --  Revision used (must run 'make version' to update)
-   SVN_REV : constant Positive := 1095;
-
    subtype UString is Ada.Strings.Unbounded.Unbounded_String;
 
    function To_UString (Value : in String) return UString

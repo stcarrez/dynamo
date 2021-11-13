@@ -15,7 +15,10 @@
       <h:panelGroup rendered="#{column.isNull and not column.type.isIdentifier}">
          Item.#{fn:capitalize(column.name)}.Is_Null := Util.Beans.Objects.Is_Null (Value);
          if not Item.#{fn:capitalize(column.name)}.Is_Null then
-            <h:panelGroup rendered="#{column.type.isInteger}">
+            <h:panelGroup rendered="#{column.type.isNewDiscrete}">
+            Item.#{fn:capitalize(column.name)}.Value := #{g:adaType(column,1)} (Util.Beans.Objects.To_Integer (Value));
+            </h:panelGroup>
+            <h:panelGroup rendered="#{column.type.isInteger and not column.type.isNewDiscrete}">
             Item.#{fn:capitalize(column.name)}.Value := Util.Beans.Objects.To_Integer (Value);
             </h:panelGroup>
             <h:panelGroup rendered="#{column.type.isFloat}">
@@ -35,8 +38,11 @@
             </h:panelGroup>
          end if;
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isInteger and not column.isNull}">
+      <h:panelGroup rendered="#{column.type.isInteger and not column.isNull and not column.type.isNewDiscrete}">
          Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Integer (Value);
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isNewDiscrete and not column.isNull}">
+         Item.#{fn:capitalize(column.name)} := #{g:adaType(column,1)} (Util.Beans.Objects.To_Integer (Value));
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isFloat and not column.isNull}">
          Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Float (Value);

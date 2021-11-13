@@ -86,7 +86,10 @@
   <h:panelGroup rendered="#{column.type.isEnum and not column.isNull}">
       Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
-  <h:panelGroup rendered="#{not column.isNull and not column.type.isIdentifier and not column.type.isString and not column.type.isEnum}">
+  <h:panelGroup rendered="#{column.type.isNewDiscrete and not column.isNull}">
+      Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)} (Stmt.Get_Long_Integer (#{column.index}));
+  </h:panelGroup>
+  <h:panelGroup rendered="#{not column.isNull and not column.type.isIdentifier and not column.type.isString and not column.type.isEnum and not column.type.isNewDiscrete}">
       Into.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
   </h:panelGroup>
 </h:list>
@@ -163,7 +166,10 @@
   <h:panelGroup rendered="#{column.type.isEnum and not column.isNull}">
          Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
-  <h:panelGroup rendered="#{not column.isNull and not column.type.isIdentifier and not column.type.isString and not column.type.isEnum}">
+  <h:panelGroup rendered="#{column.type.isNewDiscrete and not column.isNull}">
+         Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)} (Stmt.Get_Integer (#{column.index}));
+  </h:panelGroup>
+  <h:panelGroup rendered="#{not column.isNull and not column.type.isIdentifier and not column.type.isString and not column.type.isEnum and not column.type.isNewDiscrete}">
          Into.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});
   </h:panelGroup>
 </h:list>

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-testsuite -- Testsuite for gen
---  Copyright (C) 2012, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 
 with Ada.Directories;
-with Ada.Strings.Unbounded;
 
 with Gen.Artifacts.XMI.Tests;
 with Gen.Artifacts.Yaml.Tests;
@@ -26,7 +25,7 @@ package body Gen.Testsuite is
 
    Tests : aliased Util.Tests.Test_Suite;
 
-   Dir   : Ada.Strings.Unbounded.Unbounded_String;
+   Dir   : UString;
 
    function Suite return Util.Tests.Access_Test_Suite is
       Result : constant Util.Tests.Access_Test_Suite := Tests'Access;
@@ -42,13 +41,13 @@ package body Gen.Testsuite is
    --  ------------------------------
    function Get_Test_Directory return String is
    begin
-      return Ada.Strings.Unbounded.To_String (Dir);
+      return To_String (Dir);
    end Get_Test_Directory;
 
    procedure Initialize (Props : in Util.Properties.Manager) is
       pragma Unreferenced (Props);
    begin
-      Dir := Ada.Strings.Unbounded.To_Unbounded_String (Ada.Directories.Current_Directory);
+      Dir := To_UString (Ada.Directories.Current_Directory);
    end Initialize;
 
 end Gen.Testsuite;

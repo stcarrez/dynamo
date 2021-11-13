@@ -140,7 +140,7 @@ package body Gen.Integration.Tests is
    --  ------------------------------
    procedure Execute (T       : in out Test;
                       Command : in String;
-                      Result  : out Ada.Strings.Unbounded.Unbounded_String;
+                      Result  : out UString;
                       Status  : in Natural := 0) is
       P        : aliased Util.Streams.Pipes.Pipe_Stream;
       Buffer   : Util.Streams.Buffered.Input_Buffer_Stream;
@@ -168,7 +168,7 @@ package body Gen.Integration.Tests is
    --  Test dynamo create-project command.
    --  ------------------------------
    procedure Test_Create_Project (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " -o test-app create-project -l apache test", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*test.properties", Result,
@@ -181,7 +181,7 @@ package body Gen.Integration.Tests is
    --  Test dynamo create-project command --ado.
    --  ------------------------------
    procedure Test_Create_ADO_Project (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " -o test-ado create-project -l apache --ado test", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*test.properties", Result,
@@ -194,7 +194,7 @@ package body Gen.Integration.Tests is
    --  Test dynamo create-project command --gtk.
    --  ------------------------------
    procedure Test_Create_GTK_Project (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " -o test-gtk create-project -l gpl3 --gtk test", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*COPYING3", Result,
@@ -207,7 +207,7 @@ package body Gen.Integration.Tests is
    --  Test dynamo create-project command --lib.
    --  ------------------------------
    procedure Test_Create_Lib_Project (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " -o test-lib create-project -l gpl3 --lib test", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*Makefile", Result,
@@ -220,7 +220,7 @@ package body Gen.Integration.Tests is
    --  Test project configure.
    --  ------------------------------
    procedure Test_Configure (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute ("./configure --enable-coverage", Result);
       Util.Tests.Assert_Matches (T, ".*checking build system.*", Result,
@@ -233,7 +233,7 @@ package body Gen.Integration.Tests is
    --  Test propset command.
    --  ------------------------------
    procedure Test_Change_Property (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " propset author Druss", Result);
       Util.Tests.Assert_Equals (T, "", Result, "Invalid propset command");
@@ -249,7 +249,7 @@ package body Gen.Integration.Tests is
    --  Test add-module command.
    --  ------------------------------
    procedure Test_Add_Module (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " add-module tblog", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*test-tblog-beans.ads.*", Result,
@@ -264,7 +264,7 @@ package body Gen.Integration.Tests is
    --  Test add-model command.
    --  ------------------------------
    procedure Test_Add_Model (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " add-model tblog test_model", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*test-tblog-models.ads.*", Result,
@@ -279,7 +279,7 @@ package body Gen.Integration.Tests is
    --  Test add-module-operation command.
    --  ------------------------------
    procedure Test_Add_Module_Operation (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " add-module-operation tblog test_model Save", Result);
       Util.Tests.Assert_Matches (T, ".*Patching file.*tblog-modules.ads.*", Result,
@@ -300,7 +300,7 @@ package body Gen.Integration.Tests is
    --  Test add-service command.
    --  ------------------------------
    procedure Test_Add_Service (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " add-service tblog blogging", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*test-tblog-services.ads.*", Result,
@@ -315,7 +315,7 @@ package body Gen.Integration.Tests is
    --  Test add-query command.
    --  ------------------------------
    procedure Test_Add_Query (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " add-query tuser user_query", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*db/tuser-user_query.xml*", Result,
@@ -330,7 +330,7 @@ package body Gen.Integration.Tests is
    --  Test add-page command.
    --  ------------------------------
    procedure Test_Add_Page (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " add-page main_page", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*web/main_page.xhtml.*", Result,
@@ -341,7 +341,7 @@ package body Gen.Integration.Tests is
    --  Test add-layout command.
    --  ------------------------------
    procedure Test_Add_Layout (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " add-layout my-layout", Result);
       Util.Tests.Assert_Matches (T, ".*Generating file.*web/WEB-INF/layouts/my-layout.xhtml.*",
@@ -353,7 +353,7 @@ package body Gen.Integration.Tests is
    --  Test add-ajax-form command.
    --  ------------------------------
    procedure Test_Add_Ajax_Form (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " add-ajax-form tuser create-user", Result);
       Util.Tests.Assert_Matches (T,
@@ -366,7 +366,7 @@ package body Gen.Integration.Tests is
    --  Test generate command.
    --  ------------------------------
    procedure Test_Generate (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " propset is_plugin true", Result);
       T.Execute (Dynamo & " generate db", Result);
@@ -403,7 +403,7 @@ package body Gen.Integration.Tests is
    --  Test help command.
    --  ------------------------------
    procedure Test_Help (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " help", Result);
       Util.Tests.Assert_Matches (T,
@@ -420,7 +420,7 @@ package body Gen.Integration.Tests is
    --  Test dist command.
    --  ------------------------------
    procedure Test_Dist (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       Clean_Directory ("test-dist");
       T.Execute (Dynamo & " dist ../test-dist", Result);
@@ -440,7 +440,7 @@ package body Gen.Integration.Tests is
    --  Test dist with exclude support command.
    --  ------------------------------
    procedure Test_Dist_Exclude (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       Clean_Directory ("test-dist");
       T.Execute (Dynamo & " dist ../test-dist ../regtests/files/package.xml", Result);
@@ -461,7 +461,7 @@ package body Gen.Integration.Tests is
    --  Test dist command.
    --  ------------------------------
    procedure Test_Info (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " info", Result);
       Util.Tests.Assert_Matches (T,
@@ -478,7 +478,7 @@ package body Gen.Integration.Tests is
    --  Test build-doc command.
    --  ------------------------------
    procedure Test_Build_Doc (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " build-doc wiki", Result);
       Util.Tests.Assert_Equals (T, "", Result, "Invalid build-doc command");
@@ -491,7 +491,7 @@ package body Gen.Integration.Tests is
    --  Test build-doc command with -pandoc.
    --  ------------------------------
    procedure Test_Build_Pandoc (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " build-doc -pandoc docs", Result);
       Util.Tests.Assert_Equals (T, "", Result, "Invalid build-doc -pandoc command");
@@ -504,7 +504,7 @@ package body Gen.Integration.Tests is
    --  Test generate command with Hibernate XML mapping files.
    --  ------------------------------
    procedure Test_Generate_Hibernate (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       Ada.Directories.Copy_File (Source_Name => "regtests/files/User.hbm.xml",
                                  Target_Name => "test-app/db/User.hbm.xml");
@@ -545,7 +545,7 @@ package body Gen.Integration.Tests is
    --  Test generate command (XMI enum).
    --  ------------------------------
    procedure Test_Generate_XMI_Enum (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-enum.xmi", Result);
 
@@ -556,7 +556,7 @@ package body Gen.Integration.Tests is
    --  Test generate command (XMI Ada Bean).
    --  ------------------------------
    procedure Test_Generate_XMI_Bean (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-beans.xmi", Result);
 
@@ -567,7 +567,7 @@ package body Gen.Integration.Tests is
    --  Test generate command (XMI Ada Bean with inheritance).
    --  ------------------------------
    procedure Test_Generate_XMI_Bean_Table (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-table-beans.zargo", Result);
 
@@ -579,7 +579,7 @@ package body Gen.Integration.Tests is
    --  Test generate command (XMI Ada Table).
    --  ------------------------------
    procedure Test_Generate_XMI_Table (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-table.xmi", Result);
 
@@ -591,7 +591,7 @@ package body Gen.Integration.Tests is
    --  Test generate command (XMI Associations between Tables).
    --  ------------------------------
    procedure Test_Generate_XMI_Association (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-associations.xmi", Result);
 
@@ -603,7 +603,7 @@ package body Gen.Integration.Tests is
    --  Test generate command using the ArgoUML file directly (runs unzip -cq and parse the output).
    --  ------------------------------
    procedure Test_Generate_Zargo_Association (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-associations.zargo", Result);
 
@@ -615,7 +615,7 @@ package body Gen.Integration.Tests is
    --  Test generate command (XMI Datatype).
    --  ------------------------------
    procedure Test_Generate_XMI_Datatype (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-types.xmi", Result);
 
@@ -626,7 +626,7 @@ package body Gen.Integration.Tests is
    --  Test UML with several tables that have dependencies between each of them (non circular).
    --  ------------------------------
    procedure Test_Generate_Zargo_Dependencies (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-dependencies.zargo", Result);
 
@@ -638,7 +638,7 @@ package body Gen.Integration.Tests is
    --  Test UML with several tables in several packages (non circular).
    --  ------------------------------
    procedure Test_Generate_Zargo_Packages (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-packages.zargo", Result);
 
@@ -656,7 +656,7 @@ package body Gen.Integration.Tests is
    --  Test UML with serialization code.
    --  ------------------------------
    procedure Test_Generate_Zargo_Serialization (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " generate ../regtests/uml/dynamo-test-serialize.zargo", Result);
 
@@ -668,7 +668,7 @@ package body Gen.Integration.Tests is
    --  Test UML with several errors in the UML model.
    --  ------------------------------
    procedure Test_Generate_Zargo_Errors (T : in out Test) is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Execute (Dynamo & " -o tmp generate ../regtests/uml/dynamo-test-errors.zargo", Result, 1);
 
@@ -694,7 +694,7 @@ package body Gen.Integration.Tests is
    --  ------------------------------
    procedure Test_Build (T : in out Test) is
 
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       T.Test_Configure;
       T.Execute ("make", Result);
@@ -714,7 +714,7 @@ package body Gen.Integration.Tests is
    --  ------------------------------
    procedure Test_Build_Model (T : in out Test) is
 
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       Ada.Directories.Copy_File (Source_Name => "regtests/check_build/check_build.gpr",
                                  Target_Name => "test-app//check_build.gpr");

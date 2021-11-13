@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-yaml-tests -- Tests for YAML model files
---  Copyright (C) 2018 Stephane Carrez
+--  Copyright (C) 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
-with Ada.Strings.Unbounded;
 
 with Util.Test_Caller;
 
@@ -45,7 +43,7 @@ package body Gen.Artifacts.Yaml.Tests is
       Iter  : Gen.Model.Packages.Package_Cursor;
       Cnt   : Natural := 0;
    begin
-      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
+      Gen.Generator.Initialize (G, To_UString (C), False);
       A.Read_Model (Path, Model, G);
 
       Iter := Model.First;

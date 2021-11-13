@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-xmi-tests -- Tests for xmi
---  Copyright (C) 2012 Stephane Carrez
+--  Copyright (C) 2012, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,11 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-
 with Util.Test_Caller;
 
 with Gen.Configs;
 with Gen.Generator;
 package body Gen.Artifacts.XMI.Tests is
-
-   use Ada.Strings.Unbounded;
 
    package Caller is new Util.Test_Caller (Test, "Gen.XMI");
 
@@ -56,7 +52,7 @@ package body Gen.Artifacts.XMI.Tests is
                        Name      : in String;
                        Id        : in String) is
          Empty  : Gen.Model.XMI.Model_Map.Map;
-         XMI_Id : constant Unbounded_String := To_Unbounded_String (Namespace & "#" & Id);
+         XMI_Id : constant UString := To_UString (Namespace & "#" & Id);
          N      : constant Gen.Model.XMI.Model_Element_Access := Gen.Model.XMI.Find (A.Nodes,
                                                                                      Empty,
                                                                                      XMI_Id);
@@ -66,7 +62,7 @@ package body Gen.Artifacts.XMI.Tests is
       end Check;
 
    begin
-      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
+      Gen.Generator.Initialize (G, To_UString (C), False);
       A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
 
       --  ArgoUML Integer DataType
@@ -109,7 +105,7 @@ package body Gen.Artifacts.XMI.Tests is
                                         Element_Type_Access => Stereotype_Element_Access);
 
    begin
-      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
+      Gen.Generator.Initialize (G, To_UString (C), False);
       A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
 
       declare
@@ -145,7 +141,7 @@ package body Gen.Artifacts.XMI.Tests is
                                         Element_Type_Access => Tag_Definition_Element_Access);
 
    begin
-      Gen.Generator.Initialize (G, Ada.Strings.Unbounded.To_Unbounded_String (C), False);
+      Gen.Generator.Initialize (G, To_UString (C), False);
       A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
 
       declare

@@ -513,8 +513,6 @@ package body Gen.Artifacts.Docs is
    --  ------------------------------
    procedure Append_Tag (Doc : in out File_Document;
                          Tag : in String) is
-      use Ada.Strings.Unbounded;
-      use Ada.Strings;
 
       --  Scan for document files matching a pattern and include them.
       procedure Include_Files (Path    : in String;

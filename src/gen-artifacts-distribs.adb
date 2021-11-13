@@ -109,8 +109,6 @@ package body Gen.Artifacts.Distribs is
          procedure Collect_Filesets (Rule  : in out Distrib_Rule_Access;
                                      Node  : in DOM.Core.Node);
 
-         use Ada.Strings.Unbounded;
-
          Dir   : constant String := To_String (Gen.Utils.Get_Attribute (Node, "dir"));
          Mode  : constant String := To_String (Gen.Utils.Get_Attribute (Node, "mode"));
          Level : constant String := To_String (Gen.Utils.Get_Attribute (Node, "log"));

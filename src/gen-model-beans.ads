@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-beans -- Ada Bean declarations
---  Copyright (C) 2012, 2013 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,10 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-
 with Util.Beans.Objects;
 
 with Gen.Model.Tables;
 package Gen.Model.Beans is
-
-   use Ada.Strings.Unbounded;
 
    --  ------------------------------
    --  Bean Definition
@@ -39,10 +35,10 @@ package Gen.Model.Beans is
 
    --  Create an attribute with the given name and add it to the bean.
    procedure Add_Attribute (Bean   : in out Bean_Definition;
-                            Name   : in Unbounded_String;
+                            Name   : in UString;
                             Column : out Gen.Model.Tables.Column_Definition_Access);
 
    --  Create a bean with the given name.
-   function Create_Bean (Name : in Unbounded_String) return Bean_Definition_Access;
+   function Create_Bean (Name : in UString) return Bean_Definition_Access;
 
 end Gen.Model.Beans;

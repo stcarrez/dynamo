@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 
 with Ada.Containers.Hashed_Maps;
-with Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Hash;
 with Ada.Containers.Vectors;
 
@@ -25,8 +24,6 @@ with Util.Beans.Objects;
 with Util.Strings.Sets;
 
 package Gen.Model.XMI is
-
-   use Ada.Strings.Unbounded;
 
    type Element_Type is (XMI_UNKNOWN,
                          XMI_PACKAGE,
@@ -76,7 +73,7 @@ package Gen.Model.XMI is
 
    --  Define a map to search an element from its XMI ID.
    package Model_Map is
-     new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+     new Ada.Containers.Hashed_Maps (Key_Type        => UString,
                                      Element_Type    => Model_Element_Access,
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Keys => "=");
@@ -100,7 +97,7 @@ package Gen.Model.XMI is
    --  procedure.
    procedure Iterate (Model   : in Model_Map.Map;
                       On      : in Element_Type;
-                      Process : not null access procedure (Id   : in Unbounded_String;
+                      Process : not null access procedure (Id   : in UString;
                                                            Node : in Model_Element_Access));
 
    --  Generic procedure to iterate over the XMI elements of a vector
@@ -115,7 +112,7 @@ package Gen.Model.XMI is
 
    --  Map of UML models indexed on the model name.
    package UML_Model_Map is new
-     Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+     Ada.Containers.Hashed_Maps (Key_Type        => UString,
                                  Element_Type    => Model_Map.Map,
                                  Hash            => Ada.Strings.Unbounded.Hash,
                                  Equivalent_Keys => "=",
@@ -135,7 +132,7 @@ package Gen.Model.XMI is
    --  Returns null if the model element is not found.
    function Find (Model   : in UML_Model;
                   Current : in Model_Map.Map;
-                  Id      : in Ada.Strings.Unbounded.Unbounded_String)
+                  Id      : in UString)
                   return Model_Element_Access;
 
    --  Dump the XMI model elements.
@@ -150,7 +147,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    type Model_Element (Model : Model_Map_Access) is abstract new Definition with record
       --  Element XMI id.
-      XMI_Id        : Ada.Strings.Unbounded.Unbounded_String;
+      XMI_Id        : UString;
 
       --  List of tagged values for the element.
       Tagged_Values : Model_Vector;
@@ -227,7 +224,7 @@ package Gen.Model.XMI is
    --  Data type
    --  ------------------------------
    type Ref_Type_Element is new Model_Element with record
-      Ref_Id : Unbounded_String;
+      Ref_Id : UString;
       Ref    : Model_Element_Access;
    end record;
    type Ref_Type_Element_Access is access all Ref_Type_Element'Class;
@@ -311,8 +308,8 @@ package Gen.Model.XMI is
    --  Comment
    --  ------------------------------
    type Comment_Element is new Model_Element with record
-      Text       : Ada.Strings.Unbounded.Unbounded_String;
-      Ref_Id     : Ada.Strings.Unbounded.Unbounded_String;
+      Text       : UString;
+      Ref_Id     : UString;
    end record;
    type Comment_Element_Access is access all Comment_Element'Class;
 
@@ -430,7 +427,7 @@ package Gen.Model.XMI is
    --  ------------------------------
    type Generalization_Element is new Ref_Type_Element with record
       Child_Class  : Model_Element_Access;
-      Child_Id     : Ada.Strings.Unbounded.Unbounded_String;
+      Child_Id     : UString;
    end record;
    type Generalization_Element_Access is access all Generalization_Element'Class;
 
@@ -463,8 +460,8 @@ package Gen.Model.XMI is
    --  Tagged value
    --  ------------------------------
    type Tagged_Value_Element is new Ref_Type_Element with record
-      Value      : Ada.Strings.Unbounded.Unbounded_String;
-      Value_Type : Ada.Strings.Unbounded.Unbounded_String;
+      Value      : UString;
+      Value_Type : UString;
       Tag_Def    : Tag_Definition_Element_Access;
    end record;
 

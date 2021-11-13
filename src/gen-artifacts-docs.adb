@@ -81,7 +81,7 @@ package body Gen.Artifacts.Docs is
    begin
       Log.Info ("Using command: {0}", Command);
 
-      Handler.Xslt_Command := Ada.Strings.Unbounded.To_Unbounded_String (Command);
+      Handler.Xslt_Command := To_UString (Command);
       Handler.Scan_Files ("src", Docs);
       Handler.Scan_Files ("config", Docs);
       Handler.Scan_Files ("db", Docs);
@@ -153,7 +153,7 @@ package body Gen.Artifacts.Docs is
                             Doc    : in out File_Document) is
          Iter : Line_Vectors.Cursor := Doc.Lines (Mode).Last;
       begin
-         Log.Debug ("Merge {0} in {1}", Source, Ada.Strings.Unbounded.To_String (Into.Name));
+         Log.Debug ("Merge {0} in {1}", Source, To_String (Into.Name));
 --         Into.Lines (L_INCLUDE).Insert (Before => Position,
 --                                        New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
          while Line_Vectors.Has_Element (Iter) loop
@@ -282,7 +282,7 @@ package body Gen.Artifacts.Docs is
                   if L.Kind = L_INCLUDE_DOC and then not Docs.Contains (L.Content) then
                      if not Ada.Directories.Exists (L.Content) then
                         Log.Error ("{0}: Cannot include document: {1}",
-                                   Ada.Strings.Unbounded.To_String (Doc.Name), L.Content);
+                                   To_String (Doc.Name), L.Content);
                         Line_Vectors.Delete (Doc.Lines (L_INCLUDE), Pos);
                      else
                         List.Append (L.Content);
@@ -543,7 +543,7 @@ package body Gen.Artifacts.Docs is
                        Pattern => Pattern, Filter => File_Filter);
          while More_Entries (Search) loop
             Get_Next_Entry (Search, Ent);
-            Files.Include (To_Unbounded_String (Ada.Directories.Full_Name (Ent)));
+            Files.Include (To_UString (Ada.Directories.Full_Name (Ent)));
          end loop;
 
          --  Step #2: iterate on the list of files sorted on their path
@@ -567,7 +567,7 @@ package body Gen.Artifacts.Docs is
          Value : constant String := Ada.Strings.Fixed.Trim (Tag (Pos .. Tag'Last), Spaces, Spaces);
       begin
          if Tag (Tag'First .. Pos - 1) = TAG_TITLE then
-            Doc.Title := To_Unbounded_String (Value);
+            Doc.Title := To_UString (Value);
 
          elsif Tag (Tag'First .. Pos - 1) = TAG_SEE then
             Doc.Lines (L_INCLUDE).Append (Line_Type '(Len     => Value'Length,
@@ -720,7 +720,7 @@ package body Gen.Artifacts.Docs is
             S1 (I) := '_';
          end if;
       end loop;
-      Doc.Name := Ada.Strings.Unbounded.To_Unbounded_String (S1);
+      Doc.Name := To_UString (S1);
    end Set_Name;
 
    --  ------------------------------
@@ -737,7 +737,7 @@ package body Gen.Artifacts.Docs is
       else
          Pos := Pos + 4;
       end if;
-      Doc.Title := Unbounded.To_Unbounded_String (Fixed.Trim (Title (Pos .. Title'Last), Both));
+      Doc.Title := To_UString (Fixed.Trim (Title (Pos .. Title'Last), Both));
    end Set_Title;
 
    --  ------------------------------
@@ -830,7 +830,7 @@ package body Gen.Artifacts.Docs is
                             File    : in String;
                             Result  : in out File_Document) is
       function Find_Mode (Line : in String) return Line_Include_Kind;
-      procedure Append (Line : in Ada.Strings.Unbounded.Unbounded_String);
+      procedure Append (Line : in UString);
 
       Is_Empty       : Boolean := True;
       Current_Mode   : Line_Include_Kind := L_INCLUDE;
@@ -850,8 +850,8 @@ package body Gen.Artifacts.Docs is
          end if;
       end Find_Mode;
 
-      procedure Append (Line : in Ada.Strings.Unbounded.Unbounded_String) is
-         Content : constant String := Ada.Strings.Unbounded.To_String (Line);
+      procedure Append (Line : in UString) is
+         Content : constant String := To_String (Line);
          Trimmed : constant String := Ada.Strings.Fixed.Trim (Content, Spaces, Spaces);
          Mode    : constant Line_Include_Kind := Find_Mode (Content);
       begin
@@ -875,7 +875,7 @@ package body Gen.Artifacts.Docs is
       Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
       Reader  : Util.Streams.Texts.Reader_Stream;
       Name    : constant String := Ada.Directories.Base_Name (File);
-      Command : constant String := Ada.Strings.Unbounded.To_String (Handler.Xslt_Command);
+      Command : constant String := To_String (Handler.Xslt_Command);
    begin
       Log.Info ("Running {0} {1}", Command, File);
       Pipe.Open (Command & " " & File, Util.Processes.READ);
@@ -883,7 +883,7 @@ package body Gen.Artifacts.Docs is
 
       while not Reader.Is_Eof loop
          declare
-            Line : Ada.Strings.Unbounded.Unbounded_String;
+            Line : UString;
          begin
             Reader.Read_Line (Line, True);
             Log.Debug ("Doc: {0}", Line);

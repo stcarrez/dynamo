@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Unbounded;
 with Ada.Directories;
 with Ada.Exceptions;
 with Ada.Containers;
@@ -89,7 +88,7 @@ package body Gen.Artifacts.Hibernate is
       --  ------------------------------
       procedure Register_Column (Table  : in out Table_Definition;
                                  Column : in DOM.Core.Node) is
-         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
+         Name : constant UString := Gen.Utils.Get_Attribute (Column, "name");
          G    : constant DOM.Core.Node := Gen.Utils.Get_Child (Column, "generator");
          C    : Column_Definition_Access;
       begin
@@ -139,7 +138,7 @@ package body Gen.Artifacts.Hibernate is
       --  ------------------------------
       procedure Register_Association (Table  : in out Table_Definition;
                                       Column : in DOM.Core.Node) is
-         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
+         Name : constant UString := Gen.Utils.Get_Attribute (Column, "name");
          C    : Association_Definition_Access;
       begin
          Log.Debug ("Register association {0}", Name);
@@ -200,8 +199,8 @@ package body Gen.Artifacts.Hibernate is
       --  ------------------------------
       procedure Register_Class (O    : in out Gen.Model.Packages.Model_Definition;
                                 Node : in DOM.Core.Node) is
-         Name       : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
-         Table_Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "table");
+         Name       : constant UString := Gen.Utils.Get_Attribute (Node, "name");
+         Table_Name : constant UString := Gen.Utils.Get_Attribute (Node, "table");
          Table      : constant Table_Definition_Access := Gen.Model.Tables.Create_Table (Name);
       begin
          Table.Initialize (Name, Node);
@@ -221,7 +220,7 @@ package body Gen.Artifacts.Hibernate is
       --  ------------------------------
       procedure Register_Enum_Value (Enum  : in out Enum_Definition;
                                      Value : in DOM.Core.Node) is
-         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Value, "name");
+         Name : constant UString := Gen.Utils.Get_Attribute (Value, "name");
          V    : Value_Definition_Access;
       begin
          Log.Debug ("Register enum value {0}", Name);
@@ -238,7 +237,7 @@ package body Gen.Artifacts.Hibernate is
            new Gen.Utils.Iterate_Nodes (T       => Enum_Definition,
                                         Process => Register_Enum_Value);
 
-         Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Name  : constant UString := Gen.Utils.Get_Attribute (Node, "name");
          Enum  : constant Enum_Definition_Access := Gen.Model.Enums.Create_Enum (Name);
       begin
          Enum.Initialize (Name, Node);
@@ -340,7 +339,7 @@ package body Gen.Artifacts.Hibernate is
                              Driver  : in String;
                              Prefix  : in String;
                              Dynamo  : in String;
-                             Content : in out Unbounded_String);
+                             Content : in out UString);
 
       procedure Build_SQL_Schemas (Driver : in String;
                                    Prefix : in String;
@@ -351,7 +350,7 @@ package body Gen.Artifacts.Hibernate is
 
       use Util.Encoders;
 
-      SQL_Content  : Unbounded_String;
+      SQL_Content  : UString;
 
       --  SHA for each SQL content that is appended in the SQL content.
       --  This is used to avoid appending the same SQL file several times in the final SQL file.
@@ -374,12 +373,12 @@ package body Gen.Artifacts.Hibernate is
                              Driver  : in String;
                              Prefix  : in String;
                              Dynamo  : in String;
-                             Content : in out Unbounded_String) is
+                             Content : in out UString) is
          Name : constant String := Project.Get_Project_Name;
          Dir2 : constant String := Util.Files.Compose (Dir, Driver);
          Path : constant String := Util.Files.Compose (Dir2, Name & "-"
                                                        & Prefix & Driver & ".sql");
-         SQL  : Unbounded_String;
+         SQL  : UString;
       begin
          Log.Debug ("Checking SQL file {0}", Path);
 

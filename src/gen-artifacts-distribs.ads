@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Unbounded;
 with Ada.Containers.Vectors;
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Ordered_Maps;
@@ -137,8 +136,8 @@ private
                    Dir      : in Directory_List_Access);
 
    type Match_Rule is record
-      Base_Dir : Ada.Strings.Unbounded.Unbounded_String;
-      Match    : Ada.Strings.Unbounded.Unbounded_String;
+      Base_Dir : UString;
+      Match    : UString;
    end record;
 
    package Match_Rule_Vector is
@@ -151,7 +150,7 @@ private
    --  The <b>Distrib_Rule</b> represents a distribution rule that must be executed on
    --  a given file or set of files.
    type Distrib_Rule is abstract tagged record
-      Dir      : Ada.Strings.Unbounded.Unbounded_String;
+      Dir      : UString;
       Matches  : Match_Rule_Vector.Vector;
       Excludes : Match_Rule_Vector.Vector;
       Files    : File_Tree.Map;

@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Unbounded;
 with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded.Hash;
 
@@ -52,7 +51,7 @@ package Gen.Model.Mappings is
    type Mapping_Definition_Access is access all Mapping_Definition'Class;
 
    type Mapping_Definition is new Definition with record
-      Target        : Ada.Strings.Unbounded.Unbounded_String;
+      Target        : UString;
       Kind          : Basic_Type := T_INTEGER;
       Allow_Null    : Mapping_Definition_Access;
       Nullable      : Boolean := False;
@@ -65,12 +64,12 @@ package Gen.Model.Mappings is
                        Name : String) return Util.Beans.Objects.Object;
 
    --  Find the mapping for the given type name.
-   function Find_Type (Name       : in Ada.Strings.Unbounded.Unbounded_String;
+   function Find_Type (Name       : in UString;
                        Allow_Null : in Boolean)
                        return Mapping_Definition_Access;
 
    --  Get the type name according to the mapping definition.
-   function Get_Type_Name (Name : in Ada.Strings.Unbounded.Unbounded_String) return String;
+   function Get_Type_Name (Name : in UString) return String;
 
    --  Get the type name.
    function Get_Type_Name (From : Mapping_Definition) return String;
@@ -89,7 +88,7 @@ package Gen.Model.Mappings is
    procedure Set_Mapping_Name (Name : in String);
 
    package Mapping_Maps is
-     new Ada.Containers.Hashed_Maps (Key_Type        => Ada.Strings.Unbounded.Unbounded_String,
+     new Ada.Containers.Hashed_Maps (Key_Type        => UString,
                                      Element_Type    => Mapping_Definition_Access,
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Keys => Ada.Strings.Unbounded."=");

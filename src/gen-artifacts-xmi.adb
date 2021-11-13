@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Unbounded;
 with Ada.Directories;
 with Ada.Strings.Fixed;
 
@@ -157,8 +156,8 @@ package body Gen.Artifacts.XMI is
 
    type XMI_Info is record
       Model                : Gen.Model.XMI.Model_Map_Access;
-      Default_Type         : Unbounded_String;
-      File                 : Unbounded_String;
+      Default_Type         : UString;
+      File                 : UString;
       Parser               : access Util.Serialize.IO.XML.Parser'Class;
       Profiles             : access Util.Strings.Sets.Set;
       Is_Profile           : Boolean := False;
@@ -316,8 +315,8 @@ package body Gen.Artifacts.XMI is
    end Get_Parameter_Type;
 
    procedure Add_Tagged_Value (P : in out XMI_Info) is
-      Id    : constant Unbounded_String := UBO.To_Unbounded_String (P.Tagged_Id);
-      Value : constant Unbounded_String := UBO.To_Unbounded_String (P.Value);
+      Id    : constant UString := UBO.To_Unbounded_String (P.Tagged_Id);
+      Value : constant UString := UBO.To_Unbounded_String (P.Value);
       Tagged_Value : constant Model.XMI.Tagged_Value_Element_Access
         := new Model.XMI.Tagged_Value_Element (P.Model);
    begin
@@ -879,13 +878,13 @@ package body Gen.Artifacts.XMI is
                               Item : in Gen.Model.XMI.Model_Element_Access);
 
       --  Scan the package for the model generation.
-      procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Prepare_Package (Id   : in UString;
                                  Item : in Gen.Model.XMI.Model_Element_Access);
 
-      procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Prepare_Model (Key   : in UString;
                                Model : in out Gen.Model.XMI.Model_Map.Map);
 
-      procedure Prepare_Profile (Id   : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Prepare_Profile (Id   : in UString;
                                  Item : in Gen.Model.XMI.Model_Element_Access);
 
       --  ------------------------------
@@ -923,7 +922,7 @@ package body Gen.Artifacts.XMI is
                C.Is_Auditable := Column.Has_Stereotype (Handler.Auditable_Stereotype);
                C.Is_Updated   := Attr.Changeability /= CHANGEABILITY_FROZEN;
                C.Is_Inserted  := True; --  Attr.Changeability = CHANGEABILITY_INSERT;
-               C.Sql_Type     := To_Unbounded_String (Sql);
+               C.Sql_Type     := To_UString (Sql);
 
                if Column.Has_Stereotype (Handler.Not_Null_Stereotype) then
                   C.Not_Null := True;
@@ -1021,7 +1020,7 @@ package body Gen.Artifacts.XMI is
             Log.Info ("Prepare operation parameter {0} : {1}",
                       Param.Name, Param.Data_Type.Get_Qualified_Name);
             Operation.Add_Parameter (Param.Name,
-                                     To_Unbounded_String (Param.Data_Type.Get_Qualified_Name), P);
+                                     To_UString (Param.Data_Type.Get_Qualified_Name), P);
          end if;
       end Prepare_Parameter;
 
@@ -1054,7 +1053,7 @@ package body Gen.Artifacts.XMI is
       procedure Prepare_Class (Pkg  : in out Gen.Model.Packages.Package_Definition'Class;
                                Item : in Gen.Model.XMI.Model_Element_Access) is
          Class : constant Class_Element_Access := Class_Element'Class (Item.all)'Access;
-         Name  : constant Unbounded_String := Gen.Utils.Qualify_Name (Pkg.Name, Class.Name);
+         Name  : constant UString := Gen.Utils.Qualify_Name (Pkg.Name, Class.Name);
       begin
          Log.Info ("Prepare class {0}", Name);
 
@@ -1073,7 +1072,7 @@ package body Gen.Artifacts.XMI is
                Table.Is_Serializable := Item.Has_Stereotype (Handler.Serialize_Stereotype);
                if T_Name'Length /= 0 then
                   Log.Info ("Using table name {0}", Name);
-                  Table.Table_Name := To_Unbounded_String (T_Name);
+                  Table.Table_Name := To_UString (T_Name);
                end if;
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);
@@ -1095,7 +1094,7 @@ package body Gen.Artifacts.XMI is
                if Class.Parent_Class /= null then
                   Log.Info ("Bean {0} inherit from {1}", Name,
                             To_String (Class.Parent_Class.Name));
-                  Bean.Parent_Name := To_Unbounded_String (Class.Parent_Class.Get_Qualified_Name);
+                  Bean.Parent_Name := To_UString (Class.Parent_Class.Get_Qualified_Name);
                end if;
                Iterate_For_Bean (Bean.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Bean.all, Class.Associations, Prepare_Association'Access);
@@ -1155,15 +1154,15 @@ package body Gen.Artifacts.XMI is
          end if;
          if Data_Type.Parent_Type /= null then
             Stype := Gen.Model.Stypes.Create_Stype
-              (To_Unbounded_String (Name),
-               To_Unbounded_String (Data_Type.Parent_Type.Get_Qualified_Name));
+              (To_UString (Name),
+               To_UString (Data_Type.Parent_Type.Get_Qualified_Name));
          else
-            Stype := Gen.Model.Stypes.Create_Stype (To_Unbounded_String (Name),
+            Stype := Gen.Model.Stypes.Create_Stype (To_UString (Name),
                                                     Null_Unbounded_String);
          end if;
          Stype.Set_Comment (Item.Get_Comment);
          Stype.Set_Location (Item.Get_Location);
-         Stype.Sql_Type := To_Unbounded_String (Sql);
+         Stype.Sql_Type := To_UString (Sql);
          Model.Register_Stype (Stype);
 
       exception
@@ -1192,10 +1191,10 @@ package body Gen.Artifacts.XMI is
          if Msg'Length > 0 then
             Context.Error (Item.Get_Location & ": " & Msg);
          end if;
-         Enum := Gen.Model.Enums.Create_Enum (To_Unbounded_String (Name));
+         Enum := Gen.Model.Enums.Create_Enum (To_UString (Name));
          Enum.Set_Comment (Item.Get_Comment);
          Enum.Set_Location (Item.Get_Location);
-         Enum.Sql_Type := To_Unbounded_String (Sql);
+         Enum.Sql_Type := To_UString (Sql);
          Model.Register_Enum (Enum);
 
          Iterate_For_Enum (Enum.all, Item.Elements, Prepare_Enum_Literal'Access);
@@ -1204,7 +1203,7 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       --  Scan the package for the model generation.
       --  ------------------------------
-      procedure Prepare_Package (Id   : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Prepare_Package (Id   : in UString;
                                  Item : in Gen.Model.XMI.Model_Element_Access) is
          pragma Unreferenced (Id);
 
@@ -1218,7 +1217,7 @@ package body Gen.Artifacts.XMI is
 
          Log.Info ("Prepare package {0}", Name);
 
-         Model.Register_Package (To_Unbounded_String (Name), P);
+         Model.Register_Package (To_UString (Name), P);
 
          if Item.Has_Stereotype (Handler.Data_Model_Stereotype) then
             Log.Info ("Package {0} has the <<DataModel>> stereotype", Name);
@@ -1240,7 +1239,7 @@ package body Gen.Artifacts.XMI is
       --  ------------------------------
       --  Scan the profile packages for the model generation.
       --  ------------------------------
-      procedure Prepare_Profile (Id   : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Prepare_Profile (Id   : in UString;
                                  Item : in Gen.Model.XMI.Model_Element_Access) is
          pragma Unreferenced (Id);
 
@@ -1254,7 +1253,7 @@ package body Gen.Artifacts.XMI is
 
          Log.Info ("Prepare profile package {0}", Name);
 
-         Model.Register_Package (To_Unbounded_String (Name), P);
+         Model.Register_Package (To_UString (Name), P);
 
          P.Set_Predefined;
          P.Set_Comment (Pkg.Get_Comment);
@@ -1263,7 +1262,7 @@ package body Gen.Artifacts.XMI is
          Iterate_For_Package (P.all, Pkg.Classes, Prepare_Class'Access);
       end Prepare_Profile;
 
-      procedure Prepare_Model (Key   : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Prepare_Model (Key   : in UString;
                                Model : in out Gen.Model.XMI.Model_Map.Map) is
       begin
          Log.Info ("Preparing model {0}", Key);
@@ -1386,14 +1385,14 @@ package body Gen.Artifacts.XMI is
          declare
             Profile : constant String := Util.Strings.Sets.Element (Iter);
          begin
-            if not Handler.Nodes.Contains (To_Unbounded_String (Profile)) then
+            if not Handler.Nodes.Contains (To_UString (Profile)) then
                Log.Info ("Reading the UML profile {0}", Profile);
 
                --  We have a profile, load the UML model.
                Handler.Read_Model (Util.Files.Compose (Path, Profile), Context, True);
 
                --  Verify that we have the model, report an error and remove it from the profiles.
-               if not Handler.Nodes.Contains (To_Unbounded_String (Profile)) then
+               if not Handler.Nodes.Contains (To_UString (Profile)) then
                   Context.Error ("UML profile {0} was not found", Profile);
                   Handler.Profiles.Delete (Profile);
                end if;
@@ -1414,10 +1413,10 @@ package body Gen.Artifacts.XMI is
                          File          : in String;
                          Context       : in out Generator'Class;
                          Is_Predefined : in Boolean := False) is
-      procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Read (Key   : in UString;
                       Model : in out Gen.Model.XMI.Model_Map.Map);
 
-      procedure Read (Key   : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Read (Key   : in UString;
                       Model : in out Gen.Model.XMI.Model_Map.Map) is
          pragma Unreferenced (Key);
 
@@ -1460,8 +1459,8 @@ package body Gen.Artifacts.XMI is
          Info.Model        := Model'Unchecked_Access;
          Info.Parser       := Reader'Unchecked_Access;
          Info.Profiles     := Handler.Profiles'Unchecked_Access;
-         Info.File         := To_Unbounded_String (Name & ".xmi");
-         Info.Default_Type := To_Unbounded_String (Def_Type);
+         Info.File         := To_UString (Name & ".xmi");
+         Info.Default_Type := To_UString (Def_Type);
          Info.Is_Profile   := Is_Predefined;
          Mapper.Add_Mapping ("XMI", XMI_Mapping'Access);
          if Context.Get_Parameter (Gen.Configs.GEN_DEBUG_ENABLE) then
@@ -1486,8 +1485,7 @@ package body Gen.Artifacts.XMI is
       end Read;
 
       UML  : Gen.Model.XMI.Model_Map.Map;
-      Name : constant Ada.Strings.Unbounded.Unbounded_String
-        := Ada.Strings.Unbounded.To_Unbounded_String (Ada.Directories.Simple_Name (File));
+      Name : constant Ustring := To_UString (Ada.Directories.Simple_Name (File));
    begin
       Log.Info ("Reading XMI {0}", File);
 

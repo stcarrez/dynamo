@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-merges -- Web file merge
---  Copyright (C) 2020 Stephane Carrez
+--  Copyright (C) 2020-2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,6 @@ package body Gen.Artifacts.Distribs.Merges is
    use Util.Log;
    use Ada.Strings.Fixed;
    use Util.Beans.Objects;
-   use Ada.Strings.Unbounded;
 
    procedure Process_Property (Rule : in out Merge_Rule;
                                Node : in DOM.Core.Node);
@@ -69,7 +68,7 @@ package body Gen.Artifacts.Distribs.Merges is
       --  one such composition.
       declare
          Param : constant String := Name (Name'First .. Pos - 1);
-         Tag   : constant Unbounded_String := To_Unbounded_String (Param);
+         Tag   : constant UString := To_UString (Param);
          Var   : constant EL.Expressions.Expression := Rule.Variables.Get_Variable (Tag);
          Val   : Object := Rule.Params.Get_Value (Param);
          Child : Map_Bean_Access;

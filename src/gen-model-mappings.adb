@@ -28,7 +28,7 @@ package body Gen.Model.Mappings is
 
    Types : Mapping_Maps.Map;
 
-   Mapping_Name : Unbounded_String;
+   Mapping_Name : UString;
 
    --  ------------------------------
    --  Get the value identified by the name.
@@ -111,7 +111,7 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    --  Find the mapping for the given type name.
    --  ------------------------------
-   function Find_Type (Name       : in Ada.Strings.Unbounded.Unbounded_String;
+   function Find_Type (Name       : in UString;
                        Allow_Null : in Boolean)
                        return Mapping_Definition_Access is
       Pos : constant Mapping_Maps.Cursor := Types.Find (Mapping_Name & Name);
@@ -135,7 +135,7 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    --  Get the type name according to the mapping definition.
    --  ------------------------------
-   function Get_Type_Name (Name : in Ada.Strings.Unbounded.Unbounded_String) return String is
+   function Get_Type_Name (Name : in UString) return String is
       T : constant Mapping_Definition_Access := Find_Type (Name, False);
    begin
       if T = null then
@@ -148,7 +148,7 @@ package body Gen.Model.Mappings is
    procedure Register_Type (Name    : in String;
                             Mapping : in Mapping_Definition_Access;
                             Kind    : in Basic_Type) is
-      N    : constant Unbounded_String := Mapping_Name & To_Unbounded_String (Name);
+      N    : constant UString := Mapping_Name & To_UString (Name);
       Pos  : constant Mapping_Maps.Cursor := Types.Find (N);
    begin
       Log.Debug ("Register type '{0}'", Name);
@@ -166,7 +166,7 @@ package body Gen.Model.Mappings is
                             From       : in String;
                             Kind       : in Basic_Type;
                             Allow_Null : in Boolean) is
-      Name    : constant Unbounded_String := Mapping_Name & To_Unbounded_String (From);
+      Name    : constant UString := Mapping_Name & To_UString (From);
       Pos     : constant Mapping_Maps.Cursor := Types.Find (Name);
       Mapping : Mapping_Definition_Access;
       Found   : Boolean;
@@ -184,15 +184,15 @@ package body Gen.Model.Mappings is
       end if;
       if Allow_Null then
          Mapping.Allow_Null := new Mapping_Definition;
-         Mapping.Allow_Null.Target := To_Unbounded_String (Target);
+         Mapping.Allow_Null.Target := To_UString (Target);
          Mapping.Allow_Null.Kind := Kind;
          Mapping.Allow_Null.Nullable := True;
          if not Found then
-            Mapping.Target := To_Unbounded_String (Target);
+            Mapping.Target := To_UString (Target);
             Mapping.Kind   := Kind;
          end if;
       else
-         Mapping.Target := To_Unbounded_String (Target);
+         Mapping.Target := To_UString (Target);
          Mapping.Kind   := Kind;
       end if;
    end Register_Type;
@@ -204,7 +204,7 @@ package body Gen.Model.Mappings is
    begin
       Log.Info ("Using type mapping {0}", Name);
 
-      Mapping_Name := To_Unbounded_String (Name & ".");
+      Mapping_Name := To_UString (Name & ".");
    end Set_Mapping_Name;
 
 end Gen.Model.Mappings;

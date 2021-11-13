@@ -18,7 +18,6 @@
 
 with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Vectors;
-with Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Hash;
 
 with Util.Beans.Objects;
@@ -28,8 +27,6 @@ with Gen.Model.Packages;
 with Gen.Model.Mappings;
 with Gen.Model.Operations;
 package Gen.Model.Tables is
-
-   use Ada.Strings.Unbounded;
 
    type Table_Definition is tagged;
    type Table_Definition_Access is access all Table_Definition'Class;
@@ -43,13 +40,13 @@ package Gen.Model.Tables is
       Bean     : Util.Beans.Objects.Object;
 
       --  The column type name.
-      Type_Name : Unbounded_String;
+      Type_Name : UString;
 
       --  The SQL type associated with the column.
-      Sql_Type  : Unbounded_String;
+      Sql_Type  : UString;
 
       --  The SQL name associated with the column.
-      Sql_Name   : Unbounded_String;
+      Sql_Name   : UString;
 
       --  The SQL length for strings.
       Sql_Length : Positive := 255;
@@ -162,11 +159,11 @@ package Gen.Model.Tables is
       Operations       : aliased Operation_List.List_Definition;
       Operations_Bean  : Util.Beans.Objects.Object;
       Parent           : Table_Definition_Access;
-      Parent_Name      : Unbounded_String;
+      Parent_Name      : UString;
       Package_Def      : Gen.Model.Packages.Package_Definition_Access;
-      Type_Name        : Unbounded_String;
-      Pkg_Name         : Unbounded_String;
-      Table_Name       : Unbounded_String;
+      Type_Name        : UString;
+      Pkg_Name         : UString;
+      Table_Name       : UString;
       Version_Column   : Column_Definition_Access;
       Id_Column        : Column_Definition_Access;
 
@@ -225,21 +222,21 @@ package Gen.Model.Tables is
    function Depends_On (Left, Right : in Table_Definition_Access) return Dependency_Type;
 
    --  Create a table with the given name.
-   function Create_Table (Name : in Unbounded_String) return Table_Definition_Access;
+   function Create_Table (Name : in UString) return Table_Definition_Access;
 
    --  Create a table column with the given name and add it to the table.
    procedure Add_Column (Table  : in out Table_Definition;
-                         Name   : in Unbounded_String;
+                         Name   : in UString;
                          Column : out Column_Definition_Access);
 
    --  Create a table association with the given name and add it to the table.
    procedure Add_Association (Table  : in out Table_Definition;
-                              Name   : in Unbounded_String;
+                              Name   : in UString;
                               Assoc  : out Association_Definition_Access);
 
    --  Create an operation with the given name and add it to the table.
    procedure Add_Operation (Table     : in out Table_Definition;
-                            Name      : in Unbounded_String;
+                            Name      : in UString;
                             Operation : out Model.Operations.Operation_Definition_Access);
 
    --  Set the table name and determines the package name.
@@ -247,7 +244,7 @@ package Gen.Model.Tables is
                              Name  : in String);
 
    package Table_Map is
-     new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+     new Ada.Containers.Hashed_Maps (Key_Type        => UString,
                                      Element_Type    => Table_Definition_Access,
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Keys => "=");

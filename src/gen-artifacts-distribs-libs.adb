@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-libs -- Unix shared library extraction and distribution
---  Copyright (C) 2012, 2018, 2020 Stephane Carrez
+--  Copyright (C) 2012, 2018, 2020, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,7 +87,7 @@ package body Gen.Artifacts.Distribs.Libs is
                              File : in File_Record) return String is
       pragma Unreferenced (File);
 
-      Dir  : constant String := Ada.Strings.Unbounded.To_String (Rule.Dir);
+      Dir  : constant String := To_String (Rule.Dir);
    begin
       return Util.Files.Compose (Base, Dir);
    end Get_Target_Path;
@@ -160,7 +160,7 @@ package body Gen.Artifacts.Distribs.Libs is
          Reader.Initialize (Pipe'Unchecked_Access);
          while not Reader.Is_Eof loop
             declare
-               Line : Ada.Strings.Unbounded.Unbounded_String;
+               Line : UString;
                Pos  : Natural;
                Last : Natural;
             begin

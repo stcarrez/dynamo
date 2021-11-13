@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-mappings -- Type mapping artifact for Code Generator
---  Copyright (C) 2011, 2012, 2015, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018, 2019, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Unbounded;
-
 with Util.Log.Loggers;
 with Gen.Utils;
 with Gen.Model;
@@ -38,8 +36,6 @@ package body Gen.Artifacts.Mappings is
                          Node    : in DOM.Core.Node;
                          Model   : in out Gen.Model.Packages.Model_Definition'Class;
                          Context : in out Generator'Class) is
-
-      use Ada.Strings.Unbounded;
 
       procedure Register_Mapping (O    : in out Gen.Model.Packages.Model_Definition;
                                   Node : in DOM.Core.Node);

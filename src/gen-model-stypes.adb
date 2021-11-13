@@ -62,8 +62,10 @@ package body Gen.Model.Stypes is
    --  ------------------------------
    --  Create an simple type with its parent type.
    --  ------------------------------
-   function Create_Stype (Name   : in Unbounded_String;
-                           Parent : in Unbounded_String) return Stype_Definition_Access is
+   function Create_Stype (Name   : in UString;
+                          Parent : in UString) return Stype_Definition_Access is
+      use Ada.Strings.Unbounded;
+
       Stype : constant Stype_Definition_Access := new Stype_Definition;
    begin
       Stype.Set_Name (Name);

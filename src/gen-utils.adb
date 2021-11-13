@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils -- Utilities for model generator
---  Copyright (C) 2010, 2011, 2012, 2015 Stephane Carrez
+--  Copyright (C) 2010, 2011, 2012, 2015, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,7 +95,7 @@ package body Gen.Utils is
    function Get_Data_Content (Node : in DOM.Core.Node) return String is
       Nodes  : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
       S      : constant Natural   := DOM.Core.Nodes.Length (Nodes);
-      Result : Unbounded_String;
+      Result : UString;
    begin
       for J in 0 .. S - 1 loop
          Append (Result, DOM.Core.Character_Datas.Data (DOM.Core.Nodes.Item (Nodes, J)));
@@ -285,7 +285,7 @@ package body Gen.Utils is
    function Get_Comment (Node : in DOM.Core.Node) return String is
       Children : constant DOM.Core.Node_List := DOM.Core.Nodes.Child_Nodes (Node);
       Size     : constant Natural := DOM.Core.Nodes.Length (Children);
-      Result   : Unbounded_String;
+      Result   : UString;
    begin
       for I in 0 .. Size - 1 loop
          declare
@@ -313,13 +313,13 @@ package body Gen.Utils is
    --  ------------------------------
    function Get_Attribute (Node    : DOM.Core.Node;
                            Name    : String;
-                           Default : String := "") return Ada.Strings.Unbounded.Unbounded_String is
+                           Default : String := "") return UString is
       V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
    begin
       if V = "" then
-         return To_Unbounded_String (Default);
+         return To_UString (Default);
       else
-         return To_Unbounded_String (V);
+         return To_UString (V);
       end if;
    end Get_Attribute;
 
@@ -346,8 +346,8 @@ package body Gen.Utils is
    --  ------------------------------
    --  Returns a qualified name from a package name and a name.
    --  ------------------------------
-   function Qualify_Name (Pkg_Name : in Unbounded_String;
-                          Name     : in Unbounded_String) return Unbounded_String is
+   function Qualify_Name (Pkg_Name : in UString;
+                          Name     : in UString) return UString is
    begin
       return Pkg_Name & "." & Name;
    end Qualify_Name;

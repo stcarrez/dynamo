@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils -- Utilities for model generator
---  Copyright (C) 2010, 2011, 2012 Stephane Carrez
+--  Copyright (C) 2010, 2011, 2012, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,7 +66,7 @@ package Gen.Utils is
 
    use Ada.Strings.Unbounded;
    package String_Set is
-     new Ada.Containers.Ordered_Sets (Element_Type => Ada.Strings.Unbounded.Unbounded_String,
+     new Ada.Containers.Ordered_Sets (Element_Type => UString,
                                       "<"          => Ada.Strings.Unbounded."<",
                                       "="          => Ada.Strings.Unbounded."=");
 
@@ -89,7 +89,7 @@ package Gen.Utils is
    function Get_Attribute (Node    : in DOM.Core.Node;
                            Name    : in String;
                            Default : in String := "")
-                           return Ada.Strings.Unbounded.Unbounded_String;
+                           return UString;
 
    --  Get the value identified by the name from the attribute.
    --  Normalize the result string.
@@ -106,7 +106,7 @@ package Gen.Utils is
    function Get_Comment (Node : in DOM.Core.Node) return String;
 
    --  Returns a qualified name from a package name and a name.
-   function Qualify_Name (Pkg_Name : in Unbounded_String;
-                          Name     : in Unbounded_String) return Unbounded_String;
+   function Qualify_Name (Pkg_Name : in UString;
+                          Name     : in UString) return UString;
 
 end Gen.Utils;

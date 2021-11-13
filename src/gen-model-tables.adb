@@ -26,6 +26,7 @@ with EL.Variables.Default;
 with Gen.Model.Enums;
 package body Gen.Model.Tables is
 
+   use Ada.Strings.Unbounded;
    use type Gen.Model.Mappings.Basic_Type;
    use type Gen.Model.Mappings.Mapping_Definition_Access;
 
@@ -187,7 +188,7 @@ package body Gen.Model.Tables is
    procedure Set_Type (Into : in out Column_Definition;
                        Name : in String) is
    begin
-      Into.Type_Name := To_Unbounded_String (Name);
+      Into.Type_Name := To_UString (Name);
    end Set_Type;
 
    --  ------------------------------
@@ -319,7 +320,7 @@ package body Gen.Model.Tables is
    --  ------------------------------
    --  Create a table with the given name.
    --  ------------------------------
-   function Create_Table (Name : in Unbounded_String) return Table_Definition_Access is
+   function Create_Table (Name : in UString) return Table_Definition_Access is
       Table : constant Table_Definition_Access := new Table_Definition;
    begin
       Log.Debug ("Create table {0}", Name);
@@ -334,7 +335,7 @@ package body Gen.Model.Tables is
             Table.Pkg_Name := Unbounded_Slice (Table.Name, 1, Pos - 1);
             Table.Type_Name := Unbounded_Slice (Table.Name, Pos + 1, Length (Table.Name));
          else
-            Table.Pkg_Name := To_Unbounded_String ("ADO");
+            Table.Pkg_Name := To_UString ("ADO");
             Table.Type_Name := Table.Name;
          end if;
          Table.Table_Name := Table.Type_Name;
@@ -346,7 +347,7 @@ package body Gen.Model.Tables is
    --  Create a table column with the given name and add it to the table.
    --  ------------------------------
    procedure Add_Column (Table  : in out Table_Definition;
-                         Name   : in Unbounded_String;
+                         Name   : in UString;
                          Column : out Column_Definition_Access) is
    begin
       Column := new Column_Definition;
@@ -361,7 +362,7 @@ package body Gen.Model.Tables is
    --  Create a table association with the given name and add it to the table.
    --  ------------------------------
    procedure Add_Association (Table  : in out Table_Definition;
-                              Name   : in Unbounded_String;
+                              Name   : in UString;
                               Assoc  : out Association_Definition_Access) is
    begin
       Assoc := new Association_Definition;
@@ -376,7 +377,7 @@ package body Gen.Model.Tables is
    --  Create an operation with the given name and add it to the table.
    --  ------------------------------
    procedure Add_Operation (Table     : in out Table_Definition;
-                            Name      : in Unbounded_String;
+                            Name      : in UString;
                             Operation : out Model.Operations.Operation_Definition_Access) is
    begin
       Operation := new Model.Operations.Operation_Definition;
@@ -600,10 +601,10 @@ package body Gen.Model.Tables is
    begin
       Table.Set_Name (Name);
       if Pos > 0 then
-         Table.Pkg_Name := To_Unbounded_String (Name (Name'First .. Pos - 1));
-         Table.Type_Name := To_Unbounded_String (Name (Pos + 1 .. Name'Last));
+         Table.Pkg_Name := To_UString (Name (Name'First .. Pos - 1));
+         Table.Type_Name := To_UString (Name (Pos + 1 .. Name'Last));
       else
-         Table.Pkg_Name := To_Unbounded_String ("ADO");
+         Table.Pkg_Name := To_UString ("ADO");
          Table.Type_Name := Table.Name;
       end if;
    end Set_Table_Name;

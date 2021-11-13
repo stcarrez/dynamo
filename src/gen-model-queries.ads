@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-queries -- XML Mapped Database queries representation
---  Copyright (C) 2009, 2010, 2011, 2012, 2013 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-
 with Util.Beans.Objects;
 with Util.Encoders.SHA1;
 
@@ -25,13 +23,11 @@ with Gen.Model.List;
 with Gen.Model.Tables;
 package Gen.Model.Queries is
 
-   use Ada.Strings.Unbounded;
-
    --  ------------------------------
    --  Sort definition
    --  ------------------------------
    type Sort_Definition is new Definition with record
-      Sql    : Unbounded_String;
+      Sql    : UString;
    end record;
    type Sort_Definition_Access is access all Sort_Definition'Class;
 
@@ -65,8 +61,8 @@ package Gen.Model.Queries is
 
    --  Add a new sort mode for the query definition.
    procedure Add_Sort (Into : in out Query_Definition;
-                       Name : in Unbounded_String;
-                       Sql  : in Unbounded_String);
+                       Name : in UString;
+                       Sql  : in UString);
 
    --  Initialize the table definition instance.
    overriding
@@ -76,7 +72,7 @@ package Gen.Model.Queries is
    --  Table Definition
    --  ------------------------------
    type Query_File_Definition is new Query_Definition with record
-      File_Name      : Unbounded_String;
+      File_Name      : UString;
       Sha1           : Util.Encoders.SHA1.Digest;
       Queries        : aliased Gen.Model.Tables.Table_List.List_Definition;
       Queries_Bean   : Util.Beans.Objects.Object;
@@ -95,7 +91,7 @@ package Gen.Model.Queries is
 
    --  Add a new query to the definition.
    procedure Add_Query (Into   : in out Query_File_Definition;
-                        Name   : in Unbounded_String;
+                        Name   : in UString;
                         Query  : out Query_Definition_Access);
 
 private

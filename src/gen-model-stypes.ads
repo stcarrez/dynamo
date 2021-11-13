@@ -16,27 +16,22 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-
 with Util.Beans.Objects;
 
-with Gen.Model.List;
 with Gen.Model.Mappings;
 with Gen.Model.Packages;
 package Gen.Model.Stypes is
-
-   use Ada.Strings.Unbounded;
 
    --  ------------------------------
    --  Simple type definition
    --  ------------------------------
    type Stype_Definition is new Mappings.Mapping_Definition with record
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
-      Parent_Type    : Unbounded_String;
-      Type_Name      : Unbounded_String;
-      Nullable_Type  : Unbounded_String;
-      Pkg_Name       : Unbounded_String;
-      Sql_Type       : Unbounded_String;
+      Parent_Type    : UString;
+      Type_Name      : UString;
+      Nullable_Type  : UString;
+      Pkg_Name       : UString;
+      Sql_Type       : UString;
    end record;
    type Stype_Definition_Access is access all Stype_Definition'Class;
 
@@ -55,7 +50,7 @@ package Gen.Model.Stypes is
    procedure Initialize (O : in out Stype_Definition);
 
    --  Create an simple type with its parent type.
-   function Create_Stype (Name   : in Unbounded_String;
-                          Parent : in Unbounded_String) return Stype_Definition_Access;
+   function Create_Stype (Name   : in UString;
+                          Parent : in UString) return Stype_Definition_Access;
 
 end Gen.Model.Stypes;

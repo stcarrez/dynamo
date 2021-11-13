@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Unbounded;
 with Ada.Exceptions;
 with Ada.Text_IO;
 
@@ -36,9 +35,6 @@ with Util.Stacks;
 use Yaml;
 
 package body Gen.Artifacts.Yaml is
-
-   function To_String (S : Ada.Strings.Unbounded.Unbounded_String) return String
-                       renames Ada.Strings.Unbounded.To_String;
 
    use Ada.Strings.Unbounded;
    use Gen.Model;
@@ -128,7 +124,7 @@ package body Gen.Artifacts.Yaml is
 
             Log.Debug ("Set table {0} attribute {1}={2}", Node.Table.Name, Name, Value);
             if Name = "table" then
-               Node.Table.Table_Name := To_Unbounded_String (Value);
+               Node.Table.Table_Name := To_UString (Value);
             elsif Name = "description" or Name = "comment" then
                Node.Table.Set_Comment (Value);
             elsif Name = "hasList" then
@@ -146,7 +142,7 @@ package body Gen.Artifacts.Yaml is
             elsif Name = "length" then
                Node.Col.Set_Sql_Length (Value, Context);
             elsif Name = "column" then
-               Node.Col.Sql_Name := To_Unbounded_String (Value);
+               Node.Col.Sql_Name := To_UString (Value);
             elsif Name = "unique" then
                Node.Col.Unique := Value = "true" or Value = "yes";
             elsif Name = "nullable" or Name = "optional" then

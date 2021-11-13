@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-query -- Query artifact for Code Generator
---  Copyright (C) 2011, 2012, 2013, 2015, 2016, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2015, 2016, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Strings.Unbounded;
 with Ada.Directories;
 
 with Gen.Configs;
@@ -80,20 +79,20 @@ package body Gen.Artifacts.Query is
       procedure Register_Query (Query : in out Gen.Model.Queries.Query_File_Definition;
                                 Node  : in DOM.Core.Node);
 
-      Hash : Unbounded_String;
+      Hash : UString;
 
       --  ------------------------------
       --  Register the method definition in the table
       --  ------------------------------
       procedure Register_Operation (Table  : in out Query_Definition;
                                     Node   : in DOM.Core.Node) is
-         Name      : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Name      : constant UString := Gen.Utils.Get_Attribute (Node, "name");
          Operation : Gen.Model.Operations.Operation_Definition_Access;
          Param     : Gen.Model.Operations.Parameter_Definition_Access;
       begin
          Table.Add_Operation (Name, Operation);
-         Operation.Add_Parameter (To_Unbounded_String ("Outcome"),
-                                  To_Unbounded_String ("String"),
+         Operation.Add_Parameter (To_UString ("Outcome"),
+                                  To_UString ("String"),
                                   Param);
       end Register_Operation;
 
@@ -115,7 +114,7 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Column (Table  : in out Query_Definition;
                                  Column : in DOM.Core.Node) is
-         Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Column, "name");
+         Name  : constant UString := Gen.Utils.Get_Attribute (Column, "name");
          C     : Column_Definition_Access;
       begin
          Table.Add_Column (Name, C);
@@ -154,10 +153,10 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Sort (Query  : in out Query_Definition;
                                Node   : in DOM.Core.Node) is
-         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Name : constant UString := Gen.Utils.Get_Attribute (Node, "name");
          Sql  : constant String := Gen.Utils.Get_Data_Content (Node);
       begin
-         Query.Add_Sort (Name, To_Unbounded_String (Sql));
+         Query.Add_Sort (Name, To_UString (Sql));
       end Register_Sort;
 
       --  ------------------------------
@@ -178,7 +177,7 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Mapping (Query : in out Gen.Model.Queries.Query_File_Definition;
                                   Node  : in DOM.Core.Node) is
-         Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Name  : constant UString := Gen.Utils.Get_Attribute (Node, "name");
       begin
          Query.Initialize (Name, Node);
          Query.Set_Table_Name (To_String (Name));
@@ -205,7 +204,7 @@ package body Gen.Artifacts.Query is
       --  ------------------------------
       procedure Register_Query (Query : in out Gen.Model.Queries.Query_File_Definition;
                                 Node  : in DOM.Core.Node) is
-         Name : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "name");
+         Name : constant UString := Gen.Utils.Get_Attribute (Node, "name");
          C    : Gen.Model.Queries.Query_Definition_Access;
       begin
          Query.Add_Query (Name, C);
@@ -226,12 +225,12 @@ package body Gen.Artifacts.Query is
                                         Process => Register_Query);
 
          Table : constant Query_File_Definition_Access := new Query_File_Definition;
-         Pkg   : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "package");
-         Name  : constant Unbounded_String := Gen.Utils.Get_Attribute (Node, "table");
+         Pkg   : constant UString := Gen.Utils.Get_Attribute (Node, "package");
+         Name  : constant UString := Gen.Utils.Get_Attribute (Node, "table");
       begin
          Table.Initialize (Name, Node);
          Table.Set_Location (Path);
-         Table.File_Name := To_Unbounded_String (Ada.Directories.Simple_Name (Path));
+         Table.File_Name := To_UString (Ada.Directories.Simple_Name (Path));
          Table.Pkg_Name  := Pkg;
          Iterate_Mapping (Query_File_Definition (Table.all), Node, "class");
          Iterate_Query (Query_File_Definition (Table.all), Node, "query");

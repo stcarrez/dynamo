@@ -22,16 +22,18 @@ with Util.Strings;
 with Util.Log.Loggers;
 package body Gen.Model.XMI is
 
+   use Ada.Strings.Unbounded;
+
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.XMI");
 
-   procedure Append_Message (Into : in out Ada.Strings.Unbounded.Unbounded_String;
+   procedure Append_Message (Into : in out UString;
                              Message : in String);
 
    --  ------------------------------
    --  Append a message to the error message.  A newline is inserted if the buffer contains
    --  an existing message.
    --  ------------------------------
-   procedure Append_Message (Into    : in out Ada.Strings.Unbounded.Unbounded_String;
+   procedure Append_Message (Into    : in out UString;
                              Message : in String) is
    begin
       if Length (Into) > 0 then
@@ -46,7 +48,7 @@ package body Gen.Model.XMI is
    --  ------------------------------
    procedure Iterate (Model   : in Model_Map.Map;
                       On      : in Element_Type;
-                      Process : not null access procedure (Id : in Unbounded_String;
+                      Process : not null access procedure (Id : in UString;
                                                            Node : in Model_Element_Access)) is
       Iter : Model_Map_Cursor := Model.First;
    begin
@@ -88,7 +90,7 @@ package body Gen.Model.XMI is
    begin
       if Mode = BY_ID then
          declare
-            Pos : constant Model_Map_Cursor := Model.Find (To_Unbounded_String (Key));
+            Pos : constant Model_Map_Cursor := Model.Find (To_UString (Key));
          begin
             if Has_Element (Pos) then
                return Element (Pos);
@@ -143,7 +145,7 @@ package body Gen.Model.XMI is
                           Key     : in String;
                           Mode    : in Search_Type := BY_ID)
                           return Element_Type_Access is
-      Model_Pos : constant UML_Model_Map.Cursor := Model.Find (To_Unbounded_String (Name));
+      Model_Pos : constant UML_Model_Map.Cursor := Model.Find (To_UString (Name));
       Item      : Model_Element_Access;
    begin
       if UML_Model_Map.Has_Element (Model_Pos) then
@@ -188,7 +190,7 @@ package body Gen.Model.XMI is
    --  ------------------------------
    function Find (Model   : in UML_Model;
                   Current : in Model_Map.Map;
-                  Id      : in Ada.Strings.Unbounded.Unbounded_String)
+                  Id      : in UString)
                   return Model_Element_Access is
 
       Pos   : constant Natural := Index (Id, "#");
@@ -205,7 +207,7 @@ package body Gen.Model.XMI is
       end if;
       declare
          Len       : constant Natural := Length (Id);
-         Name      : constant Unbounded_String := Unbounded_Slice (Id, First, Pos - 1);
+         Name      : constant UString := Unbounded_Slice (Id, First, Pos - 1);
          Model_Pos : constant UML_Model_Map.Cursor := Model.Find (Name);
       begin
          if UML_Model_Map.Has_Element (Model_Pos) then
@@ -235,10 +237,10 @@ package body Gen.Model.XMI is
    --  ------------------------------
    procedure Reconcile (Model : in out UML_Model;
                         Debug : in Boolean := False) is
-      procedure Reconcile_Model (Key : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Reconcile_Model (Key : in UString;
                         Map : in out Model_Map.Map);
 
-      procedure Reconcile_Model (Key : in Ada.Strings.Unbounded.Unbounded_String;
+      procedure Reconcile_Model (Key : in UString;
                                  Map : in out Model_Map.Map) is
          pragma Unreferenced (Key);
 
@@ -333,7 +335,7 @@ package body Gen.Model.XMI is
    --  If an error is detected, return a message.  Returns an empty string if everything is ok.
    --  ------------------------------
    function Get_Error_Message (Node : in Model_Element) return String is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       if Length (Node.XMI_Id) = 0 then
          Append (Result, "the 'xmi.id' attribute is empty");
@@ -416,7 +418,7 @@ package body Gen.Model.XMI is
          if Tag.all in Tagged_Value_Element'Class and then
            Tagged_Value_Element'Class (Tag.all).Tag_Def = Definition
          then
-            return Ada.Strings.Unbounded.To_String (Tagged_Value_Element'Class (Tag.all).Value);
+            return To_String (Tagged_Value_Element'Class (Tag.all).Value);
          end if;
          Model_Vectors.Next (Pos);
       end loop;
@@ -429,29 +431,29 @@ package body Gen.Model.XMI is
    --  Returns the empty string if there is no comment.
    --  ------------------------------
    function Get_Comment (Node : in Model_Element) return String is
-      procedure Collect_Comment (Id   : in Unbounded_String;
+      procedure Collect_Comment (Id   : in UString;
                                  Item : in Model_Element_Access);
 
       Doc    : constant Tagged_Value_Element_Access := Node.Find_Tag_Value (TAG_DOCUMENTATION);
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
 
-      procedure Collect_Comment (Id   : in Unbounded_String;
+      procedure Collect_Comment (Id   : in UString;
                                  Item : in Model_Element_Access) is
          pragma Unreferenced (Id);
 
          Comment : constant Comment_Element_Access := Comment_Element'Class (Item.all)'Access;
       begin
          if Comment.Ref_Id = Node.XMI_Id then
-            Ada.Strings.Unbounded.Append (Result, Comment.Text);
+            Append (Result, Comment.Text);
          end if;
       end Collect_Comment;
 
    begin
       Iterate (Node.Model.all, XMI_COMMENT, Collect_Comment'Access);
       if Doc /= null then
-         Ada.Strings.Unbounded.Append (Result, Doc.Value);
+         Append (Result, Doc.Value);
       end if;
-      return Ada.Strings.Unbounded.To_String (Result);
+      return To_String (Result);
    end Get_Comment;
 
    --  ------------------------------
@@ -504,7 +506,7 @@ package body Gen.Model.XMI is
                                Profiles : in out Util.Strings.Sets.Set) is
       Pos : constant Natural := Util.Strings.Index (Ref, '#');
    begin
-      Node.Ref_Id := To_Unbounded_String (Ref);
+      Node.Ref_Id := To_UString (Ref);
       if Pos > 0 then
          declare
             First : constant Natural := Util.Strings.Rindex (Ref, '/', Pos);
@@ -541,7 +543,7 @@ package body Gen.Model.XMI is
    --  ------------------------------
    overriding
    function Get_Error_Message (Node : in Enum_Element) return String is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       Append (Result, Model_Element (Node).Get_Error_Message);
       if Node.Elements.Is_Empty then
@@ -769,7 +771,7 @@ package body Gen.Model.XMI is
    function Get_Error_Message (Node : in Association_Element) return String is
       use type Ada.Containers.Count_Type;
 
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       Append (Result, Model_Element (Node).Get_Error_Message);
       if Length (Node.Name) = 0 then
@@ -880,9 +882,9 @@ package body Gen.Model.XMI is
          Node.Set_Name (Item.Name);
          if not (Item.all in Tag_Definition_Element'Class) then
             Log.Error ("Element {0} is not a tag definition.  Tag is {1}, reference is {2}",
-                       Ada.Strings.Unbounded.To_String (Item.Name),
+                       To_String (Item.Name),
                        Ada.Tags.Expanded_Name (Item'Tag),
-                       Ada.Strings.Unbounded.To_String (Node.Ref_Id));
+                       To_String (Node.Ref_Id));
          else
             Node.Tag_Def := Tag_Definition_Element'Class (Item.all)'Access;
          end if;

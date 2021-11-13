@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -175,11 +175,11 @@ package body Gen.Commands.Templates is
                          Info      : in Patch) is
       procedure Save_Output (H       : in out Gen.Generator.Handler;
                              File    : in String;
-                             Content : in Ada.Strings.Unbounded.Unbounded_String);
+                             Content : in UString);
 
       procedure Save_Output (H       : in out Gen.Generator.Handler;
                              File    : in String;
-                             Content : in Ada.Strings.Unbounded.Unbounded_String) is
+                             Content : in UString) is
 
          type State is (MATCH_AFTER, MATCH_BEFORE, MATCH_DONE, MATCH_FAIL);
 
@@ -196,7 +196,7 @@ package body Gen.Commands.Templates is
          Output        : Util.Streams.Texts.Print_Stream;
          Missing       : Util.Strings.Vectors.Vector;
          After         : Util.Strings.Vectors.Vector;
-         Before        : Ada.Strings.Unbounded.Unbounded_String;
+         Before        : UString;
 
          procedure Process (Line : in String) is
          begin
@@ -242,7 +242,7 @@ package body Gen.Commands.Templates is
          begin
             Expand (Info.Missing, Missing, Context);
             Expand (Info.After, After, Context);
-            Before := To_Unbounded_String (EL.Utils.Eval (To_String (Info.Before), Context));
+            Before := To_UString (EL.Utils.Eval (To_String (Info.Before), Context));
          end Expand;
 
       begin
@@ -419,12 +419,12 @@ package body Gen.Commands.Templates is
                          Field   : in Command_Fields;
                          Value   : in Util.Beans.Objects.Object);
 
-   function To_String (Value : in Util.Beans.Objects.Object) return Unbounded_String;
+   function To_String (Value : in Util.Beans.Objects.Object) return UString;
 
    --  ------------------------------
    --  Convert the object value into a string and trim any space/tab/newlines.
    --  ------------------------------
-   function To_String (Value : in Util.Beans.Objects.Object) return Unbounded_String is
+   function To_String (Value : in Util.Beans.Objects.Object) return UString is
       Result    : constant String := Util.Beans.Objects.To_String (Value);
       First_Pos : Natural := Result'First;
       Last_Pos  : Natural := Result'Last;
@@ -440,7 +440,7 @@ package body Gen.Commands.Templates is
          exit when C /= ' ' and C /= ASCII.LF and C /= ASCII.CR and C /= ASCII.HT;
          Last_Pos := Last_Pos - 1;
       end loop;
-      return To_Unbounded_String (Result (First_Pos .. Last_Pos));
+      return To_UString (Result (First_Pos .. Last_Pos));
    end To_String;
 
    procedure Set_Member (Closure : in out Command_Loader;
@@ -477,16 +477,16 @@ package body Gen.Commands.Templates is
                Closure.Command.Templates.Include (To_String (Value));
 
             when FIELD_PARAM_NAME =>
-               Closure.P.Name := To_Unbounded_String (Value);
+               Closure.P.Name := To_String (Value);
 
             when FIELD_PARAM_OPTIONAL =>
                Closure.P.Is_Optional := To_Boolean (Value);
 
             when FIELD_PARAM_ARG =>
-               Closure.P.Argument := To_Unbounded_String (Value);
+               Closure.P.Argument := To_String (Value);
 
             when FIELD_PARAM =>
-               Closure.P.Value := To_Unbounded_String (Value);
+               Closure.P.Value := To_String (Value);
                Closure.Command.Params.Append (Closure.P);
                Closure.P.Name        := Ada.Strings.Unbounded.Null_Unbounded_String;
                Closure.P.Argument    := Ada.Strings.Unbounded.Null_Unbounded_String;
@@ -494,7 +494,7 @@ package body Gen.Commands.Templates is
                Closure.P.Is_Optional := False;
 
             when FIELD_BASEDIR =>
-               Closure.Command.Base_Dir := To_Unbounded_String (Value);
+               Closure.Command.Base_Dir := To_String (Value);
 
             when FIELD_COMMAND =>
                null;
@@ -503,7 +503,7 @@ package body Gen.Commands.Templates is
                Closure.Info.Optional := Util.Beans.Objects.To_Boolean (Value);
 
             when FIELD_INSERT_TEMPLATE =>
-               Closure.Info.Template := To_Unbounded_String (Value);
+               Closure.Info.Template := To_String (Value);
 
             when FIELD_MISSING =>
             Closure.Info.Missing.Append (To_String (Value));
@@ -512,18 +512,18 @@ package body Gen.Commands.Templates is
                Closure.Info.After.Append (To_String (Value));
 
             when FIELD_BEFORE =>
-               Closure.Info.Before := To_Unbounded_String (Value);
+               Closure.Info.Before := To_String (Value);
 
             when FIELD_PATCH_TITLE =>
-               Closure.Info.Title := To_Unbounded_String (Value);
+               Closure.Info.Title := To_String (Value);
 
             when FIELD_PATCH =>
                Closure.Command.Patches.Append (Closure.Info);
                Closure.Info.After.Clear;
                Closure.Info.Missing.Clear;
                Closure.Info.Optional := False;
-               Closure.Info.Before := To_Unbounded_String ("");
-               Closure.Info.Title  := To_Unbounded_String ("");
+               Closure.Info.Before := To_UString ("");
+               Closure.Info.Title  := To_UString ("");
 
          end case;
       end if;

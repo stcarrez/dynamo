@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012, 2016, 2017, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2016, 2017, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,8 +62,8 @@ package body Gen.Model.Operations is
    --  Add an operation parameter with the given name and type.
    --  ------------------------------
    procedure Add_Parameter (Into      : in out Operation_Definition;
-                            Name      : in Unbounded_String;
-                            Of_Type   : in Unbounded_String;
+                            Name      : in UString;
+                            Of_Type   : in UString;
                             Parameter : out Parameter_Definition_Access) is
    begin
       Parameter := new Parameter_Definition;
@@ -90,7 +90,7 @@ package body Gen.Model.Operations is
    --  ------------------------------
    --  Create an operation with the given name.
    --  ------------------------------
-   function Create_Operation (Name : in Unbounded_String) return Operation_Definition_Access is
+   function Create_Operation (Name : in UString) return Operation_Definition_Access is
       pragma Unreferenced (Name);
 
       Result : constant Operation_Definition_Access := new Operation_Definition;

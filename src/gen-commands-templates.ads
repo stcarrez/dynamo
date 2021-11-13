@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011, 2013, 2014, 2017, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2011, 2013, 2014, 2017, 2018, 2019, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,9 +47,9 @@ package Gen.Commands.Templates is
 private
 
    type Param is record
-      Name        : Ada.Strings.Unbounded.Unbounded_String;
-      Argument    : Ada.Strings.Unbounded.Unbounded_String;
-      Value       : Ada.Strings.Unbounded.Unbounded_String;
+      Name        : UString;
+      Argument    : UString;
+      Value       : UString;
       Is_Optional : Boolean := False;
    end record;
 
@@ -58,11 +58,11 @@ private
                                   Element_Type => Param);
 
    type Patch is record
-      Template  : Ada.Strings.Unbounded.Unbounded_String;
+      Template  : UString;
       After     : Util.Strings.Vectors.Vector;
       Missing   : Util.Strings.Vectors.Vector;
-      Before    : Ada.Strings.Unbounded.Unbounded_String;
-      Title     : Ada.Strings.Unbounded.Unbounded_String;
+      Before    : UString;
+      Title     : UString;
       Optional  : Boolean := False;
    end record;
 
@@ -71,11 +71,11 @@ private
                                  Element_Type => Patch);
 
    type Command is new Gen.Commands.Command with record
-      Name      : Ada.Strings.Unbounded.Unbounded_String;
-      Title     : Ada.Strings.Unbounded.Unbounded_String;
-      Usage     : Ada.Strings.Unbounded.Unbounded_String;
-      Help_Msg  : Ada.Strings.Unbounded.Unbounded_String;
-      Base_Dir  : Ada.Strings.Unbounded.Unbounded_String;
+      Name      : UString;
+      Title     : UString;
+      Usage     : UString;
+      Help_Msg  : UString;
+      Base_Dir  : UString;
       Templates : Util.Strings.Sets.Set;
       Patches   : Patch_Vectors.Vector;
       Params    : Param_Vectors.Vector;

@@ -18,7 +18,6 @@
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Strings.Hash;
-with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Gen.Model.Packages;
@@ -134,8 +133,8 @@ private
    type Document_Formatter_Access is access all Document_Formatter'Class;
 
    type File_Document is record
-      Name         : Ada.Strings.Unbounded.Unbounded_String;
-      Title        : Ada.Strings.Unbounded.Unbounded_String;
+      Name         : UString;
+      Title        : UString;
       State        : Doc_State := IN_PARA;
       Line_Number  : Natural := 0;
       Lines        : Line_Group_Vector;
@@ -242,7 +241,7 @@ private
                             Result  : in out File_Document);
 
    type Artifact is new Gen.Artifacts.Artifact with record
-      Xslt_Command : Ada.Strings.Unbounded.Unbounded_String;
+      Xslt_Command : UString;
       Format       : Doc_Format := DOC_WIKI_GOOGLE;
       Print_Footer : Boolean := True;
       Formatter    : Document_Formatter_Access;

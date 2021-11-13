@@ -29,6 +29,8 @@ with Util.Strings.Vectors;
 
 package body Gen.Model.Projects is
 
+   use Ada.Strings.Unbounded;
+
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Projects");
 
    --  Find the Dynamo.xml path associated with the given GNAT project file or installed
@@ -172,7 +174,7 @@ package body Gen.Model.Projects is
          end if;
          Project_Vectors.Next (Iter);
       end loop;
-      return Project_Reference '(null, To_Unbounded_String (Name), NONE);
+      return Project_Reference '(null, To_UString (Name), NONE);
    end Find_Dependency;
 
    --  ------------------------------
@@ -246,7 +248,7 @@ package body Gen.Model.Projects is
                              Project : out Project_Definition_Access) is
    begin
       Project      := new Project_Definition;
-      Project.Path := To_Unbounded_String (Path);
+      Project.Path := To_UString (Path);
       Project.Set_Name (Name);
       Log.Info ("Creating project {0} - {1}", Name, Path);
       Project_Definition'Class (Into).Add_Project (Project);
@@ -265,7 +267,7 @@ package body Gen.Model.Projects is
       end if;
 
       Log.Debug ("Adding module {0}", Name);
-      Project.Name    := To_Unbounded_String (Name);
+      Project.Name    := To_UString (Name);
       Project.Project := Into.Find_Project (Name);
       if Project.Project /= null then
          Project.Name := Project.Project.Name;
@@ -599,7 +601,7 @@ package body Gen.Model.Projects is
                               FIELD_DEPEND_NAME);
 
       type Project_Loader is record
-         Name : Unbounded_String;
+         Name : UString;
       end record;
       type Project_Loader_Access is access all Project_Loader;
 
@@ -807,7 +809,7 @@ package body Gen.Model.Projects is
       end Collect_Dynamo_Files;
 
    begin
-      Project.Path := To_Unbounded_String (Gen.Utils.Absolute_Path (File));
+      Project.Path := To_UString (Gen.Utils.Absolute_Path (File));
       Project.Root := null;
       Project.Add_Project (Project'Unchecked_Access);
       Project.Read_Project;
@@ -868,7 +870,7 @@ package body Gen.Model.Projects is
                         Result.Project := Def.Find_Project_By_Name (To_String (Result.Name));
                         if Result.Project = null then
                            Result.Project      := new Project_Definition;
-                           Result.Project.Path := To_Unbounded_String ("");
+                           Result.Project.Path := To_UString ("");
                            Result.Project.Set_Name (Result.Name);
                            Pending.Append (Result);
                         end if;
@@ -883,7 +885,7 @@ package body Gen.Model.Projects is
                                      Def.Get_Name, Result.Project.Get_Name, Dynamo);
                            if Dynamo /= "" then
                               if Path = "" then
-                                 Result.Project.Path := To_Unbounded_String (Dynamo);
+                                 Result.Project.Path := To_UString (Dynamo);
                               end if;
                               if not Has_File then
                                  Project.Dynamo_Files.Append (Dynamo);
@@ -914,7 +916,7 @@ package body Gen.Model.Projects is
                            Project.Dynamo_Files.Append (Dynamo);
                         end if;
                         Item.Project      := new Project_Definition;
-                        Item.Project.Path := To_Unbounded_String (Dynamo);
+                        Item.Project.Path := To_UString (Dynamo);
                         Item.Project.Set_Name (Item.Name);
                         Pending.Append (Item);
                         Log.Info ("Preparing to load {0} from {1}", Name, Dynamo);

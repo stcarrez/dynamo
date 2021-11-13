@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012, 2016, 2017 Stephane Carrez
+--  Copyright (C) 2012, 2016, 2017, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,10 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-
 with Util.Beans.Objects;
 
 with Gen.Model.List;
 package Gen.Model.Operations is
-
-   use Ada.Strings.Unbounded;
 
    type Operation_Type is (UNKNOWN, ASF_ACTION, ASF_UPLOAD, AWA_EVENT);
 
@@ -55,21 +51,21 @@ package Gen.Model.Operations is
 
    --  Add an operation parameter with the given name and type.
    procedure Add_Parameter (Into      : in out Operation_Definition;
-                            Name      : in Unbounded_String;
-                            Of_Type   : in Unbounded_String;
+                            Name      : in UString;
+                            Of_Type   : in UString;
                             Parameter : out Parameter_Definition_Access);
 
    --  Get the operation type.
    function Get_Type (From : in Operation_Definition) return Operation_Type;
 
    --  Create an operation with the given name.
-   function Create_Operation (Name : in Unbounded_String) return Operation_Definition_Access;
+   function Create_Operation (Name : in UString) return Operation_Definition_Access;
 
 private
 
    type Parameter_Definition is new Definition with record
       --  The parameter type name.
-      Type_Name : Unbounded_String;
+      Type_Name : UString;
    end record;
 
    package Parameter_List is new Gen.Model.List (T         => Parameter_Definition,
@@ -78,7 +74,7 @@ private
    type Operation_Definition is new Definition with record
       Parameters      : aliased Parameter_List.List_Definition;
       Parameters_Bean : Util.Beans.Objects.Object;
-      Return_Type     : Unbounded_String;
+      Return_Type     : UString;
       Kind            : Operation_Type := UNKNOWN;
    end record;
 

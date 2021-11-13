@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
 with Ada.Containers.Vectors;
 
 with Util.Beans.Objects;
@@ -26,8 +25,6 @@ with Gen.Utils;
 with Gen.Utils.GNAT;
 package Gen.Model.Projects is
 
-   use Ada.Strings.Unbounded;
-
    type Project_Definition is tagged;
    type Project_Definition_Access is access all Project_Definition'Class;
 
@@ -35,7 +32,7 @@ package Gen.Model.Projects is
 
    type Project_Reference is record
       Project : Project_Definition_Access := null;
-      Name    : Unbounded_String;
+      Name    : UString;
       Kind    : Dependency_Type := NONE;
    end record;
 
@@ -47,7 +44,7 @@ package Gen.Model.Projects is
    --  Project Definition
    --  ------------------------------
    type Project_Definition is new Definition with record
-      Path    : Unbounded_String;
+      Path    : UString;
       Props   : Util.Properties.Manager;
       Modules : Project_Vectors.Vector;
 
@@ -169,7 +166,7 @@ package Gen.Model.Projects is
    type Root_Project_Definition is new Project_Definition with record
       Projects    : Project_Vectors.Vector;
 
-      Install_Dir : Unbounded_String;
+      Install_Dir : UString;
    end record;
 
    --  Add the project in the global project list on the root project instance.

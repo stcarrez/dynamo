@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-plugins -- Plugin creation and management commands for dynamo
---  Copyright (C) 2012, 2015, 2017, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2019, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,22 +42,22 @@ package body Gen.Commands.Plugins is
       use GNAT.Command_Line;
 
       function Get_Directory_Name (Name     : in String;
-                                   Name_Dir : in Ada.Strings.Unbounded.Unbounded_String)
+                                   Name_Dir : in UString)
         return String;
 
       function Get_Directory_Name (Name     : in String;
-                                   Name_Dir : in Ada.Strings.Unbounded.Unbounded_String)
+                                   Name_Dir : in UString)
                                    return String is
       begin
          if Ada.Strings.Unbounded.Length (Name_Dir) = 0 then
             return Name;
          else
-            return Ada.Strings.Unbounded.To_String (Name_Dir);
+            return To_String (Name_Dir);
          end if;
       end Get_Directory_Name;
 
       Result_Dir : constant String := Generator.Get_Result_Directory;
-      Name_Dir   : Ada.Strings.Unbounded.Unbounded_String;
+      Name_Dir   : UString;
    begin
       --  If a dynamo.xml file exists, read it.
       if Ada.Directories.Exists ("dynamo.xml") then
@@ -73,7 +73,7 @@ package body Gen.Commands.Plugins is
          when ASCII.NUL => exit;
 
          when 'd' =>
-            Name_Dir := Ada.Strings.Unbounded.To_Unbounded_String (Parameter);
+            Name_Dir := To_UString (Parameter);
 
          when 'l' =>
             declare

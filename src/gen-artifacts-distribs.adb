@@ -128,7 +128,7 @@ package body Gen.Artifacts.Distribs is
                Context.Error ("Invalid include name {0}", Name);
                return;
             end if;
-            Match.Match := To_Unbounded_String (Name);
+            Match.Match := To_UString (Name);
             Rule.Matches.Append (Match);
          end Collect_Includes;
 
@@ -143,7 +143,7 @@ package body Gen.Artifacts.Distribs is
                Context.Error ("Invalid exclude name {0}", Name);
                return;
             end if;
-            Match.Match := To_Unbounded_String (Name);
+            Match.Match := To_UString (Name);
             Rule.Excludes.Append (Match);
          end Collect_Excludes;
 
@@ -166,7 +166,7 @@ package body Gen.Artifacts.Distribs is
                Context.Error ("Invalid fileset directory {0}", Dir);
                return;
             end if;
-            Match.Base_Dir := To_Unbounded_String (Dir);
+            Match.Base_Dir := To_UString (Dir);
             Iterate (Rule, Node, "include");
             Iterate_Excludes (Rule, Node, "exclude", False);
          end Collect_Filesets;
@@ -179,7 +179,7 @@ package body Gen.Artifacts.Distribs is
          Log.Debug ("Install {0}", Dir);
 
          if Rule /= null then
-            Rule.Dir := To_Unbounded_String (Dir);
+            Rule.Dir := To_UString (Dir);
             if Level = "info" then
                Rule.Level := Util.Log.INFO_LEVEL;
             elsif Level = "debug" then
@@ -479,7 +479,7 @@ package body Gen.Artifacts.Distribs is
       Rel_Path : constant String := Get_Relative_Path (File.Dir.all);
       Path     : constant String := Get_Strip_Path (Base, Rel_Path);
    begin
-      return Util.Files.Compose (Ada.Strings.Unbounded.To_String (Rule.Dir),
+      return Util.Files.Compose (To_String (Rule.Dir),
                                  Util.Files.Compose (Path, File.Name));
    end Get_Target_Path;
 
@@ -576,8 +576,8 @@ package body Gen.Artifacts.Distribs is
 
       procedure Scan_Pattern (Pos : in Match_Rule_Vector.Cursor) is
          Match   : constant Match_Rule := Match_Rule_Vector.Element (Pos);
-         Base    : constant String := Ada.Strings.Unbounded.To_String (Match.Base_Dir);
-         Pattern : constant String := Ada.Strings.Unbounded.To_String (Match.Match);
+         Base    : constant String := To_String (Match.Base_Dir);
+         Pattern : constant String := To_String (Match.Match);
       begin
          Log.Debug ("Scan pattern base {0} - pat {1}", Base, Pattern);
          if Base = "" then

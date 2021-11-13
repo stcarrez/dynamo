@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-distrib -- Distrib command for dynamo
---  Copyright (C) 2012, 2013, 2014, 2017, 2018, 2020 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2017, 2018, 2020, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 with GNAT.Regpat;
 with Util.Strings;
@@ -31,7 +30,7 @@ package body Gen.Commands.Distrib is
       Matches : GNAT.Regpat.Match_Array (0 .. 1);
       Build   : constant String := Generator.Get_Project_Property ("build", "1");
       Number  : Natural := 0;
-      Result  : Unbounded_String;
+      Result  : UString;
    begin
       if GNAT.Regpat.Match (Pattern, Build) then
          GNAT.Regpat.Match (Pattern, Build, Matches);

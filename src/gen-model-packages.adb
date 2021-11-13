@@ -32,6 +32,8 @@ with Util.Strings.Transforms;
 with Util.Log.Loggers;
 package body Gen.Model.Packages is
 
+   use Ada.Strings.Unbounded;
+
    Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Model.Packages");
 
    --  ------------------------------
@@ -81,7 +83,7 @@ package body Gen.Model.Packages is
    --  Find the type identified by the name.
    --  ------------------------------
    function Find_Type (From : in Package_Definition;
-                       Name : in Unbounded_String)
+                       Name : in UString)
                        return Gen.Model.Mappings.Mapping_Definition_Access is
       Pos : Mappings.Cursor;
    begin
@@ -152,7 +154,7 @@ package body Gen.Model.Packages is
                              Stype : access Gen.Model.Stypes.Stype_Definition'Class) is
       use type Mappings.Mapping_Definition_Access;
 
-      Name : constant String := Stype.Get_Name;
+      Name   : constant String := Stype.Get_Name;
       Result : Gen.Model.Mappings.Mapping_Definition_Access := null;
       Kind   : Mappings.Basic_Type := Mappings.T_INTEGER;
    begin
@@ -167,7 +169,7 @@ package body Gen.Model.Packages is
       O.Stypes.Append (Stype.all'Access);
 
       if Length (Stype.Parent_Type) > 0 then
-         Result := Gen.Model.Mappings.Find_Type (Stype.Parent_Type, false);
+         Result := Gen.Model.Mappings.Find_Type (Stype.Parent_Type, False);
          if Result /= null then
             Kind := Result.Kind;
          end if;
@@ -191,7 +193,7 @@ package body Gen.Model.Packages is
       end if;
       Table.Package_Def.Tables.Append (Table.all'Access);
       Table.Package_Def.Types.Include (Table.Name, Table.all'Access);
-      if O.Is_Generation_Enabled (Ada.Strings.Unbounded.To_String (Table.Pkg_Name)) then
+      if O.Is_Generation_Enabled (To_String (Table.Pkg_Name)) then
          O.Tables.Append (Table.all'Access);
       end if;
    end Register_Table;
@@ -223,16 +225,16 @@ package body Gen.Model.Packages is
    --  Register or find the package knowing its name
    --  ------------------------------
    procedure Register_Package (O      : in out Model_Definition;
-                               Name   : in Unbounded_String;
+                               Name   : in UString;
                                Result : out Package_Definition_Access) is
       Pkg : constant String := Util.Strings.Transforms.To_Upper_Case (To_String (Name));
-      Key : constant Unbounded_String := To_Unbounded_String (Pkg);
+      Key : constant UString := To_UString (Pkg);
       Pos : constant Package_Map.Cursor := O.Packages.Find (Key);
    begin
       if not Package_Map.Has_Element (Pos) then
          declare
             Map : Ada.Strings.Maps.Character_Mapping;
-            Base_Name : Unbounded_String;
+            Base_Name : UString;
          begin
             Map := Ada.Strings.Maps.To_Mapping (From => ".", To => "-");
             Base_Name := Translate (Name, Map);
@@ -277,7 +279,7 @@ package body Gen.Model.Packages is
    function Is_Generation_Enabled (Model : in Model_Definition;
                                    Name  : in String) return Boolean is
       Upper_Name : constant String := Util.Strings.Transforms.To_Upper_Case (Name);
-      Key        : constant Unbounded_String := To_Unbounded_String (Upper_Name);
+      Key        : constant UString := To_UString (Upper_Name);
    begin
       return not Model.Packages.Element (Key).Is_Predefined
         and (Model.Gen_Packages.Is_Empty or Model.Gen_Packages.Contains (Upper_Name));
@@ -352,18 +354,18 @@ package body Gen.Model.Packages is
                   null;
 
                when Operations.ASF_ACTION =>
-                  Used_Spec_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
-                  Used_Body_Types.Include (To_Unbounded_String ("ASF.Events.Faces.Actions"));
+                  Used_Spec_Types.Include (To_UString ("Util.Beans.Methods"));
+                  Used_Body_Types.Include (To_UString ("ASF.Events.Faces.Actions"));
 
                when Operations.ASF_UPLOAD =>
-                  Used_Spec_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
-                  Used_Spec_Types.Include (To_Unbounded_String ("ASF.Parts"));
-                  Used_Body_Types.Include (To_Unbounded_String ("ASF.Parts.Upload_Method"));
+                  Used_Spec_Types.Include (To_UString ("Util.Beans.Methods"));
+                  Used_Spec_Types.Include (To_UString ("ASF.Parts"));
+                  Used_Body_Types.Include (To_UString ("ASF.Parts.Upload_Method"));
 
                when Operations.AWA_EVENT =>
-                  Used_Spec_Types.Include (To_Unbounded_String ("Util.Beans.Methods"));
-                  Used_Spec_Types.Include (To_Unbounded_String ("AWA.Events"));
-                  Used_Body_Types.Include (To_Unbounded_String ("AWA.Events.Action_Method"));
+                  Used_Spec_Types.Include (To_UString ("Util.Beans.Methods"));
+                  Used_Spec_Types.Include (To_UString ("AWA.Events"));
+                  Used_Body_Types.Include (To_UString ("AWA.Events.Action_Method"));
 
             end case;
             Operation_List.Next (Iter);
@@ -397,7 +399,7 @@ package body Gen.Model.Packages is
 
                      when Model.Mappings.T_ENUM | Model.Mappings.T_BEAN | Model.Mappings.T_TABLE =>
                         if Pkg'Length > 0 and Pkg /= O.Name and not Col.Use_Foreign_Key_Type then
-                           Used_Spec_Types.Include (To_Unbounded_String (Pkg));
+                           Used_Spec_Types.Include (To_UString (Pkg));
                         end if;
 
                      when others =>
@@ -417,11 +419,11 @@ package body Gen.Model.Packages is
 
          --  If the table is using serialization, add the Serializable.IO package.
          if Table.Is_Serializable then
-            Used_Spec_Types.Include (To_Unbounded_String ("Util.Serialize.IO"));
-            Used_Body_Types.Include (To_Unbounded_String ("ADO.Utils.Serialize"));
+            Used_Spec_Types.Include (To_UString ("Util.Serialize.IO"));
+            Used_Body_Types.Include (To_UString ("ADO.Utils.Serialize"));
          end if;
          if Table.Is_Auditable then
-            Used_Spec_Types.Include (To_Unbounded_String ("ADO.Audits"));
+            Used_Spec_Types.Include (To_UString ("ADO.Audits"));
          end if;
       end Prepare_Table;
 
@@ -447,7 +449,7 @@ package body Gen.Model.Packages is
       begin
          while Gen.Utils.String_Set.Has_Element (P) loop
             declare
-               Name : constant Unbounded_String := Gen.Utils.String_Set.Element (P);
+               Name : constant UString := Gen.Utils.String_Set.Element (P);
             begin
                Log.Info ("with {0}", Name);
                Into.Values.Append (Util.Beans.Objects.To_Object (Name));
@@ -585,8 +587,8 @@ package body Gen.Model.Packages is
                           Target_Dir : in String;
                           Model_Dir  : in String) is
    begin
-      O.Dir_Name := To_Unbounded_String (Target_Dir);
-      O.DB_Name  := To_Unbounded_String (Model_Dir);
+      O.Dir_Name := To_UString (Target_Dir);
+      O.DB_Name  := To_UString (Model_Dir);
    end Set_Dirname;
 
    --  ------------------------------
@@ -613,7 +615,7 @@ package body Gen.Model.Packages is
       T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Tables'Unchecked_Access;
    begin
       O.Tables_Bean := Util.Beans.Objects.To_Object (T, Util.Beans.Objects.STATIC);
-      O.Dir_Name    := To_Unbounded_String ("src");
+      O.Dir_Name    := To_UString ("src");
    end Initialize;
 
    --  ------------------------------
@@ -692,7 +694,7 @@ package body Gen.Model.Packages is
    --  Find the type identified by the name.
    --  ------------------------------
    function Find_Type (From : in Model_Definition;
-                       Name : in Unbounded_String)
+                       Name : in UString)
                        return Gen.Model.Mappings.Mapping_Definition_Access is
       N : constant Natural := Ada.Strings.Unbounded.Index (Name, ".", Ada.Strings.Backward);
       L : constant Natural := Ada.Strings.Unbounded.Length (Name);
@@ -704,10 +706,10 @@ package body Gen.Model.Packages is
          Pkg_Name  : constant String := Ada.Strings.Unbounded.Slice (Name, 1, N - 1);
          Base_Name : constant String := Ada.Strings.Unbounded.Slice (Name, N + 1, L);
          Key       : constant String := Util.Strings.Transforms.To_Upper_Case (Pkg_Name);
-         Pos       : constant Package_Map.Cursor := From.Packages.Find (To_Unbounded_String (Key));
+         Pos       : constant Package_Map.Cursor := From.Packages.Find (To_UString (Key));
       begin
          if Package_Map.Has_Element (Pos) then
-            return Package_Map.Element (Pos).Find_Type (To_Unbounded_String (Base_Name));
+            return Package_Map.Element (Pos).Find_Type (To_UString (Base_Name));
          else
             return null;
          end if;

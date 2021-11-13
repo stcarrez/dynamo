@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-beans -- Ada Bean declarations
---  Copyright (C) 2012, 2013, 2018 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,7 @@ package body Gen.Model.Beans is
    --  Create an attribute with the given name and add it to the bean.
    --  ------------------------------
    procedure Add_Attribute (Bean   : in out Bean_Definition;
-                            Name   : in Unbounded_String;
+                            Name   : in UString;
                             Column : out Gen.Model.Tables.Column_Definition_Access) is
    begin
       Column := new Gen.Model.Tables.Column_Definition;
@@ -59,7 +59,9 @@ package body Gen.Model.Beans is
    --  ------------------------------
    --  Create a table with the given name.
    --  ------------------------------
-   function Create_Bean (Name : in Unbounded_String) return Bean_Definition_Access is
+   function Create_Bean (Name : in UString) return Bean_Definition_Access is
+      use Ada.Strings.Unbounded;
+
       Bean : constant Bean_Definition_Access := new Bean_Definition;
    begin
       Bean.Kind := Mappings.T_BEAN;
@@ -71,7 +73,7 @@ package body Gen.Model.Beans is
             Bean.Pkg_Name := Unbounded_Slice (Bean.Name, 1, Pos - 1);
             Bean.Type_Name := Unbounded_Slice (Bean.Name, Pos + 1, Length (Bean.Name));
          else
-            Bean.Pkg_Name := To_Unbounded_String ("ADO");
+            Bean.Pkg_Name := To_UString ("ADO");
             Bean.Type_Name := Bean.Name;
          end if;
       end;

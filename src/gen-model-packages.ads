@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 
 with Ada.Containers.Hashed_Maps;
-with Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Hash;
 
 with Util.Beans.Objects;
@@ -32,8 +31,6 @@ limited with Gen.Model.Queries;
 limited with Gen.Model.Beans;
 limited with Gen.Model.Stypes;
 package Gen.Model.Packages is
-
-   use Ada.Strings.Unbounded;
 
    --  ------------------------------
    --  Model Definition
@@ -79,7 +76,7 @@ package Gen.Model.Packages is
 
    --  Find the type identified by the name.
    function Find_Type (From : in Package_Definition;
-                       Name : in Unbounded_String)
+                       Name : in UString)
                        return Gen.Model.Mappings.Mapping_Definition_Access;
 
    --  Get the model which contains all the package definitions.
@@ -107,7 +104,7 @@ package Gen.Model.Packages is
 
    --  Register or find the package knowing its name
    procedure Register_Package (O      : in out Model_Definition;
-                               Name   : in Unbounded_String;
+                               Name   : in UString;
                                Result : out Package_Definition_Access);
 
    --  Register the declaration of the given enum in the model.
@@ -139,7 +136,7 @@ package Gen.Model.Packages is
 
    --  Find the type identified by the name.
    function Find_Type (From : in Model_Definition;
-                       Name : in Unbounded_String)
+                       Name : in UString)
                        return Gen.Model.Mappings.Mapping_Definition_Access;
 
    --  Set the directory name associated with the model. This directory name allows to
@@ -182,7 +179,7 @@ package Gen.Model.Packages is
    procedure Prepare (O : in out Model_Definition);
 
    package Package_Map is
-     new Ada.Containers.Hashed_Maps (Key_Type        => Unbounded_String,
+     new Ada.Containers.Hashed_Maps (Key_Type        => UString,
                                      Element_Type    => Package_Definition_Access,
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Keys => "=");
@@ -280,7 +277,7 @@ private
       Types        : Gen.Model.Mappings.Mapping_Maps.Map;
 
       --  The base name for the package (ex: gen-model-users)
-      Base_Name    : Unbounded_String;
+      Base_Name    : UString;
 
       --  The global model (used to resolve types from other packages).
       Model              : Model_Definition_Access;
@@ -317,10 +314,10 @@ private
       Packages     : Package_Map.Map;
 
       --  Directory associated with the model ('src', 'samples', 'regtests', ...).
-      Dir_Name     : Unbounded_String;
+      Dir_Name     : UString;
 
       --  Directory that contains the SQL and model files.
-      DB_Name      : Unbounded_String;
+      DB_Name      : UString;
 
       --  When not empty, a list of packages that must be taken into account for the generation.
       --  By default all packages and tables defined in the model are generated.

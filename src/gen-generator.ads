@@ -252,7 +252,7 @@ private
                                      Hash            => Ada.Strings.Unbounded.Hash,
                                      Equivalent_Keys => "=");
 
-   type Object_Access is access all Util.Beans.Objects.Object;
+   type Object_Access is access all UBO.Object;
 
    type Handler is new ASF.Applications.Main.Application and Gen.Artifacts.Generator with record
       Conf       : ASF.Applications.Config;

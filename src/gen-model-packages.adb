@@ -42,13 +42,13 @@ package body Gen.Model.Packages is
    --  ------------------------------
    overriding
    function Get_Value (From : in Package_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Name);
+         return UBO.To_Object (From.Name);
 
       elsif Name = "package" then
-         return Util.Beans.Objects.To_Object (From.Base_Name);
+         return UBO.To_Object (From.Base_Name);
 
       elsif Name = "tables" then
          return From.Tables_Bean;
@@ -72,7 +72,7 @@ package body Gen.Model.Packages is
          return From.Used_Body;
 
       elsif Name = "useCalendarTime" then
-         return Util.Beans.Objects.To_Object (From.Uses_Calendar_Time);
+         return UBO.To_Object (From.Uses_Calendar_Time);
 
       else
          return Definition (From).Get_Value (Name);
@@ -242,8 +242,7 @@ package body Gen.Model.Packages is
             Result := new Package_Definition;
             Result.Set_Name (Name);
             Result.Model := O'Unchecked_Access;
-            Result.Tables_Bean := Util.Beans.Objects.To_Object (Result.Tables'Access,
-                                                                Util.Beans.Objects.STATIC);
+            Result.Tables_Bean := UBO.To_Object (Result.Tables'Access, UBO.STATIC);
             Util.Strings.Transforms.To_Lower_Case (To_String (Base_Name),
                                                    Result.Base_Name);
             O.Packages.Insert (Key, Result);
@@ -452,7 +451,7 @@ package body Gen.Model.Packages is
                Name : constant UString := Gen.Utils.String_Set.Element (P);
             begin
                Log.Info ("with {0}", Name);
-               Into.Values.Append (Util.Beans.Objects.To_Object (Name));
+               Into.Values.Append (UBO.To_Object (Name));
             end;
             Gen.Utils.String_Set.Next (P);
          end loop;
@@ -504,15 +503,14 @@ package body Gen.Model.Packages is
    --  ------------------------------
    overriding
    procedure Initialize (O : in out Package_Definition) is
-      use Util.Beans.Objects;
    begin
-      O.Enums_Bean   := Util.Beans.Objects.To_Object (O.Enums'Unchecked_Access, STATIC);
-      O.Stypes_Bean  := Util.Beans.Objects.To_Object (O.Stypes'Unchecked_Access, STATIC);
-      O.Tables_Bean  := Util.Beans.Objects.To_Object (O.Tables'Unchecked_Access, STATIC);
-      O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access, STATIC);
-      O.Beans_Bean   := Util.Beans.Objects.To_Object (O.Beans'Unchecked_Access, STATIC);
-      O.Used_Spec    := Util.Beans.Objects.To_Object (O.Used_Spec_Types'Unchecked_Access, STATIC);
-      O.Used_Body    := Util.Beans.Objects.To_Object (O.Used_Body_Types'Unchecked_Access, STATIC);
+      O.Enums_Bean   := UBO.To_Object (O.Enums'Unchecked_Access, UBO.STATIC);
+      O.Stypes_Bean  := UBO.To_Object (O.Stypes'Unchecked_Access, UBO.STATIC);
+      O.Tables_Bean  := UBO.To_Object (O.Tables'Unchecked_Access, UBO.STATIC);
+      O.Queries_Bean := UBO.To_Object (O.Queries'Unchecked_Access, UBO.STATIC);
+      O.Beans_Bean   := UBO.To_Object (O.Beans'Unchecked_Access, UBO.STATIC);
+      O.Used_Spec    := UBO.To_Object (O.Used_Spec_Types'Unchecked_Access, UBO.STATIC);
+      O.Used_Body    := UBO.To_Object (O.Used_Body_Types'Unchecked_Access, UBO.STATIC);
    end Initialize;
 
    --  ------------------------------
@@ -540,7 +538,7 @@ package body Gen.Model.Packages is
    --  Get the element at the current row index.
    --  ------------------------------
    overriding
-   function Get_Row (From  : List_Object) return Util.Beans.Objects.Object is
+   function Get_Row (From  : List_Object) return UBO.Object is
    begin
       Log.Debug ("Getting row {0}", Natural'Image (From.Row));
       return From.Values.Element (From.Row);
@@ -552,11 +550,11 @@ package body Gen.Model.Packages is
    --  ------------------------------
    overriding
    function Get_Value (From : in List_Object;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
       pragma Unreferenced (From);
       pragma Unreferenced (Name);
    begin
-      return Util.Beans.Objects.Null_Object;
+      return UBO.Null_Object;
    end Get_Value;
 
    --  ------------------------------
@@ -565,13 +563,13 @@ package body Gen.Model.Packages is
    --  ------------------------------
    overriding
    function Get_Value (From : in Model_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "tables" then
          return From.Tables_Bean;
 
       elsif Name = "dirname" then
-         return Util.Beans.Objects.To_Object (From.Dir_Name);
+         return UBO.To_Object (From.Dir_Name);
 
       else
          return Definition (From).Get_Value (Name);
@@ -614,7 +612,7 @@ package body Gen.Model.Packages is
    procedure Initialize (O : in out Model_Definition) is
       T : constant Util.Beans.Basic.Readonly_Bean_Access := O.Tables'Unchecked_Access;
    begin
-      O.Tables_Bean := Util.Beans.Objects.To_Object (T, Util.Beans.Objects.STATIC);
+      O.Tables_Bean := UBO.To_Object (T, UBO.STATIC);
       O.Dir_Name    := To_UString ("src");
    end Initialize;
 

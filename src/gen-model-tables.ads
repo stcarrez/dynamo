@@ -20,8 +20,6 @@ with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded.Hash;
 
-with Util.Beans.Objects;
-
 with Gen.Model.List;
 with Gen.Model.Packages;
 with Gen.Model.Mappings;
@@ -37,7 +35,7 @@ package Gen.Model.Tables is
    type Column_Definition is new Definition with record
       Number   : Natural := 0;
       Table    : Table_Definition_Access;
-      Bean     : Util.Beans.Objects.Object;
+      Bean     : UBO.Object;
 
       --  The column type name.
       Type_Name : UString;
@@ -79,7 +77,7 @@ package Gen.Model.Tables is
       Use_Foreign_Key_Type : Boolean := False;
 
       --  The class generator to use for this column.
-      Generator    : Util.Beans.Objects.Object;
+      Generator    : UBO.Object;
 
       --  The type mapping of the column.
       Type_Mapping : Gen.Model.Mappings.Mapping_Definition_Access;
@@ -90,7 +88,7 @@ package Gen.Model.Tables is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Column_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Prepare the generation of the model.
    overriding
@@ -136,7 +134,7 @@ package Gen.Model.Tables is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Association_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Prepare the generation of the model.
    overriding
@@ -153,11 +151,11 @@ package Gen.Model.Tables is
    --  ------------------------------
    type Table_Definition is new Mappings.Mapping_Definition with record
       Members          : aliased Column_List.List_Definition;
-      Members_Bean     : Util.Beans.Objects.Object;
+      Members_Bean     : UBO.Object;
       Auditables       : aliased Column_List.List_Definition;
-      Auditables_Bean  : Util.Beans.Objects.Object;
+      Auditables_Bean  : UBO.Object;
       Operations       : aliased Operation_List.List_Definition;
-      Operations_Bean  : Util.Beans.Objects.Object;
+      Operations_Bean  : UBO.Object;
       Parent           : Table_Definition_Access;
       Parent_Name      : UString;
       Package_Def      : Gen.Model.Packages.Package_Definition_Access;
@@ -195,7 +193,7 @@ package Gen.Model.Tables is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Table_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Prepare the generation of the model.
    overriding

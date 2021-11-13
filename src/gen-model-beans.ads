@@ -16,8 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Util.Beans.Objects;
-
 with Gen.Model.Tables;
 package Gen.Model.Beans is
 
@@ -31,7 +29,7 @@ package Gen.Model.Beans is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : in Bean_Definition;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    --  Create an attribute with the given name and add it to the bean.
    procedure Add_Attribute (Bean   : in out Bean_Definition;

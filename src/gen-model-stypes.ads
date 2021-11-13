@@ -16,8 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Util.Beans.Objects;
-
 with Gen.Model.Mappings;
 with Gen.Model.Packages;
 package Gen.Model.Stypes is
@@ -39,7 +37,7 @@ package Gen.Model.Stypes is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Stype_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Prepare the generation of the model.
    overriding

@@ -65,14 +65,14 @@ package body Gen.Model.Projects is
    --  ------------------------------
    overriding
    function Get_Value (From : in Project_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Name);
+         return UBO.To_Object (From.Name);
       elsif From.Props.Exists (Name) then
-         return Util.Beans.Objects.To_Object (String '(From.Props.Get (Name)));
+         return UBO.To_Object (String '(From.Props.Get (Name)));
       else
-         return Util.Beans.Objects.Null_Object;
+         return UBO.Null_Object;
       end if;
    end Get_Value;
 
@@ -468,7 +468,6 @@ package body Gen.Model.Projects is
    procedure Save (Project : in out Project_Definition;
                    Path    : in String) is
       use Util.Streams;
-      use Util.Beans.Objects;
 
       procedure Save_Dependency (Pos : in Project_Vectors.Cursor);
       procedure Save_Module (Pos : in Project_Vectors.Cursor);
@@ -486,7 +485,7 @@ package body Gen.Model.Projects is
             Output.Write_String (ASCII.LF & "    ");
             Output.Start_Entity (Name => "depend");
             Output.Write_Attribute (Name  => "name",
-                                    Value => To_Object (Depend.Name));
+                                    Value => UBO.To_Object (Depend.Name));
             Output.End_Entity (Name => "depend");
          end if;
       end Save_Dependency;
@@ -499,7 +498,7 @@ package body Gen.Model.Projects is
             Output.Write_String (ASCII.LF & "    ");
             Output.Start_Entity (Name => "module");
             Output.Write_Attribute (Name  => "name",
-                                    Value => Util.Beans.Objects.To_Object (Name));
+                                    Value => UBO.To_Object (Name));
             Output.End_Entity (Name => "module");
          end if;
       end Save_Module;
@@ -545,7 +544,7 @@ package body Gen.Model.Projects is
       --  At the same time, we append in the project property file the list of dynamo properties.
       Output.Start_Entity (Name => "project");
       Output.Write_String (ASCII.LF & "    ");
-      Output.Write_Entity (Name => "name", Value => Util.Beans.Objects.To_Object (Name));
+      Output.Write_Entity (Name => "name", Value => UBO.To_Object (Name));
       declare
          Names : Util.Strings.Vectors.Vector;
       begin
@@ -555,7 +554,7 @@ package body Gen.Model.Projects is
                Output.Write_String (ASCII.LF & "    ");
                Output.Start_Entity (Name => "property");
                Output.Write_Attribute (Name  => "name",
-                                       Value => Util.Beans.Objects.To_Object (Name));
+                                       Value => UBO.To_Object (Name));
                Output.Write_String (Value => To_String (Project.Props.Get (Name)));
                Output.End_Entity (Name => "property");
             end if;
@@ -607,36 +606,36 @@ package body Gen.Model.Projects is
 
       procedure Set_Member (Closure : in out Project_Loader;
                             Field   : in Project_Fields;
-                            Value   : in Util.Beans.Objects.Object);
+                            Value   : in UBO.Object);
 
       --  ------------------------------
       --  Called by the de-serialization when a given field is recognized.
       --  ------------------------------
       procedure Set_Member (Closure : in out Project_Loader;
                             Field   : in Project_Fields;
-                            Value   : in Util.Beans.Objects.Object) is
+                            Value   : in UBO.Object) is
       begin
          case Field is
          when FIELD_PROJECT_NAME =>
-            Project.Set_Name (Util.Beans.Objects.To_Unbounded_String (Value));
+            Project.Set_Name (UBO.To_Unbounded_String (Value));
 
          when FIELD_MODULE_NAME =>
             declare
-               Name : constant String := Util.Beans.Objects.To_String (Value);
+               Name : constant String := UBO.To_String (Value);
             begin
                Project.Add_Module (Name);
             end;
 
          when FIELD_DEPEND_NAME =>
-            if not Util.Beans.Objects.Is_Empty (Value) then
-               Project.Add_Dependency (Util.Beans.Objects.To_String (Value), DIRECT);
+            if not UBO.Is_Empty (Value) then
+               Project.Add_Dependency (UBO.To_String (Value), DIRECT);
             end if;
 
          when FIELD_PROPERTY_NAME =>
-            Closure.Name := Util.Beans.Objects.To_Unbounded_String (Value);
+            Closure.Name := UBO.To_Unbounded_String (Value);
 
          when FIELD_PROPERTY_VALUE =>
-            Project.Props.Set (Closure.Name, Util.Beans.Objects.To_Unbounded_String (Value));
+            Project.Props.Set (Closure.Name, UBO.To_Unbounded_String (Value));
 
          end case;
       end Set_Member;

@@ -25,16 +25,16 @@ package body Gen.Model.Beans is
    --  ------------------------------
    overriding
    function Get_Value (From : in Bean_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "members" or Name = "columns" then
          return From.Members_Bean;
 
       elsif Name = "type" then
-         return Util.Beans.Objects.To_Object (From.Type_Name);
+         return UBO.To_Object (From.Type_Name);
 
       elsif Name = "isBean" then
-         return Util.Beans.Objects.To_Object (True);
+         return UBO.To_Object (True);
 
       else
          return Tables.Table_Definition (From).Get_Value (Name);

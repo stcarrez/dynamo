@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Util.Beans.Objects;
 with Util.Encoders.SHA1;
 
 with Gen.Model.List;
@@ -35,7 +34,7 @@ package Gen.Model.Queries is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : in Sort_Definition;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    package Sort_List is new Gen.Model.List (T         => Sort_Definition,
                                             T_Access  => Sort_Definition_Access);
@@ -44,7 +43,7 @@ package Gen.Model.Queries is
    --  Query definition
    --  ------------------------------
    type Query_Definition is new Gen.Model.Tables.Table_Definition with record
-      Sorts_Bean     : Util.Beans.Objects.Object;
+      Sorts_Bean     : UBO.Object;
       Sorts          : aliased Sort_List.List_Definition;
    end record;
    type Query_Definition_Access is access all Query_Definition'Class;
@@ -53,7 +52,7 @@ package Gen.Model.Queries is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : in Query_Definition;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    --  Prepare the generation of the model.
    overriding
@@ -75,7 +74,7 @@ package Gen.Model.Queries is
       File_Name      : UString;
       Sha1           : Util.Encoders.SHA1.Digest;
       Queries        : aliased Gen.Model.Tables.Table_List.List_Definition;
-      Queries_Bean   : Util.Beans.Objects.Object;
+      Queries_Bean   : UBO.Object;
    end record;
    type Query_File_Definition_Access is access all Query_File_Definition'Class;
 
@@ -83,7 +82,7 @@ package Gen.Model.Queries is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : in Query_File_Definition;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    --  Prepare the generation of the model.
    overriding

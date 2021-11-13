@@ -38,7 +38,7 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    function Get_Value (From : Column_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+                       Name : String) return UBO.Object is
    begin
 
       if Name = "type" then
@@ -46,35 +46,35 @@ package body Gen.Model.Tables is
             T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
          begin
             if T = null then
-               return Util.Beans.Objects.Null_Object;
+               return UBO.Null_Object;
             end if;
-            return Util.Beans.Objects.To_Object (T.all'Access, Util.Beans.Objects.STATIC);
+            return UBO.To_Object (T.all'Access, UBO.STATIC);
          end;
 
       elsif Name = "index" then
-         return Util.Beans.Objects.To_Object (From.Number);
+         return UBO.To_Object (From.Number);
 
       elsif Name = "isUnique" then
-         return Util.Beans.Objects.To_Object (From.Unique);
+         return UBO.To_Object (From.Unique);
 
       elsif Name = "isNull" then
-         return Util.Beans.Objects.To_Object (not From.Not_Null);
+         return UBO.To_Object (not From.Not_Null);
 
       elsif Name = "isInserted" then
-         return Util.Beans.Objects.To_Object (From.Is_Inserted);
+         return UBO.To_Object (From.Is_Inserted);
 
       elsif Name = "isUpdated" then
-         return Util.Beans.Objects.To_Object (From.Is_Updated);
+         return UBO.To_Object (From.Is_Updated);
 
       elsif Name = "sqlType" then
          if Length (From.Sql_Type) > 0 then
-            return Util.Beans.Objects.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
+            return UBO.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
          end if;
          declare
             T    : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
          begin
             if T = null then
-               return Util.Beans.Objects.Null_Object;
+               return UBO.Null_Object;
                --  If this is an association to another table, use the primary key of that table.
             elsif T.all in Table_Definition'Class
               and then Table_Definition'Class (T.all).Id_Column /= null
@@ -96,7 +96,7 @@ package body Gen.Model.Tables is
 
       elsif Name = "sqlName" then
          if Length (From.Sql_Name) > 0 then
-            return Util.Beans.Objects.To_Object (From.Sql_Name);
+            return UBO.To_Object (From.Sql_Name);
          end if;
          declare
             T     : constant Gen.Model.Mappings.Mapping_Definition_Access := From.Get_Type_Mapping;
@@ -106,29 +106,29 @@ package body Gen.Model.Tables is
                Table := Table_Definition'Class (T.all)'Access;
             end if;
             if Table /= null and then Table.Id_Column /= null then
-               return Util.Beans.Objects.To_Object (From.Name & "_" & Table.Id_Column.Name);
+               return UBO.To_Object (From.Name & "_" & Table.Id_Column.Name);
             else
-               return Util.Beans.Objects.To_Object (From.Name);
+               return UBO.To_Object (From.Name);
             end if;
          end;
 
       elsif Name = "sqlLength" then
-         return Util.Beans.Objects.To_Object (From.Sql_Length);
+         return UBO.To_Object (From.Sql_Length);
 
       elsif Name = "isVersion" then
-         return Util.Beans.Objects.To_Object (From.Is_Version);
+         return UBO.To_Object (From.Is_Version);
 
       elsif Name = "isReadable" then
-         return Util.Beans.Objects.To_Object (From.Is_Readable);
+         return UBO.To_Object (From.Is_Readable);
 
       elsif Name = "isPrimaryKey" then
-         return Util.Beans.Objects.To_Object (From.Is_Key);
+         return UBO.To_Object (From.Is_Key);
 
       elsif Name = "isPrimitiveType" then
-         return Util.Beans.Objects.To_Object (From.Is_Basic_Type);
+         return UBO.To_Object (From.Is_Basic_Type);
 
       elsif Name = "isAuditable" then
-         return Util.Beans.Objects.To_Object (From.Is_Auditable);
+         return UBO.To_Object (From.Is_Auditable);
 
       elsif Name = "generator" then
          return From.Generator;
@@ -242,8 +242,8 @@ package body Gen.Model.Tables is
    overriding
    procedure Prepare (O : in out Column_Definition) is
    begin
-      O.Bean := Util.Beans.Objects.To_Object (O'Unchecked_Access,
-                                              Util.Beans.Objects.STATIC);
+      O.Bean := UBO.To_Object (O'Unchecked_Access,
+                                              UBO.STATIC);
    end Prepare;
 
    --  ------------------------------
@@ -283,7 +283,7 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    function Get_Value (From : Association_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+                       Name : String) return UBO.Object is
    begin
       return Column_Definition (From).Get_Value (Name);
    end Get_Value;
@@ -309,12 +309,12 @@ package body Gen.Model.Tables is
    overriding
    procedure Initialize (O : in out Table_Definition) is
    begin
-      O.Members_Bean := Util.Beans.Objects.To_Object (O.Members'Unchecked_Access,
-                                                      Util.Beans.Objects.STATIC);
-      O.Auditables_Bean := Util.Beans.Objects.To_Object (O.Auditables'Unchecked_Access,
-                                                         Util.Beans.Objects.STATIC);
-      O.Operations_Bean := Util.Beans.Objects.To_Object (O.Operations'Unchecked_Access,
-                                                         Util.Beans.Objects.STATIC);
+      O.Members_Bean := UBO.To_Object (O.Members'Unchecked_Access,
+                                                      UBO.STATIC);
+      O.Auditables_Bean := UBO.To_Object (O.Auditables'Unchecked_Access,
+                                                         UBO.STATIC);
+      O.Operations_Bean := UBO.To_Object (O.Operations'Unchecked_Access,
+                                                         UBO.STATIC);
    end Initialize;
 
    --  ------------------------------
@@ -412,7 +412,7 @@ package body Gen.Model.Tables is
    --  ------------------------------
    overriding
    function Get_Value (From : in Table_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "members" or Name = "columns" then
          return From.Members_Bean;
@@ -427,7 +427,7 @@ package body Gen.Model.Tables is
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Id_Column.all'Access;
          begin
-            return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
+            return UBO.To_Object (Bean, UBO.STATIC);
          end;
 
       elsif Name = "version" and From.Version_Column /= null then
@@ -435,23 +435,23 @@ package body Gen.Model.Tables is
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access
               := From.Version_Column.all'Unchecked_Access;
          begin
-            return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
+            return UBO.To_Object (Bean, UBO.STATIC);
          end;
 
       elsif Name = "hasAssociations" then
-         return Util.Beans.Objects.To_Object (From.Has_Associations);
+         return UBO.To_Object (From.Has_Associations);
 
       elsif Name = "hasList" then
-         return Util.Beans.Objects.To_Object (From.Has_List);
+         return UBO.To_Object (From.Has_List);
 
       elsif Name = "type" then
-         return Util.Beans.Objects.To_Object (From.Type_Name);
+         return UBO.To_Object (From.Type_Name);
 
       elsif Name = "table" or Name = "sqlName" then
-         return Util.Beans.Objects.To_Object (From.Table_Name);
+         return UBO.To_Object (From.Table_Name);
 
       elsif Name = "keyCount" then
-         return Util.Beans.Objects.To_Object (From.Key_Count);
+         return UBO.To_Object (From.Key_Count);
 
       elsif Name = "parent" then
          if From.Parent /= null then
@@ -459,10 +459,10 @@ package body Gen.Model.Tables is
                Bean : constant Util.Beans.Basic.Readonly_Bean_Access
                  := From.Parent.all'Unchecked_Access;
             begin
-               return Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
+               return UBO.To_Object (Bean, UBO.STATIC);
             end;
          else
-            return Util.Beans.Objects.Null_Object;
+            return UBO.Null_Object;
          end if;
 
       elsif Name = "isVersion" or Name = "isPrimaryKey" or Name = "isBean"
@@ -470,19 +470,19 @@ package body Gen.Model.Tables is
         or Name = "isDiscrete" or Name = "isNewDiscrete"
         or Name = "isBoolean" or Name = "isBlob" or Name = "isDate" or Name = "isString"
       then
-         return Util.Beans.Objects.To_Object (False);
+         return UBO.To_Object (False);
 
       elsif Name = "isReadable" or Name = "isObject" then
-         return Util.Beans.Objects.To_Object (True);
+         return UBO.To_Object (True);
 
       elsif Name = "isLimited" then
-         return Util.Beans.Objects.To_Object (From.Is_Limited);
+         return UBO.To_Object (From.Is_Limited);
 
       elsif Name = "isSerializable" then
-         return Util.Beans.Objects.To_Object (From.Is_Serializable);
+         return UBO.To_Object (From.Is_Serializable);
 
       elsif Name = "isAuditable" then
-         return Util.Beans.Objects.To_Object (From.Is_Auditable);
+         return UBO.To_Object (From.Is_Auditable);
 
       else
          return Definition (From).Get_Value (Name);

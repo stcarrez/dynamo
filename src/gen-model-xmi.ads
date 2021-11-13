@@ -20,7 +20,6 @@ with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded.Hash;
 with Ada.Containers.Vectors;
 
-with Util.Beans.Objects;
 with Util.Strings.Sets;
 
 package Gen.Model.XMI is
@@ -177,11 +176,11 @@ package Gen.Model.XMI is
 
    --  Set the model name.
    procedure Set_Name (Node  : in out Model_Element;
-                       Value : in Util.Beans.Objects.Object);
+                       Value : in UBO.Object);
 
    --  Set the model XMI unique id.
    procedure Set_XMI_Id (Node  : in out Model_Element;
-                         Value : in Util.Beans.Objects.Object);
+                         Value : in UBO.Object);
 
    --  Validate the node definition as much as we can before the reconcile phase.
    --  If an error is detected, return a message.  Returns an empty string if everything is ok.
@@ -285,8 +284,8 @@ package Gen.Model.XMI is
 
    --  Create an enum literal and add it to the enum.
    procedure Add_Literal (Node    : in out Enum_Element;
-                          Id      : in Util.Beans.Objects.Object;
-                          Name    : in Util.Beans.Objects.Object;
+                          Id      : in UBO.Object;
+                          Name    : in UBO.Object;
                           Literal : out Literal_Element_Access);
 
    --  ------------------------------
@@ -336,7 +335,7 @@ package Gen.Model.XMI is
       Data_Type          : Data_Type_Element_Access;
       Visibility         : Visibility_Type := VISIBILITY_PUBLIC;
       Changeability      : Changeability_Type := CHANGEABILITY_CHANGEABLE;
-      Initial_Value      : Util.Beans.Objects.Object;
+      Initial_Value      : UBO.Object;
       Multiplicity_Lower : Integer := 0;
       Multiplicity_Upper : Integer := 1;
    end record;

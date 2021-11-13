@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-list -- List bean interface for model objects
---  Copyright (C) 2009, 2010, 2011, 2012, 2018 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,10 +96,10 @@ package body Gen.Model.List is
             Bean    : constant Util.Beans.Basic.Readonly_Bean_Access := Current.all'Access;
          begin
             Current.Set_Index (Index);
-            From.Value_Bean := Util.Beans.Objects.To_Object (Bean, Util.Beans.Objects.STATIC);
+            From.Value_Bean := UBO.To_Object (Bean, UBO.STATIC);
          end;
       else
-         From.Value_Bean := Util.Beans.Objects.Null_Object;
+         From.Value_Bean := UBO.Null_Object;
       end if;
    end Set_Row_Index;
 
@@ -107,7 +107,7 @@ package body Gen.Model.List is
    --  Get the element at the current row index.
    --  ------------------------------
    overriding
-   function Get_Row (From  : List_Definition) return Util.Beans.Objects.Object is
+   function Get_Row (From  : List_Definition) return UBO.Object is
    begin
       return From.Value_Bean;
    end Get_Row;
@@ -118,12 +118,12 @@ package body Gen.Model.List is
    --  ------------------------------
    overriding
    function Get_Value (From : List_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+                       Name : String) return UBO.Object is
    begin
       if Name = "size" then
-         return Util.Beans.Objects.To_Object (From.Get_Count);
+         return UBO.To_Object (From.Get_Count);
       else
-         return Util.Beans.Objects.Null_Object;
+         return UBO.Null_Object;
       end if;
    end Get_Value;
 

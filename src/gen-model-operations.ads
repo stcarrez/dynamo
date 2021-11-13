@@ -16,8 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Util.Beans.Objects;
-
 with Gen.Model.List;
 package Gen.Model.Operations is
 
@@ -39,7 +37,7 @@ package Gen.Model.Operations is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : in Operation_Definition;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    --  Prepare the generation of the model.
    overriding
@@ -73,7 +71,7 @@ private
 
    type Operation_Definition is new Definition with record
       Parameters      : aliased Parameter_List.List_Definition;
-      Parameters_Bean : Util.Beans.Objects.Object;
+      Parameters_Bean : UBO.Object;
       Return_Type     : UString;
       Kind            : Operation_Type := UNKNOWN;
    end record;

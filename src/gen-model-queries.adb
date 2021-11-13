@@ -24,13 +24,13 @@ package body Gen.Model.Queries is
    --  ------------------------------
    overriding
    function Get_Value (From : in Sort_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Name);
+         return UBO.To_Object (From.Name);
 
       elsif Name = "sql" then
-         return Util.Beans.Objects.To_Object (From.Sql);
+         return UBO.To_Object (From.Sql);
 
       else
          return Definition (From).Get_Value (Name);
@@ -43,13 +43,13 @@ package body Gen.Model.Queries is
    --  ------------------------------
    overriding
    function Get_Value (From : Query_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+                       Name : String) return UBO.Object is
    begin
       if Name = "sorts" then
          return From.Sorts_Bean;
 
       elsif Name = "isBean" then
-         return Util.Beans.Objects.To_Object (True);
+         return UBO.To_Object (True);
 
       else
          return Tables.Table_Definition (From).Get_Value (Name);
@@ -84,8 +84,7 @@ package body Gen.Model.Queries is
    overriding
    procedure Initialize (O : in out Query_Definition) is
    begin
-      O.Sorts_Bean := Util.Beans.Objects.To_Object (O.Sorts'Unchecked_Access,
-                                                    Util.Beans.Objects.STATIC);
+      O.Sorts_Bean := UBO.To_Object (O.Sorts'Unchecked_Access, UBO.STATIC);
       Tables.Table_Definition (O).Initialize;
    end Initialize;
 
@@ -93,16 +92,16 @@ package body Gen.Model.Queries is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : in Query_File_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "queries" then
          return From.Queries_Bean;
 
       elsif Name = "path" then
-         return Util.Beans.Objects.To_Object (From.File_Name);
+         return UBO.To_Object (From.File_Name);
 
       elsif Name = "sha1" then
-         return Util.Beans.Objects.To_Object (From.Sha1);
+         return UBO.To_Object (From.Sha1);
 
       else
          return Query_Definition (From).Get_Value (Name);
@@ -135,8 +134,7 @@ package body Gen.Model.Queries is
    overriding
    procedure Initialize (O : in out Query_File_Definition) is
    begin
-      O.Queries_Bean := Util.Beans.Objects.To_Object (O.Queries'Unchecked_Access,
-                                                      Util.Beans.Objects.STATIC);
+      O.Queries_Bean := UBO.To_Object (O.Queries'Unchecked_Access, UBO.STATIC);
       Tables.Table_Definition (O).Initialize;
    end Initialize;
 

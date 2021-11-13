@@ -18,7 +18,6 @@
 
 with Ada.Containers.Vectors;
 
-with Util.Beans.Objects;
 with Util.Properties;
 
 with Gen.Utils;
@@ -83,7 +82,7 @@ package Gen.Model.Projects is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Project_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Get the project name.
    function Get_Project_Name (Project : in Project_Definition) return String;

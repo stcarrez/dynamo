@@ -57,7 +57,7 @@ package Gen.Model.Packages is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : in Package_Definition;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    --  Prepare the generation of the package:
    --  o identify the column types which are used
@@ -93,7 +93,7 @@ package Gen.Model.Packages is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Model_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Initialize the model definition instance.
    overriding
@@ -220,9 +220,9 @@ private
    subtype Stype_List_Definition is Table_List.List_Definition;
 
    type List_Object is new Util.Beans.Basic.List_Bean with record
-      Values     : Util.Beans.Objects.Vectors.Vector;
+      Values     : UBO.Vectors.Vector;
       Row        : Natural;
-      Value_Bean : Util.Beans.Objects.Object;
+      Value_Bean : UBO.Object;
    end record;
 
    --  Get the number of elements in the list.
@@ -236,42 +236,42 @@ private
 
    --  Get the element at the current row index.
    overriding
-   function Get_Row (From  : in List_Object) return Util.Beans.Objects.Object;
+   function Get_Row (From  : in List_Object) return UBO.Object;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : in List_Object;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    type Package_Definition is new Definition with record
       --  Enums defined in the package.
       Enums        : aliased Enum_List_Definition;
-      Enums_Bean   : Util.Beans.Objects.Object;
+      Enums_Bean   : UBO.Object;
 
       --  Simple data types defined in the package.
       Stypes       : aliased Stype_List_Definition;
-      Stypes_Bean  : Util.Beans.Objects.Object;
+      Stypes_Bean  : UBO.Object;
 
       --  Hibernate tables
       Tables       : aliased Table_List_Definition;
-      Tables_Bean  : Util.Beans.Objects.Object;
+      Tables_Bean  : UBO.Object;
 
       --  Custom queries
       Queries      : aliased Table_List_Definition;
-      Queries_Bean : Util.Beans.Objects.Object;
+      Queries_Bean : UBO.Object;
 
       --  Ada Beans
       Beans        : aliased Table_List_Definition;
-      Beans_Bean   : Util.Beans.Objects.Object;
+      Beans_Bean   : UBO.Object;
 
       --  A list of external packages which are used (used for with clause generation).
       Used_Spec_Types    : aliased List_Object;
-      Used_Spec          : Util.Beans.Objects.Object;
+      Used_Spec          : UBO.Object;
 
       --  A list of external packages which are used (used for with clause generation).
       Used_Body_Types    : aliased List_Object;
-      Used_Body          : Util.Beans.Objects.Object;
+      Used_Body          : UBO.Object;
 
       --  A map of all types defined in this package.
       Types        : Gen.Model.Mappings.Mapping_Maps.Map;
@@ -292,23 +292,23 @@ private
    type Model_Definition is new Definition with record
       --  List of all enums.
       Enums        : aliased Enum_List_Definition;
-      Enums_Bean   : Util.Beans.Objects.Object;
+      Enums_Bean   : UBO.Object;
 
       --  Simple data types defined in the package.
       Stypes       : aliased Stype_List_Definition;
-      Stypes_Bean  : Util.Beans.Objects.Object;
+      Stypes_Bean  : UBO.Object;
 
       --  List of all tables.
       Tables       : aliased Table_List_Definition;
-      Tables_Bean  : Util.Beans.Objects.Object;
+      Tables_Bean  : UBO.Object;
 
       --  List of all queries.
       Queries      : aliased Table_List_Definition;
-      Queries_Bean : Util.Beans.Objects.Object;
+      Queries_Bean : UBO.Object;
 
       --  Ada Beans
       Beans        : aliased Table_List_Definition;
-      Beans_Bean   : Util.Beans.Objects.Object;
+      Beans_Bean   : UBO.Object;
 
       --  Map of all packages.
       Packages     : Package_Map.Map;

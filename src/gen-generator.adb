@@ -64,34 +64,34 @@ package body Gen.Generator is
 
    function Get_Ada_Type (Type_Name : in UString) return String;
 
-   function To_Ada_Type (Value : in Util.Beans.Objects.Object;
-                         Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
-   function Indent (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+   function To_Ada_Type (Value : in UBO.Object;
+                         Param : in UBO.Object) return UBO.Object;
+   function Indent (Value : UBO.Object) return UBO.Object;
 
    --  EL Function to translate a model type to the key enum value
-   function To_Key_Enum (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+   function To_Key_Enum (Name : UBO.Object) return UBO.Object;
 
    --  EL function to create an Ada identifier from a file name
-   function To_Ada_Ident (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+   function To_Ada_Ident (Value : UBO.Object) return UBO.Object;
 
    --  EL function to format an Ada comment
-   function Comment (Value  : in Util.Beans.Objects.Object;
-                     Prefix : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+   function Comment (Value  : in UBO.Object;
+                     Prefix : in UBO.Object) return UBO.Object;
 
    --  EL function to return a singular form of a name
-   function To_Singular (Value : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+   function To_Singular (Value : in UBO.Object) return UBO.Object;
 
    --  Returns a string resulting from replacing in an input string all occurrences of
    --  a "Item" string into an "By" substring.
-   function Replace (Value, Item, By : in Util.Beans.Objects.Object)
-                     return Util.Beans.Objects.Object;
+   function Replace (Value, Item, By : in UBO.Object)
+                     return UBO.Object;
 
    --  Concat the arguments converted as a string.
-   function Concat (Arg1, Arg2, Arg3, Arg4 : in Util.Beans.Objects.Object)
-                    return Util.Beans.Objects.Object;
+   function Concat (Arg1, Arg2, Arg3, Arg4 : in UBO.Object)
+                    return UBO.Object;
 
    --  EL function to check if a file exists.
-   function File_Exists (Path : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
+   function File_Exists (Path : in UBO.Object) return UBO.Object;
 
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class);
 
@@ -118,8 +118,8 @@ package body Gen.Generator is
    --    1 : Get the type for a parameter declaration or a return type
    --    2 : Get the type for the generation of the ADO.Statements.Get procedure name
    --  ------------------------------
-   function To_Ada_Type (Value : in Util.Beans.Objects.Object;
-                         Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+   function To_Ada_Type (Value : in UBO.Object;
+                         Param : in UBO.Object) return UBO.Object is
       use Gen.Model.Tables;
       use Gen.Model.Mappings;
       use Gen.Model;
@@ -127,7 +127,7 @@ package body Gen.Generator is
       Column : Column_Definition_Access := null;
 
       Ptr : constant access Util.Beans.Basic.Readonly_Bean'Class
-        := Util.Beans.Objects.To_Bean (Value);
+        := UBO.To_Bean (Value);
       Type_Mapping : Gen.Model.Mappings.Mapping_Definition_Access;
    begin
       if Ptr /= null and then Ptr.all in Column_Definition'Class then
@@ -139,43 +139,43 @@ package body Gen.Generator is
          Type_Mapping := Column.Get_Type_Mapping;
          if Type_Mapping /= null then
 
-            if Type_Mapping.Kind = T_DATE and Util.Beans.Objects.To_Integer (Param) = 2 then
-               return Util.Beans.Objects.To_Object (String '("Time"));
+            if Type_Mapping.Kind = T_DATE and UBO.To_Integer (Param) = 2 then
+               return UBO.To_Object (String '("Time"));
 
             elsif Type_Mapping.Kind = T_ENUM then
-               if Column.Not_Null or Util.Beans.Objects.To_Integer (Param) = 2 then
-                  return Util.Beans.Objects.To_Object (Get_Ada_Type (Column.Type_Name));
+               if Column.Not_Null or UBO.To_Integer (Param) = 2 then
+                  return UBO.To_Object (Get_Ada_Type (Column.Type_Name));
                else
                   declare
                      Result : constant UString
                        := Gen.Model.Enums.Enum_Definition (Type_Mapping.all).Nullable_Type;
                   begin
-                     return Util.Beans.Objects.To_Object (Get_Ada_Type (Result));
+                     return UBO.To_Object (Get_Ada_Type (Result));
                   end;
                end if;
 
             elsif Type_Mapping.Kind /= T_TABLE then
                if Length (Type_Mapping.Target) > 0 then
-                  return Util.Beans.Objects.To_Object (Type_Mapping.Target);
+                  return UBO.To_Object (Type_Mapping.Target);
                else
-                  return Util.Beans.Objects.To_Object (Type_Mapping.Name);
+                  return UBO.To_Object (Type_Mapping.Name);
                end if;
 
             elsif Column.Use_Foreign_Key_Type then
-               return Util.Beans.Objects.To_Object (Type_Mapping.Target);
+               return UBO.To_Object (Type_Mapping.Target);
 
-            elsif Util.Beans.Objects.To_Integer (Param) = 1 then
-               return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref'Class");
+            elsif UBO.To_Integer (Param) = 1 then
+               return UBO.To_Object (Type_Mapping.Target & "_Ref'Class");
 
             else
-               return Util.Beans.Objects.To_Object (Type_Mapping.Target & "_Ref");
+               return UBO.To_Object (Type_Mapping.Target & "_Ref");
             end if;
          elsif Column.Is_Basic_Type then
-            return Util.Beans.Objects.To_Object (Column.Get_Type);
-         elsif Util.Beans.Objects.To_Integer (Param) = 1 then
-            return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref'Class");
+            return UBO.To_Object (Column.Get_Type);
+         elsif UBO.To_Integer (Param) = 1 then
+            return UBO.To_Object (Column.Get_Type & "_Ref'Class");
          else
-            return Util.Beans.Objects.To_Object (Column.Get_Type & "_Ref");
+            return UBO.To_Object (Column.Get_Type & "_Ref");
          end if;
       else
          return Value;
@@ -185,23 +185,23 @@ package body Gen.Generator is
    --  ------------------------------
    --  Concat the arguments converted as a string.
    --  ------------------------------
-   function Concat (Arg1, Arg2, Arg3, Arg4 : in Util.Beans.Objects.Object)
-                    return Util.Beans.Objects.Object is
+   function Concat (Arg1, Arg2, Arg3, Arg4 : in UBO.Object)
+                    return UBO.Object is
       Result : UString;
    begin
-      if not Util.Beans.Objects.Is_Null (Arg1) then
-         Append (Result, Util.Beans.Objects.To_String (Arg1));
+      if not UBO.Is_Null (Arg1) then
+         Append (Result, UBO.To_String (Arg1));
       end if;
-      if not Util.Beans.Objects.Is_Null (Arg2) then
-         Append (Result, Util.Beans.Objects.To_String (Arg2));
+      if not UBO.Is_Null (Arg2) then
+         Append (Result, UBO.To_String (Arg2));
       end if;
-      if not Util.Beans.Objects.Is_Null (Arg3) then
-         Append (Result, Util.Beans.Objects.To_String (Arg3));
+      if not UBO.Is_Null (Arg3) then
+         Append (Result, UBO.To_String (Arg3));
       end if;
-      if not Util.Beans.Objects.Is_Null (Arg4) then
-         Append (Result, Util.Beans.Objects.To_String (Arg4));
+      if not UBO.Is_Null (Arg4) then
+         Append (Result, UBO.To_String (Arg4));
       end if;
-      return Util.Beans.Objects.To_Object (Result);
+      return UBO.To_Object (Result);
    end Concat;
 
    KEY_INTEGER_LABEL : constant String := "KEY_INTEGER";
@@ -210,33 +210,33 @@ package body Gen.Generator is
    --  ------------------------------
    --  EL Function to translate a model type to the key enum value
    --  ------------------------------
-   function To_Key_Enum (Name : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
-      Value : constant String := Util.Beans.Objects.To_String (Name);
+   function To_Key_Enum (Name : UBO.Object) return UBO.Object is
+      Value : constant String := UBO.To_String (Name);
    begin
       if Value = "Integer" or Value = "int" or Value = "Identifier"
         or Value = "ADO.Identifier"
       then
-         return Util.Beans.Objects.To_Object (KEY_INTEGER_LABEL);
+         return UBO.To_Object (KEY_INTEGER_LABEL);
       else
-         return Util.Beans.Objects.To_Object (KEY_STRING_LABEL);
+         return UBO.To_Object (KEY_STRING_LABEL);
       end if;
    end To_Key_Enum;
 
    --  ------------------------------
    --  EL function to indent the code
    --  ------------------------------
-   function Indent (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
-      S      : constant String := Util.Beans.Objects.To_String (Value);
+   function Indent (Value : UBO.Object) return UBO.Object is
+      S      : constant String := UBO.To_String (Value);
       Result : constant String (S'Range) := (others => ' ');
    begin
-      return Util.Beans.Objects.To_Object (Result);
+      return UBO.To_Object (Result);
    end Indent;
 
    --  ------------------------------
    --  EL function to create an Ada identifier from a file name
    --  ------------------------------
-   function To_Ada_Ident (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
-      Name   : constant String := Util.Beans.Objects.To_String (Value);
+   function To_Ada_Ident (Value : UBO.Object) return UBO.Object is
+      Name   : constant String := UBO.To_String (Value);
       Result : UString;
       C      : Character;
    begin
@@ -255,17 +255,17 @@ package body Gen.Generator is
             Append (Result, C);
          end if;
       end loop;
-      return Util.Beans.Objects.To_Object (Result);
+      return UBO.To_Object (Result);
    end To_Ada_Ident;
 
    --  ------------------------------
    --  EL function to return a singular form of a name
    --  ------------------------------
-   function To_Singular (Value : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
-      Name   : constant String := Util.Beans.Objects.To_String (Value);
+   function To_Singular (Value : in UBO.Object) return UBO.Object is
+      Name   : constant String := UBO.To_String (Value);
    begin
       if Name'Length > 1 and then Name (Name'Last) = 's' then
-         return Util.Beans.Objects.To_Object (Name (Name'First .. Name'Last - 1));
+         return UBO.To_Object (Name (Name'First .. Name'Last - 1));
       else
          return Value;
       end if;
@@ -275,11 +275,11 @@ package body Gen.Generator is
    --  Returns a string resulting from replacing in an input string all occurrences of
    --  a "Item" string into an "By" substring.
    --  ------------------------------
-   function Replace (Value, Item, By : in Util.Beans.Objects.Object)
-                     return Util.Beans.Objects.Object is
-      Content : constant String := Util.Beans.Objects.To_String (Value);
-      Pattern : constant String := Util.Beans.Objects.To_String (Item);
-      Token   : constant String := Util.Beans.Objects.To_String (By);
+   function Replace (Value, Item, By : in UBO.Object)
+                     return UBO.Object is
+      Content : constant String := UBO.To_String (Value);
+      Pattern : constant String := UBO.To_String (Item);
+      Token   : constant String := UBO.To_String (By);
       Last    : Natural := Content'First;
       Result  : UString;
       Pos     : Natural;
@@ -300,18 +300,18 @@ package body Gen.Generator is
          end if;
          Last := Pos + Pattern'Length;
       end loop;
-      return Util.Beans.Objects.To_Object (Result);
+      return UBO.To_Object (Result);
    end Replace;
 
    --  ------------------------------
    --  EL function to format an Ada comment
    --  ------------------------------
-   function Comment (Value  : in Util.Beans.Objects.Object;
-                     Prefix : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
+   function Comment (Value  : in UBO.Object;
+                     Prefix : in UBO.Object) return UBO.Object is
 
       START_POS : constant Natural := 8;
 
-      Comment   : constant String := Ada.Strings.Fixed.Trim (Util.Beans.Objects.To_String (Value),
+      Comment   : constant String := Ada.Strings.Fixed.Trim (UBO.To_String (Value),
                                                              Ada.Strings.Both);
       Result    : UString;
       C         : Character;
@@ -332,10 +332,10 @@ package body Gen.Generator is
                Append (Result, "   --  ");
             else
                Append (Result, "  ");
-               if not Util.Beans.Objects.Is_Null (Prefix)
-                 and not Util.Beans.Objects.Is_Empty (Prefix)
+               if not UBO.Is_Null (Prefix)
+                 and not UBO.Is_Empty (Prefix)
                then
-                  Append (Result, Util.Beans.Objects.To_String (Prefix));
+                  Append (Result, UBO.To_String (Prefix));
                end if;
             end if;
             Append (Result, C);
@@ -343,16 +343,16 @@ package body Gen.Generator is
          end if;
       end loop;
       Append (Result, ASCII.LF);
-      return Util.Beans.Objects.To_Object (Result);
+      return UBO.To_Object (Result);
    end Comment;
 
    --  ------------------------------
    --  EL function to check if a file exists.
    --  ------------------------------
-   function File_Exists (Path : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
-      P : constant String := Util.Beans.Objects.To_String (Path);
+   function File_Exists (Path : in UBO.Object) return UBO.Object is
+      P : constant String := UBO.To_String (Path);
    begin
-      return Util.Beans.Objects.To_Object (Ada.Directories.Exists (P));
+      return UBO.To_Object (Ada.Directories.Exists (P));
    end File_Exists;
 
    --  ------------------------------
@@ -432,9 +432,9 @@ package body Gen.Generator is
       H.Output_Dir := To_UString (H.Conf.Get (RESULT_DIR, "./"));
 
       Register_Funcs (H);
-      H.File   := new Util.Beans.Objects.Object;
-      H.Mode   := new Util.Beans.Objects.Object;
-      H.Ignore := new Util.Beans.Objects.Object;
+      H.File   := new UBO.Object;
+      H.Mode   := new UBO.Object;
+      H.Ignore := new UBO.Object;
       H.Servlet := new ASF.Servlets.Faces.Faces_Servlet;
       H.Add_Servlet (Name => "file", Server => H.Servlet);
       H.Add_Mapping ("*.xhtml", "file");
@@ -641,7 +641,7 @@ package body Gen.Generator is
    --  ------------------------------
    function Get_Generated_File (H : in Handler) return String is
    begin
-      return Util.Beans.Objects.To_String (H.File.all);
+      return UBO.To_String (H.File.all);
    end Get_Generated_File;
 
    --  ------------------------------
@@ -998,7 +998,7 @@ package body Gen.Generator is
                            File    : in String;
                            Content : in UString) is
       Dir         : constant String := To_String (H.Output_Dir);
-      Mode        : constant String := Util.Beans.Objects.To_String (H.Mode.all);
+      Mode        : constant String := UBO.To_String (H.Mode.all);
       Path        : constant String := Util.Files.Compose (Dir, File);
       Exists      : constant Boolean := Ada.Directories.Exists (Path);
       Old_Content : UString;
@@ -1007,8 +1007,8 @@ package body Gen.Generator is
          Log.Info ("File {0} exists, generation skipped.", Path);
       elsif Exists and not (H.Force_Save or Mode = "force") then
          H.Error ("Cannot generate file: '{0}' exists already.", Path);
-      elsif not Util.Beans.Objects.Is_Null (H.File.all) and
-      then not Util.Beans.Objects.To_Boolean (H.Ignore.all)
+      elsif not UBO.Is_Null (H.File.all) and
+      then not UBO.To_Boolean (H.Ignore.all)
       then
          if Length (Content) = 0 and Mode = "remove-empty" then
             Log.Debug ("File {0} skipped because it is empty", Path);
@@ -1036,18 +1036,16 @@ package body Gen.Generator is
                        Save  : not null access procedure (H       : in out Handler;
                                                           File    : in String;
                                                           Content : in UString)) is
-      use Util.Beans.Objects;
-
       Req   : ASF.Requests.Mockup.Request;
       Reply : aliased ASF.Responses.Mockup.Response;
       Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := Model.all'Unchecked_Access;
-      Bean  : constant Object := Util.Beans.Objects.To_Object (Ptr, Util.Beans.Objects.STATIC);
+      Bean  : constant UBO.Object := UBO.To_Object (Ptr, UBO.STATIC);
 
       Model_Ptr   : constant Util.Beans.Basic.Readonly_Bean_Access := H.Model'Unchecked_Access;
-      Model_Bean  : constant Object := To_Object (Model_Ptr, Util.Beans.Objects.STATIC);
+      Model_Bean  : constant UBO.Object := UBO.To_Object (Model_Ptr, UBO.STATIC);
 
       Prj_Ptr  : constant Util.Beans.Basic.Readonly_Bean_Access := H.Project'Unchecked_Access;
-      Prj_Bean : constant Object := To_Object (Prj_Ptr, Util.Beans.Objects.STATIC);
+      Prj_Bean : constant UBO.Object := UBO.To_Object (Prj_Ptr, UBO.STATIC);
       Dispatcher : constant ASF.Servlets.Request_Dispatcher := H.Get_Request_Dispatcher (File);
    begin
       Log.Debug ("With template '{0}'", File);
@@ -1059,16 +1057,16 @@ package body Gen.Generator is
       Req.Set_Attribute (Name => "project", Value => Prj_Bean);
       Req.Set_Attribute (Name => "package", Value => Bean);
       Req.Set_Attribute (Name => "model", Value => Model_Bean);
-      Req.Set_Attribute (Name => "genRevision", Value => Util.Beans.Objects.To_Object (Configs.VERSION));
-      Req.Set_Attribute (Name => "genURL", Value => Util.Beans.Objects.To_Object (Configs.GIT_URL));
+      Req.Set_Attribute (Name => "genRevision", Value => UBO.To_Object (Configs.VERSION));
+      Req.Set_Attribute (Name => "genURL", Value => UBO.To_Object (Configs.GIT_URL));
       Req.Set_Attribute (Name => "date",
-                         Value => Util.Beans.Objects.Time.To_Object (Ada.Calendar.Clock));
+                         Value => UBO.Time.To_Object (Ada.Calendar.Clock));
 
       Servlet.Core.Forward (Dispatcher, Req, Reply);
 
       declare
          Content  : UString;
-         File     : constant String := Util.Beans.Objects.To_String (H.File.all);
+         File     : constant String := UBO.To_String (H.File.all);
       begin
          Reply.Read_Content (Content);
          Save (H, File, Content);

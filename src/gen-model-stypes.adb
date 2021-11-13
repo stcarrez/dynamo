@@ -24,18 +24,18 @@ package body Gen.Model.Stypes is
    --  ------------------------------
    overriding
    function Get_Value (From : Stype_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+                       Name : String) return UBO.Object is
    begin
       if Name = "parent" then
-         return Util.Beans.Objects.To_Object (From.Parent_Type);
+         return UBO.To_Object (From.Parent_Type);
       elsif Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Type_Name);
+         return UBO.To_Object (From.Type_Name);
       elsif Name = "isEnum" then
-         return Util.Beans.Objects.To_Object (False);
+         return UBO.To_Object (False);
       elsif Name = "isDiscrete" or Name = "isNewDiscrete" then
-         return Util.Beans.Objects.To_Object (True);
+         return UBO.To_Object (True);
       elsif Name = "sqlType" then
-         return Util.Beans.Objects.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
+         return UBO.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
       else
          return Mappings.Mapping_Definition (From).Get_Value (Name);
       end if;

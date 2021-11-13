@@ -36,34 +36,34 @@ package body Gen.Model.Mappings is
    --  ------------------------------
    overriding
    function Get_Value (From : in Mapping_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Target);
+         return UBO.To_Object (From.Target);
       elsif Name = "isBoolean" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_BOOLEAN);
+         return UBO.To_Object (From.Kind = T_BOOLEAN);
       elsif Name = "isInteger" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_INTEGER or From.Kind = T_ENTITY_TYPE);
+         return UBO.To_Object (From.Kind = T_INTEGER or From.Kind = T_ENTITY_TYPE);
       elsif Name = "isFloat" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_FLOAT);
+         return UBO.To_Object (From.Kind = T_FLOAT);
       elsif Name = "isString" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_STRING);
+         return UBO.To_Object (From.Kind = T_STRING);
       elsif Name = "isIdentifier" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_IDENTIFIER);
+         return UBO.To_Object (From.Kind = T_IDENTIFIER);
       elsif Name = "isDate" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_DATE);
+         return UBO.To_Object (From.Kind = T_DATE);
       elsif Name = "isBlob" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_BLOB);
+         return UBO.To_Object (From.Kind = T_BLOB);
       elsif Name = "isEnum" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_ENUM);
+         return UBO.To_Object (From.Kind = T_ENUM);
       elsif Name = "isDiscrete" then
-         return Util.Beans.Objects.To_Object (From.Kind = T_ENUM or From.Kind = T_INTEGER);
+         return UBO.To_Object (From.Kind = T_ENUM or From.Kind = T_INTEGER);
       elsif Name = "isNewDiscrete" then
-         return Util.Beans.Objects.To_Object (False);
+         return UBO.To_Object (False);
       elsif Name = "isPrimitiveType" then
-         return Util.Beans.Objects.To_Object (From.Kind /= T_TABLE and From.Kind /= T_BLOB);
+         return UBO.To_Object (From.Kind /= T_TABLE and From.Kind /= T_BLOB);
       elsif Name = "isNullable" then
-         return Util.Beans.Objects.To_Object (From.Nullable);
+         return UBO.To_Object (From.Nullable);
       else
          return Definition (From).Get_Value (Name);
       end if;

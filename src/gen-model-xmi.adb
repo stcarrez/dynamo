@@ -314,10 +314,10 @@ package body Gen.Model.XMI is
    --  Set the model name.
    --  ------------------------------
    procedure Set_Name (Node  : in out Model_Element;
-                       Value : in Util.Beans.Objects.Object) is
+                       Value : in UBO.Object) is
    begin
-      if not Util.Beans.Objects.Is_Null (Value) then
-         Node.Set_Name (Util.Beans.Objects.To_Unbounded_String (Value));
+      if not UBO.Is_Null (Value) then
+         Node.Set_Name (UBO.To_Unbounded_String (Value));
       end if;
    end Set_Name;
 
@@ -325,9 +325,9 @@ package body Gen.Model.XMI is
    --  Set the model XMI unique id.
    --  ------------------------------
    procedure Set_XMI_Id (Node  : in out Model_Element;
-                         Value : in Util.Beans.Objects.Object) is
+                         Value : in UBO.Object) is
    begin
-      Node.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Value);
+      Node.XMI_Id := UBO.To_Unbounded_String (Value);
    end Set_XMI_Id;
 
    --  ------------------------------
@@ -556,13 +556,13 @@ package body Gen.Model.XMI is
    --  Create an enum literal and add it to the enum.
    --  ------------------------------
    procedure Add_Literal (Node    : in out Enum_Element;
-                          Id      : in Util.Beans.Objects.Object;
-                          Name    : in Util.Beans.Objects.Object;
+                          Id      : in UBO.Object;
+                          Name    : in UBO.Object;
                           Literal : out Literal_Element_Access) is
    begin
       Literal := new Literal_Element (Node.Model);
-      Literal.XMI_Id := Util.Beans.Objects.To_Unbounded_String (Id);
-      Literal.Set_Name (Util.Beans.Objects.To_Unbounded_String (Name));
+      Literal.XMI_Id := UBO.To_Unbounded_String (Id);
+      Literal.Set_Name (UBO.To_Unbounded_String (Name));
       Node.Elements.Append (Literal.all'Access);
    end Add_Literal;
 

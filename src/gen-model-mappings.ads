@@ -18,8 +18,6 @@
 with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded.Hash;
 
-with Util.Beans.Objects;
-
 --  The <b>Gen.Model.Mappings</b> package controls the mappings to convert an XML
 --  type into the Ada type.
 package Gen.Model.Mappings is
@@ -61,7 +59,7 @@ package Gen.Model.Mappings is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Mapping_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Find the mapping for the given type name.
    function Find_Type (Name       : in UString;

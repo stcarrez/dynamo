@@ -44,9 +44,9 @@ package body Gen.Model.Enums is
       if Name = "values" then
          return From.Values_Bean;
       elsif Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Type_Name);
+         return UBO.To_Object (From.Type_Name);
       elsif Name = "isEnum" or Name = "isDiscrete" then
-         return Util.Beans.Objects.To_Object (True);
+         return UBO.To_Object (True);
       elsif Name = "sqlType" then
          if Length (From.Sql_Type) > 0 then
             return UBO.To_Object (Mappings.Get_Type_Name (From.Sql_Type));

@@ -24,16 +24,16 @@ package body Gen.Model.Operations is
    --  ------------------------------
    overriding
    function Get_Value (From : in Operation_Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "parameters" or Name = "columns" then
          return From.Parameters_Bean;
 
       elsif Name = "return" then
-         return Util.Beans.Objects.To_Object (From.Return_Type);
+         return UBO.To_Object (From.Return_Type);
 
       elsif Name = "type" then
-         return Util.Beans.Objects.To_Object (Operation_Type'Image (From.Kind));
+         return UBO.To_Object (Operation_Type'Image (From.Kind));
 
       else
          return Definition (From).Get_Value (Name);
@@ -53,8 +53,8 @@ package body Gen.Model.Operations is
    overriding
    procedure Initialize (O : in out Operation_Definition) is
    begin
-      O.Parameters_Bean := Util.Beans.Objects.To_Object (O.Parameters'Unchecked_Access,
-                                                         Util.Beans.Objects.STATIC);
+      O.Parameters_Bean := UBO.To_Object (O.Parameters'Unchecked_Access,
+                                          UBO.STATIC);
 
    end Initialize;
 

@@ -3,6 +3,7 @@ Version 1.2.3   -
   - Fix #7: No default type for SQL generation of a column that uses an enumeration
   - Fix #9: Option or configuration to disable some SQL generation
   - Fix #10: Definition of an UML datatype with a tagged value raises an exception
+  - Fix #12: Avoid emitting a full qualified type name for types declared in the current package
 
 Version 1.2.2   - Jul 2021
   - Fix the SQL type definition for double on PostgreSQL

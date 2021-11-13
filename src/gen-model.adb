@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model -- Model for Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2019, 2020 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2019, 2020, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,10 +29,10 @@ package body Gen.Model is
    --  ------------------------------
    function Get_Name (From : in Definition) return String is
    begin
-      return Ada.Strings.Unbounded.To_String (From.Def_Name);
+      return To_String (From.Def_Name);
    end Get_Name;
 
-   function Name (From : in Definition) return Ada.Strings.Unbounded.Unbounded_String is
+   function Name (From : in Definition) return UString is
    begin
       return From.Def_Name;
    end Name;
@@ -43,11 +43,11 @@ package body Gen.Model is
    procedure Set_Name (Def  : in out Definition;
                        Name : in String) is
    begin
-      Def.Def_Name := Ada.Strings.Unbounded.To_Unbounded_String (Name);
+      Def.Def_Name := To_UString (Name);
    end Set_Name;
 
    procedure Set_Name (Def  : in out Definition;
-                       Name : in Ada.Strings.Unbounded.Unbounded_String) is
+                       Name : in UString) is
    begin
       Def.Def_Name := Name;
    end Set_Name;
@@ -57,16 +57,16 @@ package body Gen.Model is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    function Get_Value (From : in Definition;
-                       Name : in String) return Util.Beans.Objects.Object is
+                       Name : in String) return UBO.Object is
    begin
       if Name = "comment" then
          return From.Comment;
 
       elsif Name = "rowIndex" then
-         return Util.Beans.Objects.To_Object (From.Row_Index);
+         return UBO.To_Object (From.Row_Index);
 
       elsif Name = "name" then
-         return Util.Beans.Objects.To_Object (From.Def_Name);
+         return UBO.To_Object (From.Def_Name);
       else
          return From.Attrs.Get_Value (Name);
       end if;
@@ -78,9 +78,9 @@ package body Gen.Model is
    --  ------------------------------
    function Get_Attribute (From : in Definition;
                            Name : in String) return String is
-      V : constant Util.Beans.Objects.Object := From.Get_Value (Name);
+      V : constant UBO.Object := From.Get_Value (Name);
    begin
-      return Util.Beans.Objects.To_String (V);
+      return UBO.To_String (V);
    end Get_Attribute;
 
    --  ------------------------------
@@ -88,9 +88,9 @@ package body Gen.Model is
    --  If the name cannot be found, the method should return the Null object.
    --  ------------------------------
    function Get_Attribute (From : in Definition;
-                           Name : in String) return Ada.Strings.Unbounded.Unbounded_String is
+                           Name : in String) return UString is
    begin
-      return Ada.Strings.Unbounded.To_Unbounded_String (From.Get_Attribute (Name));
+      return To_UString (From.Get_Attribute (Name));
    end Get_Attribute;
 
    --  ------------------------------
@@ -101,13 +101,13 @@ package body Gen.Model is
       Trimmed_Comment : constant String
         := Ada.Strings.Fixed.Trim (Comment, Trim_Chars, Trim_Chars);
    begin
-      Def.Comment := Util.Beans.Objects.To_Object (Trimmed_Comment);
+      Def.Comment := UBO.To_Object (Trimmed_Comment);
    end Set_Comment;
 
    --  ------------------------------
    --  Get the comment associated with the element.
    --  ------------------------------
-   function Get_Comment (Def : in Definition) return Util.Beans.Objects.Object is
+   function Get_Comment (Def : in Definition) return UBO.Object is
    begin
       return Def.Comment;
    end Get_Comment;
@@ -118,7 +118,7 @@ package body Gen.Model is
    procedure Set_Location (Node     : in out Definition;
                            Location : in String) is
    begin
-      Node.Location := Ada.Strings.Unbounded.To_Unbounded_String (Location);
+      Node.Location := To_UString (Location);
    end Set_Location;
 
    --  ------------------------------
@@ -126,21 +126,21 @@ package body Gen.Model is
    --  ------------------------------
    function Get_Location (Node : in Definition) return String is
    begin
-      return Ada.Strings.Unbounded.To_String (Node.Location);
+      return To_String (Node.Location);
    end Get_Location;
 
    --  ------------------------------
    --  Initialize the definition from the DOM node attributes.
    --  ------------------------------
    procedure Initialize (Def  : in out Definition;
-                         Name : in Ada.Strings.Unbounded.Unbounded_String;
+                         Name : in UString;
                          Node : in DOM.Core.Node) is
       use type DOM.Core.Node;
 
       Attrs : constant DOM.Core.Named_Node_Map := DOM.Core.Nodes.Attributes (Node);
    begin
       Def.Def_Name := Name;
-      Def.Comment := Util.Beans.Objects.To_Object (Gen.Utils.Get_Comment (Node));
+      Def.Comment := UBO.To_Object (Gen.Utils.Get_Comment (Node));
 
       for I in 0 .. DOM.Core.Nodes.Length (Attrs) loop
          declare
@@ -151,7 +151,7 @@ package body Gen.Model is
                   Name  : constant DOM.Core.DOM_String := DOM.Core.Nodes.Node_Name (A);
                   Value : constant DOM.Core.DOM_String := DOM.Core.Nodes.Node_Value (A);
                begin
-                  Def.Attrs.Include (Name, Util.Beans.Objects.To_Object (Value));
+                  Def.Attrs.Include (Name, UBO.To_Object (Value));
                end;
             end if;
          end;
@@ -164,7 +164,7 @@ package body Gen.Model is
    procedure Validate (Def : in out Definition;
                        Log : in out Util.Log.Logging'Class) is
    begin
-      if Ada.Strings.Unbounded.Length (Def.Def_Name) = 0 then
+      if Length (Def.Def_Name) = 0 then
          Log.Error (Def.Get_Location & ": name is empty");
       end if;
    end Validate;

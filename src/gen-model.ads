@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model -- Model for Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2020 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2020, 2021 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Ada.Finalization;
-with Ada.Strings.Unbounded;
 
 with Util.Log;
 with Util.Beans.Basic;
@@ -25,6 +24,8 @@ with Util.Beans.Objects.Maps;
 
 with DOM.Core;
 package Gen.Model is
+
+   package UBO renames Util.Beans.Objects;
 
    --  Exception raised if a name is already registered in the model.
    --  This exception is raised if a table, an enum is already defined.
@@ -42,18 +43,18 @@ package Gen.Model is
 
    --  Get the object unique name.
    function Get_Name (From : in Definition) return String;
-   function Name (From : in Definition) return Ada.Strings.Unbounded.Unbounded_String;
+   function Name (From : in Definition) return UString;
 
    --  Set the object unique name.
    procedure Set_Name (Def  : in out Definition;
                        Name : in String);
    procedure Set_Name (Def  : in out Definition;
-                       Name : in Ada.Strings.Unbounded.Unbounded_String);
+                       Name : in UString);
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    function Get_Value (From : in Definition;
-                       Name : in String) return Util.Beans.Objects.Object;
+                       Name : in String) return UBO.Object;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
@@ -63,14 +64,14 @@ package Gen.Model is
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    function Get_Attribute (From : in Definition;
-                           Name : in String) return Ada.Strings.Unbounded.Unbounded_String;
+                           Name : in String) return UString;
 
    --  Set the comment associated with the element.
    procedure Set_Comment (Def     : in out Definition;
                           Comment : in String);
 
    --  Get the comment associated with the element.
-   function Get_Comment (Def : in Definition) return Util.Beans.Objects.Object;
+   function Get_Comment (Def : in Definition) return UBO.Object;
 
    --  Set the location (file and line) where the model element is defined in the XMI file.
    procedure Set_Location (Node     : in out Definition;
@@ -81,7 +82,7 @@ package Gen.Model is
 
    --  Initialize the definition from the DOM node attributes.
    procedure Initialize (Def  : in out Definition;
-                         Name : in Ada.Strings.Unbounded.Unbounded_String;
+                         Name : in UString;
                          Node : in DOM.Core.Node);
 
    --  Validate the definition by checking and reporting problems to the logger interface.
@@ -96,10 +97,10 @@ private
    type Definition is new Ada.Finalization.Limited_Controlled
      and Util.Beans.Basic.Readonly_Bean with record
       Row_Index  : Natural;
-      Def_Name   : Ada.Strings.Unbounded.Unbounded_String;
-      Attrs      : Util.Beans.Objects.Maps.Map_Bean;
-      Comment    : Util.Beans.Objects.Object;
-      Location   : Ada.Strings.Unbounded.Unbounded_String;
+      Def_Name   : UString;
+      Attrs      : UBO.Maps.Map_Bean;
+      Comment    : UBO.Object;
+      Location   : UString;
    end record;
 
 end Gen.Model;

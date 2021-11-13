@@ -24,10 +24,10 @@ package body Gen.Model.Enums is
    --  ------------------------------
    overriding
    function Get_Value (From : Value_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+                       Name : String) return UBO.Object is
    begin
       if Name = "value" then
-         return Util.Beans.Objects.To_Object (From.Number);
+         return UBO.To_Object (From.Number);
       else
          return Definition (From).Get_Value (Name);
       end if;
@@ -39,7 +39,7 @@ package body Gen.Model.Enums is
    --  ------------------------------
    overriding
    function Get_Value (From : Enum_Definition;
-                       Name : String) return Util.Beans.Objects.Object is
+                       Name : String) return UBO.Object is
    begin
       if Name = "values" then
          return From.Values_Bean;
@@ -48,7 +48,11 @@ package body Gen.Model.Enums is
       elsif Name = "isEnum" or Name = "isDiscrete" then
          return Util.Beans.Objects.To_Object (True);
       elsif Name = "sqlType" then
-         return Util.Beans.Objects.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
+         if Length (From.Sql_Type) > 0 then
+            return UBO.To_Object (Mappings.Get_Type_Name (From.Sql_Type));
+         else
+            return UBO.To_Object (Mappings.Get_Type_Name (To_UString ("enum")));
+         end if;
       else
          return Mappings.Mapping_Definition (From).Get_Value (Name);
       end if;
@@ -79,8 +83,8 @@ package body Gen.Model.Enums is
    overriding
    procedure Initialize (O : in out Enum_Definition) is
    begin
-      O.Values_Bean := Util.Beans.Objects.To_Object (O.Values'Unchecked_Access,
-                                                     Util.Beans.Objects.STATIC);
+      O.Values_Bean := UBO.To_Object (O.Values'Unchecked_Access,
+                                      UBO.STATIC);
    end Initialize;
 
    --  ------------------------------
@@ -99,11 +103,13 @@ package body Gen.Model.Enums is
    --  ------------------------------
    --  Create an enum with the given name.
    --  ------------------------------
-   function Create_Enum (Name : in Unbounded_String) return Enum_Definition_Access is
+   function Create_Enum (Name : in UString) return Enum_Definition_Access is
       Enum : constant Enum_Definition_Access := new Enum_Definition;
    begin
       Enum.Set_Name (Name);
       declare
+         use Ada.Strings.Unbounded;
+
          Pos : constant Natural := Index (Enum.Name, ".", Ada.Strings.Backward);
       begin
          if Pos > 0 then

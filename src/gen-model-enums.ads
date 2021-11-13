@@ -16,16 +16,10 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
-
-with Util.Beans.Objects;
-
 with Gen.Model.List;
 with Gen.Model.Mappings;
 with Gen.Model.Packages;
 package Gen.Model.Enums is
-
-   use Ada.Strings.Unbounded;
 
    type Enum_Definition is tagged;
    type Enum_Definition_Access is access all Enum_Definition'Class;
@@ -43,7 +37,7 @@ package Gen.Model.Enums is
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Value_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Compare two enum literals.
    function "<" (Left, Right : in Value_Definition_Access) return Boolean;
@@ -56,19 +50,19 @@ package Gen.Model.Enums is
    --  ------------------------------
    type Enum_Definition is new Mappings.Mapping_Definition with record
       Values         : aliased Value_List.List_Definition;
-      Values_Bean    : Util.Beans.Objects.Object;
+      Values_Bean    : UBO.Object;
       Package_Def    : Gen.Model.Packages.Package_Definition_Access;
-      Type_Name      : Unbounded_String;
-      Nullable_Type  : Unbounded_String;
-      Pkg_Name       : Unbounded_String;
-      Sql_Type       : Unbounded_String;
+      Type_Name      : UString;
+      Nullable_Type  : UString;
+      Pkg_Name       : UString;
+      Sql_Type       : UString;
    end record;
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
    overriding
    function Get_Value (From : Enum_Definition;
-                       Name : String) return Util.Beans.Objects.Object;
+                       Name : String) return UBO.Object;
 
    --  Prepare the generation of the model.
    overriding
@@ -84,6 +78,6 @@ package Gen.Model.Enums is
                         Value : out Value_Definition_Access);
 
    --  Create an enum with the given name.
-   function Create_Enum (Name : in Unbounded_String) return Enum_Definition_Access;
+   function Create_Enum (Name : in UString) return Enum_Definition_Access;
 
 end Gen.Model.Enums;

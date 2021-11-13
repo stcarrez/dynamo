@@ -62,6 +62,8 @@ package body Gen.Generator is
 
    RESULT_DIR : constant String := "generator.output.dir";
 
+   function Get_Ada_Type (Type_Name : in UString) return String;
+
    function To_Ada_Type (Value : in Util.Beans.Objects.Object;
                          Param : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
    function Indent (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
@@ -92,6 +94,22 @@ package body Gen.Generator is
    function File_Exists (Path : in Util.Beans.Objects.Object) return Util.Beans.Objects.Object;
 
    procedure Set_Functions (Mapper : in out EL.Functions.Function_Mapper'Class);
+
+   Current_Package : UString;
+
+   function Get_Ada_Type (Type_Name : in UString) return String is
+      Name : constant String := To_String (Type_Name);
+      Pkg  : constant String := To_String (Current_Package);
+   begin
+      if Name'Length > Pkg'Length
+        and then Util.Strings.Starts_With (Name, Pkg)
+        and then Name (Name'First + Pkg'Length) = '.'
+      then
+         return Name (Name'First + Pkg'Length + 1 .. Name'Last);
+      else
+         return Name;
+      end if;
+   end Get_Ada_Type;
 
    --  ------------------------------
    --  EL Function to translate a model type to an Ada implementation type
@@ -126,10 +144,14 @@ package body Gen.Generator is
 
             elsif Type_Mapping.Kind = T_ENUM then
                if Column.Not_Null or Util.Beans.Objects.To_Integer (Param) = 2 then
-                  return Util.Beans.Objects.To_Object (Column.Type_Name);
+                  return Util.Beans.Objects.To_Object (Get_Ada_Type (Column.Type_Name));
                else
-                  return Util.Beans.Objects.To_Object
-                    (Gen.Model.Enums.Enum_Definition (Type_Mapping.all).Nullable_Type);
+                  declare
+                     Result : constant UString
+                       := Gen.Model.Enums.Enum_Definition (Type_Mapping.all).Nullable_Type;
+                  begin
+                     return Util.Beans.Objects.To_Object (Get_Ada_Type (Result));
+                  end;
                end if;
 
             elsif Type_Mapping.Kind /= T_TABLE then
@@ -165,7 +187,7 @@ package body Gen.Generator is
    --  ------------------------------
    function Concat (Arg1, Arg2, Arg3, Arg4 : in Util.Beans.Objects.Object)
                     return Util.Beans.Objects.Object is
-      Result : Ada.Strings.Unbounded.Unbounded_String;
+      Result : UString;
    begin
       if not Util.Beans.Objects.Is_Null (Arg1) then
          Append (Result, Util.Beans.Objects.To_String (Arg1));
@@ -215,7 +237,7 @@ package body Gen.Generator is
    --  ------------------------------
    function To_Ada_Ident (Value : Util.Beans.Objects.Object) return Util.Beans.Objects.Object is
       Name   : constant String := Util.Beans.Objects.To_String (Value);
-      Result : Unbounded_String;
+      Result : UString;
       C      : Character;
    begin
       for I in Name'Range loop
@@ -259,7 +281,7 @@ package body Gen.Generator is
       Pattern : constant String := Util.Beans.Objects.To_String (Item);
       Token   : constant String := Util.Beans.Objects.To_String (By);
       Last    : Natural := Content'First;
-      Result  : Ada.Strings.Unbounded.Unbounded_String;
+      Result  : UString;
       Pos     : Natural;
    begin
       if Pattern'Length = 0 then
@@ -291,7 +313,7 @@ package body Gen.Generator is
 
       Comment   : constant String := Ada.Strings.Fixed.Trim (Util.Beans.Objects.To_String (Value),
                                                              Ada.Strings.Both);
-      Result    : Unbounded_String;
+      Result    : UString;
       C         : Character;
       Pos       : Natural := START_POS;
    begin
@@ -371,14 +393,14 @@ package body Gen.Generator is
    --  Initialize the generator
    --  ------------------------------
    procedure Initialize (H : in out Handler;
-                         Config_Dir : in Ada.Strings.Unbounded.Unbounded_String;
+                         Config_Dir : in UString;
                          Debug : in Boolean) is
       use Ada.Directories;
 
       procedure Register_Funcs is
         new ASF.Applications.Main.Register_Functions (Set_Functions);
 
-      Dir     : constant String := Ada.Strings.Unbounded.To_String (Config_Dir);
+      Dir     : constant String := To_String (Config_Dir);
       Factory : ASF.Applications.Main.Application_Factory;
       Path    : constant String := Compose (Dir, "generator.properties");
       Context : EL.Contexts.Default.Default_Context;
@@ -406,8 +428,8 @@ package body Gen.Generator is
       EL.Utils.Expand (Source => Props, Into => H.Conf, Context => Context);
       H.Initialize (H.Conf, Factory);
 
-      H.Config_Dir := To_Unbounded_String (Dir);
-      H.Output_Dir := To_Unbounded_String (H.Conf.Get (RESULT_DIR, "./"));
+      H.Config_Dir := To_UString (Dir);
+      H.Output_Dir := To_UString (H.Conf.Get (RESULT_DIR, "./"));
 
       Register_Funcs (H);
       H.File   := new Util.Beans.Objects.Object;
@@ -438,7 +460,7 @@ package body Gen.Generator is
    --  Set the directory where template files are stored.
    --  ------------------------------
    procedure Set_Template_Directory (H    : in out Handler;
-                                     Path : in Ada.Strings.Unbounded.Unbounded_String) is
+                                     Path : in UString) is
    begin
       H.Conf.Set (ASF.Applications.VIEW_DIR, Path);
    end Set_Template_Directory;
@@ -450,7 +472,7 @@ package body Gen.Generator is
                                    Path : in String) is
    begin
       H.Conf.Set (RESULT_DIR, Path);
-      H.Output_Dir := To_Unbounded_String (Path);
+      H.Output_Dir := To_UString (Path);
    end Set_Result_Directory;
 
    --  ------------------------------
@@ -665,7 +687,7 @@ package body Gen.Generator is
                            Recursive : in Boolean := False) is
       Dir : constant String := Ada.Directories.Containing_Directory (To_String (H.Config_Dir));
    begin
-      H.Project.Install_Dir := To_Unbounded_String (Dir);
+      H.Project.Install_Dir := To_UString (Dir);
       H.Project.Read_Project (File      => File,
                               Config    => H.Conf,
                               Recursive => Recursive);
@@ -953,8 +975,8 @@ package body Gen.Generator is
       if Value'Length = 0 then
          H.Error ("Template '{0}' is not defined.", Name);
       else
-         H.Templates.Include (To_Unbounded_String (Value),
-                              Template_Context '(Mode, To_Unbounded_String (Mapping)));
+         H.Templates.Include (To_UString (Value),
+                              Template_Context '(Mode, To_UString (Mapping)));
       end if;
    end Add_Generation;
 
@@ -974,12 +996,12 @@ package body Gen.Generator is
    --  ------------------------------
    procedure Save_Content (H       : in out Handler;
                            File    : in String;
-                           Content : in Unbounded_String) is
+                           Content : in UString) is
       Dir         : constant String := To_String (H.Output_Dir);
       Mode        : constant String := Util.Beans.Objects.To_String (H.Mode.all);
       Path        : constant String := Util.Files.Compose (Dir, File);
       Exists      : constant Boolean := Ada.Directories.Exists (Path);
-      Old_Content : Unbounded_String;
+      Old_Content : UString;
    begin
       if Exists and Mode = "once" then
          Log.Info ("File {0} exists, generation skipped.", Path);
@@ -1013,7 +1035,7 @@ package body Gen.Generator is
                        Model : in Gen.Model.Definition_Access;
                        Save  : not null access procedure (H       : in out Handler;
                                                           File    : in String;
-                                                          Content : in Unbounded_String)) is
+                                                          Content : in UString)) is
       use Util.Beans.Objects;
 
       Req   : ASF.Requests.Mockup.Request;
@@ -1030,6 +1052,9 @@ package body Gen.Generator is
    begin
       Log.Debug ("With template '{0}'", File);
 
+      Current_Package := To_UString (Model.Get_Name);
+      Log.Error ("Current package '{0}'", To_String (Current_Package));
+
       Req.Set_Method ("GET");
       Req.Set_Attribute (Name => "project", Value => Prj_Bean);
       Req.Set_Attribute (Name => "package", Value => Bean);
@@ -1042,7 +1067,7 @@ package body Gen.Generator is
       Servlet.Core.Forward (Dispatcher, Req, Reply);
 
       declare
-         Content  : Unbounded_String;
+         Content  : UString;
          File     : constant String := Util.Beans.Objects.To_String (H.File.all);
       begin
          Reply.Read_Content (Content);
@@ -1059,7 +1084,7 @@ package body Gen.Generator is
                        Save  : not null access
                          procedure (H       : in out Handler;
                                     File    : in String;
-                                    Content : in Ada.Strings.Unbounded.Unbounded_String)) is
+                                    Content : in UString)) is
    begin
       Log.Debug ("Generating with template {0} in mode {1}",
                  File, Iteration_Mode'Image (Mode));
@@ -1129,7 +1154,7 @@ package body Gen.Generator is
       Ent        : Directory_Entry_Type;
       Dir        : constant String := H.Conf.Get (ASF.Applications.VIEW_DIR);
       Path       : constant String := Util.Files.Compose (Dir, Name);
-      Base_Dir   : constant Unbounded_String := H.Output_Dir;
+      Base_Dir   : constant UString := H.Output_Dir;
    begin
       if Kind (Path) /= Directory then
          Ada.Text_IO.Put_Line ("Cannot read model directory: " & Path);
@@ -1143,7 +1168,7 @@ package body Gen.Generator is
             File_Path : constant String := Full_Name (Ent);
             Ext       : constant String := Extension (Base_Name);
             Target    : constant String := Compose (To_String (Base_Dir), Base_Name);
-            Content   : Unbounded_String;
+            Content   : UString;
          begin
             if Ext = "xhtml" then
                H.Generate (Mode, File_Path, Save_Content'Access);
@@ -1167,7 +1192,7 @@ package body Gen.Generator is
             Dir      : constant String := Compose (To_String (Base_Dir), Dir_Name);
          begin
             if Dir_Name /= "." and Dir_Name /= ".." and Dir_Name /= ".svn" then
-               H.Output_Dir := To_Unbounded_String (Dir);
+               H.Output_Dir := To_UString (Dir);
                if not Ada.Directories.Exists (Dir) then
                   Ada.Directories.Create_Directory (Dir);
                end if;
@@ -1219,7 +1244,7 @@ package body Gen.Generator is
    function Get_Search_Directories (H : in Handler) return String is
       Current_Dir : constant String := Ada.Directories.Current_Directory;
       Iter : Gen.Utils.String_List.Cursor := H.Project.Dynamo_Files.Last;
-      Dirs : Ada.Strings.Unbounded.Unbounded_String;
+      Dirs : UString;
    begin
       while Gen.Utils.String_List.Has_Element (Iter) loop
          declare

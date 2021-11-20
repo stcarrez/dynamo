@@ -381,7 +381,7 @@
       if Object.Is_Modified (#{column.index + 1}) then
       <h:panelGroup rendered="#{column.type.isEnum}">
          Stmt.Save_Field (Name  => COL_#{column.index}_#{table.rowIndex}_NAME, --  #{column.sqlName}
-                          Value => Integer (#{g:adaType(column,1)}'Pos (Object.#{fn:capitalize(column.name)})));
+                          Value => Integer (#{g:adaType(column,1)}'Enum_Rep (Object.#{fn:capitalize(column.name)})));
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isNewDiscrete}">
          Stmt.Save_Field (Name  => COL_#{column.index}_#{table.rowIndex}_NAME, --  #{column.sqlName}
@@ -455,7 +455,7 @@
   <h:panelGroup rendered="#{table.id.generator ne 'native' or table.id.name ne column.name}">
     <h:panelGroup rendered="#{column.type.isEnum and column.isInserted}">
       Query.Save_Field (Name  => COL_#{column.index}_#{table.rowIndex}_NAME, --  #{column.sqlName}
-                        Value => Integer (#{g:adaType(column,1)}'Pos (Object.#{fn:capitalize(column.name)})));
+                        Value => Integer (#{g:adaType(column,1)}'Enum_Rep (Object.#{fn:capitalize(column.name)})));
     </h:panelGroup>
     <h:panelGroup rendered="#{column.name ne table.id.name and (column.isInserted or column.isVersion) and column.type.isNewDiscrete}">
       Query.Save_Field (Name  => COL_#{column.index}_#{table.rowIndex}_NAME, --  #{column.sqlName}
@@ -573,7 +573,7 @@
       Object.#{fn:capitalize(column.name)} := Stmt.Get_Time (#{column.index});
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isEnum}">
-      Object.#{fn:capitalize(column.name)} := #{g:adaType(column,1)}'Val (Stmt.Get_Integer (#{column.index}));
+      Object.#{fn:capitalize(column.name)} := #{g:adaType(column,1)}'Enum_Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isNewDiscrete}">
       Object.#{fn:capitalize(column.name)} := #{g:adaType(column,1)} (Stmt.Get_Integer (#{column.index}));

@@ -80,11 +80,11 @@
   <h:panelGroup rendered="#{column.type.isEnum and column.isNull}">
       Into.#{fn:capitalize(column.name)}.Is_Null := Stmt.Is_Null (#{column.index});
       if not Into.#{fn:capitalize(column.name)}.Is_Null then
-         Into.#{fn:capitalize(column.name)}.Value := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
+         Into.#{fn:capitalize(column.name)}.Value := #{g:adaType(column,2)}'Enum_Val (Stmt.Get_Integer (#{column.index}));
       end if;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isEnum and not column.isNull}">
-      Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
+      Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Enum_Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isNewDiscrete and not column.isNull}">
       Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)} (Stmt.Get_Long_Integer (#{column.index}));
@@ -160,11 +160,11 @@
   <h:panelGroup rendered="#{column.type.isEnum and column.isNull}">
          Into.#{fn:capitalize(column.name)}.Is_Null := Stmt.Is_Null (#{column.index});
          if not Into.#{fn:capitalize(column.name)}.Is_Null then
-            Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
+            Into.#{fn:capitalize(column.name)}.Value := #{g:adaType(column,2)}'Enum_Val (Stmt.Get_Integer (#{column.index}));
          end if;
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isEnum and not column.isNull}">
-         Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Val (Stmt.Get_Integer (#{column.index}));
+         Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Enum_Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isNewDiscrete and not column.isNull}">
          Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)} (Stmt.Get_Integer (#{column.index}));

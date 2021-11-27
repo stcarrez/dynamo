@@ -97,11 +97,19 @@
         new ADO.Objects.Set_Field_Operation
           (#{g:adaType(column,1)});
      </h:panelGroup>
-     <h:panelGroup rendered="#{(column.type.isEnum or column.type.isNewDiscrete) and column.isAuditable}">
+     <h:panelGroup rendered="#{column.type.isEnum and column.isAuditable}">
       procedure Set_Field_Discrete is
         new ADO.Audits.Set_Field_Operation
           (#{g:adaType(column,1)},
            #{g:adaType(column,1)}_Objects.To_Object);
+     </h:panelGroup>
+     <h:panelGroup rendered="#{column.type.isNewDiscrete and column.isAuditable}">
+      function To_Object (Value : in #{g:adaType(column,1)}) return Util.Beans.Objects.Object
+        is (Util.Beans.Objects.To_Object (Long_Long_Integer (Value)));
+      procedure Set_Field_Discrete is
+        new ADO.Audits.Set_Field_Operation
+          (#{g:adaType(column,1)},
+           To_Object);
      </h:panelGroup>
       Impl : #{fn:capitalize(table.type)}_Access;
    begin

@@ -102,6 +102,11 @@ package Gen.Model.Projects is
    --  The default is <tt>db</tt>.
    function Get_Database_Dir (Project : in Project_Definition) return String;
 
+   --  Get the directory path which is the base dir for the 'web, 'config' and 'bundles'.
+   --  This is controlled by the <b>base_dir</b> configuration property.
+   --  The default is <tt>.</tt>.
+   function Get_Base_Dir (Project : in Project_Definition) return String;
+
    --  Find the dependency for the <b>Name</b> plugin.
    --  Returns a null dependency if the project does not depend on that plugin.
    function Find_Dependency (From : in Project_Definition;

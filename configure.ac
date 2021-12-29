@@ -70,6 +70,11 @@ AC_ARG_WITH(gprpath,
 GNAT_PROJECT_PATHS=${gnat_project_paths}
 AC_SUBST(GNAT_PROJECT_PATHS)
 
+ac_asf_dir=`realpath $ASF_DIR`
+BUNDLE_DIR='#{generator_config_dir}/../asf/bundles'
+BUNDLE_DIR="$BUNDLE_DIR;$ac_asf_dir/bundles"
+AC_SUBST(BUNDLE_DIR)
+
 # directories GNAT project gives the installation paths
 AM_GNAT_CHECK_PROJECT([gnatprj],[gnatprj])
 

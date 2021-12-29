@@ -79,6 +79,7 @@ package body Prj.Attr is
    "LVlanguages#" &
    "Lbroots#" &
    "SVexternally_built#" &
+   "SVcreate_missing_dirs#" &
 
    --  Directories
 

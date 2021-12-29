@@ -437,13 +437,12 @@ package body Gen.Artifacts.Hibernate is
            and Pos <= Project.Dynamo_Files.Last_Index loop
             declare
                Name : constant String := Project.Dynamo_Files.Element (Pos);
-               Dir  : constant String := Ada.Directories.Containing_Directory (Name);
                Prj  : constant Gen.Model.Projects.Project_Definition_Access
                  := Project.Find_Project (Name);
             begin
                Log.Debug ("Checking project {0}", Name);
                if Prj /= null then
-                  Collect_SQL (Prj.all, Util.Files.Compose (Dir, "db"), Driver,
+                  Collect_SQL (Prj.all, Prj.Get_Database_Dir, Driver,
                                Prefix, Name, SQL_Content);
                end if;
             end;

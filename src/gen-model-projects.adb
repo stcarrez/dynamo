@@ -126,6 +126,20 @@ package body Gen.Model.Projects is
    end Get_Database_Dir;
 
    --  ------------------------------
+   --  Get the directory path which is the base dir for the 'web, 'config' and 'bundles'.
+   --  This is controlled by the <b>base_dir</b> configuration property.
+   --  The default is <tt>.</tt>.
+   --  ------------------------------
+   function Get_Base_Dir (Project : in Project_Definition) return String is
+      Dir : constant String := Ada.Directories.Containing_Directory (To_String (Project.Path));
+   begin
+      if not Project.Props.Exists ("base_dir") then
+         return Dir;
+      end if;
+      return Util.Files.Compose (Dir, Project.Props.Get ("base_dir", ""));
+   end Get_Base_Dir;
+
+   --  ------------------------------
    --  Find the Dynamo.xml path associated with the given GNAT project file or installed
    --  in the Dynamo installation path.
    --  ------------------------------

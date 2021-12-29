@@ -1226,9 +1226,15 @@ package body Gen.Generator is
    begin
       while Gen.Utils.String_List.Has_Element (Iter) loop
          declare
-            Path : constant String := Gen.Utils.String_List.Element (Iter);
+            use type Gen.Model.Projects.Project_Definition_Access;
+
+            Name : constant String := Gen.Utils.String_List.Element (Iter);
+            Prj  : constant Gen.Model.Projects.Project_Definition_Access
+                 := H.Project.Find_Project (Name);
          begin
-            Process (Ada.Directories.Containing_Directory (Path));
+            if Prj /= null then
+               Process (Prj.Get_Base_Dir);
+            end if;
          end;
          Gen.Utils.String_List.Next (Iter);
       end loop;
@@ -1245,13 +1251,18 @@ package body Gen.Generator is
    begin
       while Gen.Utils.String_List.Has_Element (Iter) loop
          declare
-            Path : constant String := Gen.Utils.String_List.Element (Iter);
-            Dir  : constant String := Ada.Directories.Containing_Directory (Path);
+            use type Gen.Model.Projects.Project_Definition_Access;
+
+            Name : constant String := Gen.Utils.String_List.Element (Iter);
+            Prj  : constant Gen.Model.Projects.Project_Definition_Access
+                 := H.Project.Find_Project (Name);
          begin
-            if Length (Dirs) > 0 then
-               Append (Dirs, ";");
+            if Prj /= null then
+               if Length (Dirs) > 0 then
+                  Append (Dirs, ";");
+               end if;
+               Append (Dirs, Util.Files.Get_Relative_Path (Current_Dir, Prj.Get_Base_Dir));
             end if;
-            Append (Dirs, Util.Files.Get_Relative_Path (Current_Dir, Dir));
          end;
          Gen.Utils.String_List.Previous (Iter);
       end loop;

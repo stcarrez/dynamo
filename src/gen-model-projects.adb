@@ -112,6 +112,20 @@ package body Gen.Model.Projects is
    end Get_Module_Dir;
 
    --  ------------------------------
+   --  Get the directory path which holds database model files.
+   --  This is controlled by the <b>db_dir</b> configuration property.
+   --  The default is <tt>db</tt>.
+   --  ------------------------------
+   function Get_Database_Dir (Project : in Project_Definition) return String is
+      Dir : constant String := Ada.Directories.Containing_Directory (To_String (Project.Path));
+   begin
+      if not Project.Props.Exists ("db_dir") then
+         return Util.Files.Compose (Dir, "db");
+      end if;
+      return Util.Files.Compose (Dir, Project.Props.Get ("db_dir", "db"));
+   end Get_Database_Dir;
+
+   --  ------------------------------
    --  Find the Dynamo.xml path associated with the given GNAT project file or installed
    --  in the Dynamo installation path.
    --  ------------------------------

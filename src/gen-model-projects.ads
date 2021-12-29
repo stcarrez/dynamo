@@ -95,8 +95,12 @@ package Gen.Model.Projects is
    --  Get the directory path which holds application modules.
    --  This is controlled by the <b>modules_dir</b> configuration property.
    --  The default is <tt>plugins</tt>.
-   --  ------------------------------
    function Get_Module_Dir (Project : in Project_Definition) return String;
+
+   --  Get the directory path which holds database model files.
+   --  This is controlled by the <b>db_dir</b> configuration property.
+   --  The default is <tt>db</tt>.
+   function Get_Database_Dir (Project : in Project_Definition) return String;
 
    --  Find the dependency for the <b>Name</b> plugin.
    --  Returns a null dependency if the project does not depend on that plugin.

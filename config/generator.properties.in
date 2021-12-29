@@ -38,4 +38,4 @@ generator.uml.default_type=http://argouml.org/profiles/uml14/default-uml14.xmi#-
 
 generator.debug=true
 
-bundle.dir=#{generator_config_dir}/../asf/bundles
+bundle.dir=@BUNDLE_DIR@

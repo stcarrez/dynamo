@@ -685,9 +685,10 @@ package body Gen.Generator is
    procedure Read_Project (H         : in out Handler;
                            File      : in String;
                            Recursive : in Boolean := False) is
-      Dir : constant String := Ada.Directories.Containing_Directory (To_String (H.Config_Dir));
+      Dir        : constant String := H.Get_Install_Directory;
+      Search_Dir : constant String := H.Get_Parameter (Gen.Configs.GEN_DYNAMO_SEARCH_DIRS, ".");
    begin
-      H.Project.Install_Dir := To_UString (Dir);
+      H.Project.Install_Dir := To_UString (Dir & ";" & Search_Dir);
       H.Project.Read_Project (File      => File,
                               Config    => H.Conf,
                               Recursive => Recursive);

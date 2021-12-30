@@ -75,6 +75,9 @@ BUNDLE_DIR='#{generator_config_dir}/../asf/bundles'
 BUNDLE_DIR="$BUNDLE_DIR;$ac_asf_dir/bundles"
 AC_SUBST(BUNDLE_DIR)
 
+DYNAMO_SEARCH_DIR='#{generator_config_dir}'
+AC_SUBST(DYNAMO_SEARCH_DIR)
+
 # directories GNAT project gives the installation paths
 AM_GNAT_CHECK_PROJECT([gnatprj],[gnatprj])
 

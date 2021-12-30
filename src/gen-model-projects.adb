@@ -35,7 +35,6 @@ package body Gen.Model.Projects is
 
    --  Find the Dynamo.xml path associated with the given GNAT project file or installed
    --  in the Dynamo installation path.
-   --  ------------------------------
    function Get_Dynamo_Path (Name         : in String;
                              Project_Path : in String;
                              Install_Dir  : in String) return String;
@@ -163,23 +162,23 @@ package body Gen.Model.Projects is
       --  Look in the Dynamo installation directory.
       if Name'Length > 0 then
          declare
-            Path   : constant String := Util.Files.Compose (Install_Dir, Name);
-            Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+            Dynamo : constant String := Util.Files.Compose (Name, "dynamo.xml");
+            Path   : constant String := Util.Files.Find_File_Path (Dynamo, Install_Dir);
          begin
-            Log.Debug ("Checking dynamo file {0}", Dynamo);
-            if Ada.Directories.Exists (Dynamo) then
-               return Dynamo;
+            Log.Debug ("Checking dynamo file {0}", Path);
+            if Ada.Directories.Exists (Path) then
+               return Path;
             end if;
          end;
       else
          declare
             Name   : constant String := Ada.Directories.Base_Name (Project_Path);
-            Path   : constant String := Util.Files.Compose (Install_Dir, Name);
-            Dynamo : constant String := Util.Files.Compose (Path, "dynamo.xml");
+            Dynamo : constant String := Util.Files.Compose (Name, "dynamo.xml");
+            Path   : constant String := Util.Files.Find_File_Path (Dynamo, Install_Dir);
          begin
-            Log.Debug ("Checking dynamo file {0}", Dynamo);
-            if Ada.Directories.Exists (Dynamo) then
-               return Dynamo;
+            Log.Debug ("Checking dynamo file {0}", Path);
+            if Ada.Directories.Exists (Path) then
+               return Path;
             end if;
          end;
       end if;
@@ -886,9 +885,9 @@ package body Gen.Model.Projects is
                Iter   : Project_Vectors.Cursor := Def.Dependencies.First;
                Result : Project_Reference;
                Found  : Project_Reference;
-               Dir    : constant String := To_String (Project.Install_Dir);
             begin
-               Log.Debug ("Read dependencies of {0}", Def.Name);
+               Log.Debug ("Read dependencies of '{0}' with install dir '{1}'",
+                          Def.Name, Install_Dir);
                while Project_Vectors.Has_Element (Iter) loop
                   Result := Project_Vectors.Element (Iter);
                   if Result.Project = null then
@@ -905,12 +904,12 @@ package body Gen.Model.Projects is
                            Path     : constant String := To_String (Result.Project.Path);
                            Dynamo   : constant String := Get_Dynamo_Path (Result.Project.Get_Name,
                                                                           Path,
-                                                                          Dir);
+                                                                          Install_Dir);
                            Has_File : constant Boolean := Project.Dynamo_Files.Contains (Dynamo);
                         begin
-                           Log.Info ("Project {0} depends on {1} found dynamo file {2}",
-                                     Def.Get_Name, Result.Project.Get_Name, Dynamo);
                            if Dynamo /= "" then
+                              Log.Info ("Project '{0}'' depends on '{1}' found dynamo file '{2}'",
+                                        Def.Get_Name, Result.Project.Get_Name, Dynamo);
                               if Path = "" then
                                  Result.Project.Path := To_UString (Dynamo);
                               end if;

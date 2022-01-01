@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Sep 26, 2021" "Ada Web Application"
+.TH DYNAMO 1 "Dec 29, 2021" "Ada Web Application"
 .SH NAME
 dynamo - Ada Application Generator
 .SH SYNOPSIS
@@ -527,6 +527,13 @@ resource bundles and XHTML presentation files.
 .\"
 .SS database
 The default database connection string.
+.\"
+.SS db_dir
+The relative path of the
+.B db
+directory that contains the XML query files and the SQL schema files.
+The default path is
+.BR db .
 .\"
 .SS links
 For the generated documentation, the property indicates the path of a file

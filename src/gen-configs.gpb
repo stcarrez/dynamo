@@ -37,6 +37,7 @@ package Gen.Configs is
    GEN_DEBUG_ENABLE         : constant String := "generator.debug";
    GEN_GNAT_PROJECT_DIRS    : constant String := "generator.gnat.projects.dir";
    GEN_TEMPLATES_DIRS       : constant String := "generator.model.dir";
+   GEN_DYNAMO_SEARCH_DIRS   : constant String := "generator.dynamo.dir";
 
    --  Path of the config directory
    CONFIG_DIR               : constant String := $CONFIG_DIR;

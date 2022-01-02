@@ -70,14 +70,6 @@ AC_ARG_WITH(gprpath,
 GNAT_PROJECT_PATHS=${gnat_project_paths}
 AC_SUBST(GNAT_PROJECT_PATHS)
 
-ac_asf_dir=`realpath $ASF_DIR`
-BUNDLE_DIR='#{generator_config_dir}/../asf/bundles'
-BUNDLE_DIR="$BUNDLE_DIR;$ac_asf_dir/bundles"
-AC_SUBST(BUNDLE_DIR)
-
-DYNAMO_SEARCH_DIR='#{generator_config_dir}'
-AC_SUBST(DYNAMO_SEARCH_DIR)
-
 # directories GNAT project gives the installation paths
 AM_GNAT_CHECK_PROJECT([gnatprj],[gnatprj])
 
@@ -106,6 +98,14 @@ AM_GNAT_FIND_ADA_SECURITY([Dynamo])
 AM_GNAT_FIND_ADA_SERVLET([Dynamo])
 AM_GNAT_FIND_ADA_SERVER_FACES([Dynamo])
 AM_GNAT_FIND_ADA_ADO([Dynamo])
+
+ac_asf_dir=`realpath $ASF_DIR`
+BUNDLE_DIR='#{generator_config_dir}/../asf/bundles'
+BUNDLE_DIR="$BUNDLE_DIR;$ac_asf_dir/bundles"
+AC_SUBST(BUNDLE_DIR)
+
+DYNAMO_SEARCH_DIR='#{generator_config_dir}'
+AC_SUBST(DYNAMO_SEARCH_DIR)
 
 AC_SUBST(mkdir_p)
 

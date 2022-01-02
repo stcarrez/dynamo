@@ -585,6 +585,8 @@ ac_unique_file="src/gen.ads"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 mkdir_p
+DYNAMO_SEARCH_DIR
+BUNDLE_DIR
 ADO_DIR
 ASF_DIR
 SERVLET_DIR
@@ -593,8 +595,6 @@ EL_DIR
 UTIL_DIR
 WITH_GPR
 DYNAMO_HAVE_GPR
-DYNAMO_SEARCH_DIR
-BUNDLE_DIR
 GNAT_PROJECT_PATHS
 GEN_LIBDIR
 GEN_MICRO_VERSION
@@ -3404,14 +3404,6 @@ fi
 GNAT_PROJECT_PATHS=${gnat_project_paths}
 
 
-ac_asf_dir=`realpath $ASF_DIR`
-BUNDLE_DIR='#{generator_config_dir}/../asf/bundles'
-BUNDLE_DIR="$BUNDLE_DIR;$ac_asf_dir/bundles"
-
-
-DYNAMO_SEARCH_DIR='#{generator_config_dir}'
-
-
 # directories GNAT project gives the installation paths
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gnatprj project exists" >&5
@@ -4225,6 +4217,14 @@ $as_echo "no" >&6; }
   fi
 
 
+
+
+ac_asf_dir=`realpath $ASF_DIR`
+BUNDLE_DIR='#{generator_config_dir}/../asf/bundles'
+BUNDLE_DIR="$BUNDLE_DIR;$ac_asf_dir/bundles"
+
+
+DYNAMO_SEARCH_DIR='#{generator_config_dir}'
 
 
 

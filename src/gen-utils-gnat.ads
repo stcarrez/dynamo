@@ -21,7 +21,7 @@ with Util.Properties;
 
 --  This package encapsulate a set of high level operations on top of the GNAT project
 --  files.  It uses the GNAT project reader which is packaged in the GNAT compiler (4.6.0).
---  A minimal supset of GNAT compiler was copied in <b>src/gnat</b> to ensure that a
+--  A minimal subset of GNAT compiler was copied in <b>src/gnat</b> to ensure that a
 --  compatible API is defined.  The GNAT files stored in <b>src/gnat</b> are licensed
 --  under the GNU General Public License.
 package Gen.Utils.GNAT is

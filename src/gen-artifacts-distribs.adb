@@ -242,7 +242,7 @@ package body Gen.Artifacts.Distribs is
       procedure Execute_Rule (Pos : in Distrib_Rule_Vectors.Cursor);
 
       --  ------------------------------
-      --  Process the rule by scaning the directory tree and detecting files that are concerned.
+      --  Process the rule by scanning the directory tree and detecting files that are concerned.
       --  ------------------------------
       procedure Scan_Rule (Pos : in Distrib_Rule_Vectors.Cursor) is
          Rule : constant Distrib_Rule_Access := Distrib_Rule_Vectors.Element (Pos);

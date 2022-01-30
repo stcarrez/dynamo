@@ -810,7 +810,7 @@ package body Gen.Artifacts.Docs is
 
       exception
          when E : Unknown_Tag =>
-            Log.Error ("{0}:{1}: Unkown comment tag '@{2}'",
+            Log.Error ("{0}:{1}: Unknown comment tag '@{2}'",
                        Ada.Directories.Base_Name (File),
                        Util.Strings.Image (Result.Line_Number),
                        Ada.Exceptions.Exception_Message (E));
@@ -925,7 +925,7 @@ package body Gen.Artifacts.Docs is
 
       exception
          when E : Unknown_Tag =>
-            Log.Error ("{0}:{1}: Unkown comment tag '@{2}'",
+            Log.Error ("{0}:{1}: Unknown comment tag '@{2}'",
                        Ada.Directories.Base_Name (File),
                        Util.Strings.Image (Result.Line_Number),
                        Ada.Exceptions.Exception_Message (E));

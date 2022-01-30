@@ -27,7 +27,7 @@ with Util.Properties;
 package Gen.Utils.GNAT is
 
    --  Directory which contains the GNAT project files installed on the system.
-   --  This is overriden by the configuration property 'generator.gnat.projects.dir'.
+   --  This is overridden by the configuration property 'generator.gnat.projects.dir'.
    DEFAULT_GNAT_PROJECT_DIR : constant String := "/usr/lib/gnat";
 
    ADA_PROJECT_PATH_NAME    : constant String := "ADA_PROJECT_PATH";

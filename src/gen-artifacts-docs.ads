@@ -215,7 +215,7 @@ private
    procedure Set_Title (Doc   : in out File_Document;
                         Title : in String);
 
-   --  Scan the files in the directory refered to by <b>Path</b> and collect the documentation
+   --  Scan the files in the directory referred to by <b>Path</b> and collect the documentation
    --  in the <b>Docs</b> hashed map.
    procedure Scan_Files (Handler : in out Artifact;
                          Path    : in String;

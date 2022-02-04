@@ -29,7 +29,7 @@ with Util.Beans.Objects.Maps;
 --
 --    <!-- DYNAMO-MERGE-START link=#{contextPath}/css/target-merge-1.css -->
 --
---  and the Javascript merge start begings with:
+--  and the Javascript merge start begins with:
 --
 --    <!-- DYNAMO-MERGE-START script=#{contextPath}/js/target-merge-1.js -->
 --

@@ -21,13 +21,13 @@ with Util.Properties;
 
 --  This package encapsulate a set of high level operations on top of the GNAT project
 --  files.  It uses the GNAT project reader which is packaged in the GNAT compiler (4.6.0).
---  A minimal supset of GNAT compiler was copied in <b>src/gnat</b> to ensure that a
+--  A minimal subset of GNAT compiler was copied in <b>src/gnat</b> to ensure that a
 --  compatible API is defined.  The GNAT files stored in <b>src/gnat</b> are licensed
 --  under the GNU General Public License.
 package Gen.Utils.GNAT is
 
    --  Directory which contains the GNAT project files installed on the system.
-   --  This is overriden by the configuration property 'generator.gnat.projects.dir'.
+   --  This is overridden by the configuration property 'generator.gnat.projects.dir'.
    DEFAULT_GNAT_PROJECT_DIR : constant String := "/usr/lib/gnat";
 
    ADA_PROJECT_PATH_NAME    : constant String := "ADA_PROJECT_PATH";

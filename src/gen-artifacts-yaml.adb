@@ -54,10 +54,10 @@ package body Gen.Artifacts.Yaml is
                        IN_ASSOCIATION,
                        IN_KEY,
                        IN_GENERATOR,
-                       IN_UNKOWN);
+                       IN_UNKNOWN);
 
    type Node_Info is record
-      State    : State_Type := IN_UNKOWN;
+      State    : State_Type := IN_UNKNOWN;
       Name     : Text.Reference;
       Tag      : Text.Reference;
       Has_Name : Boolean := False;
@@ -277,7 +277,7 @@ package body Gen.Artifacts.Yaml is
             when others =>
                Node_Stack.Push (Stack);
                New_Node := Node_Stack.Current (Stack);
-               New_Node.State := IN_UNKOWN;
+               New_Node.State := IN_UNKNOWN;
 
             end case;
          else

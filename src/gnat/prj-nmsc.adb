@@ -50,6 +50,9 @@ with GNAT.Table;
 
 package body Prj.Nmsc is
 
+   function To_Lower (S : in String) return String
+      renames Ada.Characters.Handling.To_Lower;
+
    No_Continuation_String : aliased String := "";
    Continuation_String    : aliased String := "\";
    --  Used in Check_Library for continuation error messages at the same

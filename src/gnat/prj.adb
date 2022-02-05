@@ -1545,6 +1545,8 @@ package body Prj is
    -----------
 
    function Value (Image : String) return Casing_Type is
+     function To_Lower (S : in String) return String
+       renames Ada.Characters.Handling.To_Lower;
    begin
       for Casing in The_Casing_Images'Range loop
          if To_Lower (Image) = To_Lower (The_Casing_Images (Casing).all) then

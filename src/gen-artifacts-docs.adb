@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012 - 2021 Stephane Carrez
+--  Copyright (C) 2012 - 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -151,17 +151,21 @@ package body Gen.Artifacts.Docs is
       --  ------------------------------
       procedure Do_Include (Source : in String;
                             Doc    : in out File_Document) is
-         Iter : Line_Vectors.Cursor := Doc.Lines (Mode).Last;
+         Last_Kind : Line_Kind := L_LIST;
       begin
          Log.Debug ("Merge {0} in {1}", Source, To_String (Into.Name));
---         Into.Lines (L_INCLUDE).Insert (Before => Position,
---                                        New_Item => (Len => 0, Kind => L_TEXT, Content => ""));
-         while Line_Vectors.Has_Element (Iter) loop
+         for Line of reverse Doc.Lines (Mode) loop
+            Last_Kind := Line.Kind;
             Into.Lines (L_INCLUDE).Insert (Before   => Position,
-                                           New_Item => Line_Vectors.Element (Iter));
-            Line_Vectors.Previous (Iter);
+                                           New_Item => Line);
          end loop;
          Doc.Was_Included := True;
+         if Last_Kind /= L_TEXT then
+            Into.Lines (L_INCLUDE).Insert (Before => Position,
+                                           New_Item => (Len => 0,
+                                                        Kind => L_TEXT,
+                                                        Content => ""));
+         end if;
       end Do_Include;
 
       Pos  : constant Doc_Maps.Cursor := Docs.Find (Name);
@@ -228,20 +232,11 @@ package body Gen.Artifacts.Docs is
       --  ------------------------------
       procedure Generate (Source : in String;
                           Doc    : in File_Document) is
-
-         procedure Write (Line : in Line_Type);
-
-         Name : constant String := Doc.Formatter.Get_Document_Name (Doc);
-         Path : constant String := Util.Files.Compose (Dir, Name);
-         File : Ada.Text_IO.File_Type;
-         Iter : Line_Vectors.Cursor := Doc.Lines (L_INCLUDE).First;
-
-         procedure Write (Line : in Line_Type) is
-         begin
-            Doc.Formatter.Write_Line (File => File,
-                                      Line => Line);
-         end Write;
-
+         Name       : constant String := Doc.Formatter.Get_Document_Name (Doc);
+         Path       : constant String := Util.Files.Compose (Dir, Name);
+         File       : Ada.Text_IO.File_Type;
+         Prev_Empty : Boolean := False;
+         Is_Empty   : Boolean;
       begin
          if Doc.Lines (L_INCLUDE).Is_Empty or Doc.Was_Included then
             return;
@@ -256,9 +251,13 @@ package body Gen.Artifacts.Docs is
          Doc.Formatter.Start_Document (Document => Doc,
                                        File     => File);
 
-         while Line_Vectors.Has_Element (Iter) loop
-            Line_Vectors.Query_Element (Iter, Write'Access);
-            Line_Vectors.Next (Iter);
+         for Line of Doc.Lines (L_INCLUDE) loop
+            Is_Empty := Line.Len = 0 and Line.Kind = L_TEXT;
+            if not Prev_Empty or not Is_Empty then
+               Doc.Formatter.Write_Line (File => File,
+                                         Line => Line);
+            end if;
+            Prev_Empty := Is_Empty;
          end loop;
          Doc.Formatter.Finish_Document (Document => Doc,
                                         File     => File,
@@ -681,7 +680,7 @@ package body Gen.Artifacts.Docs is
          when IN_LIST =>
             if Is_List (Line) then
                Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => Line'Length,
-                                                         Kind => L_LIST, Content => Line));
+                                                         Kind => L_LIST_ITEM, Content => Line));
 
             elsif Line'Length = 0 then
                Doc.State := IN_SEPARATOR;

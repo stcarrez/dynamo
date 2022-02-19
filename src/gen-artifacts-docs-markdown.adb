@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs-markdown -- Artifact for GitHub Markdown documentation format
---  Copyright (C) 2015, 2017, 2018, 2019, 2020 Stephane Carrez
+--  Copyright (C) 2015, 2017, 2018, 2019, 2020, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -264,6 +264,13 @@ package body Gen.Artifacts.Docs.Markdown is
                Ada.Text_IO.New_Line (File);
 
             when L_LIST | L_LIST_ITEM =>
+               --  When we are in a list, make sure the continuation lines
+               --  start with two spaces.
+               if Line'Length > 2 and then Line (Line'First) = ' '
+                 and then Line (Line'First + 1) /= ' '
+               then
+                  Ada.Text_IO.Put (File, ' ');
+               end if;
                Formatter.Write_Text (File, Line);
 
             when others =>
@@ -292,6 +299,7 @@ package body Gen.Artifacts.Docs.Markdown is
             Formatter.Mode := Line.Kind;
 
          when L_LIST_ITEM =>
+            Formatter.Mode := Line.Kind;
             Formatter.Write_Line (File, Line.Content);
             --  Ada.Text_IO.Put (File, Line.Content);
             --  Formatter.Need_Newline := True;

@@ -29,11 +29,12 @@ To build Dynamo, you will need:
 - Fix #9: Option or configuration to disable some SQL generation
 - Fix #10: Definition of an UML datatype with a tagged value raises an exception
 - Fix #12: Avoid emitting a full qualified type name for types declared in the current package
+- Fix #16: Improvement in Markdown documentation generator
 
 ## Version 1.2.2   - Jul 2021
 - Fix the SQL type definition for double on PostgreSQL
 - Fix double support and nullable entity_type
-- Fix SQL generation for a foreign key with variable lenght
+- Fix SQL generation for a foreign key with variable length
 
 [List all versions](https://github.com/stcarrez/dynamo/blob/master/NEWS.md)
 

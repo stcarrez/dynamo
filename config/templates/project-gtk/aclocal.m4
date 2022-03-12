@@ -1,13 +1,77 @@
+#############################################################
+#
+#  Macro to add for using GNU gettext
+#
+#############################################################
+
+
+AC_DEFUN(AM_WITH_NLS,
+  [AC_MSG_CHECKING([whether NLS is requested])
+    dnl Default is enabled NLS
+    AC_ARG_ENABLE(nls,
+      [  --disable-nls           do not use Native Language Support],
+      USE_NLS=$enableval, USE_NLS=yes)
+    AC_MSG_RESULT($USE_NLS)
+    AC_SUBST(USE_NLS)
+
+    GETTEXT_INTL="False"
+    HAVE_GETTEXT="False"
+
+    dnl If we use NLS figure out what method
+    if test "$USE_NLS" = "yes"; then
+      AC_DEFINE(ENABLE_NLS)
+
+      dnl Figure out whether gettext is available in the C or intl library.
+      nls_cv_header_intl=
+      nls_cv_header_libgt=
+
+      AC_CACHE_CHECK([for gettext in libc], gt_cv_func_gettext_libc,
+       [AC_TRY_LINK([extern int gettext(char*);], [return (int) gettext ("")],
+	gt_cv_func_gettext_libc=yes, gt_cv_func_gettext_libc=no)])
+
+      if test "$gt_cv_func_gettext_libc" != "yes"; then
+        AC_CHECK_LIB(intl, bindtextdomain,
+         [AC_CACHE_CHECK([for gettext in libintl],
+           gt_cv_func_gettext_libintl,
+           [AC_CHECK_LIB(intl, gettext,
+              gt_cv_func_gettext_libintl=yes,
+              gt_cv_func_gettext_libintl=no)],
+	    gt_cv_func_gettext_libintl=no)])
+
+	  if test "$gt_cv_func_gettext_libintl" = "yes"; then
+            GETTEXT_INTL="True"
+          fi
+      fi
+
+       if test "$gt_cv_func_gettext_libc" = "yes" \
+         || test "$gt_cv_func_gettext_libintl" = "yes"; then
+            HAVE_GETTEXT="True"
+       fi
+    fi
+
+    dnl Make all variables we use known to autoconf.
+    AC_SUBST(GETTEXT_INTL)
+    AC_SUBST(HAVE_GETTEXT)
+  ])
+
+AC_DEFUN(AM_GNU_GETTEXT,
+  [AM_WITH_NLS
+  ])
+
 dnl Check if we are running under Windows with msys to use pwd -W which produces Windows paths such as d:/tool instead of /d/tool
 AC_DEFUN(AM_CHECK_HOST_PWD,
 [
   if test x${awa_host_pwd_check} != xyes; then
-    AC_CHECK_PROG(awa_has_msys, msysinfo, yes, no)
-    if test x${awa_has_msys} = xyes; then
-      awa_pwd_option="-W"
-    else
+    case "${target_os}" in
+       mingw32*|cygwin*|mingw64*|msys)
+       awa_pwd_option="-W"
+       ;;
+
+     *)
       awa_pwd_option=""
-    fi
+      ;;
+
+    esac
     awa_host_pwd_check=yes
   fi
 ])
@@ -42,7 +106,7 @@ AC_DEFUN(AM_GNAT_CHECK_PROJECT,
 [
   AC_CACHE_CHECK([whether $1 project exists],[ac_cv_gnat_project_$1],[
     echo "with \"$2\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
-    if AC_TRY_COMMAND([gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out])
+    if AC_TRY_COMMAND([$GNATCHECK -Pconftest.gpr $GNATCHECK_ARG > /dev/null 2>conftest.out])
     then
       ac_cv_gnat_project_$1=yes
       ac_cv_gnat_project_with_$1="with \"$2\";";
@@ -60,7 +124,7 @@ AC_DEFUN(AM_GNAT_FIND_PROJECT,
     AS_HELP_STRING([--with-$1=x], [Path for $2]),
     [
       if test "${withval}/" = "yes/"; then
-        ac_cv_gnat_project_name_$3=${awa_build_root}$3
+        ac_cv_gnat_project_name_$3=${awa_build_root}$1
       else
         ac_cv_gnat_project_name_$3=${withval}/
         if test -d "${withval}"; then
@@ -76,7 +140,7 @@ AC_DEFUN(AM_GNAT_FIND_PROJECT,
     rm -f conftest.gpr
     # Search in the GNAT project path.
     echo "with \"${ac_cv_gnat_project_name_$3}\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
-    if AC_TRY_COMMAND([gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out])
+    if AC_TRY_COMMAND([$GNATCHECK -Pconftest.gpr $GNATCHECK_ARG > /dev/null 2>conftest.out])
     then
       ac_cv_gnat_project_$3=yes
     else
@@ -89,7 +153,7 @@ AC_DEFUN(AM_GNAT_FIND_PROJECT,
         dir=`dirname $name`
         # AC_MSG_CHECKING([for $2 project in ${dir}])
         echo "with \"${name}\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
-        if AC_TRY_COMMAND([gnat ls -Pconftest.gpr system.ads > /dev/null 2>conftest.out])
+        if AC_TRY_COMMAND([$GNATCHECK -Pconftest.gpr $GNATCHECK_ARG > /dev/null 2>conftest.out])
         then
            ac_cv_gnat_project_$3=yes
 		   ac_cv_gnat_project_name_$3=${name}
@@ -100,6 +164,16 @@ AC_DEFUN(AM_GNAT_FIND_PROJECT,
            # AC_MSG_RESULT(no)
         fi
       done
+      if test x${ac_cv_gnat_project_$3} != xyes; then
+        echo "with \"$3\"; project conftest is for Source_Dirs use (); end conftest;" > conftest.gpr
+        if AC_TRY_COMMAND([$GNATCHECK -Pconftest.gpr $GNATCHECK_ARG > /dev/null 2>conftest.out])
+        then
+           ac_cv_gnat_project_$3=yes
+           ac_cv_gnat_project_name_$3=$3
+        else
+           ac_cv_gnat_project_$3=no
+        fi
+      fi
     fi
     rm -f conftest.gpr
 
@@ -764,7 +838,7 @@ end Check;
    $2
 ])
 
-   rm -f check.adb check
+   rm -f check.adb check check.o check.ali
 ])
 
 # Prepare for using the GNAT project 
@@ -791,7 +865,7 @@ AC_DEFUN(AM_GNAT_LIBRARY_PROJECT,
 
   if test x${awa_build_root} != x; then
     AM_CHECK_HOST_PWD
-    awa_build_pwd=`cd ${awa_build_root} && pwd $pwd_option`
+    awa_build_pwd=`cd ${awa_build_root} && pwd $awa_pwd_option`
     if test x${awa_build_pwd} != x${awa_build_root}; then
       awa_build_root=${awa_build_pwd}/
     fi
@@ -800,6 +874,14 @@ AC_DEFUN(AM_GNAT_LIBRARY_PROJECT,
   # checking for local tools
   AC_CANONICAL_SYSTEM
   AM_GNAT_CHECK_GPRBUILD
+  AC_CHECK_PROGS(GNAT, gnat, "")
+  if test -n "$GNAT"; then
+    GNATCHECK="$GNAT ls"
+    GNATCHECK_ARG=" system.ads"
+  else
+    GNATCHECK="$GNATMAKE"
+    GNATCHECK_ARG=""
+  fi
 
   AC_PROG_MAKE_SET
   AC_PROG_INSTALL
@@ -848,10 +930,176 @@ EOF
     else
        ac_cv_gnat_aws_version='none'
     fi
+
+    if test "$ac_cv_gnat_aws_version" = "20.0"; then
+      dnl The version 20.0 is sometimes wrong because used by several versions of AWS.
+      dnl The version 22.0 has the AWS.HTTP_2 constant defined and uses version 20.0.
+      dnl Check for that and fix the version.
+      cat > conftest.adb <<EOF
+with AWS;
+with Ada.Text_IO;
+procedure Conftest is
+begin
+  Ada.Text_IO.Put_Line (AWS.HTTP_2);
+end Conftest;
+EOF
+      if AC_TRY_COMMAND([gnatmake -Pconftest.gpr >/dev/null 2>conftest.out])
+      then
+         ac_cv_gnat_aws_version="22.0"
+      fi
+
+    fi
+
     rm -f conftest.gpr conftest.adb conftest.o conftest.ali
     rm -f b__conftest.ads b__conftest.adb b__conftest.o b__conftest.ali
   ])
 
   AWS_VERSION=$ac_cv_gnat_aws_version
   AC_SUBST(AWS_VERSION)
+])
+
+dnl Check the OS and CPU to build Ada Util configuration (UTIL_OS)
+AC_DEFUN(AM_ADA_UTIL_HARDWARE,
+[
+  AC_CANONICAL_SYSTEM
+
+  os_base='unix'
+  os_version='none'
+  AC_MSG_CHECKING([operating system])
+  case "${target_os}" in
+     linux|linux-*|solaris*|sysv-*)
+        os_version='linux'
+        ;;
+
+     netbsd*|dragonfly*)
+        os_version='netbsd'
+        ;;
+
+     openbsd*|freebsd*)
+        # Let OpenBSD people cry 
+        os_version='freebsd'
+        ;;
+
+     macos*|darwin*)
+        os_version='macos'
+        ;;
+
+     mingw32*|cygwin*|mingw64*|msys)
+        os_version='win'
+        os_base='windows'
+        ;;
+
+     mingw32*|cygwin*|mingw64*|msys)
+        os_version='win'
+        os_base='windows'
+        ;;
+
+     *)
+        # Be authoritative
+        os_version='linux'
+        ;;
+  esac
+  AC_MSG_RESULT($os_version)
+
+  AC_MSG_CHECKING([hardware platform])
+  case "${target_cpu}" in
+     x86_64)
+        os_version="${os_version}64"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     i386|i486|i586|i686)
+        os_version="${os_version}32"
+        HARDWARE_PLATFORM='x86'
+        ;;
+
+     armv8*|aarch64*|mips64*|mipsisa64*|sh64*|riscv64*|sparc64*)
+        os_version="${os_version}64"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     armv7*|mips*|mipsisa*|sh*|riscv32*|sparc*)
+        os_version="${os_version}32"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+
+     *)
+        os_version="${os_version}64"
+        HARDWARE_PLATFORM=${target_cpu}
+        ;;
+  esac
+  AC_MSG_RESULT($HARDWARE_PLATFORM)
+  AC_SUBST(HARDWARE_PLATFORM)
+
+  # Check for gcc intrinsics
+  AM_HAS_INTRINSIC_SYNC_COUNTERS(src_asm='intrinsic',src_asm='')
+  AC_MSG_CHECKING([specific processor support])
+  if test T$src_asm = T; then
+   case "${target}" in
+   ## Intel 386 machines where we don't care about the manufacturer
+     i[[34567]]86-*-* | x86_* | x86-*)
+       src_asm='x86'
+       ;;
+
+     *)
+       src_asm='none'
+       ;;
+
+   esac
+  fi
+  AC_MSG_RESULT(using $src_asm)
+  UTIL_ASM_TYPE="$src_asm"
+  AC_SUBST(UTIL_ASM_TYPE)
+
+  UTIL_OS_VERSION=$os_version
+  AC_SUBST(UTIL_OS_VERSION)
+
+])
+
+dnl Identify the AWS version for Ada Util.
+AC_DEFUN(AM_ADA_UTIL_AWS_VERSION,
+[
+AM_GNAT_CHECK_AWS(
+  [
+    UTIL_HAVE_AWS=no
+    WITH_SERVER="";
+    WITH_UTIL_AWS="";
+    UTIL_AWS_VERSION="none"
+  ], [
+    UTIL_HAVE_AWS=yes
+    WITH_UTIL_AWS="with \"utilada_aws\";";
+    WITH_SERVER=$ac_cv_gnat_project_with_aws
+    AM_GNAT_LIBRARY_SETUP(utilada_aws)
+
+    AM_GNAT_AWS_VERSION
+
+    AC_MSG_CHECKING([using Ada Util AWS http client])
+    UTIL_AWS_VERSION=1
+case $AWS_VERSION in
+  22.0)
+     UTIL_AWS_VERSION=3
+     ;;
+
+  *2017*|*2018*|*2019*|*202*|20.0)
+     UTIL_AWS_VERSION=2
+     ;;
+
+  3.3.2)
+     UTIL_AWS_VERSION=2
+     ;;
+
+  3.*|2.*)
+     UTIL_AWS_VERSION=1
+     ;;
+
+  *)
+     UTIL_AWS_VERSION=3
+     ;;
+esac
+    AC_MSG_RESULT(${UTIL_AWS_VERSION})
+
+  ])
+
+AC_SUBST(UTIL_AWS_VERSION)
+
 ])

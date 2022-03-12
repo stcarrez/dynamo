@@ -82,15 +82,19 @@ dist-clean:: clean
 	-rm -f *.log *~ config.status Makefile.conf
 
 doc::
+ifeq (${HAVE_DYNAMO},yes)
 	$(DYNAMO) build-doc -markdown wiki
+endif
 
 dist::
 	rm -f $(DIST_FILE)
 	git archive -o $(DIST_FILE) --prefix=$(DIST_DIR)/ HEAD
 
-install-info:
+install-info::
+ifeq (${VERBOSE},1)
 	@echo "Environment setup:"
 	@echo "  export ADA_PROJECT_PATH=${projectdir}:$$ADA_PROJECT_PATH"
+endif
 
 define ada_library
   static:: setup
@@ -118,6 +122,17 @@ endif
 
   uninstall::
 	-$(GPRINSTALL) --uninstall -q -f --prefix=$(DESTDIR)${prefix} $(MAKE_ARGS) $(1).gpr
+
+endef
+
+define ada_program
+  all:: setup
+	$(GNATMAKE) $(GPRFLAGS) -p -P$(2)$(1).gpr $(STATIC_MAKE_ARGS)
+
+  setup:: obj/$(1)/static
+
+  obj/$(1)/static:
+	$(MKDIR) -p obj/$(1)/static
 
 endef
 
@@ -172,6 +187,29 @@ clean::
 
 endef
 
+define pandoc_build
+
+ifeq (${HAVE_PANDOC},yes)
+
+doc::  docs/$(1).pdf docs/$(1).html
+ifeq (${HAVE_DYNAMO},yes)
+	$(DYNAMO) build-doc -markdown wiki
+endif
+
+docs/$(1).pdf:  force
+ifeq (${HAVE_DYNAMO},yes)
+	$(DYNAMO) build-doc -pandoc docs
+	$(3)
+endif
+	cd docs && pandoc $(DOC_OPTIONS) -o $(1).pdf --template=./eisvogel.tex $(2)
+
+docs/$(1).html: docs/$(1).pdf force
+	cd docs && pandoc $(HTML_OPTIONS) -o $(1).html $(2)
+
+endif
+
+endef
+
 force:
 
 build-test::
@@ -179,5 +217,11 @@ build-test::
 uninstall::
 
 install-static::
+
+endif
+
+ifdef DESTDIR
+
+.NOTPARALLEL:
 
 endif

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011 - 2021 Stephane Carrez
+--  Copyright (C) 2011 - 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ with Ada.IO_Exceptions;
 with Ada.Directories;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
+with Ada.Command_Line;
 
 with Util.Files;
 with Util.Log.Loggers;
@@ -593,6 +594,10 @@ package body Gen.Model.Projects is
             Prop_Output.Write (ASCII.LF);
          end loop;
       end;
+
+      Prop_Output.Write ("dynamo_path=");
+      Prop_Output.Write (Ada.Command_Line.Command_Name);
+      Prop_Output.Write (ASCII.LF);
 
       Project.Modules.Iterate (Save_Module'Access);
       Project.Dependencies.Iterate (Save_Dependency'Access);

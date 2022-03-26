@@ -758,6 +758,7 @@ package body Gen.Model.Projects is
                   if P = null then
                      Project.Create_Project (Path => File, Name => "", Project => P);
 
+                     Log.Info ("Adding dynamo file '{0}'", File);
                      Project.Dynamo_Files.Append (File);
                      P.Read_Project;
                      Project.Add_Dependency (P, DIRECT);
@@ -782,8 +783,37 @@ package body Gen.Model.Projects is
                            Config    : in Util.Properties.Manager'Class;
                            Recursive : in Boolean := False) is
 
+      procedure Append_Dynamo_File (Name   : in String;
+                                    Dynamo : in String;
+                                    Result : in out Gen.Utils.String_List.Vector);
       procedure Collect_Dynamo_Files (List   : in Gen.Utils.GNAT.Project_Info_Vectors.Vector;
                                       Result : out Gen.Utils.String_List.Vector);
+
+      procedure Append_Dynamo_File (Name   : in String;
+                                    Dynamo : in String;
+                                    Result : in out Gen.Utils.String_List.Vector) is
+         Has_File : constant Boolean := Result.Contains (Dynamo);
+         P        : Model.Projects.Project_Definition_Access := Project.Find_Project (Dynamo);
+      begin
+         Log.Debug ("Dynamo file {0} is used", Dynamo);
+         if Has_File then
+            Log.Info ("Delete dynamo file '{0}' at {1}", Dynamo,
+                      Natural'Image (Natural (Result.Find_Index (Dynamo))));
+            Result.Delete (Result.Find_Index (Dynamo));
+         end if;
+         Log.Info ("Adding dynamo file '{0}'", Dynamo);
+         Result.Append (Dynamo);
+
+         --  Find the project associated with the dynamo.xml file.
+         --  Create it and load the XML if necessary.
+         if P = null then
+            Log.Debug ("Create dependency for {0} on {1}", Name, Dynamo);
+            Project.Create_Project (Path => Dynamo, Name => Name, Project => P);
+            P.Read_Project;
+            Log.Debug ("Loaded project {0}", P.Name);
+            Project.Add_Dependency (P, DIRECT);
+         end if;
+      end Append_Dynamo_File;
 
       --  ------------------------------
       --  Collect the <b>dynamo.xml</b> files used by the projects.
@@ -805,7 +835,6 @@ package body Gen.Model.Projects is
                                                               To_String (Info.Path),
                                                               Dir);
                Has_File : constant Boolean := Result.Contains (Dynamo);
-               P        : Model.Projects.Project_Definition_Access;
             begin
                Log.Info ("GNAT project {0}", Name);
                Project_Info_Vectors.Next (Iter);
@@ -818,22 +847,7 @@ package body Gen.Model.Projects is
                  and then (not Has_File or else not Project_Info_Vectors.Has_Element (Iter))
                  and then Dynamo'Length > 0
                then
-                  Log.Debug ("Dynamo file {0} is used", Dynamo);
-                  if Has_File then
-                     Result.Delete (Result.Find_Index (Dynamo));
-                  end if;
-                  Result.Append (Dynamo);
-
-                  --  Find the project associated with the dynamo.xml file.
-                  --  Create it and load the XML if necessary.
-                  P := Project.Find_Project (Dynamo);
-                  if P = null then
-                     Log.Debug ("Create dependency for {0} on {1}", Name, Dynamo);
-                     Project.Create_Project (Path => Dynamo, Name => Name, Project => P);
-                     P.Read_Project;
-                     Log.Debug ("Loaded project {0}", P.Name);
-                     Project.Add_Dependency (P, DIRECT);
-                  end if;
+                  Append_Dynamo_File (Name, Dynamo, Result);
                end if;
             end;
          end loop;
@@ -913,12 +927,13 @@ package body Gen.Model.Projects is
                            Has_File : constant Boolean := Project.Dynamo_Files.Contains (Dynamo);
                         begin
                            if Dynamo /= "" then
-                              Log.Info ("Project '{0}'' depends on '{1}' found dynamo file '{2}'",
+                              Log.Info ("Project '{0}' depends on '{1}' found dynamo file '{2}'",
                                         Def.Get_Name, Result.Project.Get_Name, Dynamo);
                               if Path = "" then
                                  Result.Project.Path := To_UString (Dynamo);
                               end if;
                               if not Has_File then
+                                 Log.Info ("Adding dynamo file '{0}'", Dynamo);
                                  Project.Dynamo_Files.Append (Dynamo);
                               end if;
                            end if;
@@ -944,6 +959,7 @@ package body Gen.Model.Projects is
                      Log.Debug ("Checking dynamo file {0}", Dynamo);
                      if Ada.Directories.Exists (Dynamo) then
                         if not Project.Dynamo_Files.Contains (Dynamo) then
+                           Log.Info ("Adding dynamo file '{0}'", Dynamo);
                            Project.Dynamo_Files.Append (Dynamo);
                         end if;
                         Item.Project      := new Project_Definition;
@@ -966,25 +982,30 @@ package body Gen.Model.Projects is
                end if;
             end Update;
 
-            Iter : Project_Vectors.Cursor;
+            Info   : constant Gen.Utils.GNAT.Project_Info := Project.Project_Files.Last_Element;
+            Name   : constant String := To_String (Info.Name);
+            Dynamo : constant String := Get_Dynamo_Path (Name,
+                                                         To_String (Info.Path),
+                                                         Install_Dir);
          begin
             Iterate (Project.Modules, Update'Access);
             for Pass in 1 .. 4 loop
-               Iter := Project.Projects.First;
-
                Log.Info ("Checking {0} projects",
                          Ada.Containers.Count_Type'Image (Project.Projects.Length));
                Iterate (Project.Projects, Update'Access);
 
                exit when Pending.Is_Empty;
                while not Pending.Is_Empty loop
-                  Iter := Pending.First;
-
-                  Project.Projects.Append (Project_Vectors.Element (Iter));
-                  Project_Vectors.Element (Iter).Project.Read_Project;
+                  Project.Projects.Append (Pending.First_Element);
+                  Pending.First_Element.Project.Read_Project;
                   Pending.Delete_First;
                end loop;
             end loop;
+
+            --  Make sure the project's dynamo.xml file appears last in the list so that
+            --  the generated search path is correct (search path is in reverse order and we
+            --  want to search locally first, then in dependent modules).
+            Append_Dynamo_File (Name, Dynamo, Project.Dynamo_Files);
          end;
       end if;
    end Read_Project;

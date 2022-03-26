@@ -33,7 +33,7 @@
 --  writing error messages and informational output. It is also used by the
 --  debug source file output routines (see Sprint.Print_Debug_Line).
 
-with Hostparm; use Hostparm;
+with Hostparm;
 with Types;    use Types;
 
 pragma Warnings (Off);

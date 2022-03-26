@@ -30,7 +30,7 @@ with Prj.Attr;
 with Prj.Com;
 with Prj.Err;  use Prj.Err;
 with Snames;   use Snames;
-with Uintp;    use Uintp;
+with Uintp;
 
 with Ada.Characters.Handling;    use Ada.Characters.Handling;
 with Ada.Containers.Ordered_Sets;
@@ -569,7 +569,7 @@ package body Prj is
       Include_Aggregated : Boolean := True;
       Imported_First     : Boolean := False)
    is
-      use Project_Boolean_Htable;
+      --  use Project_Boolean_Htable;
 
       procedure Recursive_Check_Context
         (Project               : Project_Id;
@@ -1545,11 +1545,14 @@ package body Prj is
    -----------
 
    function Value (Image : String) return Casing_Type is
-     function To_Lower (S : in String) return String
-       renames Ada.Characters.Handling.To_Lower;
+      --  SCz 2022-03-26: some version of GNAT fail to see the To_Lower function,
+      --  and some other GNAT version report a warning that To_Lower is already visible.
+      --  let's use another name to keep all these compiler versions happy!
+      function To_Lower_Case (S : in String) return String
+         renames Ada.Characters.Handling.To_Lower;
    begin
       for Casing in The_Casing_Images'Range loop
-         if To_Lower (Image) = To_Lower (The_Casing_Images (Casing).all) then
+         if To_Lower_Case (Image) = To_Lower (The_Casing_Images (Casing).all) then
             return Casing;
          end if;
       end loop;

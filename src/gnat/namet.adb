@@ -37,7 +37,7 @@ with Debug;    use Debug;
 with Opt;      use Opt;
 with Output;   use Output;
 with Tree_IO;  use Tree_IO;
-with Widechar; use Widechar;
+with Widechar;
 
 with Interfaces; use Interfaces;
 

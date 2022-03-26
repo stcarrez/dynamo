@@ -35,7 +35,7 @@ with Einfo;  use Einfo;
 with Namet;  use Namet;
 with Types;  use Types;
 with Snames; use Snames;
-with System; use System;
+with System;
 with Table;
 with Uintp;  use Uintp;
 with Urealp; use Urealp;

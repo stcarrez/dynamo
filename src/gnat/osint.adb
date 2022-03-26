@@ -250,6 +250,9 @@ package body Osint is
 
    --  SCz 2018-06-10: this is a constant that is initialized during the package elaboration.
    --  It can't be put as constant because it would be part of read-only section.
+   --  SCz 2022-03-26: the GNAT warning nightmare continues, some compiler bark some other don't
+   --  Turn off warnings for No_File_Info_Cache variable and package instantiation.
+   pragma Warnings (Off);
    No_File_Info_Cache : File_Info_Cache;
 
    package File_Name_Hash_Table is new GNAT.HTable.Simple_HTable (
@@ -259,6 +262,8 @@ package body Osint is
      Key        => File_Name_Type,
      Hash       => File_Hash,
      Equal      => "=");
+
+   pragma Warnings (On);
 
    function Smart_Find_File
      (N : File_Name_Type;
@@ -1091,8 +1096,11 @@ package body Osint is
       --  The conversion from int64 to Long_Integer is ok here as this
       --  routine is only to be used by the compiler and we do not expect
       --  a unit to be larger than a 32bit integer.
-
+      --  SCz 2022-03-26: some compiler will bark due to redundant conversation
+      --  and some other will not because the conversion is necessary.
+      pragma Warnings (Off);
       return Long_Integer (Internal (-1, Name, Attr.all'Address));
+      pragma Warnings (On);
    end File_Length;
 
    ---------------------

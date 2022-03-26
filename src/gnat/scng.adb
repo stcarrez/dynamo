@@ -29,7 +29,7 @@ with Hostparm; use Hostparm;
 with Namet;    use Namet;
 with Opt;      use Opt;
 --  with Restrict; use Restrict;
-with Rident;   use Rident;
+--  with Rident;   use Rident;
 with Scans;    use Scans;
 with Sinput;   use Sinput;
 with Snames;   use Snames;

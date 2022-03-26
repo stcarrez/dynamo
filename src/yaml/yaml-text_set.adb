@@ -67,7 +67,7 @@ package body Yaml.Text_Set is
    end Grow_If_Needed;
 
    function Get (Object : in out Reference; S : Standard.String;
-                 Create : Boolean) return not null access Holder is
+                 Create : Boolean) return Holder is
       Hash : constant Ada.Containers.Hash_Type := Non_Zero_Hash (S);
    begin
       <<Start>>
@@ -84,9 +84,29 @@ package body Yaml.Text_Set is
                Cur.Key := Object.Pool.From_String (S);
             end if;
          end if;
-         return Cur;
+         return Cur.all;
       end;
    end Get;
+
+   procedure Update (Object : in out Reference; S : Standard.String;
+                     Value : Value_Type) is
+      Hash : constant Ada.Containers.Hash_Type := Non_Zero_Hash (S);
+   begin
+      <<Start>>
+      declare
+         Cur : constant not null access Holder := Raw_Set (Object, Hash, S);
+      begin
+         if Cur.Hash = 0 then
+            if Grow_If_Needed (Object) then
+               goto Start;
+            end if;
+            Object.Count := Object.Count + 1;
+            Cur.Hash := Hash;
+            Cur.Key := Object.Pool.From_String (S);
+         end if;
+         Cur.Value := Value;
+      end;
+   end Update;
 
    function Set (Object : in out Reference;
                  S : Standard.String; Value : Value_Type) return Boolean is

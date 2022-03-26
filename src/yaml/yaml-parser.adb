@@ -118,7 +118,7 @@ package body Yaml.Parser is
                        return Text.Reference is
       use type Ada.Containers.Hash_Type;
       Tag_Handle : constant String := Lexer.Full_Lexeme (P.L);
-      Holder : constant access constant Tag_Handle_Sets.Holder :=
+      Holder : constant Tag_Handle_Sets.Holder :=
         P.Tag_Handles.Get (Tag_Handle, False);
    begin
       if Holder.Hash = 0 then
@@ -231,7 +231,6 @@ package body Yaml.Parser is
             end if;
             declare
                Tag_Handle : constant String := Lexer.Full_Lexeme (P.L);
-               Holder : access Tag_Handle_Sets.Holder;
             begin
                P.Current := Lexer.Next_Token (P.L);
                if P.Current.Kind /= Lexer.Suffix then
@@ -239,8 +238,7 @@ package body Yaml.Parser is
                     "Invalid token (expected tag URI): " & P.Current.Kind'Img;
                end if;
                if Tag_Handle = "!" or Tag_Handle = "!!" then
-                  Holder := Tag_Handle_Sets.Get (P.Tag_Handles, Tag_Handle, False);
-                  Holder.Value := Lexer.Current_Content (P.L);
+                  Tag_Handle_Sets.Update (P.Tag_Handles, Tag_Handle, Lexer.Current_Content (P.L));
                else
                   if not Tag_Handle_Sets.Set (P.Tag_Handles, Tag_Handle,
                                               Lexer.Current_Content (P.L))

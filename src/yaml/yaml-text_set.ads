@@ -17,9 +17,11 @@ package Yaml.Text_Set is
    end record;
 
    function Get (Object : in out Reference; S : Standard.String;
-                 Create : Boolean) return not null access Holder;
+                 Create : Boolean) return Holder;
    function Set (Object : in out Reference; S : Standard.String;
                  Value : Value_Type) return Boolean;
+   procedure Update (Object : in out Reference; S : Standard.String;
+                     Value : Value_Type);
 
    procedure Init (Object : in out Reference; Pool : Text.Pool.Reference;
                    Initial_Size : Positive);

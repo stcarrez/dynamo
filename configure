@@ -1821,6 +1821,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
 # Current release settings
 GEN_MAJOR_VERSION=1
 GEN_MINOR_VERSION=2

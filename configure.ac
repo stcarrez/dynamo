@@ -16,7 +16,8 @@ dnl  limitations under the License.
 dnl 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(src/gen.ads)
+AC_INIT
+AC_CONFIG_SRCDIR([src/gen.ads])
 
 # Current release settings
 GEN_MAJOR_VERSION=1
@@ -110,9 +111,9 @@ AC_SUBST(DYNAMO_SEARCH_DIR)
 AC_SUBST(mkdir_p)
 
 AC_CONFIG_FILES([Makefile])
-AC_OUTPUT(
-dynamo.gpr
+AC_CONFIG_FILES([dynamo.gpr
 dynamo_tests.gpr
 regtests/check_build/check_build.gpr
 config/generator.properties
-)
+])
+AC_OUTPUT

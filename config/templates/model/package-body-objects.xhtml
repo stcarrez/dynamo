@@ -294,6 +294,40 @@
          ADO.Objects.Set_Object (Object, Impl.all'Access);
       end if;
    end Load;
+<h:panelGroup rendered="#{not empty table.version}">
+#{''}
+
+   procedure Reload (Object  : in out #{fn:capitalize(table.type)}_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean) is
+      Result : ADO.Objects.Object_Record_Access;
+      Impl   : #{fn:capitalize(table.type)}_Access;
+      Query  : ADO.SQL.Query;
+      Id     : #{g:adaType(table.id,0)};
+   begin
+      if Object.Is_Null then
+         raise ADO.Objects.NULL_ERROR;
+      end if;
+      Object.Prepare_Modify (Result);
+      Impl := #{fn:capitalize(table.type)}_Impl (Result.all)'Access;
+      Id := ADO.Objects.Get_Key_Value (Impl.all);
+      Query.Bind_Param (Position => 1, Value => Id);
+      Query.Bind_Param (Position => 2, Value => Impl.#{fn:capitalize(table.version.name)});
+      Query.Set_Filter ("#{table.id.name} = ? AND #{table.version.name} != ?");
+      declare
+         Stmt : ADO.Statements.Query_Statement
+             := Session.Create_Statement (Query, #{fn:toUpperCase(table.type)}_DEF'Access);
+      begin
+         Stmt.Execute;
+         if Stmt.Has_Elements then
+            Updated := True;
+            Impl.Load (Stmt, Session);
+         else
+            Updated := False;
+         end if;
+      end;
+   end Reload;
+</h:panelGroup>
 #{''}
 
    procedure Save (Object  : in out #{fn:capitalize(table.type)}_Ref;

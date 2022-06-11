@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-list -- List bean interface for model objects
---  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 -----------------------------------------------------------------------
 
 with Util.Beans.Basic;
-with Gen.Model;
 with Ada.Containers.Vectors;
 with Ada.Iterator_Interfaces;
 

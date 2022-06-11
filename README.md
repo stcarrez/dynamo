@@ -31,6 +31,7 @@ To build Dynamo, you will need:
 - Fix #12: Avoid emitting a full qualified type name for types declared in the current package
 - Fix #16: Improvement in Markdown documentation generator
 - Fix #17: YAML parser: accessibility check failure
+- Fix #18: Generate database operation to reload an object
 
 ## Version 1.2.2   - Jul 2021
 - Fix the SQL type definition for double on PostgreSQL

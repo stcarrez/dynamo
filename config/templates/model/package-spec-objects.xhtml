@@ -66,6 +66,15 @@
                    Session : in out ADO.Sessions.Session'Class;
                    Id      : in #{g:adaType(table.id,0)};
                    Found   : out Boolean);
+<h:panelGroup rendered="#{not empty table.version}">
+#{''}
+   --  Reload from the database the same object if it was modified.
+   --  Returns True in `Updated` if the object was reloaded.
+   --  Raises the NOT_FOUND exception if it does not exist.
+   procedure Reload (Object  : in out #{fn:capitalize(table.type)}_Ref;
+                     Session : in out ADO.Sessions.Session'Class;
+                     Updated : out Boolean);
+</h:panelGroup>
 #{''}
 
    --  Find and load the entity.

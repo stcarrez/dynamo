@@ -35,6 +35,7 @@ macos = true
 [[depends-on]]
 security = "^1.4.1"
 servletada = "^1.5.3"
+serverfaces = "1.5.0"
 utilada = "^2.5.0"
 elada = "^1.8.0"
 utilada_xml = "^2.5.0"

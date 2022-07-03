@@ -34,4 +34,8 @@ project Dynamo_Tool is
    package Compiler renames Dynamo_Config.Compiler;
    package Linker renames Dynamo_Config.Linker;
 
+   package Install is
+      for Artifacts (".") use ("config");
+   end Install;
+
 end Dynamo_Tool;

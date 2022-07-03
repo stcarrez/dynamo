@@ -42,6 +42,7 @@ utilada_xml = "^2.5.0"
 ado_mysql = "2.2.1"
 ado_sqlite = "2.2.1"
 ado_postgresql = "2.2.1"
+ado_all = "2.2.1"
 xmlada = "any"
 libgpr = "any"
 

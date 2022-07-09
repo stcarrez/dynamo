@@ -70,15 +70,12 @@ UTIL_OS = "win32"
 [gpr-set-externals."case(os)".windows."case(word-size)".bits-64]
 UTIL_OS = "win64"
 
-#[configuration]
-#disabled = true
+[configuration]
+disabled = true
 
 [[actions]]
 type = "post-fetch"
-command = ["gnatprep", "-DCONFIG_DIR=\"./config/base\"", "-DVERSION=\"1.2.3\"",
-  "src/gen-configs.gpb",
-  "src/gen-configs.ads"
-]
+command = ["sh", "./alire-setup.sh"]
 
-[configuration.variables]
-Install_Path = {type = "String", default = "${CRATE_ROOT}"}
+[environment]
+PATH.prepend = "${CRATE_ROOT}/bin"

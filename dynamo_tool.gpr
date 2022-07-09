@@ -16,7 +16,7 @@ project Dynamo_Tool is
 
    Version      := "1.2.0";
 
-   Root_Dir := external ("ROOT_DIR", "../");
+   Root_Dir := external ("ROOT_DIR", "./");
 
    Exec_Dir     := Root_Dir & "/bin";
 

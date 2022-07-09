@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2018, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -1400,7 +1400,7 @@ package body Gen.Artifacts.XMI is
                Log.Info ("Reading the UML profile {0}", Profile);
 
                --  We have a profile, load the UML model.
-               Handler.Read_Model (Util.Files.Compose (Path, Profile), Context, True);
+               Handler.Read_Model (Util.Files.Find_File_Path (Profile, Path), Context, True);
 
                --  Verify that we have the model, report an error and remove it from the profiles.
                if not Handler.Nodes.Contains (To_UString (Profile)) then

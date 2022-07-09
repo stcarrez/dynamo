@@ -39,6 +39,9 @@ package Gen.Configs is
    GEN_TEMPLATES_DIRS       : constant String := "generator.model.dir";
    GEN_DYNAMO_SEARCH_DIRS   : constant String := "generator.dynamo.dir";
 
+   ENV_DYNAMO_SEARCH_PATH   : constant String := "DYNAMO_SEARCH_PATH";
+   ENV_DYNAMO_UML_PATH      : constant String := "DYNAMO_UML_PATH";
+
    --  Path of the config directory
    CONFIG_DIR               : constant String
       := $CONFIG_DIR;

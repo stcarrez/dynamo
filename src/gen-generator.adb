@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-generator -- Code Generator
---  Copyright (C) 2009 - 2021 Stephane Carrez
+--  Copyright (C) 2009 - 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ with Ada.Directories;
 with Ada.IO_Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Calendar;
+with Ada.Environment_Variables;
 
 with Input_Sources.File;
 
@@ -414,6 +415,16 @@ package body Gen.Generator is
          when Ada.IO_Exceptions.Name_Error =>
             H.Error ("Cannot load configuration file {0}", Path);
       end;
+      if Ada.Environment_Variables.Exists (Gen.Configs.ENV_DYNAMO_SEARCH_PATH) then
+         H.Conf.Set (Gen.Configs.GEN_DYNAMO_SEARCH_DIRS,
+                     String '(Ada.Environment_Variables.Value (Gen.Configs.ENV_DYNAMO_SEARCH_PATH)
+                                & ":" & H.Conf.Get (Gen.Configs.GEN_DYNAMO_SEARCH_DIRS)));
+      end if;
+      if Ada.Environment_Variables.Exists (Gen.Configs.ENV_DYNAMO_UML_PATH) then
+         H.Conf.Set (Gen.Configs.GEN_UML_DIR,
+                     String '(Ada.Environment_Variables.Value (Gen.Configs.ENV_DYNAMO_UML_PATH)
+                                & ":" & H.Conf.Get (Gen.Configs.GEN_UML_DIR)));
+      end if;
       H.Conf.Set (ASF.Applications.VIEW_DIR, Compose (Dir,  "templates"));
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");

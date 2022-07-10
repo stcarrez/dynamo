@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012, 2013, 2014, 2016, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2016, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -94,5 +94,8 @@ private
       --  Stereotype which triggers the generation of serialization.
       Serialize_Stereotype    : Gen.Model.XMI.Stereotype_Element_Access;
    end record;
+
+   function Find_Profile (Name : in String;
+                          Path : in String) return String;
 
 end Gen.Artifacts.XMI;

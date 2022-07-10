@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Dec 29, 2021" "Ada Web Application"
+.TH DYNAMO 1 "Jul 10, 2022" "Ada Web Application"
 .SH NAME
 dynamo - Ada Application Generator
 .SH SYNOPSIS
@@ -579,6 +579,17 @@ commands.
 This directory contains the UML profiles that
 .I dynamo
 reads to obtain global definitions.
+.\"
+.SH ENVIRONMENT
+.\"
+.SS DYNAMO_SEARCH_PATH
+A list of directories representing the search paths to find the
+.I dynamo.xml
+files that describe plugins.
+.\"
+.SS DYNAMO_UML_PATH
+A list of directories representing the search paths to find the
+UML model files.
 .\"
 .SH SEE ALSO
 \fIgprbuild(1)\fR, \fIgcc(1)\fR, \fIyui-compressor(1)\fR, \fIpngcrush(1)\fR, \fIjpegtran(1)\fR

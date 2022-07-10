@@ -79,3 +79,4 @@ command = ["sh", "./alire-setup.sh"]
 
 [environment]
 PATH.prepend = "${CRATE_ROOT}/bin"
+MANPATH.prepend = "${CRATE_ROOT}/man"

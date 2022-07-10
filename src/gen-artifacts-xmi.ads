@@ -50,6 +50,7 @@ package Gen.Artifacts.XMI is
    --  Read the UML/XMI model file.
    procedure Read_Model (Handler       : in out Artifact;
                          File          : in String;
+                         Profile       : in String;
                          Context       : in out Generator'Class;
                          Is_Predefined : in Boolean := False);
 

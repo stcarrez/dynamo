@@ -1470,7 +1470,7 @@ package body Gen.Artifacts.XMI is
                   Profile_Path : constant String := Find_Profile (Profile, Path);
                begin
                   --  We have a profile, load the UML model.
-                  Handler.Read_Model (Profile_Path, Context, True);
+                  Handler.Read_Model (Profile_Path, Profile, Context, True);
 
                   --  Verify that we have the model,
                   --  report an error and remove it from the profiles.
@@ -1494,6 +1494,7 @@ package body Gen.Artifacts.XMI is
    --  ------------------------------
    procedure Read_Model (Handler       : in out Artifact;
                          File          : in String;
+                         Profile       : in String;
                          Context       : in out Generator'Class;
                          Is_Predefined : in Boolean := False) is
       procedure Read (Key   : in UString;
@@ -1568,7 +1569,8 @@ package body Gen.Artifacts.XMI is
       end Read;
 
       UML  : Gen.Model.XMI.Model_Map.Map;
-      Name : constant UString := To_UString (Ada.Directories.Simple_Name (File));
+      Name : constant Ustring
+        := To_UString ((if Is_Predefined then Profile else Ada.Directories.Simple_Name (File)));
    begin
       Log.Info ("Reading XMI {0}", File);
 

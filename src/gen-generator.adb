@@ -822,7 +822,7 @@ package body Gen.Generator is
          Log.Info ("Reading model file '{0}'", File);
       end if;
       if Ext = "xmi" or Ext = "XMI" or Ext = "zargo" then
-         H.XMI.Read_Model (File, H);
+         H.XMI.Read_Model (File, "", H);
          return;
       elsif Ext = "yaml" or Ext = "YAML" then
          H.Yaml.Read_Model (File, H.Model, H);

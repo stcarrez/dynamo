@@ -113,7 +113,7 @@ install: install-data
 install-data:	  install_dirs
 	$(INSTALL) bin/dynamo $(DESTDIR)$(prefix)/bin/dynamo
 	$(INSTALL) bin/argouml.sh $(DESTDIR)$(prefix)/bin/argouml
-	$(INSTALL) doc/dynamo.1 $(DESTDIR)$(prefix)/share/man/man1/dynamo.1
+	$(INSTALL) man/man1/dynamo.1 $(DESTDIR)$(prefix)/share/man/man1/dynamo.1
 	$(CP) config/*.jar $(DESTDIR)$(prefix)/share/dynamo/base
 	$(CP) config/*.properties $(DESTDIR)$(prefix)/share/dynamo/base
 	$(CP) config/*.xsl $(DESTDIR)$(prefix)/share/dynamo/base

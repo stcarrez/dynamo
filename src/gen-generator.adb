@@ -35,8 +35,6 @@ with ASF.Components.Base;
 with ASF.Servlets.Faces;
 with Servlet.Core;
 
-with Util.Beans.Basic;
-with Util.Strings.Vectors;
 with EL.Functions;
 with EL.Utils;
 with EL.Contexts.Default;
@@ -50,9 +48,12 @@ with Gen.Model.Mappings;
 with Gen.Commands.Templates;
 
 with Util.Strings;
+with Util.Strings.Vectors;
 with Util.Files;
 with Util.Log.Loggers;
+with Util.Beans.Basic;
 with Util.Beans.Objects.Time;
+with Util.Systems.Os;
 
 package body Gen.Generator is
 
@@ -62,6 +63,8 @@ package body Gen.Generator is
    Log : constant Loggers.Logger := Loggers.Create ("Gen.Generator");
 
    RESULT_DIR : constant String := "generator.output.dir";
+
+   Windows  : constant Boolean := Util.Systems.Os.Directory_Separator = '\';
 
    function Get_Ada_Type (Type_Name : in UString) return String;
 
@@ -402,11 +405,18 @@ package body Gen.Generator is
          return;
       end if;
       declare
-         Value : constant String
+         Value : String
            := Ada.Environment_Variables.Value (Env_Name);
       begin
+         if not Windows then
+            for I in Value'Range loop
+               if Value (I) = ':' then
+                  Value (I) := ';';
+               end if;
+            end loop;
+         end if;
          if H.Conf.Exists (Name) then
-            H.Conf.Set (Name, String '(Value & ":" & H.Conf.Get (Name)));
+            H.Conf.Set (Name, String '(Value & ";" & H.Conf.Get (Name)));
          else
             H.Conf.Set (Name, Value);
          end if;

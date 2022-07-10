@@ -391,6 +391,29 @@ package body Gen.Generator is
    end Set_Functions;
 
    --  ------------------------------
+   --  Set the global configuration identified by the name by pre-pending the
+   --  environtment variable if it is defined.
+   --  ------------------------------
+   procedure Set_Configuration (H        : in out Handler;
+                                Name     : in String;
+                                Env_Name : in String) is
+   begin
+      if not Ada.Environment_Variables.Exists (Env_Name) then
+         return;
+      end if;
+      declare
+         Value : constant String
+           := Ada.Environment_Variables.Value (Env_Name);
+      begin
+         if H.Conf.Exists (Name) then
+            H.Conf.Set (Name, String '(Value & ":" & H.Conf.Get (Name)));
+         else
+            H.Conf.Set (Name, Value);
+         end if;
+      end;
+   end Set_Configuration;
+
+   --  ------------------------------
    --  Initialize the generator
    --  ------------------------------
    procedure Initialize (H : in out Handler;
@@ -415,16 +438,6 @@ package body Gen.Generator is
          when Ada.IO_Exceptions.Name_Error =>
             H.Error ("Cannot load configuration file {0}", Path);
       end;
-      if Ada.Environment_Variables.Exists (Gen.Configs.ENV_DYNAMO_SEARCH_PATH) then
-         H.Conf.Set (Gen.Configs.GEN_DYNAMO_SEARCH_DIRS,
-                     String '(Ada.Environment_Variables.Value (Gen.Configs.ENV_DYNAMO_SEARCH_PATH)
-                                & ":" & H.Conf.Get (Gen.Configs.GEN_DYNAMO_SEARCH_DIRS)));
-      end if;
-      if Ada.Environment_Variables.Exists (Gen.Configs.ENV_DYNAMO_UML_PATH) then
-         H.Conf.Set (Gen.Configs.GEN_UML_DIR,
-                     String '(Ada.Environment_Variables.Value (Gen.Configs.ENV_DYNAMO_UML_PATH)
-                                & ":" & H.Conf.Get (Gen.Configs.GEN_UML_DIR)));
-      end if;
       H.Conf.Set (ASF.Applications.VIEW_DIR, Compose (Dir,  "templates"));
       H.Conf.Set (ASF.Applications.VIEW_IGNORE_WHITE_SPACES, "false");
       H.Conf.Set (ASF.Applications.VIEW_ESCAPE_UNKNOWN_TAGS, "false");
@@ -437,6 +450,10 @@ package body Gen.Generator is
       end if;
       Props.Set ("generator_config_dir", Dir);
       EL.Utils.Expand (Source => Props, Into => H.Conf, Context => Context);
+      H.Set_Configuration (Gen.Configs.GEN_DYNAMO_SEARCH_DIRS,
+                           Gen.Configs.ENV_DYNAMO_SEARCH_PATH);
+      H.Set_Configuration (Gen.Configs.GEN_UML_DIR,
+                           Gen.Configs.ENV_DYNAMO_UML_PATH);
       H.Initialize (H.Conf, Factory);
 
       H.Config_Dir := To_UString (Dir);

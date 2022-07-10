@@ -29,6 +29,7 @@ with Gen.Model.Stypes;
 
 with Util.Log.Loggers;
 with Util.Strings;
+with Util.Strings.Transforms;
 with Util.Files;
 with Util.Beans;
 with Util.Beans.Objects;
@@ -1383,6 +1384,72 @@ package body Gen.Artifacts.XMI is
       end if;
    end Prepare;
 
+   function Find_Profile (Name : in String;
+                          Path : in String) return String is
+      procedure Find (Dir  : in String;
+                      Done : out Boolean);
+      function Make_Zargo (Name : in String) return String;
+      function To_Lower_Case (Name : in String) return String
+        renames Util.Strings.Transforms.To_Lower_Case;
+
+      function Make_Zargo (Name : in String) return String is
+         Pos : constant Natural := Util.Strings.Rindex (Name, '.');
+      begin
+         if Pos = 0 then
+            return Name & ".zargo";
+         else
+            return Name (Name'First .. Pos) & "zargo";
+         end if;
+      end Make_Zargo;
+
+      Zargo_Name       : constant String := Make_Zargo (Name);
+      Zargo_Lower_Name : constant String := To_Lower_Case (Zargo_Name);
+      Result           : UString;
+
+      procedure Find (Dir  : in String;
+                      Done : out Boolean) is
+      begin
+         declare
+            File_Path : constant String
+              := Util.Files.Compose (Dir, Name);
+         begin
+            if Ada.Directories.Exists (File_Path) then
+               Result := To_UString (File_Path);
+               Done := True;
+               return;
+            end if;
+         end;
+
+         declare
+            File_Path : constant String
+              := Util.Files.Compose (Dir, Zargo_Name);
+         begin
+            if Ada.Directories.Exists (File_Path) then
+               Result := To_UString (File_Path);
+               Done := True;
+               return;
+            end if;
+         end;
+
+         declare
+            File_Path : constant String
+              := Util.Files.Compose (Dir, Zargo_Lower_Name);
+         begin
+            if Ada.Directories.Exists (File_Path) then
+               Result := To_UString (File_Path);
+               Done := True;
+               return;
+            end if;
+         end;
+
+         Done := False;
+      end Find;
+
+   begin
+      Util.Files.Iterate_Path (Path, Find'Access);
+      return To_String (Result);
+   end Find_Profile;
+
    --  ------------------------------
    --  Read the UML profiles that are referenced by the current models.
    --  The UML profiles are installed in the UML config directory for dynamo's installation.
@@ -1399,14 +1466,19 @@ package body Gen.Artifacts.XMI is
             if not Handler.Nodes.Contains (To_UString (Profile)) then
                Log.Info ("Reading the UML profile {0}", Profile);
 
-               --  We have a profile, load the UML model.
-               Handler.Read_Model (Util.Files.Find_File_Path (Profile, Path), Context, True);
+               declare
+                  Profile_Path : constant String := Find_Profile (Profile, Path);
+               begin
+                  --  We have a profile, load the UML model.
+                  Handler.Read_Model (Profile_Path, Context, True);
 
-               --  Verify that we have the model, report an error and remove it from the profiles.
-               if not Handler.Nodes.Contains (To_UString (Profile)) then
-                  Context.Error ("UML profile {0} was not found", Profile);
-                  Handler.Profiles.Delete (Profile);
-               end if;
+                  --  Verify that we have the model,
+                  --  report an error and remove it from the profiles.
+                  if not Handler.Nodes.Contains (To_UString (Profile)) then
+                     Context.Error ("UML profile {0} was not found", Profile);
+                     Handler.Profiles.Delete (Profile);
+                  end if;
+               end;
 
                --  And start again from the beginning since new profiles could be necessary.
                Iter := Handler.Profiles.First;

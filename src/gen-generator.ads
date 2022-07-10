@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-generator -- Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015, 2018 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015, 2018, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -218,6 +218,12 @@ package Gen.Generator is
    function Get_Project_Property (H       : in Handler;
                                   Name    : in String;
                                   Default : in String := "") return String;
+
+   --  Set the global configuration identified by the name by pre-pending the
+   --  environtment variable if it is defined.
+   procedure Set_Configuration (H        : in out Handler;
+                                Name     : in String;
+                                Env_Name : in String);
 
    --  Save the project description and parameters.
    procedure Save_Project (H : in out Handler);

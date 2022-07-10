@@ -26,7 +26,7 @@ pragma Warnings (On);
 
 package body #{package.name} is
 #{''}
-   pragma Style_Checks ("-mr");
+   pragma Style_Checks ("-mrIu");
    pragma Warnings (Off, "formal parameter * is not referenced");
 <h:panelGroup rendered="#{not empty package.queries or not empty package.tables}">
    pragma Warnings (Off, "use clause for type *");

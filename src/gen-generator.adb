@@ -464,6 +464,8 @@ package body Gen.Generator is
                            Gen.Configs.ENV_DYNAMO_SEARCH_PATH);
       H.Set_Configuration (Gen.Configs.GEN_UML_DIR,
                            Gen.Configs.ENV_DYNAMO_UML_PATH);
+      H.Set_Configuration ("bundle.dir",
+                           Gen.Configs.ENV_DYNAMO_BUNDLE_PATH);
       H.Initialize (H.Conf, Factory);
 
       H.Config_Dir := To_UString (Dir);

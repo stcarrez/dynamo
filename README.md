@@ -32,6 +32,9 @@ To build Dynamo, you will need:
 - Fix #16: Improvement in Markdown documentation generator
 - Fix #17: YAML parser: accessibility check failure
 - Fix #18: Generate database operation to reload an object
+- Fix #19: Add dynamo configuration through environment support
+- Fix #20: Give access to the man page from alire
+- Fix $21: Generated procedure Create is missing overriding keyword
 
 ## Version 1.2.2   - Jul 2021
 - Fix the SQL type definition for double on PostgreSQL

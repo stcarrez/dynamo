@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-xmi-tests -- Tests for xmi
---  Copyright (C) 2012, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,7 +63,7 @@ package body Gen.Artifacts.XMI.Tests is
 
    begin
       Gen.Generator.Initialize (G, To_UString (C), False);
-      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
+      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", "", G);
 
       --  ArgoUML Integer DataType
       Check ("default-uml14.xmi", "Integer",
@@ -106,7 +106,7 @@ package body Gen.Artifacts.XMI.Tests is
 
    begin
       Gen.Generator.Initialize (G, To_UString (C), False);
-      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
+      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", "", G);
 
       declare
          S : Gen.Model.XMI.Stereotype_Element_Access;
@@ -142,7 +142,7 @@ package body Gen.Artifacts.XMI.Tests is
 
    begin
       Gen.Generator.Initialize (G, To_UString (C), False);
-      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", G);
+      A.Read_Model (G.Get_Parameter (Gen.Configs.GEN_UML_DIR) & "/Dynamo.xmi", "", G);
 
       declare
          Tag : Tag_Definition_Element_Access;

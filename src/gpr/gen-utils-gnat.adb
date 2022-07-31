@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils-gnat -- GNAT utilities
---  Copyright (C) 2011, 2012, 2014, 2015, 2018 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2014, 2015, 2018, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -80,7 +80,6 @@ package body Gen.Utils.GNAT is
       function Get_Variable_Value (Proj : in GPR.Project_Id;
                                    Name : in String) return String;
       function Get_Project_Name (Proj  : in GPR.Project_Id) return String;
-
 
       --  Get the variable value represented by the name <b>Name</b>.
       --  ??? There are probably other efficient ways to get this but I couldn't find them.

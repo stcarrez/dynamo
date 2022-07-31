@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-database -- Database creation from application model
---  Copyright (C) 2011, 2012, 2016, 2017, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2016, 2017, 2018, 2019, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,7 +92,7 @@ package body Gen.Commands.Database is
                return;
             end if;
 
-            if Config.Get_Driver = "mysql" or Config.Get_Driver = "postgresql" then
+            if Config.Get_Driver in "mysql" | "postgresql" then
                if Config.Get_Property ("user") = "" then
                   Generator.Error ("Invalid database connection: missing user property");
                   return;
@@ -132,7 +132,7 @@ package body Gen.Commands.Database is
       ADO.Drivers.Initialize (Generator.Get_Properties);
 
       --  Check if a database is specified in the command line and use it.
-      if Ada.Strings.Fixed.Index (Arg1, "://") > 0 or Arg3'Length > 0 then
+      if Ada.Strings.Fixed.Index (Arg1, "://") > 0 or else Arg3'Length > 0 then
          Create_Database (Model, Arg1, Arg2, Arg3);
       else
          declare
@@ -151,6 +151,7 @@ package body Gen.Commands.Database is
    --  ------------------------------
    --  Write the help associated with the command.
    --  ------------------------------
+   overriding
    procedure Help (Cmd       : in out Command;
                    Name      : in String;
                    Generator : in out Gen.Generator.Handler) is

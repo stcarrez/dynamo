@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-plugins -- Plugin creation and management commands for dynamo
---  Copyright (C) 2012, 2015, 2017, 2018, 2019, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2019, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -116,7 +116,7 @@ package body Gen.Commands.Plugins is
             Cmd.Usage (Name, Generator);
             return;
          end if;
-         if Kind /= "ada" and Kind /= "web" then
+         if Kind /= "ada" and then Kind /= "web" then
             Generator.Error ("Invalid plugin type (must be 'ada' or 'web')");
             return;
          end if;

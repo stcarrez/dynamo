@@ -379,7 +379,7 @@ package body Gen.Artifacts.XMI is
       Parent : constant Gen.Model.XMI.Package_Element_Access := P.Package_Element;
    begin
       --  This is a new nested package, create it.
-      if Parent /= null and P.Has_Package_Name and P.Has_Package_Id then
+      if Parent /= null and then P.Has_Package_Name and then P.Has_Package_Id then
          P.Package_Element := null;
       end if;
       if P.Package_Element = null then
@@ -473,8 +473,8 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_GENERALIZATION_END =>
             if not UBO.Is_Null (P.Child_Id)
-              and not UBO.Is_Null (P.Parent_Id)
-              and not UBO.Is_Null (P.Generalization_Id)
+              and then not UBO.Is_Null (P.Parent_Id)
+              and then not UBO.Is_Null (P.Generalization_Id)
             then
                P.Generalization := new Gen.Model.XMI.Generalization_Element (P.Model);
                P.Generalization.Set_XMI_Id (P.Generalization_Id);
@@ -555,7 +555,7 @@ package body Gen.Artifacts.XMI is
             P.Parameter_Type := Get_Parameter_Type (Value);
 
          when FIELD_PARAMETER_END =>
-            if P.Attr_Element /= null and P.Operation /= null then
+            if P.Attr_Element /= null and then P.Operation /= null then
                P.Attr_Element.Set_XMI_Id (P.Attr_Id);
                P.Operation.Elements.Append (P.Attr_Element.all'Access);
                P.Model.Insert (P.Attr_Element.XMI_Id, P.Attr_Element.all'Access);
@@ -563,7 +563,7 @@ package body Gen.Artifacts.XMI is
             P.Attr_Element := null;
 
          when FIELD_OPERATION_END =>
-            if P.Operation /= null and P.Class_Element /= null then
+            if P.Operation /= null and then P.Class_Element /= null then
                P.Operation.Set_XMI_Id (P.Operation_Id);
                P.Model.Insert (P.Operation.XMI_Id, P.Operation.all'Access);
                P.Class_Element.Operations.Append (P.Operation.all'Access);
@@ -601,7 +601,7 @@ package body Gen.Artifacts.XMI is
             end if;
 
          when FIELD_ASSOCIATION_END =>
-            if P.Assos_End_Element /= null and P.Association /= null then
+            if P.Assos_End_Element /= null and then P.Association /= null then
                P.Assos_End_Element.Set_Name (P.Assos_End_Name);
                P.Assos_End_Element.Visibility := P.Assos_End_Visibility;
                P.Assos_End_Element.Navigable := P.Assos_End_Navigable;
@@ -670,15 +670,15 @@ package body Gen.Artifacts.XMI is
 
          when FIELD_DATA_TYPE =>
             if P.Attr_Element = null
-              and P.Operation = null
-              and UBO.Is_Null (P.Generalization_Id)
-              and P.Data_Type /= null
+              and then P.Operation = null
+              and then UBO.Is_Null (P.Generalization_Id)
+              and then P.Data_Type /= null
             then
-               if P.Package_Element /= null and not P.Is_Profile then
+               if P.Package_Element /= null and then not P.Is_Profile then
                   P.Data_Type.Parent := P.Package_Element.all'Access;
                end if;
                P.Model.Insert (P.Data_Type.XMI_Id, P.Data_Type.all'Access);
-               if P.Package_Element /= null and not P.Is_Profile then
+               if P.Package_Element /= null and then not P.Is_Profile then
                   P.Package_Element.Types.Append (P.Data_Type.all'Access);
                end if;
             end if;
@@ -724,7 +724,7 @@ package body Gen.Artifacts.XMI is
 
             --  Stereotype mapping.
          when FIELD_STEREOTYPE =>
-            if not UBO.Is_Null (P.Stereotype_Id) and P.Stereotype /= null then
+            if not UBO.Is_Null (P.Stereotype_Id) and then P.Stereotype /= null then
                P.Stereotype.XMI_Id := UBO.To_Unbounded_String (P.Stereotype_Id);
                P.Model.Insert (P.Stereotype.XMI_Id, P.Stereotype.all'Access);
                if P.Class_Element /= null then
@@ -824,6 +824,7 @@ package body Gen.Artifacts.XMI is
    --  After the configuration file is read, processes the node whose root
    --  is passed in <b>Node</b> and initializes the <b>Model</b> with the information.
    --  ------------------------------
+   overriding
    procedure Initialize (Handler : in out Artifact;
                          Path    : in String;
                          Node    : in DOM.Core.Node;
@@ -1091,7 +1092,7 @@ package body Gen.Artifacts.XMI is
             end;
 
          elsif Item.Has_Stereotype (Handler.Bean_Stereotype)
-           or Item.Has_Stereotype (Handler.Limited_Bean_Stereotype)
+           or else Item.Has_Stereotype (Handler.Limited_Bean_Stereotype)
          then
             Log.Debug ("Class {0} recognized as a bean", Name);
             declare
@@ -1569,7 +1570,7 @@ package body Gen.Artifacts.XMI is
       end Read;
 
       UML  : Gen.Model.XMI.Model_Map.Map;
-      Name : constant Ustring
+      Name : constant UString
         := To_UString ((if Is_Predefined then Profile else Ada.Directories.Simple_Name (File)));
    begin
       Log.Info ("Reading XMI {0}", File);

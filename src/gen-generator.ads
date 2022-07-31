@@ -64,6 +64,7 @@ package Gen.Generator is
    function Get_Properties (H : in Handler) return Util.Properties.Manager;
 
    --  Report an error and set the exit status accordingly
+   overriding
    procedure Error (H : in out Handler;
                     Message : in String;
                     Arg1    : in String;
@@ -114,6 +115,7 @@ package Gen.Generator is
    --  The name is a property name that must be defined in generator.properties to
    --  indicate the template file.  Several artifacts can trigger the generation
    --  of a given template.  The template is generated only once.
+   overriding
    procedure Add_Generation (H    : in out Handler;
                              Name : in String;
                              Mode : in Gen.Artifacts.Iteration_Mode;
@@ -165,12 +167,14 @@ package Gen.Generator is
                                    Path : in String);
 
    --  Get the result directory path.
+   overriding
    function Get_Result_Directory (H : in Handler) return String;
 
    --  Get the project plugin directory path.
    function Get_Plugin_Directory (H : in Handler) return String;
 
    --  Get the config directory path.
+   overriding
    function Get_Config_Directory (H : in Handler) return String;
 
    --  Get the dynamo installation directory path.
@@ -186,11 +190,13 @@ package Gen.Generator is
    function Get_Status (H : in Handler) return Ada.Command_Line.Exit_Status;
 
    --  Get the configuration parameter.
+   overriding
    function Get_Parameter (H       : in Handler;
                            Name    : in String;
                            Default : in String := "") return String;
 
    --  Get the configuration parameter.
+   overriding
    function Get_Parameter (H       : in Handler;
                            Name    : in String;
                            Default : in Boolean := False) return Boolean;
@@ -238,6 +244,7 @@ package Gen.Generator is
 
    --  Scan the dynamo directories and execute the <b>Process</b> procedure with the
    --  directory path.
+   overriding
    procedure Scan_Directories (H : in Handler;
                                Process : not null access
                                  procedure (Dir : in String));

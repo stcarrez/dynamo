@@ -238,7 +238,7 @@ package body Gen.Artifacts.Docs is
          Prev_Empty : Boolean := False;
          Is_Empty   : Boolean;
       begin
-         if Doc.Lines (L_INCLUDE).Is_Empty or Doc.Was_Included then
+         if Doc.Lines (L_INCLUDE).Is_Empty or else Doc.Was_Included then
             return;
          end if;
 
@@ -252,7 +252,7 @@ package body Gen.Artifacts.Docs is
                                        File     => File);
 
          for Line of Doc.Lines (L_INCLUDE) loop
-            Is_Empty := Line.Len = 0 and Line.Kind = L_TEXT;
+            Is_Empty := Line.Len = 0 and then Line.Kind = L_TEXT;
             if not Prev_Empty or not Is_Empty then
                Doc.Formatter.Write_Line (File => File,
                                          Line => Line);
@@ -368,7 +368,7 @@ package body Gen.Artifacts.Docs is
             Doc       : File_Document;
             Pos       : constant Natural := Util.Strings.Rindex (Name, '.');
          begin
-            if Gen.Utils.Is_File_Ignored (Name) or Pos = 0 then
+            if Gen.Utils.Is_File_Ignored (Name) or else Pos = 0 then
                Log.Debug ("File {0} ignored", Name);
 
             else
@@ -376,7 +376,7 @@ package body Gen.Artifacts.Docs is
 
                Doc.Print_Footer := Handler.Print_Footer;
                Doc.Formatter := Handler.Formatter;
-               if Name (Pos .. Name'Last) = ".ads" or Name (Pos .. Name'Last) = ".adb" then
+               if Name (Pos .. Name'Last) in ".ads" | ".adb" then
                   Handler.Read_Ada_File (Full_Path, Doc);
 
                elsif Name (Pos .. Name'Last) = ".xml" then
@@ -397,7 +397,7 @@ package body Gen.Artifacts.Docs is
             Name      : constant String := Simple_Name (Ent);
          begin
             if not Gen.Utils.Is_File_Ignored (Name)
-              and Name /= "regtests"
+              and then Name /= "regtests"
             then
                Handler.Scan_Files (Ada.Directories.Full_Name (Ent), Docs);
             end if;
@@ -412,7 +412,7 @@ package body Gen.Artifacts.Docs is
    begin
       if Line'Length <= 3 then
          return False;
-      elsif Line (Line'First) = '*' and Line (Line'First + 1) = ' ' then
+      elsif Line (Line'First) = '*' and then Line (Line'First + 1) = ' ' then
          return True;
       else
          return Line (Line'First .. Line'First + 3) = "  * ";
@@ -427,7 +427,7 @@ package body Gen.Artifacts.Docs is
       if Line'Length <= 3 then
          return False;
       else
-         return Line (Line'First) =  ' ' and Line (Line'First + 1) = ' ';
+         return Line (Line'First) =  ' ' and then Line (Line'First + 1) = ' ';
       end if;
    end Is_Code;
 
@@ -453,10 +453,10 @@ package body Gen.Artifacts.Docs is
       Start  : Natural := Line'First;
       Finish : Natural := Line'Last;
    begin
-      while Start < Finish and (Line (Start) = '=' or Line (Start) = ' ') loop
+      while Start < Finish and then Line (Start) in '=' | ' ' loop
          Start := Start + 1;
       end loop;
-      while Start < Finish and (Line (Finish) = '=' or Line (Finish) = ' ') loop
+      while Start < Finish and then Line (Finish) in '=' | ' ' loop
          Finish := Finish - 1;
       end loop;
       return Line (Start .. Finish);
@@ -624,7 +624,7 @@ package body Gen.Artifacts.Docs is
    begin
       if Line'Length >= 1 and then Line (Line'First) = TAG_CHAR then
          --  Force a close of the code extract if we see some @xxx command.
-         if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
+         if Doc.State in IN_CODE | IN_CODE_SEPARATOR then
             Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0,
                                                       Kind => L_END_CODE,
                                                       Content => ""));
@@ -667,7 +667,7 @@ package body Gen.Artifacts.Docs is
          when IN_CODE_SEPARATOR =>
             if Line'Length > 0 and
             then (Ada.Characters.Handling.Is_Letter (Line (Line'First))
-                  or Line (Line'First) = '=')
+                  or else Line (Line'First) = '=')
             then
                Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0,
                                                          Kind => L_END_CODE,
@@ -699,7 +699,7 @@ package body Gen.Artifacts.Docs is
    --  ------------------------------
    procedure Finish (Doc : in out File_Document) is
    begin
-      if Doc.State = IN_CODE or Doc.State = IN_CODE_SEPARATOR then
+      if Doc.State in IN_CODE | IN_CODE_SEPARATOR then
          Doc.Lines (L_INCLUDE).Append (Line_Type '(Len => 0, Kind => L_END_CODE, Content => ""));
          Doc.State := IN_PARA;
       end if;
@@ -713,7 +713,7 @@ package body Gen.Artifacts.Docs is
       S1 : String := Ada.Strings.Fixed.Trim (Name, Ada.Strings.Both);
    begin
       for I in S1'Range loop
-         if S1 (I) = '.' or S1 (I) = '/' or S1 (I) = '\' then
+         if S1 (I) in '.' | '/' | '\' then
             S1 (I) := '_';
          end if;
       end loop;
@@ -767,12 +767,12 @@ package body Gen.Artifacts.Docs is
             Result.Line_Number := Result.Line_Number - 1;
             Process (Line (Line'First .. Line'Last - 1));
 
-         elsif Line (Line'First) = '-' and Line (Line'First + 1) = '-' then
+         elsif Line (Line'First) = '-' and then Line (Line'First + 1) = '-' then
             if Doc_Block then
                if Line'Length < 4 then
                   Append (Result, "");
 
-               elsif Line (Line'First + 2) = ' ' and Line (Line'First + 3) = ' ' then
+               elsif Line (Line'First + 2) = ' ' and then Line (Line'First + 3) = ' ' then
                   Append (Result, Line (Line'First + 4 .. Line'Last));
                end if;
             elsif Line'Length >= 5 and then Line (Line'First .. Line'First + 4) = "--  =" then
@@ -838,7 +838,7 @@ package body Gen.Artifacts.Docs is
             return L_INCLUDE_PERMISSION;
          elsif Line = "### Queries" then
             return L_INCLUDE_QUERY;
-         elsif Line = "### Beans" or Line = "### Mapping" then
+         elsif Line = "### Beans" or else Line = "### Mapping" then
             return L_INCLUDE_BEAN;
          elsif Line = "### Configuration" then
             return L_INCLUDE_CONFIG;

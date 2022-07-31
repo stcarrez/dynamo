@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012, 2015, 2018, 2019, 2021 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018, 2019, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,7 @@ package body Gen.Model.Mappings is
       elsif Name = "isBoolean" then
          return UBO.To_Object (From.Kind = T_BOOLEAN);
       elsif Name = "isInteger" then
-         return UBO.To_Object (From.Kind = T_INTEGER or From.Kind = T_ENTITY_TYPE);
+         return UBO.To_Object (From.Kind = T_INTEGER or else From.Kind = T_ENTITY_TYPE);
       elsif Name = "isFloat" then
          return UBO.To_Object (From.Kind = T_FLOAT);
       elsif Name = "isString" then
@@ -57,11 +57,11 @@ package body Gen.Model.Mappings is
       elsif Name = "isEnum" then
          return UBO.To_Object (From.Kind = T_ENUM);
       elsif Name = "isDiscrete" then
-         return UBO.To_Object (From.Kind = T_ENUM or From.Kind = T_INTEGER);
+         return UBO.To_Object (From.Kind = T_ENUM or else From.Kind = T_INTEGER);
       elsif Name = "isNewDiscrete" then
          return UBO.To_Object (False);
       elsif Name = "isPrimitiveType" then
-         return UBO.To_Object (From.Kind /= T_TABLE and From.Kind /= T_BLOB);
+         return UBO.To_Object (From.Kind /= T_TABLE and then From.Kind /= T_BLOB);
       elsif Name = "isNullable" then
          return UBO.To_Object (From.Nullable);
       else

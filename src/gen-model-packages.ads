@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009 - 2021 Stephane Carrez
+--  Copyright (C) 2009 - 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -205,7 +205,6 @@ private
 
    package Table_List is new Gen.Model.List (T        => Definition,
                                              T_Access => Definition_Access);
-
 
    --  Returns False if the <tt>Left</tt> table does not depend on <tt>Right</tt>.
    --  Returns True if the <tt>Left</tt> table depends on the <tt>Right</tt> table.

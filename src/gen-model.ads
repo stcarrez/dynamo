@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model -- Model for Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2020, 2021 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2018, 2020, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,6 +53,7 @@ package Gen.Model is
 
    --  Get the value identified by the name.
    --  If the name cannot be found, the method should return the Null object.
+   overriding
    function Get_Value (From : in Definition;
                        Name : in String) return UBO.Object;
 

@@ -142,6 +142,7 @@ package body Yaml.Text_Set is
       Clear (Object);
    end Init;
 
+   overriding
    procedure Finalize (Object : in out Reference) is
    begin
       if Object.Elements /= null then

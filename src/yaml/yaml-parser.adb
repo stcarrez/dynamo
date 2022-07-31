@@ -29,11 +29,13 @@ package body Yaml.Parser is
    function Value (Object : Reference) return Accessor is
      ((Data => Object.Data));
 
+   overriding
    procedure Adjust (Object : in out Reference) is
    begin
       Increase_Refcount (Object.Data);
    end Adjust;
 
+   overriding
    procedure Finalize (Object : in out Reference) is
    begin
       Decrease_Refcount (Object.Data);
@@ -78,8 +80,8 @@ package body Yaml.Parser is
 
    function Pool (P : Instance) return Text.Pool.Reference is (P.Pool);
 
+   overriding
    procedure Finalize (P : in out Instance) is null;
-
 
    function Current_Lexer_Token_Start (P : Instance) return Mark is
      (Lexer.Recent_Start_Mark (P.L));
@@ -105,7 +107,7 @@ package body Yaml.Parser is
    begin
       Tag_Handle_Sets.Clear (P.Tag_Handles);
       pragma Warnings (Off);
-      if P.Tag_Handles.Set ("!", P.Pool.From_String ("!")) and
+      if P.Tag_Handles.Set ("!", P.Pool.From_String ("!")) and then
         P.Tag_Handles.Set ("!!",
                            P.Pool.From_String ("tag:yaml.org,2002:"))
       then
@@ -237,7 +239,7 @@ package body Yaml.Parser is
                   raise Parser_Error with
                     "Invalid token (expected tag URI): " & P.Current.Kind'Img;
                end if;
-               if Tag_Handle = "!" or Tag_Handle = "!!" then
+               if Tag_Handle = "!" or else Tag_Handle = "!!" then
                   Tag_Handle_Sets.Update (P.Tag_Handles, Tag_Handle, Lexer.Current_Content (P.L));
                else
                   if not Tag_Handle_Sets.Set (P.Tag_Handles, Tag_Handle,
@@ -1447,7 +1449,6 @@ package body Yaml.Parser is
             end if;
       end case;
    end Possible_Next_Sequence_Item;
-
 
    function After_Flow_Seq_Sep (P : in out Class;
                                 E : out Event) return Boolean is

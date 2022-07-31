@@ -143,11 +143,11 @@ package body Gen.Generator is
          Type_Mapping := Column.Get_Type_Mapping;
          if Type_Mapping /= null then
 
-            if Type_Mapping.Kind = T_DATE and UBO.To_Integer (Param) = 2 then
+            if Type_Mapping.Kind = T_DATE and then UBO.To_Integer (Param) = 2 then
                return UBO.To_Object (String '("Time"));
 
             elsif Type_Mapping.Kind = T_ENUM then
-               if Column.Not_Null or UBO.To_Integer (Param) = 2 then
+               if Column.Not_Null or else UBO.To_Integer (Param) = 2 then
                   return UBO.To_Object (Get_Ada_Type (Column.Type_Name));
                else
                   declare
@@ -217,9 +217,7 @@ package body Gen.Generator is
    function To_Key_Enum (Name : UBO.Object) return UBO.Object is
       Value : constant String := UBO.To_String (Name);
    begin
-      if Value = "Integer" or Value = "int" or Value = "Identifier"
-        or Value = "ADO.Identifier"
-      then
+      if Value in "Integer" | "int" | "Identifier" | "ADO.Identifier" then
          return UBO.To_Object (KEY_INTEGER_LABEL);
       else
          return UBO.To_Object (KEY_STRING_LABEL);
@@ -249,13 +247,13 @@ package body Gen.Generator is
          if C = '-' then
             Append (Result, '_');
 
-         elsif C >= 'a' and C <= 'z' then
+         elsif C in 'a' .. 'z' then
             Append (Result, C);
 
-         elsif C >= 'A' and C <= 'Z' then
+         elsif C in 'A' .. 'Z' then
             Append (Result, C);
 
-         elsif C >= '0' and C <= '9' then
+         elsif C in '0' .. '9' then
             Append (Result, C);
          end if;
       end loop;
@@ -330,14 +328,14 @@ package body Gen.Generator is
                Append (Result, C);
                Pos := Pos + 1;
             end if;
-         elsif C /= ' ' and C /= ASCII.LF then
+         elsif C /= ' ' and then C /= ASCII.LF then
             if Length (Result) > 0 then
                Append (Result, ASCII.LF);
                Append (Result, "   --  ");
             else
                Append (Result, "  ");
                if not UBO.Is_Null (Prefix)
-                 and not UBO.Is_Empty (Prefix)
+                 and then not UBO.Is_Empty (Prefix)
                then
                   Append (Result, UBO.To_String (Prefix));
                end if;
@@ -518,6 +516,7 @@ package body Gen.Generator is
    --  ------------------------------
    --  Get the result directory path.
    --  ------------------------------
+   overriding
    function Get_Result_Directory (H : in Handler) return String is
    begin
       return To_String (H.Output_Dir);
@@ -534,6 +533,7 @@ package body Gen.Generator is
    --  ------------------------------
    --  Get the config directory path.
    --  ------------------------------
+   overriding
    function Get_Config_Directory (H : in Handler) return String is
    begin
       return To_String (H.Config_Dir);
@@ -560,6 +560,7 @@ package body Gen.Generator is
    --  ------------------------------
    --  Get the configuration parameter.
    --  ------------------------------
+   overriding
    function Get_Parameter (H       : in Handler;
                            Name    : in String;
                            Default : in String := "") return String is
@@ -573,6 +574,7 @@ package body Gen.Generator is
    --  ------------------------------
    --  Get the configuration parameter.
    --  ------------------------------
+   overriding
    function Get_Parameter (H       : in Handler;
                            Name    : in String;
                            Default : in Boolean := False) return Boolean is
@@ -583,7 +585,7 @@ package body Gen.Generator is
          declare
             V : constant String := H.Conf.Get (Name);
          begin
-            return V = "1" or V = "true" or V = "yes";
+            return V in "1" | "true" | "yes";
          end;
       end if;
    end Get_Parameter;
@@ -687,6 +689,7 @@ package body Gen.Generator is
    --  ------------------------------
    --  Report an error and set the exit status accordingly
    --  ------------------------------
+   overriding
    procedure Error (H : in out Handler;
                     Message : in String;
                     Arg1    : in String;
@@ -823,10 +826,10 @@ package body Gen.Generator is
       else
          Log.Info ("Reading model file '{0}'", File);
       end if;
-      if Ext = "xmi" or Ext = "XMI" or Ext = "zargo" then
+      if Ext in "xmi" | "XMI" | "zargo" then
          H.XMI.Read_Model (File, "", H);
          return;
-      elsif Ext = "yaml" or Ext = "YAML" then
+      elsif Ext in "yaml" | "YAML" then
          H.Yaml.Read_Model (File, H.Model, H);
          return;
       end if;
@@ -1005,6 +1008,7 @@ package body Gen.Generator is
    --  indicate the template file.  Several artifacts can trigger the generation
    --  of a given template.  The template is generated only once.
    --  ------------------------------
+   overriding
    procedure Add_Generation (H    : in out Handler;
                              Name : in String;
                              Mode : in Gen.Artifacts.Iteration_Mode;
@@ -1044,14 +1048,14 @@ package body Gen.Generator is
       Exists      : constant Boolean := Ada.Directories.Exists (Path);
       Old_Content : UString;
    begin
-      if Exists and Mode = "once" then
+      if Exists and then Mode = "once" then
          Log.Info ("File {0} exists, generation skipped.", Path);
-      elsif Exists and not (H.Force_Save or Mode = "force") then
+      elsif Exists and then not (H.Force_Save or else Mode = "force") then
          H.Error ("Cannot generate file: '{0}' exists already.", Path);
       elsif not UBO.Is_Null (H.File.all) and
       then not UBO.To_Boolean (H.Ignore.all)
       then
-         if Length (Content) = 0 and Mode = "remove-empty" then
+         if Length (Content) = 0 and then Mode = "remove-empty" then
             Log.Debug ("File {0} skipped because it is empty", Path);
          else
             Log.Info ("Generating file '{0}'", Path);
@@ -1211,7 +1215,7 @@ package body Gen.Generator is
             if Ext = "xhtml" then
                H.Generate (Mode, File_Path, Save_Content'Access);
             elsif Util.Strings.Index (Base_Name, '~') = 0 then
-               if Ada.Directories.Exists (Target) and not H.Force_Save then
+               if Ada.Directories.Exists (Target) and then not H.Force_Save then
                   H.Error ("Cannot copy file: '{0}' exists already.", Target);
                else
                   Util.Files.Read_File (Path => File_Path, Into => Content);
@@ -1229,7 +1233,7 @@ package body Gen.Generator is
             Dir_Name : constant String := Simple_Name (Ent);
             Dir      : constant String := Compose (To_String (Base_Dir), Dir_Name);
          begin
-            if Dir_Name /= "." and Dir_Name /= ".." and Dir_Name /= ".svn" then
+            if not (Dir_Name in "." | ".." | ".svn") then
                H.Output_Dir := To_UString (Dir);
                if not Ada.Directories.Exists (Dir) then
                   Ada.Directories.Create_Directory (Dir);
@@ -1260,6 +1264,7 @@ package body Gen.Generator is
    --  Scan the dynamo directories and execute the <b>Process</b> procedure with the
    --  directory path.
    --  ------------------------------
+   overriding
    procedure Scan_Directories (H : in Handler;
                                Process : not null access
                                  procedure (Dir : in String)) is

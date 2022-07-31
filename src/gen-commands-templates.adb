@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,7 +96,7 @@ package body Gen.Commands.Templates is
          elsif Pattern (P_Pos) = '*' and then Line (L_Pos) = Pattern (P_Pos + 1) then
             P_Pos := P_Pos + 2;
             L_Pos := L_Pos + 1;
-         elsif Pattern (P_Pos) = '*' and Line (L_Pos) /= ' ' then
+         elsif Pattern (P_Pos) = '*' and then Line (L_Pos) /= ' ' then
             L_Pos := L_Pos + 1;
          else
             return False;
@@ -325,13 +325,13 @@ package body Gen.Commands.Templates is
             begin
                if P.Value /= Null_Unbounded_String then
                   Result := EL.Utils.Eval (To_String (P.Value), Context);
-               elsif not P.Is_Optional and Value'Length = 0 then
+               elsif not P.Is_Optional and then Value'Length = 0 then
                   Generator.Error ("Missing argument for {0}", To_String (P.Argument));
                   raise PARAM_ERROR;
                elsif Value'Length /= 0 then
                   Result := Util.Beans.Objects.To_Object (Value);
                end if;
-               if not P.Is_Optional and not Util.Beans.Objects.Is_Null (Result) then
+               if not P.Is_Optional and then not Util.Beans.Objects.Is_Null (Result) then
                   Generator.Set_Global (To_String (P.Name), Result);
                end if;
             end;
@@ -432,12 +432,12 @@ package body Gen.Commands.Templates is
    begin
       while First_Pos <= Last_Pos loop
          C := Result (First_Pos);
-         exit when C /= ' ' and C /= ASCII.LF and C /= ASCII.CR and C /= ASCII.HT;
+         exit when not (C in ' ' | ASCII.LF | ASCII.CR | ASCII.HT);
          First_Pos := First_Pos + 1;
       end loop;
       while Last_Pos >= First_Pos loop
          C := Result (Last_Pos);
-         exit when C /= ' ' and C /= ASCII.LF and C /= ASCII.CR and C /= ASCII.HT;
+         exit when not (C in ' ' | ASCII.LF | ASCII.CR | ASCII.HT);
          Last_Pos := Last_Pos - 1;
       end loop;
       return To_UString (Result (First_Pos .. Last_Pos));

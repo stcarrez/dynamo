@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-page -- Page creation command for dynamo
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,7 +69,7 @@ package body Gen.Commands.Page is
       end Get_Layout;
 
    begin
-      if Args.Get_Count = 0 or Args.Get_Count > 2 then
+      if Args.Get_Count = 0 or else Args.Get_Count > 2 then
          Cmd.Usage (Name, Generator);
          return;
       end if;

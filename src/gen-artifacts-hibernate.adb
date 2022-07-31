@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-hibernate -- Hibernate artifact for Code Generator
---  Copyright (C) 2011 - 2021 Stephane Carrez
+--  Copyright (C) 2011 - 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -434,7 +434,7 @@ package body Gen.Artifacts.Hibernate is
             Incr := 1;
          end if;
          while Pos >= Project.Dynamo_Files.First_Index
-           and Pos <= Project.Dynamo_Files.Last_Index loop
+           and then Pos <= Project.Dynamo_Files.Last_Index loop
             declare
                Name : constant String := Project.Dynamo_Files.Element (Pos);
                Prj  : constant Gen.Model.Projects.Project_Definition_Access

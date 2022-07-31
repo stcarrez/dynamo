@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-yaml -- Query artifact for Code Generator
---  Copyright (C) 2018, 2019, 2021 Stephane Carrez
+--  Copyright (C) 2018, 2019, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -125,10 +125,10 @@ package body Gen.Artifacts.Yaml is
             Log.Debug ("Set table {0} attribute {1}={2}", Node.Table.Name, Name, Value);
             if Name = "table" then
                Node.Table.Table_Name := To_UString (Value);
-            elsif Name = "description" or Name = "comment" then
+            elsif Name = "description" or else Name = "comment" then
                Node.Table.Set_Comment (Value);
             elsif Name = "hasList" then
-               Node.Table.Has_List := Value = "true" or Value = "yes";
+               Node.Table.Has_List := Value in "true" | "yes";
             end if;
 
          when IN_COLUMN | IN_KEY | IN_ASSOCIATION =>
@@ -144,21 +144,21 @@ package body Gen.Artifacts.Yaml is
             elsif Name = "column" then
                Node.Col.Sql_Name := To_UString (Value);
             elsif Name = "unique" then
-               Node.Col.Unique := Value = "true" or Value = "yes";
-            elsif Name = "nullable" or Name = "optional" then
-               Node.Col.Not_Null := Value = "false" or Value = "no";
-            elsif Name = "not-null" or Name = "required" then
-               Node.Col.Not_Null := Value = "true" or Value = "yes";
-            elsif Name = "description" or Name = "comment" then
+               Node.Col.Unique := Value in "true" | "yes";
+            elsif Name = "nullable" or else Name = "optional" then
+               Node.Col.Not_Null := Value in "false" | "no";
+            elsif Name = "not-null" or else Name = "required" then
+               Node.Col.Not_Null := Value in "true" | "yes";
+            elsif Name = "description" or else Name = "comment" then
                Node.Col.Set_Comment (Value);
             elsif Name = "version" then
-               Node.Col.Is_Version := Value = "true" or Value = "yes";
+               Node.Col.Is_Version := Value in "true" | "yes";
             elsif Name = "readonly" then
-               Node.Col.Is_Updated := Value = "false" or Value = "no";
+               Node.Col.Is_Updated := Value in "false" | "no";
             elsif Name = "auditable" then
-               Node.Col.Is_Auditable := Value = "true" or Value = "yes";
-            elsif Name = "useForeignKey" and Node.Assoc /= null then
-               Node.Assoc.Use_Foreign_Key_Type := Value = "true" or Value = "yes";
+               Node.Col.Is_Auditable := Value in "true" | "yes";
+            elsif Name = "useForeignKey" and then Node.Assoc /= null then
+               Node.Assoc.Use_Foreign_Key_Type := Value in "true" | "yes";
             end if;
 
          when IN_GENERATOR =>
@@ -206,7 +206,7 @@ package body Gen.Artifacts.Yaml is
                New_Node.State := IN_TYPE;
 
             when IN_TABLE =>
-               if Node.Name = "fields" or Node.Name = "properties" then
+               if Node.Name = "fields" or else Node.Name = "properties" then
                   Node_Stack.Push (Stack);
                   New_Node := Node_Stack.Current (Stack);
                   New_Node.Table := Node.Table;
@@ -285,7 +285,6 @@ package body Gen.Artifacts.Yaml is
 
          end if;
       end Process_Mapping;
-
 
       Input : Source.Pointer;
       P     : Parser.Instance;
@@ -385,13 +384,13 @@ package body Gen.Artifacts.Yaml is
          Ada.Text_IO.Set_Col (File, Indent);
          Ada.Text_IO.Put (File, "description: ");
          if Util.Strings.Index (Content, ASCII.LF) > 0
-           or Util.Strings.Index (Content, ASCII.CR) > 0
+           or else Util.Strings.Index (Content, ASCII.CR) > 0
          then
             Start := Content'First;
             Pos   := Content'First;
             Ada.Text_IO.Put_Line (File, "|");
             while Pos <= Content'Last loop
-               if Content (Pos) = ASCII.CR or Content (Pos) = ASCII.LF then
+               if Content (Pos) in ASCII.CR | ASCII.LF then
                   Ada.Text_IO.Set_Col (File, Indent + 2);
                   Ada.Text_IO.Put_Line (File, Content (Start .. Pos - 1));
                   Start := Pos + 1;

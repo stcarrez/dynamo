@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009 - 2021 Stephane Carrez
+--  Copyright (C) 2009 - 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -150,13 +150,13 @@ package body Gen.Model.Tables is
       Name : constant String := To_String (From.Type_Name);
    begin
       if T /= null then
-         return T.Kind /= Gen.Model.Mappings.T_BLOB and T.Kind /= Gen.Model.Mappings.T_TABLE
-         and T.Kind /= Gen.Model.Mappings.T_BEAN;
+         return not (T.Kind in Gen.Model.Mappings.T_BLOB | Gen.Model.Mappings.T_TABLE
+                       | Gen.Model.Mappings.T_BEAN);
       end if;
-      return Name = "int" or Name = "String"
-        or Name = "ADO.Identifier" or Name = "Timestamp"
-        or Name = "Integer"
-        or Name = "long" or Name = "Long" or Name = "Date" or Name = "Time";
+      return Name in "int" | "String"
+        | "ADO.Identifier" | "Timestamp"
+        | "Integer"
+        | "long" | "Long" | "Date" | "Time";
    end Is_Basic_Type;
 
    --  ------------------------------
@@ -417,7 +417,7 @@ package body Gen.Model.Tables is
    function Get_Value (From : in Table_Definition;
                        Name : in String) return UBO.Object is
    begin
-      if Name = "members" or Name = "columns" then
+      if Name in "members" | "columns" then
          return From.Members_Bean;
 
       elsif Name = "operations" then
@@ -426,14 +426,14 @@ package body Gen.Model.Tables is
       elsif Name = "auditables" then
          return From.Auditables_Bean;
 
-      elsif Name = "id" and From.Id_Column /= null then
+      elsif Name = "id" and then From.Id_Column /= null then
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access := From.Id_Column.all'Access;
          begin
             return UBO.To_Object (Bean, UBO.STATIC);
          end;
 
-      elsif Name = "version" and From.Version_Column /= null then
+      elsif Name = "version" and then From.Version_Column /= null then
          declare
             Bean : constant Util.Beans.Basic.Readonly_Bean_Access
               := From.Version_Column.all'Unchecked_Access;
@@ -450,7 +450,7 @@ package body Gen.Model.Tables is
       elsif Name = "type" then
          return UBO.To_Object (From.Type_Name);
 
-      elsif Name = "table" or Name = "sqlName" then
+      elsif Name in "table" | "sqlName" then
          return UBO.To_Object (From.Table_Name);
 
       elsif Name = "keyCount" then
@@ -468,14 +468,14 @@ package body Gen.Model.Tables is
             return UBO.Null_Object;
          end if;
 
-      elsif Name = "isVersion" or Name = "isPrimaryKey" or Name = "isBean"
-        or Name = "isPrimitiveType" or Name = "isEnum" or Name = "isIdentifier"
-        or Name = "isDiscrete" or Name = "isNewDiscrete"
-        or Name = "isBoolean" or Name = "isBlob" or Name = "isDate" or Name = "isString"
+      elsif Name in "isVersion" | "isPrimaryKey" | "isBean"
+        | "isPrimitiveType" | "isEnum" | "isIdentifier"
+        | "isDiscrete" | "isNewDiscrete"
+        | "isBoolean" | "isBlob" | "isDate" | "isString"
       then
          return UBO.To_Object (False);
 
-      elsif Name = "isReadable" or Name = "isObject" then
+      elsif Name in "isReadable" | "isObject" then
          return UBO.To_Object (True);
 
       elsif Name = "isLimited" then
@@ -534,7 +534,7 @@ package body Gen.Model.Tables is
          end if;
          Column_List.Next (Iter);
       end loop;
-      if O.Id_Column = null and Length (O.Table_Name) > 0 then
+      if O.Id_Column = null and then Length (O.Table_Name) > 0 then
          Log.Error ("Table {0} does not have any primary key", To_String (O.Name));
       end if;
       if Length (O.Parent_Name) > 0 then

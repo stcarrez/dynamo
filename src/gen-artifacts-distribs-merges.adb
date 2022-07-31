@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs-merges -- Web file merge
---  Copyright (C) 2020-2021 Stephane Carrez
+--  Copyright (C) 2020-2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -203,7 +203,7 @@ package body Gen.Artifacts.Distribs.Merges is
             return "";
          end if;
          Pos := Pos + Tag'Length;
-         if Pos > Line'Last or else (Line (Pos) /= '"' and Line (Pos) /= ''') then
+         if Pos > Line'Last or else (Line (Pos) /= '"' and then Line (Pos) /= ''') then
             return "";
          end if;
          Last := Util.Strings.Index (Line, Line (Pos), Pos + 1);

@@ -162,7 +162,7 @@ private
        '@' | '&' | '=' | '+' | '$' | ',' | '_' | '.' | '!' | '~' | '*' | ''' |
          '(' | ')' | '[' | ']' | '-';
    subtype Tag_Char is Character with Static_Predicate =>
-     (Tag_Char in Tag_Uri_Char) and not (Tag_Char in Flow_Indicator | '!');
+     (Tag_Char in Tag_Uri_Char) and then not (Tag_Char in Flow_Indicator | '!');
    subtype Suffix_Char is Character with Static_Predicate =>
      Suffix_Char in Ascii_Char | Digit | '#' | ';' | '/' | '?' | '@' | '&' |
        '=' | '+' | '$' | '_' | '.' | '!' | '~' | '*' | ''' | '-';

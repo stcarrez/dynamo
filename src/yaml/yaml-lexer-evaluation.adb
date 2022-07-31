@@ -169,9 +169,9 @@ package body Yaml.Lexer.Evaluation is
             end loop Newline_Loop;
             if
               (L.Cur = ':' and then not Next_Is_Plain_Safe (L)) or else
-              L.Cur = '#' or else (L.Cur in Flow_Indicator and
+              L.Cur = '#' or else (L.Cur in Flow_Indicator and then
                                     L.Flow_Depth + L.Annotation_Depth > 0)
-              or else (L.Cur = ')' and L.Annotation_Depth > 0)
+              or else (L.Cur = ')' and then L.Annotation_Depth > 0)
             then
                L.State := After_Newline_State;
                exit Multiline_Loop;
@@ -461,7 +461,7 @@ package body Yaml.Lexer.Evaluation is
                end loop;
             else
                Max_Leading_Spaces := L.Line_Start + Indent;
-               while L.Cur = ' ' and L.Pos <= Max_Leading_Spaces loop
+               while L.Cur = ' ' and then L.Pos <= Max_Leading_Spaces loop
                   L.Cur := Next (L);
                end loop;
             end if;
@@ -518,7 +518,7 @@ package body Yaml.Lexer.Evaluation is
             declare
                Indent_Pos : constant Natural := L.Line_Start + Indent;
             begin
-               while L.Cur = ' ' and L.Pos - 1 < Indent_Pos loop
+               while L.Cur = ' ' and then L.Pos - 1 < Indent_Pos loop
                   L.Cur := Next (L);
                end loop;
                case L.Cur is
@@ -603,7 +603,7 @@ package body Yaml.Lexer.Evaluation is
       Literal_Start : Positive;
    begin
       if End_With_Space then
-         if (not Restricted) and L.Cur in '[' | ']' | ',' then
+         if (not Restricted) and then L.Cur in '[' | ']' | ',' then
             raise Lexer_Error with "Flow indicator cannot start tag prefix";
          end if;
          Literal_Start := L.Pos - 1;
@@ -650,6 +650,5 @@ package body Yaml.Lexer.Evaluation is
       end loop;
       L.Value := Target.Lock;
    end Read_URI;
-
 
 end Yaml.Lexer.Evaluation;

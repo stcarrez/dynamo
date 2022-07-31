@@ -4,6 +4,8 @@
 with Ada.Unchecked_Deallocation;
 
 package body Yaml.Stacks is
+
+   overriding
    procedure Adjust (Object : in out Stack) is
    begin
       if Object.Data /= null then
@@ -14,6 +16,7 @@ package body Yaml.Stacks is
    procedure Free_Element_Array is new Ada.Unchecked_Deallocation
      (Element_Array, Element_Array_Access);
 
+   overriding
    procedure Finalize (Object : in out Stack) is
       procedure Free_Holder is new Ada.Unchecked_Deallocation
         (Holder, Holder_Access);

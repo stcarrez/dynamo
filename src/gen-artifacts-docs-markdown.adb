@@ -166,7 +166,9 @@ package body Gen.Artifacts.Docs.Markdown is
          end if;
          Formatter.Write_Text_Auto_Links (File, Text (Start .. Pos - 1));
 
-         if Pos - 1 >= Text'First and then (Text (Pos - 1) = '\' or Text (Pos - 1) = '`') then
+         if Pos - 1 >= Text'First
+           and then (Text (Pos - 1) = '\' or else Text (Pos - 1) = '`')
+         then
             Ada.Text_IO.Put (File, "[");
             Start := Pos + 1;
 
@@ -194,11 +196,14 @@ package body Gen.Artifacts.Docs.Markdown is
          else
             Pos := Pos + 1;
             End_Pos := Pos;
-            while End_Pos < Text'Last and Text (End_Pos) /= ' ' and Text (End_Pos) /= ']' loop
+            while End_Pos < Text'Last
+              and then Text (End_Pos) /= ' '
+              and then Text (End_Pos) /= ']'
+            loop
                End_Pos := End_Pos + 1;
             end loop;
             Last_Pos := End_Pos;
-            while Last_Pos < Text'Last and Text (Last_Pos) /= ']' loop
+            while Last_Pos < Text'Last and then Text (Last_Pos) /= ']' loop
                Last_Pos := Last_Pos + 1;
             end loop;
             if Is_Image (Text (Pos .. Last_Pos - 1)) then

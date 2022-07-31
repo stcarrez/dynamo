@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-distrib -- Distrib command for dynamo
---  Copyright (C) 2012, 2013, 2014, 2017, 2018, 2020, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2017, 2018, 2020, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ package body Gen.Commands.Distrib is
                       Generator : in out Gen.Generator.Handler) is
       pragma Unreferenced (Cmd, Name);
    begin
-      if Args.Get_Count = 0 or Args.Get_Count > 2 then
+      if Args.Get_Count = 0 or else Args.Get_Count > 2 then
          Generator.Error ("Missing target directory");
          return;
       end if;

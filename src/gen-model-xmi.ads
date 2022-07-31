@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012, 2013, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2018, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -349,7 +349,6 @@ package Gen.Model.XMI is
    overriding
    procedure Reconcile (Node  : in out Attribute_Element;
                         Model : in UML_Model);
-
 
    --  ------------------------------
    --  A parameter

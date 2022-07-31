@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-beans -- Ada Bean declarations
---  Copyright (C) 2012, 2013, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2018, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ package body Gen.Model.Beans is
    function Get_Value (From : in Bean_Definition;
                        Name : in String) return UBO.Object is
    begin
-      if Name = "members" or Name = "columns" then
+      if Name = "members" or else Name = "columns" then
          return From.Members_Bean;
 
       elsif Name = "type" then

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-utils -- Utilities for model generator
---  Copyright (C) 2010, 2011, 2012, 2015, 2021 Stephane Carrez
+--  Copyright (C) 2010, 2011, 2012, 2015, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -127,9 +127,9 @@ package body Gen.Utils is
                            Default : in Boolean := False) return Boolean is
       V : constant DOM.Core.DOM_String := DOM.Core.Elements.Get_Attribute (Node, Name);
    begin
-      if V = "yes" or V = "true" then
+      if V = "yes" or else V = "true" then
          return True;
-      elsif V = "no" or V = "false" then
+      elsif V = "no" or else V = "false" then
          return False;
       else
          return Default;
@@ -206,14 +206,12 @@ package body Gen.Utils is
          return False;
       end if;
       C := Name (Name'First);
-      if not (C >= 'a' and C <= 'z') and not (C >= 'A' and C <= 'Z') then
+      if C not in 'a' .. 'z' | 'A' .. 'Z' then
          return False;
       end if;
       for I in Name'First + 1 .. Name'Last loop
          C := Name (I);
-         if not (C >= 'a' and C <= 'z') and not (C >= 'A' and C <= 'Z')
-           and not (C >= '0' and C <= '9') and C /= '_'
-         then
+         if C not in 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' then
             return False;
          end if;
       end loop;
@@ -227,7 +225,7 @@ package body Gen.Utils is
    begin
       if Path'Length = 0 then
          return False;
-      elsif Path (Path'First) = '/' or Path (Path'First) = '\' then
+      elsif Path (Path'First) = '/' or else Path (Path'First) = '\' then
          return True;
       elsif Path'Length = 1 then
          return False;

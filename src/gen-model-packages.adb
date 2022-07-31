@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009 - 2021 Stephane Carrez
+--  Copyright (C) 2009 - 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -281,7 +281,7 @@ package body Gen.Model.Packages is
       Key        : constant UString := To_UString (Upper_Name);
    begin
       return not Model.Packages.Element (Key).Is_Predefined
-        and (Model.Gen_Packages.Is_Empty or Model.Gen_Packages.Contains (Upper_Name));
+        and then (Model.Gen_Packages.Is_Empty or else Model.Gen_Packages.Contains (Upper_Name));
    end Is_Generation_Enabled;
 
    --  ------------------------------
@@ -397,13 +397,16 @@ package body Gen.Model.Packages is
                         O.Uses_Calendar_Time := True;
 
                      when Model.Mappings.T_ENUM | Model.Mappings.T_BEAN | Model.Mappings.T_TABLE =>
-                        if Pkg'Length > 0 and Pkg /= O.Name and not Col.Use_Foreign_Key_Type then
+                        if Pkg'Length > 0
+                          and then Pkg /= O.Name
+                          and then not Col.Use_Foreign_Key_Type
+                        then
                            Used_Spec_Types.Include (To_UString (Pkg));
                         end if;
 
                      when others =>
                         if T.Kind /= Model.Mappings.T_DATE
-                          and (Name = "Date" or Name = "DateTime" or Name = "Time")
+                          and then Name in "Date" | "DateTime" | "Time"
                         then
                            Log.Error ("Date type {0} is invalid in table {1} - type is name {2}",
                                       Model.Mappings.Basic_Type'Image (T.Kind), Table.Get_Name,

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs -- Artifact for distributions
---  Copyright (C) 2012, 2013, 2015, 2020, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015, 2020, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +50,7 @@ package body Gen.Artifacts.Distribs is
    begin
       Log.Debug ("Creating distribution rule {0}", Kind);
 
-      if Kind = "copy" or Kind = "" then
+      if Kind = "copy" or else Kind = "" then
          return Gen.Artifacts.Distribs.Copies.Create_Rule (Node, False);
       elsif Kind = "copy-first" then
          return Gen.Artifacts.Distribs.Copies.Create_Rule (Node, True);
@@ -338,7 +338,7 @@ package body Gen.Artifacts.Distribs is
          if Pattern (I) = '*' then
             Pos := Pos + 1;
             Result (Pos) := '.';
-         elsif Pattern (I) = '.' or Pattern (I) = '$' or Pattern (I) = '^' then
+         elsif Pattern (I) in '.' | '$' | '^' then
             Pos := Pos + 1;
             Result (Pos) := '\';
          end if;

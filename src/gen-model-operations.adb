@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012, 2016, 2017, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2016, 2017, 2018, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ package body Gen.Model.Operations is
    function Get_Value (From : in Operation_Definition;
                        Name : in String) return UBO.Object is
    begin
-      if Name = "parameters" or Name = "columns" then
+      if Name in "parameters" | "columns" then
          return From.Parameters_Bean;
 
       elsif Name = "return" then

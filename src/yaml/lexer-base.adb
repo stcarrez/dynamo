@@ -111,6 +111,7 @@ package body Lexer.Base is
       L.Cur_Line := L.Cur_Line + 1;
    end Handle_LF;
 
+   overriding
    procedure Finalize (Object : in out Instance) is
       procedure Free is new Ada.Unchecked_Deallocation
         (Source.Instance'Class, Source.Pointer);

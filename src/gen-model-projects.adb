@@ -54,7 +54,7 @@ package body Gen.Model.Projects is
          declare
             Value : constant String := Project.Props.Get (Name);
          begin
-            return Value = "TRUE" or Value = "true" or Value = "1";
+            return Value = "TRUE" or else Value = "true" or else Value = "1";
          end;
       end if;
    end Get;
@@ -215,7 +215,7 @@ package body Gen.Model.Projects is
    begin
       Log.Debug ("Adding dependency {0}", Name);
 
-      if Depend.Project = null and Depend.Kind = NONE then
+      if Depend.Project = null and then Depend.Kind = NONE then
          Depend.Project := Into.Find_Project_By_Name (Name);
          Depend.Kind := Kind;
          Into.Dependencies.Append (Depend);
@@ -451,7 +451,7 @@ package body Gen.Model.Projects is
 
       procedure Update (Item : in out Project_Reference) is
       begin
-         if Item.Name = Project.Name or Item.Name = Project.Path then
+         if Item.Name = Project.Name or else Item.Name = Project.Path then
             if Item.Project = null then
                Item.Project := Project;
 
@@ -544,7 +544,10 @@ package body Gen.Model.Projects is
 
       function Is_Default_Value (Name : in String) return Boolean is
       begin
-         if Name /= "use_mysql" and Name /= "use_sqlite" and Name /= "use_postgresql" then
+         if Name /= "use_mysql"
+           and then Name /= "use_sqlite"
+           and then Name /= "use_postgresql"
+         then
             return False;
          end if;
 

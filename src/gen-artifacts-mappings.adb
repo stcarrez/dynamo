@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-mappings -- Type mapping artifact for Code Generator
---  Copyright (C) 2011, 2012, 2015, 2018, 2019, 2021 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018, 2019, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -75,10 +75,10 @@ package body Gen.Artifacts.Mappings is
                                         Process => Register_Type);
 
       begin
-         if Kind = "date" or To = "Ada.Calendar.Time" then
+         if Kind = "date" or else To = "Ada.Calendar.Time" then
             Kind_Type := Gen.Model.Mappings.T_DATE;
 
-         elsif Kind = "identifier" or To = "ADO.Identifier" then
+         elsif Kind = "identifier" or else To = "ADO.Identifier" then
             Kind_Type := Gen.Model.Mappings.T_IDENTIFIER;
 
          elsif Kind = "boolean" then
@@ -87,13 +87,13 @@ package body Gen.Artifacts.Mappings is
          elsif Kind = "float" then
             Kind_Type := Gen.Model.Mappings.T_FLOAT;
 
-         elsif Kind = "string" or To = "Ada.Strings.Unbounded.Unbounded_String" then
+         elsif Kind = "string" or else To = "Ada.Strings.Unbounded.Unbounded_String" then
             Kind_Type := Gen.Model.Mappings.T_STRING;
 
-         elsif Kind = "blob" or To = "ADO.Blob_Ref" then
+         elsif Kind = "blob" or else To = "ADO.Blob_Ref" then
             Kind_Type := Gen.Model.Mappings.T_BLOB;
 
-         elsif Kind = "entity_type" or To = "ADO.Entity_Type" then
+         elsif Kind = "entity_type" or else To = "ADO.Entity_Type" then
             Kind_Type := Gen.Model.Mappings.T_ENTITY_TYPE;
 
          else

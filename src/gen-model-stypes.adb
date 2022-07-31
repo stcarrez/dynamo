@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-stypes -- Simple data type definitions
---  Copyright (C) 2021 Stephane Carrez
+--  Copyright (C) 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@ package body Gen.Model.Stypes is
          return UBO.To_Object (From.Type_Name);
       elsif Name = "isEnum" then
          return UBO.To_Object (False);
-      elsif Name = "isDiscrete" or Name = "isNewDiscrete" then
+      elsif Name = "isDiscrete" or else Name = "isNewDiscrete" then
          return UBO.To_Object (True);
       elsif Name = "sqlType" then
          if Length (From.Sql_Type) > 0 then

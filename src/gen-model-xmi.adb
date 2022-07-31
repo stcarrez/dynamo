@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-xmi -- UML-XMI model
---  Copyright (C) 2012, 2013, 2015, 2016, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015, 2016, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -115,7 +115,7 @@ package body Gen.Model.XMI is
                begin
                   --  Find in the package only.  If there is no '.', check the package name only.
                   if Node.Get_Type = XMI_PACKAGE then
-                     if Pos = 0 and Node.Name = Key then
+                     if Pos = 0 and then Node.Name = Key then
                         return Node;
                      end if;
 
@@ -149,7 +149,7 @@ package body Gen.Model.XMI is
       Item      : Model_Element_Access;
    begin
       if UML_Model_Map.Has_Element (Model_Pos) then
-         if Mode = BY_ID or Mode = BY_NAME then
+         if Mode = BY_ID or else Mode = BY_NAME then
             Item := Find (UML_Model_Map.Element (Model_Pos), Key, Mode);
          else
             declare
@@ -291,7 +291,7 @@ package body Gen.Model.XMI is
       Iter  : Model_Cursor;
       Item  : Model_Element_Access;
    begin
-      if Pos = 0 or Name (Name'First) = '@' then
+      if Pos = 0 or else Name (Name'First) = '@' then
          Iter := Node.Elements.First;
          while Model_Vectors.Has_Element (Iter) loop
             Item := Model_Vectors.Element (Iter);
@@ -424,7 +424,6 @@ package body Gen.Model.XMI is
       end loop;
       return Default;
    end Find_Tag_Value;
-
 
    --  ------------------------------
    --  Get the documentation and comment associated with the model element.
@@ -784,15 +783,15 @@ package body Gen.Model.XMI is
             First  := Association_End_Element'Class (Node.Connections.Element (1).all)'Access;
             Second := Association_End_Element'Class (Node.Connections.Element (2).all)'Access;
 
-            if First.Navigable and Length (First.Name) = 0 then
+            if First.Navigable and then Length (First.Name) = 0 then
                Append_Message (Result, "Association '" & To_String (Node.Name) &
                                  "' has a navigable association end with an empty name.");
             end if;
-            if Second.Navigable and Length (Second.Name) = 0 then
+            if Second.Navigable and then Length (Second.Name) = 0 then
                Append_Message (Result, "Association '" & To_String (Node.Name) &
                                  "' has a navigable association end with an empty name.");
             end if;
-            if not First.Navigable and not Second.Navigable then
+            if not First.Navigable and then not Second.Navigable then
                Append_Message (Result, "Association '" & To_String (Node.Name) &
                                  "' has no navigable association ends.");
             end if;

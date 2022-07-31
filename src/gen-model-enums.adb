@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-enums -- Enum definitions
---  Copyright (C) 2011, 2012, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2018, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,7 @@ package body Gen.Model.Enums is
          return From.Values_Bean;
       elsif Name = "name" then
          return UBO.To_Object (From.Type_Name);
-      elsif Name = "isEnum" or Name = "isDiscrete" then
+      elsif Name = "isEnum" or else Name = "isDiscrete" then
          return UBO.To_Object (True);
       elsif Name = "sqlType" then
          if Length (From.Sql_Type) > 0 then

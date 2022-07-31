@@ -37,7 +37,6 @@ package Yaml is
    function Version_Minor return Natural with Inline;
    function Version_Patch return Natural with Inline;
 
-
    --  all positions in a mark start at 1
    subtype Mark_Position is Positive;
 

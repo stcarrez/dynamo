@@ -25,14 +25,27 @@ while [ -h "$PRG" ] ; do
   fi
 done
 
-DIR=`dirname $PRG`/../share/dynamo/base/
+BASE=`dirname $PRG`
+DIR=$BASE/../share/dynamo/base/
 if [ ! -d $DIR ] ; then
-    echo "Cannot find ArgoUML-Dynamo configuration directory: $DIR does not exist"
+    DIR=$BASE/../config
+    if [ ! -d $DIR ] ; then
+      echo "Cannot find ArgoUML-Dynamo configuration directory: $DIR does not exist"
+      exit 1
+    fi
+fi
+JAR=$DIR/argouml-0.35.5.jar
+if [ ! -f $JAR ] ; then
+    echo "Cannot find ArgoUML-Dynamo: $JAR does not exist"
     exit 1
 fi
-CONFIG="-Dargouml.profiles.directory=$DIR/uml/ -Dlog4j.configuration=org/argouml/resource/full_console.lcf -Djava.util.logging.config.file=$DIR/argouml.properties -Dargouml.modules=org.argouml.activity2.ActivityDiagramModule;org.argouml.sequence2.SequenceDiagramModule;org.argouml.core.propertypanels.module.XmlPropertyPanelsModule;org.argouml.transformer.TransformerModule"
+UML_PATH=$DIR/uml/
+if [ T"$DYNAMO_UML_PATH" != T ]; then
+   UML_PATH="$UML_PATH;$DYNAMO_UML_PATH"
+fi
+CONFIG="-Dargouml.profiles.directory=$UML_PATH -Dlog4j.configuration=org/argouml/resource/full_console.lcf -Djava.util.logging.config.file=$DIR/argouml.properties -Dargouml.modules=org.argouml.activity2.ActivityDiagramModule;org.argouml.sequence2.SequenceDiagramModule;org.argouml.core.propertypanels.module.XmlPropertyPanelsModule;org.argouml.transformer.TransformerModule"
 
 CONFIG="$CONFIG -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.plaf.metal.windowTitleFont=Sans-17 -Dswing.plaf.metal.systemTextFont=Sans-17 -Dswing.plaf.metal.menuTextFont=Sans-17 -Dswing.plaf.metal.controlFont=Sans-24 -Dswing.plaf.metal.userFont=Sans-24 -Dawt.useSystemAAFontSettings=on -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.plaf.metal.userTextFont=Sans-24 -Dswing.plaf.metal.subTextFont=Sans-24"
 
-exec java -Xms64m -Xmx512m $CONFIG -jar $DIR/argouml-0.35.2.jar "$@"
+exec java -Xms64m -Xmx512m $CONFIG -jar $JAR "$@"
 

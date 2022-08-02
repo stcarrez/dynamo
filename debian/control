@@ -3,16 +3,16 @@ Priority: optional
 Section: devel
 Maintainer: Stephane Carrez <Stephane.Carrez@gmail.com>
 Build-Depends: debhelper (>= 10), autotools-dev,
- gnat, gnat-9,
+ gnat, gnat-10,
 # This line is parsed by debian/rules.
  gprbuild (>= 2015-2),
 # 2015-2 is compatible with gnat-6
- libxmlada-sax9-dev,
- libutilada-sys3-dev,
- libutilada-xml3-dev,
- libasf3-dev,
- libado3-dev,
- libgnatprj7-dev
+ libxmlada-sax10-dev,
+ libutilada-sys4-dev,
+ libutilada-xml4-dev,
+ libasf4-dev,
+ libado4-dev,
+ libgnatprj8-dev
 Standards-Version: 4.1.4
 Homepage: https://github.com/stcarrez/dynamo/
 Vcs-Git: https://github.com/stcarrez/dynamo.git -b debian-gnat-9

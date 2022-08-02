@@ -22,10 +22,10 @@ override_dh_install::
 	dh_installdirs --package=dynamo-argouml usr/share/dynamo/base
 	dh_installdirs --package=dynamo-argouml usr/bin
 	dh_install -pdynamo-argouml usr/bin/argouml usr/bin
-	dh_install -pdynamo-argouml config/argouml-0.35.2.jar usr/share/dynamo/base
+	dh_install -pdynamo-argouml config/argouml-0.35.5.jar usr/share/dynamo/base
 	dh_install -pdynamo-argouml config/argouml.properties usr/share/dynamo/base
 	rm -f $(CURDIR)/debian/dynamo/usr/bin/argouml
-	rm -f $(CURDIR)/debian/dynamo/usr/share/dynamo/base/argouml-0.35.2.jar
+	rm -f $(CURDIR)/debian/dynamo/usr/share/dynamo/base/argouml-0.35.5.jar
 	rm -f $(CURDIR)/debian/dynamo/usr/share/dynamo/base/argouml.properties
 
 override_dh_auto_test::

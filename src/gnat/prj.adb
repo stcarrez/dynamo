@@ -1552,7 +1552,7 @@ package body Prj is
          renames Ada.Characters.Handling.To_Lower;
    begin
       for Casing in The_Casing_Images'Range loop
-         if To_Lower_Case (Image) = To_Lower (The_Casing_Images (Casing).all) then
+         if To_Lower_Case (Image) = To_Lower_Case (The_Casing_Images (Casing).all) then
             return Casing;
          end if;
       end loop;

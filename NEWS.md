@@ -1,3 +1,6 @@
+Version 1.4.0   - Under development
+  - Feature #22: Support to audit creation of new objects in the database
+
 Version 1.3.0   - Aug 2022
   - Fix #5: Generated body does not compile when an enumeration of another UML package is used
   - Fix #7: No default type for SQL generation of a column that uses an enumeration
@@ -9,7 +12,7 @@ Version 1.3.0   - Aug 2022
   - Fix #18: Generate database operation to reload an object
   - Fix #19: Add dynamo configuration through environment support
   - Fix #20: Give access to the man page from alire
-  - Fix $21: Generated procedure Create is missing overriding keyword
+  - Fix #21: Generated procedure Create is missing overriding keyword
 
 Version 1.2.2   - Jul 2021
   - Fix the SQL type definition for double on PostgreSQL

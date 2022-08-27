@@ -69,6 +69,8 @@ package body Gen.Model.Projects is
    begin
       if Name = "name" then
          return UBO.To_Object (From.Name);
+      elsif Name = "modelVersion" then
+         return UBO.To_Object (From.Model_Version);
       elsif From.Props.Exists (Name) then
          return UBO.To_Object (String '(From.Props.Get (Name)));
       else
@@ -621,6 +623,18 @@ package body Gen.Model.Projects is
       Project.Use_Mysql := Get (Project, "use_mysql", Project.Use_Mysql);
       Project.Use_Postgresql := Get (Project, "use_postgresql", Project.Use_Postgresql);
       Project.Use_Sqlite := Get (Project, "use_sqlite", Project.Use_Sqlite);
+      Project.Model_Version := 1;
+      if Project.Props.Exists ("model_version") then
+         declare
+            Value : constant String := Project.Props.Get ("model_version");
+         begin
+            Project.Model_Version := Positive'Value (Value);
+
+         exception
+            when Constraint_Error =>
+               null;
+         end;
+      end if;
    end Update_From_Properties;
 
    --  ------------------------------

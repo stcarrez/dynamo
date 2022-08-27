@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,6 +76,9 @@ package Gen.Model.Projects is
       Use_Mysql      : Boolean := True;
       Use_Sqlite     : Boolean := True;
       Use_Postgresql : Boolean := True;
+
+      --  The database model version for this project.
+      Model_Version  : Positive := 1;
    end record;
 
    --  Get the value identified by the name.

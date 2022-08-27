@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Jul 10, 2022" "Ada Web Application"
+.TH DYNAMO 1 "Aug 27, 2022" "Ada Web Application"
 .SH NAME
 dynamo - Ada Application Generator
 .SH SYNOPSIS
@@ -534,6 +534,13 @@ The relative path of the
 directory that contains the XML query files and the SQL schema files.
 The default path is
 .BR db .
+.\"
+.SS model_version
+The database schema version associated with the project.
+This must be a positive integer that is incremented manually each time
+the database schema is changed.  It is used for the generation of
+SQL schema to insert the database schema version associated with
+the current project.
 .\"
 .SS links
 For the generated documentation, the property indicates the path of a file

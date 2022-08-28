@@ -634,6 +634,8 @@ package body Gen.Model.Projects is
             when Constraint_Error =>
                null;
          end;
+      else
+         Project.Props.Set ("model_version", "1");
       end if;
    end Update_From_Properties;
 

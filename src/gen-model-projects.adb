@@ -560,6 +560,7 @@ package body Gen.Model.Projects is
       Name      : constant String := Project.Get_Project_Name;
       Prop_Name : constant String := Name & ".properties";
       Prop_Path : constant String := Ada.Directories.Compose (Dir, Prop_Name);
+      Dis_Prop  : constant Boolean := Project.Get ("no_properties", False);
    begin
       Prop_Output.Initialize (Size => 100000);
       Buffer.Initialize (Size => 100000);
@@ -610,8 +611,10 @@ package body Gen.Model.Projects is
       Output.End_Entity (Name => "project");
       Util.Files.Write_File (Content => Texts.To_String (Buffer),
                              Path    => Path);
-      Util.Files.Write_File (Content => Texts.To_String (Prop_Output),
-                             Path    => Prop_Path);
+      if not Dis_Prop then
+         Util.Files.Write_File (Content => Texts.To_String (Prop_Output),
+                                Path    => Prop_Path);
+      end if;
    end Save;
 
    --  ------------------------------

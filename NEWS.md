@@ -2,6 +2,7 @@ Version 1.4.0   - Under development
   - Feature #22: Support to audit creation of new objects in the database
   - Feature #23: Update SQL templates for ADO 2.4
   - Feature #24: Support for database schema versionning
+  - Feature #8: Option or configuration to disable generation of <project>.properties file
 
 Version 1.3.0   - Aug 2022
   - Fix #5: Generated body does not compile when an enumeration of another UML package is used

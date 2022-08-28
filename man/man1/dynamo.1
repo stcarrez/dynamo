@@ -535,6 +535,12 @@ directory that contains the XML query files and the SQL schema files.
 The default path is
 .BR db .
 .\"
+.SS links
+For the generated documentation, the property indicates the path of a file
+that contains links to external documentation.  The syntax of the file is
+very basic: each line describes a link with the text of the link followed
+by the link itself.
+.\"
 .SS model_version
 The database schema version associated with the project.
 This must be a positive integer that is incremented manually each time
@@ -542,11 +548,9 @@ the database schema is changed.  It is used for the generation of
 SQL schema to insert the database schema version associated with
 the current project.
 .\"
-.SS links
-For the generated documentation, the property indicates the path of a file
-that contains links to external documentation.  The syntax of the file is
-very basic: each line describes a link with the text of the link followed
-by the link itself.
+.SS no_properties
+This boolean property controls the generation of project properties files
+(the default is true).
 .\"
 .SS use_sqlite
 This boolean property controls the generation of SQLite schema files

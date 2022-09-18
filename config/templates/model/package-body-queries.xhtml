@@ -167,7 +167,7 @@
          Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)}'Enum_Val (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
   <h:panelGroup rendered="#{column.type.isNewDiscrete and not column.isNull}">
-         Into.#{fn:capitalize(column.name)} := #{g:adaType(column,2)} (Stmt.Get_Integer (#{column.index}));
+         Into.#{fn:capitalize(column.name)} := #{g:adaType(column,1)} (Stmt.Get_Integer (#{column.index}));
   </h:panelGroup>
   <h:panelGroup rendered="#{not column.isNull and not column.type.isIdentifier and not column.type.isString and not column.type.isEnum and not column.type.isNewDiscrete}">
          Into.#{fn:capitalize(column.name)} := Stmt.Get_#{fn:capitalize(g:adaType(column,2))} (#{column.index});

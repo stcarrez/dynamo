@@ -38,8 +38,11 @@
             </h:panelGroup>
          end if;
       </h:panelGroup>
-      <h:panelGroup rendered="#{column.type.isInteger and not column.isNull and not column.type.isNewDiscrete}">
+      <h:panelGroup rendered="#{column.type.isInteger and not column.isNull and not column.type.isNewDiscrete and g:adaType(column,1) ne 'ADO.Int64'}">
          Item.#{fn:capitalize(column.name)} := Util.Beans.Objects.To_Integer (Value);
+      </h:panelGroup>
+      <h:panelGroup rendered="#{column.type.isInteger and not column.isNull and g:adaType(column,1) eq 'ADO.Int64'}">
+         Item.#{fn:capitalize(column.name)} := #{g:adaType(column,1)} (Util.Beans.Objects.To_Long_Long_Integer (Value));
       </h:panelGroup>
       <h:panelGroup rendered="#{column.type.isNewDiscrete and not column.isNull}">
          Item.#{fn:capitalize(column.name)} := #{g:adaType(column,1)} (Util.Beans.Objects.To_Integer (Value));

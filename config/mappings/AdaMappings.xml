@@ -63,7 +63,7 @@
         <from>Long</from>
         <from>PrimitiveTypes::Long</from>
         <from>datatype::Long</from>
-        <to>Long</to>
+        <to>ADO.Int64</to>
     </mapping>
     <mapping type='integer'>
         <from>Natural</from>

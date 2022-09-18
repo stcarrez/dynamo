@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 
 with Util.Log.Loggers;
+with Util.Strings;
 
 --  The <b>Gen.Model.Mappings</b> package controls the mappings to convert an XML
 --  type into the Ada type.
@@ -68,6 +69,26 @@ package body Gen.Model.Mappings is
          return Definition (From).Get_Value (Name);
       end if;
    end Get_Value;
+
+   --  ------------------------------
+   --  Get the type name for the code template generator.
+   --  (See Gen.Generator.To_Ada_Type)
+   --  ------------------------------
+   function To_Ada_Type (From : in Mapping_Definition;
+                         Mode : in Natural) return UBO.Object is
+      Name : constant String
+        := (if Length (From.Target) > 0 then To_String (From.Target)
+            else To_String (From.Name));
+      Pos  : Natural;
+   begin
+      if Mode = 2 then
+         Pos := Util.Strings.Rindex (Name, '.');
+         if Pos > 0 then
+            return UBO.To_Object (Name (Pos + 1 .. Name'Last));
+         end if;
+      end if;
+      return UBO.To_Object (Name);
+   end To_Ada_Type;
 
    --  ------------------------------
    --  Get the type name.

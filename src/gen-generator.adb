@@ -159,11 +159,7 @@ package body Gen.Generator is
                end if;
 
             elsif Type_Mapping.Kind /= T_TABLE then
-               if Length (Type_Mapping.Target) > 0 then
-                  return UBO.To_Object (Type_Mapping.Target);
-               else
-                  return UBO.To_Object (Type_Mapping.Name);
-               end if;
+               return Type_Mapping.To_Ada_Type (UBO.To_Integer (Param));
 
             elsif Column.Use_Foreign_Key_Type then
                return UBO.To_Object (Type_Mapping.Target);

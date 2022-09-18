@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-mappings -- Type mappings for Code Generator
---  Copyright (C) 2011, 2012, 2015, 2018, 2019, 2021 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2015, 2018, 2019, 2021, 2022 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,6 +71,11 @@ package Gen.Model.Mappings is
 
    --  Get the type name.
    function Get_Type_Name (From : Mapping_Definition) return String;
+
+   --  Get the type name for the code template generator.
+   --  (See Gen.Generator.To_Ada_Type)
+   function To_Ada_Type (From : in Mapping_Definition;
+                         Mode : in Natural) return UBO.Object;
 
    procedure Register_Type (Name    : in String;
                             Mapping : in Mapping_Definition_Access;

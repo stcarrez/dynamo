@@ -173,6 +173,24 @@ package body Gen.Model.Projects is
                return Path;
             end if;
          end;
+
+         --  If the name contains a '_' and it was not found, look for the same name
+         --  with '_' replaced by '-'.
+         if Util.Strings.Index (Name, '_') > 0 then
+            declare
+               Replace : constant Ada.Strings.Maps.Character_Mapping
+                 := Ada.Strings.Maps.To_Mapping (From => "_", To   => "-");
+               Dir_Name : constant String := Ada.Strings.Fixed.Translate (Name, Replace);
+               Dynamo   : constant String := Util.Files.Compose (Dir_Name, "dynamo.xml");
+               Path     : constant String := Util.Files.Find_File_Path (Dynamo, Install_Dir);
+            begin
+               Log.Debug ("Checking dynamo file {0}", Path);
+               if Ada.Directories.Exists (Path) then
+                  return Path;
+               end if;
+            end;
+         end if;
+
       else
          declare
             Name   : constant String := Ada.Directories.Base_Name (Project_Path);

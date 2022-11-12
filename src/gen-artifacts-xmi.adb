@@ -869,6 +869,9 @@ package body Gen.Artifacts.XMI is
       procedure Prepare_Attribute (Bean   : in out Gen.Model.Beans.Bean_Definition'Class;
                                    Column : in Model_Element_Access);
 
+      --  Reorder the associations according to optional @dynamo.assoc.order tagged values.
+      procedure Order_Associations (Associations : in out Model_Vector);
+
       --  Identify the UML association and create an entry for it in the table.
       procedure Prepare_Association (Table  : in out Gen.Model.Tables.Table_Definition'Class;
                                      Node   : in Model_Element_Access);
@@ -1059,6 +1062,62 @@ package body Gen.Artifacts.XMI is
       end Prepare_Operation;
 
       --  ------------------------------
+      --  Reorder the associations according to optional @dynamo.assoc.order tagged values.
+      --  ------------------------------
+      procedure Order_Associations (Associations : in out Model_Vector) is
+         Count : constant Natural := Natural (Associations.Length);
+
+         type Assoc_Array is array (Positive range 1 .. Count) of Model_Element_Access;
+         Ordered_List : Assoc_Array := (others => null);
+         Remain_List  : Assoc_Array := (others => null);
+         Last  : Natural := 0;
+         First : Natural := 0;
+      begin
+         --  Step 1: build in Ordered_List the list of associations according to their
+         --  ordered defined by the @dynamo.assoc.order tagged values and keep in
+         --  Remain_List the associations that are not specified.
+         for I in 1 .. Count loop
+            declare
+               Assoc : constant Model_Element_Access := Associations.Element (I);
+               Order : constant String := Assoc.Find_Tag_Value (Handler.Assoc_Order_Tag);
+               Pos   : Positive;
+            begin
+               if Order'Length > 0 then
+                  Pos := Positive'Value (Order);
+                  if Ordered_List (Pos) = null then
+                     Ordered_List (Pos) := Assoc;
+                  else
+                     Last := Last + 1;
+                     Remain_List (Last) := Assoc;
+                  end if;
+               else
+                  Last := Last + 1;
+                  Remain_List (Last) := Assoc;
+               end if;
+
+            exception
+               when Constraint_Error =>
+                  Log.Error ("Association order '{0}' is not a number", Order);
+                  Last := Last + 1;
+                  Remain_List (Last) := Assoc;
+
+            end;
+         end loop;
+
+         --  Step 2: reorganize the association array to honor the ordered list
+         --  and then follow the remain list order.
+         First := 1;
+         for I in 1 .. Count loop
+            if Ordered_List (I) /= null then
+               Associations.Replace_Element (I, Ordered_List (I));
+            elsif First <= Last then
+               Associations.Replace_Element (I, Remain_List (First));
+               First := First + 1;
+            end if;
+         end loop;
+      end Order_Associations;
+
+      --  ------------------------------
       --  Prepare a UML/XMI class:
       --   o if the class has the <<Dynamo.ADO.table>> stereotype, create a table definition.
       --   o if the class has the <<Dynamo.AWA.bean>> stereotype, create a bean
@@ -1087,6 +1146,7 @@ package body Gen.Artifacts.XMI is
                   Log.Info ("Using table name {0}", Name);
                   Table.Table_Name := To_UString (T_Name);
                end if;
+               Order_Associations (Class.Associations);
                Iterate_For_Table (Table.all, Class.Attributes, Prepare_Attribute'Access);
                Iterate_For_Table (Table.all, Class.Associations, Prepare_Association'Access);
             end;
@@ -1361,10 +1421,14 @@ package body Gen.Artifacts.XMI is
                                                     "Dynamo.xmi",
                                                     "ADO.PK.@dynamo.pk.generator",
                                                     Gen.Model.XMI.BY_NAME);
+      Handler.Assoc_Order_Tag := Find_Tag_Definition (Handler.Nodes,
+                                                      "Dynamo.xmi",
+                                                      "ADO.@dynamo.assoc.order",
+                                                      Gen.Model.XMI.BY_NAME);
       Handler.Literal_Tag := Find_Tag_Definition (Handler.Nodes,
-                                                    "Dynamo.xmi",
-                                                    "ADO.Literal.@dynamo.literal",
-                                                    Gen.Model.XMI.BY_NAME);
+                                                  "Dynamo.xmi",
+                                                  "ADO.Literal.@dynamo.literal",
+                                                  Gen.Model.XMI.BY_NAME);
 
       for Model of Handler.Nodes loop
          Gen.Model.XMI.Iterate (Model   => Model,

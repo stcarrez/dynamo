@@ -1,8 +1,8 @@
 <?xml version = '1.0' encoding = 'UTF-8' ?>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Dec 24 18:05:37 CET 2018'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Fri Nov 11 22:31:40 CET 2022'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
-      <XMI.exporterVersion>0.35.1(6) revised on $Date: 2012-12-30 14:06:01 +0100 (Sun, 30 Dec 2012) $ </XMI.exporterVersion>
+      <XMI.exporterVersion>0.35.5-2022-08-01(6) revised on $Date$ </XMI.exporterVersion>
     </XMI.documentation>
     <XMI.metamodel xmi.name="UML" xmi.version="1.4"/></XMI.header>
   <XMI.content>
@@ -121,6 +121,13 @@ with the table and the generation of the List procedure.
                     <UML:TagDefinition href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F77'/>
                   </UML:TaggedValue.type>
                 </UML:TaggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1--107c5a9:184687ea56a:-8000:0000000000001F0B'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1-416ec9ab:13b39addf6a:-8000:00000000000022C0'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
               </UML:ModelElement.taggedValue>
               <UML:Stereotype.definedTag>
                 <UML:TagDefinition xmi.id = '127-0-1-1-7456d6ee:167dfa78b58:-8000:0000000000002682'
@@ -223,6 +230,15 @@ database and bean support for the package classes.</UML:TaggedValue.dataValue>
                   </UML:Multiplicity.range>
                 </UML:Multiplicity>
               </UML:TagDefinition.multiplicity>
+              <UML:ModelElement.taggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1-9c55abb:1836f831b29:-8000:0000000000002E71'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>the SQL type to use</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+              </UML:ModelElement.taggedValue>
             </UML:TagDefinition>
             <UML:Stereotype xmi.id = '127-0-1-1-3e7d6b0e:13b48c59386:-8000:0000000000004B43'
               name = 'Nullable' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
@@ -402,6 +418,13 @@ database and bean support for the package classes.</UML:TaggedValue.dataValue>
                         <UML:TagDefinition href = 'http://argouml.org/user-profiles/Dynamo.xmi#127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001D5E'/>
                       </UML:TaggedValue.type>
                     </UML:TaggedValue>
+                    <UML:TaggedValue xmi.id = '127-0-1-1-9c55abb:1836f831b29:-8000:0000000000002E70'
+                      isSpecification = 'false'>
+                      <UML:TaggedValue.dataValue>the range minimum value</UML:TaggedValue.dataValue>
+                      <UML:TaggedValue.type>
+                        <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                      </UML:TaggedValue.type>
+                    </UML:TaggedValue>
                   </UML:ModelElement.taggedValue>
                 </UML:TagDefinition>
                 <UML:TagDefinition xmi.id = '127-0-1-1--3b614687:13bbdcadd24:-8000:000000000000363F'
@@ -414,6 +437,15 @@ database and bean support for the package classes.</UML:TaggedValue.dataValue>
                       </UML:Multiplicity.range>
                     </UML:Multiplicity>
                   </UML:TagDefinition.multiplicity>
+                  <UML:ModelElement.taggedValue>
+                    <UML:TaggedValue xmi.id = '127-0-1-1-9c55abb:1836f831b29:-8000:0000000000002E6F'
+                      isSpecification = 'false'>
+                      <UML:TaggedValue.dataValue>the range maximum value</UML:TaggedValue.dataValue>
+                      <UML:TaggedValue.type>
+                        <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                      </UML:TaggedValue.type>
+                    </UML:TaggedValue>
+                  </UML:ModelElement.taggedValue>
                 </UML:TagDefinition>
               </UML:Stereotype.definedTag>
             </UML:Stereotype>
@@ -441,6 +473,15 @@ database and bean support for the package classes.</UML:TaggedValue.dataValue>
                       </UML:Multiplicity.range>
                     </UML:Multiplicity>
                   </UML:TagDefinition.multiplicity>
+                  <UML:ModelElement.taggedValue>
+                    <UML:TaggedValue xmi.id = '127-0-1-1-9c55abb:1836f831b29:-8000:0000000000002E6E'
+                      isSpecification = 'false'>
+                      <UML:TaggedValue.dataValue>the literal value</UML:TaggedValue.dataValue>
+                      <UML:TaggedValue.type>
+                        <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                      </UML:TaggedValue.type>
+                    </UML:TaggedValue>
+                  </UML:ModelElement.taggedValue>
                 </UML:TagDefinition>
               </UML:Stereotype.definedTag>
             </UML:Stereotype>
@@ -454,6 +495,15 @@ database and bean support for the package classes.</UML:TaggedValue.dataValue>
                   </UML:Multiplicity.range>
                 </UML:Multiplicity>
               </UML:TagDefinition.multiplicity>
+              <UML:ModelElement.taggedValue>
+                <UML:TaggedValue xmi.id = '127-0-1-1-9c55abb:1836f831b29:-8000:0000000000002E72'
+                  isSpecification = 'false'>
+                  <UML:TaggedValue.dataValue>the length associated with the SQL type</UML:TaggedValue.dataValue>
+                  <UML:TaggedValue.type>
+                    <UML:TagDefinition xmi.idref = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F7B'/>
+                  </UML:TaggedValue.type>
+                </UML:TaggedValue>
+              </UML:ModelElement.taggedValue>
             </UML:TagDefinition>
             <UML:Stereotype xmi.id = '127-0-1-1-7d018c30:156951efbee:-8000:00000000000017E3'
               name = 'Auditable' isSpecification = 'false' isRoot = 'false' isLeaf = 'false'
@@ -461,6 +511,17 @@ database and bean support for the package classes.</UML:TaggedValue.dataValue>
               <UML:Stereotype.baseClass>Attribute</UML:Stereotype.baseClass>
               <UML:Stereotype.baseClass>AssociationEnd</UML:Stereotype.baseClass>
             </UML:Stereotype>
+            <UML:TagDefinition xmi.id = '127-0-1-1-4a13b0de:18468563d1f:-8000:0000000000001C1F'
+              name = '@dynamo.assoc.order' visibility = 'public' isSpecification = 'false'>
+              <UML:TagDefinition.multiplicity>
+                <UML:Multiplicity xmi.id = '127-0-1-1-4a13b0de:18468563d1f:-8000:0000000000001C24'>
+                  <UML:Multiplicity.range>
+                    <UML:MultiplicityRange xmi.id = '127-0-1-1-4a13b0de:18468563d1f:-8000:0000000000001C23'
+                      lower = '0' upper = '1'/>
+                  </UML:Multiplicity.range>
+                </UML:Multiplicity>
+              </UML:TagDefinition.multiplicity>
+            </UML:TagDefinition>
           </UML:Namespace.ownedElement>
         </UML:Package>
         <UML:Package xmi.id = '127-0-1-1--44304ba0:139c0f2a59c:-8000:0000000000001F71'

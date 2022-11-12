@@ -30,6 +30,7 @@ To build Dynamo, you will need:
 - Feature #8: Option or configuration to disable generation of <project>.properties file
 - Feature #25: Support for queries with 64-bit integer columns
 - Feature #26: Plugins without a GNAT project are not always recognized
+- Feature #27: UML model evolution for code generation
 
 ## Version 1.3.0   - Aug 2022
 - Fix #5: Generated body does not compile when an enumeration of another UML package is used

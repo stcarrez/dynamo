@@ -9,11 +9,13 @@
    <dist>
      <install mode='copy'>
          <include name="bin/*-server"/>
+         <include name="bin/*.sh"/>
          <include name="config/*.xml"/>
          <include name="#{projectName}*.properties"/>
      </install>
      <install mode='exec'>
        <command>chmod +x \#{dst}</command>
+       <include name="bin/*.sh"/>
        <include name="bin/*-server"/>
      </install>
 
@@ -41,14 +43,15 @@
      </install>
 
      <install mode='copy' dir='web'>
-       <fileset dir="samples/web">
-          <include name="**/*.xhtml"/>
-          <include name="**/*.html"/>
-       </fileset>
        <fileset dir="web">
           <include name="**/*.xhtml"/>
           <include name="**/*.html"/> 
           <include name="WEB-INF/**"/>
+          <include name="**/*.gif"/>
+          <include name="**/*.ico"/>
+          <include name="**/*.ttf"/>
+          <include name="**/*.woff2"/>
+          <include name="**/*.svg"/>
           <exclude name="preview/**"/>
           <exclude name="WEB-INF/layouts/**"/>
        </fileset>
@@ -58,8 +61,10 @@
        <command slow='true'>closure --warning_level QUIET --charset UTF-8 \#{src} --js_output_file \#{dst}</command>
        <fileset dir="web">
          <include name="**/*.js"/>
+         <exclude name="js/jquery-3.4.1.js"/>
          <exclude name="js/highlight.pack.js"/>
          <exclude name="js/trumbowyg/trumbowyg.js"/>
+         <exclude name="js/easymde/easymde.min.js"/>
        </fileset>
        <fileset dir="samples/web">
           <include name="**/*.js"/>
@@ -73,6 +78,7 @@
        <fileset dir="web">
          <include name="js/highlight.pack.js"/>
          <include name="js/trumbowyg/trumbowyg.js"/>
+         <include name="js/easymde/easymde.min.js"/>
        </fileset>
      </install>
 
@@ -88,7 +94,7 @@
 
      <install mode='merge' dir='web' log='info'>
        <property name="contextPath"></property>
-       <property name="jquery.path">/js/jquery-3.4.1.js</property>
+       <property name="jquery.path">/js/jquery-3.6.0.js</property>
        <property name="jquery.uiCssPath">/css/redmond/jquery-ui-1.12.1.css</property>
        <property name="jquery.chosenCssPath">/css/jquery-chosen-1.8.7/chosen.css</property>
        <property name="jquery.uiPath">/js/jquery-ui-1.12.1/</property>

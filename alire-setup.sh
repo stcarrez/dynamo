@@ -1,6 +1,6 @@
 #!/bin/sh
 INSTALL_DIR=`pwd`
-gnatprep -DCONFIG_DIR=\"${INSTALL_DIR}/config\" -DVERSION=\"1.3.0\" src/gen-configs.gpb src/gen-configs.ads
+gnatprep -DCONFIG_DIR=\"${INSTALL_DIR}/config\" -DVERSION=\"1.4.0\" src/gen-configs.gpb src/gen-configs.ads
 GNATBUILD=`which gprbuild`
 GNATBIN=`dirname ${GNATBUILD}`
 GNATDIR=`dirname ${GNATBIN}`

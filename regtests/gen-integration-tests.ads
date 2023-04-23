@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2016, 2017, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2016, 2017, 2018, 2021, 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,19 +16,12 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
-with Ada.Strings.Unbounded;
 with Util.Tests;
 package Gen.Integration.Tests is
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite);
 
    type Test is new Util.Tests.Test with null record;
-
-   --  Execute the command and get the output in a string.
-   procedure Execute (T       : in out Test;
-                      Command : in String;
-                      Result  : out Ada.Strings.Unbounded.Unbounded_String;
-                      Status  : in Natural := 0);
 
    --  Test dynamo create-project command.
    procedure Test_Create_Project (T : in out Test);

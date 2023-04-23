@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012 - 2021 Stephane Carrez
+--  Copyright (C) 2012 - 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,20 +17,13 @@
 -----------------------------------------------------------------------
 
 with Ada.Directories;
-with Ada.Text_IO;
 
-with Util.Log.Loggers;
 with Util.Test_Caller;
-with Util.Streams.Pipes;
-with Util.Streams.Buffered;
-with Util.Processes;
 with Util.Files;
 with Util.Systems.Os;
 
 with Gen.Testsuite;
 package body Gen.Integration.Tests is
-
-   Log : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("Gen.Integration.Tests");
 
    --  Get the dynamo executable path.
    function Dynamo return String;
@@ -134,35 +127,6 @@ package body Gen.Integration.Tests is
    begin
       return Util.Files.Compose (Gen.Testsuite.Get_Test_Directory, "bin/dynamo");
    end Dynamo;
-
-   --  ------------------------------
-   --  Execute the command and get the output in a string.
-   --  ------------------------------
-   procedure Execute (T       : in out Test;
-                      Command : in String;
-                      Result  : out UString;
-                      Status  : in Natural := 0) is
-      P        : aliased Util.Streams.Pipes.Pipe_Stream;
-      Buffer   : Util.Streams.Buffered.Input_Buffer_Stream;
-      Test_Dir : constant String := Gen.Testsuite.Get_Test_Directory;
-      Dir      : constant String := Util.Files.Compose (Test_Dir, "test-app");
-   begin
-      Log.Info ("Execute: {0}", Command);
-      if Ada.Directories.Exists (Dir) then
-         P.Set_Working_Directory (Dir);
-         Ada.Text_IO.Put_Line ("Set dir: " & Dir);
-      end if;
-      P.Open (Command, Util.Processes.READ_ALL);
-
-      --  Write on the process input stream.
-      Result := Ada.Strings.Unbounded.Null_Unbounded_String;
-      Buffer.Initialize (P'Unchecked_Access, 8192);
-      Buffer.Read (Result);
-      P.Close;
-      Ada.Text_IO.Put_Line (Ada.Strings.Unbounded.To_String (Result));
-      Log.Info ("Command result: {0}", Result);
-      Util.Tests.Assert_Equals (T, Status, P.Get_Exit_Status, "Command '" & Command & "' failed");
-   end Execute;
 
    --  ------------------------------
    --  Test dynamo create-project command.

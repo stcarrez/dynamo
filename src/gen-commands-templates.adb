@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-templates -- Template based command
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2021, 2022 Stephane Carrez
+--  Copyright (C) 2011 - 2023 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,6 +78,12 @@ package body Gen.Commands.Templates is
       L_Pos : Natural := Line'First;
       P_Pos : Natural := Pattern'First;
    begin
+      --  Skip spaces in the line if the pattern does not start with a space.
+      if Pattern (P_Pos) /= ' ' then
+         while L_Pos <= Line'Last and then Line (L_Pos) = ' ' loop
+            L_Pos := L_Pos + 1;
+         end loop;
+      end if;
       while P_Pos <= Pattern'Last loop
          if L_Pos > Line'Last then
             return False;

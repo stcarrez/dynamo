@@ -26,8 +26,11 @@ AC_DEFUN(AM_WITH_NLS,
       nls_cv_header_libgt=
 
       AC_CACHE_CHECK([for gettext in libc], gt_cv_func_gettext_libc,
-       [AC_TRY_LINK([extern int gettext(char*);], [return (int) gettext ("")],
-	gt_cv_func_gettext_libc=yes, gt_cv_func_gettext_libc=no)])
+        [AC_LINK_IFELSE(
+          [AC_LANG_PROGRAM([extern int gettext(char*);],
+                           [return (int) gettext ("")])],
+         [gt_cv_func_gettext_libc=yes],
+         [gt_cv_func_gettext_libc=no])])
 
       if test "$gt_cv_func_gettext_libc" != "yes"; then
         AC_CHECK_LIB(intl, bindtextdomain,
@@ -298,13 +301,13 @@ AC_DEFUN(AM_GNAT_FIND_ADA_WIKI,
 dnl Check for swaggerada GNAT project
 AC_DEFUN(AM_GNAT_FIND_ADA_OPENAPI,
 [
-  AM_GNAT_FIND_PROJECT([openapi-ada],[OpenAPI Ada Library],[swagger],
+  AM_GNAT_FIND_PROJECT([openapi-ada],[OpenAPI Ada Library],[openapi],
     [git@github.com:stcarrez/swagger-ada.git],
     [Building $1 requires the Ada OpenAPI Library.],
     [
-      SWAGGER_DIR=${ac_cv_gnat_project_dir_swagger}
+      OPENAPI_DIR=${ac_cv_gnat_project_dir_openapi}
     ])
-  AC_SUBST(SWAGGER_DIR)
+  AC_SUBST(OPENAPI_DIR)
 ])
 
 dnl Check for swaggerada GNAT project
@@ -872,7 +875,7 @@ AC_DEFUN(AM_GNAT_LIBRARY_PROJECT,
   fi
 
   # checking for local tools
-  AC_CANONICAL_SYSTEM
+  AC_CANONICAL_TARGET
   AM_GNAT_CHECK_GPRBUILD
   AC_CHECK_PROGS(GNAT, gnat, "")
   if test -n "$GNAT"; then
@@ -931,6 +934,7 @@ EOF
        ac_cv_gnat_aws_version='none'
     fi
 
+    rm -f conftest conftest.o conftest.ali
     if test "$ac_cv_gnat_aws_version" = "20.0"; then
       dnl The version 20.0 is sometimes wrong because used by several versions of AWS.
       dnl The version 22.0 has the AWS.HTTP_2 constant defined and uses version 20.0.
@@ -961,7 +965,7 @@ EOF
 dnl Check the OS and CPU to build Ada Util configuration (UTIL_OS)
 AC_DEFUN(AM_ADA_UTIL_HARDWARE,
 [
-  AC_CANONICAL_SYSTEM
+  AC_CANONICAL_TARGET
 
   os_base='unix'
   os_version='none'

@@ -43,7 +43,10 @@ AM_GNAT_FIND_ADA_OPENAPI([#{projectName}])
 AM_GNAT_FIND_ADA_AWA([#{projectName}])
 #{''}
 
-AC_OUTPUT(
-Makefile.conf #{projectName}.gpr tests.gpr
-)
+AC_CONFIG_FILES([
+Makefile.conf
+#{projectName}.gpr
+tests.gpr
+])
+AC_OUTPUT
 </f:view>

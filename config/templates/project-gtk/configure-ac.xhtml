@@ -32,8 +32,8 @@ AM_GNAT_LIBRARY_PROJECT(#{projectName})
 AC_PROG_CC
 #{''}
 
-AC_OUTPUT(
-Makefile.conf
+AC_CONFIG_FILES([Makefile.conf
 #{projectName}.gpr
-)
+])
+AC_OUTPUT
 </f:view>

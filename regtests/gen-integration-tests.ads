@@ -16,12 +16,21 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 
+with GNAT.Source_Info;
 with Util.Tests;
 package Gen.Integration.Tests is
 
    procedure Add_Tests (Suite : in Util.Tests.Access_Test_Suite);
 
    type Test is new Util.Tests.Test with null record;
+
+   overriding
+   procedure Execute (T       : in out Test;
+                      Command : in String;
+                      Result  : out UString;
+                      Status  : in Natural := 0;
+                      Source  : String := GNAT.Source_Info.File;
+                      Line    : Natural := GNAT.Source_Info.Line);
 
    --  Test dynamo create-project command.
    procedure Test_Create_Project (T : in out Test);

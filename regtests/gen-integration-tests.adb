@@ -32,6 +32,25 @@ package body Gen.Integration.Tests is
    procedure Clean_Directory (Path : in String);
 
    package Caller is new Util.Test_Caller (Test, "Dynamo");
+   --  ------------------------------
+   --  Execute the command and get the output in a string.
+   --  ------------------------------
+   overriding
+   procedure Execute (T       : in out Test;
+                      Command : in String;
+                      Result  : out UString;
+                      Status  : in Natural := 0;
+                      Source  : String := GNAT.Source_Info.File;
+                      Line    : Natural := GNAT.Source_Info.Line) is
+      Test_Dir : constant String := Gen.Testsuite.Get_Test_Directory;
+      Dir      : constant String := Util.Files.Compose (Test_Dir, "test-app");
+   begin
+      if Ada.Directories.Exists (Dir) then
+         Util.Tests.Test (T).Execute (Command, "", "", Result, Dir, Status, Source, Line);
+      else
+         Util.Tests.Test (T).Execute (Command, "", "", Result, "", Status, Source, Line);
+      end if;
+   end Execute;
 
    --  ------------------------------
    --  Clean the directory if it exists.

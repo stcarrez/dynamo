@@ -405,6 +405,7 @@ package body Gen.Integration.Tests is
    procedure Test_Dist (T : in out Test) is
       Result : UString;
    begin
+      T.Execute ("unzip ../regtests/files/dist-web.zip", Result);
       Clean_Directory ("test-dist");
       T.Execute (Dynamo & " dist ../test-dist", Result);
       Util.Tests.Assert_Matches (T,

@@ -38,6 +38,6 @@ INSERT INTO awa_audit_field (entity_type, name)
 </h:list>
 </h:panelGroup>
 INSERT INTO ado_version (name, version)
-  VALUES ("#{projectName}", #{project.modelVersion})
+  VALUES ('#{projectName}', #{project.modelVersion})
   ON CONFLICT DO NOTHING;
 </f:view>

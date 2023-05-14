@@ -1,5 +1,5 @@
 dnl Autoconf configure script for Dynamo
-dnl Copyright (C) 2011-2022 Stephane Carrez
+dnl Copyright (C) 2011-2023 Stephane Carrez
 dnl Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 dnl
 dnl  Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,6 +99,10 @@ AM_GNAT_FIND_ADA_SECURITY([Dynamo])
 AM_GNAT_FIND_ADA_SERVLET([Dynamo])
 AM_GNAT_FIND_ADA_SERVER_FACES([Dynamo])
 AM_GNAT_FIND_ADA_ADO([Dynamo])
+
+if test x"$ASF_DIR" = x; then
+  ASF_DIR=${prefix}/share/dynamo/asf
+fi
 
 ac_asf_dir=`realpath $ASF_DIR`
 BUNDLE_DIR='#{generator_config_dir}/../asf/bundles'

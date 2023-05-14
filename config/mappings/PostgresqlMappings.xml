@@ -78,7 +78,7 @@
         <from>datatype::float</from>
         <from>datatype::Float</from>
         <from>float</from>
-        <to>FLOAT</to>
+        <to>REAL</to>
     </mapping>
     <mapping>
         <from>PrimitiveTypes::Double</from>

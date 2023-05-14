@@ -33,6 +33,7 @@ To build Dynamo, you will need:
 - Feature #27: UML model evolution for code generation
 - Fix #6: Integration test 'Dynamo.Dist' fails
 - Fix #28: Dynamo add-module command fails to patch the source
+- Fix #29: Single precision float mapped to a double precision in PostgreSQL schema generator
 
 ## Version 1.3.0   - Aug 2022
 - Fix #5: Generated body does not compile when an enumeration of another UML package is used

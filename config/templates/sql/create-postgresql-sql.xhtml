@@ -6,6 +6,7 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="db/#{model.dirname ne 'src' ? model.dirname : ''}#{model.dirname ne 'src' ? '/' : ''}postgresql/#{projectName}-postgresql.sql">
 /* File generated automatically by dynamo */
+SET client_min_messages = warning;
 <h:list value="#{model.tables}" var="table">
 /* #{table.comment} */
 CREATE TABLE IF NOT EXISTS #{table.table} (

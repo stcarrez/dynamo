@@ -101,10 +101,11 @@ AM_GNAT_FIND_ADA_SERVER_FACES([Dynamo])
 AM_GNAT_FIND_ADA_ADO([Dynamo])
 
 if test x"$ASF_DIR" = x; then
-  ASF_DIR=${prefix}/share/dynamo/asf
+  ac_asf_dir=${prefix}/share/dynamo/asf
+else
+  ac_asf_dir=`realpath $ASF_DIR`
 fi
 
-ac_asf_dir=`realpath $ASF_DIR`
 BUNDLE_DIR='#{generator_config_dir}/../asf/bundles'
 BUNDLE_DIR="$BUNDLE_DIR;$ac_asf_dir/bundles"
 AC_SUBST(BUNDLE_DIR)

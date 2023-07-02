@@ -1,17 +1,18 @@
 # Dynamo Ada Generator
 
-[![Build Status](https://img.shields.io/jenkins/s/https/jenkins.vacs.fr/Bionic-Dynamo.svg)](https://jenkins.vacs.fr/job/Bionic-Dynamo/)
-[![Test Status](https://img.shields.io/jenkins/t/https/jenkins.vacs.fr/Bionic-Dynamo.svg)](https://jenkins.vacs.fr/job/Bionic-Dynamo/)
-[![codecov](https://codecov.io/gh/stcarrez/dynamo/branch/master/graph/badge.svg)](https://codecov.io/gh/stcarrez/dynamo)
+[![Alire](https://img.shields.io/endpoint?url=https://alire.ada.dev/badges/dynamo.json)](https://alire.ada.dev/crates/dynamo)
+[![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/build.json)](https://porion.vacs.fr/porion/projects/view/dynamo/summary)
+[![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/tests.json)](https://porion.vacs.fr/porion/projects/view/dynamo/xunits)
+[![Coverage](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/coverage.json)](https://porion.vacs.fr/porion/projects/view/dynamo/summary)
 [![Download](https://img.shields.io/badge/download-1.3.0-brightgreen.svg)](https://download.vacs.fr/dynamo/dynamo-1.3.0.tar.gz)
 [![License](https://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
-![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/1.3.0.svg)
+[![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/1.3.0.svg)](Commits)
 
 This Ada05 application is a code generator used to generate
 an Ada Web Application or database mappings from hibernate-like
 XML description, YAML doctrine model or UML models.  It provides various commands for the
 generation of a web application which uses the Ada Web Application framework
-(https://github.com/stcarrez/ada-awa/).
+(https://gitlab.com/stcarrez/ada-awa/).
 
 To build Dynamo, you will need:
 
@@ -50,7 +51,13 @@ To build Dynamo, you will need:
 
 [List all versions](https://github.com/stcarrez/dynamo/blob/master/NEWS.md)
 
-## Build
+## Build with Alire
+
+```
+alr with dynamo
+```
+
+## Build with configure
 
 Build with the following commands:
 ```
@@ -66,7 +73,7 @@ Install it with:
 The Dynamo Ada Generator sources as well as a wiki documentation
 is provided on:
 
-   https://github.com/stcarrez/dynamo
+   https://gitlab.com/stcarrez/dynamo
 
 
 ## License

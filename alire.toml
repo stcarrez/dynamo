@@ -30,16 +30,16 @@ macos = true
 '...' = false
 
 [[depends-on]]
-security = "^1.4.1"
+security = "^1.5.0"
 servletada = "^1.6.0"
-serverfaces = "1.5.0"
+serverfaces = "1.6.0"
 utilada = "^2.6.0"
-elada = "^1.8.5"
+elada = "^1.8.6"
 utilada_xml = "^2.6.0"
-ado_mysql = "2.3.0"
-ado_sqlite = "2.3.0"
-ado_postgresql = "2.3.0"
-ado_all = "2.3.0"
+ado_mysql = "2.4.0"
+ado_sqlite = "2.4.0"
+ado_postgresql = "2.4.0"
+ado_all = "2.4.0"
 xmlada = "any"
 libgpr = "any"
 

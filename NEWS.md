@@ -1,4 +1,4 @@
-Version 1.4.0   - Under development
+Version 1.4.0   - Aug 2023
   - Feature #22: Support to audit creation of new objects in the database
   - Feature #23: Update SQL templates for ADO 2.4
   - Feature #24: Support for database schema versionning

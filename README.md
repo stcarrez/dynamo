@@ -16,15 +16,15 @@ generation of a web application which uses the Ada Web Application framework
 
 To build Dynamo, you will need:
 
-* Ada Util     (https://github.com/stcarrez/ada-util          2.5.0)
-* Ada EL       (https://github.com/stcarrez/ada-el            1.8.5)
+* Ada Util     (https://github.com/stcarrez/ada-util          2.6.0)
+* Ada EL       (https://github.com/stcarrez/ada-el            1.8.6)
 * Ada Security (https://github.com/stcarrez/ada-security      1.4.1)
 * Ada Servlet  (https://github.com/stcarrez/ada-servlet       1.6.0)
 * Ada Server Faces (https://github.com/stcarrez/ada-asf       1.5.0)
 * Ada ADO      (https://github.com/stcarrez/ada-ado           2.3.0)
-* XML/Ada      (https://libre.adacore.com/libre/tools/xmlada/  4.4)
+* XML/Ada      (https://libre.adacore.com/libre/tools/xmlada/  23)
 
-## Version 1.4.0   - Under development
+## Version 1.4.0   - Aug 2023
 - Feature #22: Support to audit creation of new objects in the database
 - Feature #23: Update SQL templates for ADO 2.4
 - Feature #24: Support for database schema versionning
@@ -35,19 +35,6 @@ To build Dynamo, you will need:
 - Fix #6: Integration test 'Dynamo.Dist' fails
 - Fix #28: Dynamo add-module command fails to patch the source
 - Fix #29: Single precision float mapped to a double precision in PostgreSQL schema generator
-
-## Version 1.3.0   - Aug 2022
-- Fix #5: Generated body does not compile when an enumeration of another UML package is used
-- Fix #7: No default type for SQL generation of a column that uses an enumeration
-- Fix #9: Option or configuration to disable some SQL generation
-- Fix #10: Definition of an UML datatype with a tagged value raises an exception
-- Fix #12: Avoid emitting a full qualified type name for types declared in the current package
-- Fix #16: Improvement in Markdown documentation generator
-- Fix #17: YAML parser: accessibility check failure
-- Fix #18: Generate database operation to reload an object
-- Fix #19: Add dynamo configuration through environment support
-- Fix #20: Give access to the man page from alire
-- Fix $21: Generated procedure Create is missing overriding keyword
 
 [List all versions](https://github.com/stcarrez/dynamo/blob/master/NEWS.md)
 

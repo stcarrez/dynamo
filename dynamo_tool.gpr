@@ -1,5 +1,5 @@
 with "dynamo_config";
-with "xmlada";
+with "xmlada_dom";
 with "utilada_sys";
 with "elada";
 with "asf";

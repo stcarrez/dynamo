@@ -61,16 +61,12 @@
        <command slow='true'>closure --warning_level QUIET --charset UTF-8 \#{src} --js_output_file \#{dst}</command>
        <fileset dir="web">
          <include name="**/*.js"/>
-         <exclude name="js/jquery-3.4.1.js"/>
          <exclude name="js/highlight.pack.js"/>
          <exclude name="js/trumbowyg/trumbowyg.js"/>
          <exclude name="js/easymde/easymde.min.js"/>
        </fileset>
        <fileset dir="samples/web">
-          <include name="**/*.js"/>
-         <exclude name="js/jquery-chosen-1.4.2/**"/>
-         <exclude name="js/jquery-ui-1.11.4/**"/>
-         <exclude name="js/jquery-1.11.3.js"/>
+         <include name="**/*.js"/>
        </fileset>
      </install>
 
@@ -94,7 +90,7 @@
 
      <install mode='merge' dir='web' log='info'>
        <property name="contextPath"></property>
-       <property name="jquery.path">/js/jquery-3.6.0.js</property>
+       <property name="jquery.path">/js/jquery-3.7.0.js</property>
        <property name="jquery.uiCssPath">/css/jquery-ui-1.13.2/</property>
        <property name="jquery.chosenCssPath">/css/jquery-chosen-1.8.7/chosen.css</property>
        <property name="jquery.uiPath">/js/jquery-ui-1.13.2/</property>

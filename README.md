@@ -4,9 +4,9 @@
 [![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/build.json)](https://porion.vacs.fr/porion/projects/view/dynamo/summary)
 [![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/tests.json)](https://porion.vacs.fr/porion/projects/view/dynamo/xunits)
 [![Coverage](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/coverage.json)](https://porion.vacs.fr/porion/projects/view/dynamo/summary)
-[![Download](https://img.shields.io/badge/download-1.3.0-brightgreen.svg)](https://download.vacs.fr/dynamo/dynamo-1.3.0.tar.gz)
+[![Download](https://img.shields.io/badge/download-1.4.0-brightgreen.svg)](https://download.vacs.fr/dynamo/dynamo-1.4.0.tar.gz)
 [![License](https://img.shields.io/badge/license-APACHE2-blue.svg)](LICENSE)
-[![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/1.3.0.svg)](Commits)
+[![Commits](https://img.shields.io/github/commits-since/stcarrez/dynamo/1.4.0.svg)](Commits)
 
 This Ada05 application is a code generator used to generate
 an Ada Web Application or database mappings from hibernate-like

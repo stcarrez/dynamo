@@ -1,5 +1,5 @@
 dnl Autoconf configure script for Dynamo
-dnl Copyright (C) 2011-2023 Stephane Carrez
+dnl Copyright (C) 2011-2024 Stephane Carrez
 dnl Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 dnl
 dnl  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ AC_CONFIG_SRCDIR([src/gen.ads])
 
 # Current release settings
 GEN_MAJOR_VERSION=1
-GEN_MINOR_VERSION=4
+GEN_MINOR_VERSION=5
 GEN_MICRO_VERSION=0
 GEN_VERSION=$GEN_MAJOR_VERSION.$GEN_MINOR_VERSION.$GEN_MICRO_VERSION
 

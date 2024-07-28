@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  dynamo -- Ada Code Generator
---  Copyright (C) 2009, 2010, 2011, 2012, 2015, 2017, 2020 Stephane Carrez
+--  Copyright (C) 2009, 2010, 2011, 2012, 2015, 2017, 2020, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,7 @@ procedure Dynamo is
 
    procedure Set_Config_Directory (Path   : in String;
                                    Silent : in Boolean := False);
+   procedure Set_Current_Directory (Path : in String);
 
    procedure Print_Configuration (Generator : in Gen.Generator.Handler);
 
@@ -122,6 +123,21 @@ procedure Dynamo is
       Config_Dir := To_Unbounded_String (Path);
    end Set_Config_Directory;
 
+   procedure Set_Current_Directory (Path : in String) is
+   begin
+      if not Ada.Directories.Exists (Path) then
+         Ada.Text_IO.Put_Line ("Not a directory: " & Path);
+         Status := Failure;
+         return;
+      end if;
+      Ada.Directories.Set_Directory (Path);
+
+   exception
+      when Ada.Directories.Name_Error =>
+         Ada.Text_IO.Put_Line ("Cannot change to directory: " & Path);
+         Status := Failure;
+   end Set_Current_Directory;
+
    function Get_Installation_Directory return String is
       Name : constant String := Ada.Command_Line.Command_Name;
       Path : constant String := Ada.Directories.Containing_Directory (Name);
@@ -137,7 +153,7 @@ begin
    Initialize_Option_Scan (Stop_At_First_Non_Switch => True, Section_Delimiters => "targs");
    --  Parse the command line
    loop
-      case Getopt ("* v d e E o: t: c:") is
+      case Getopt ("* v d e E o: t: c: C:") is
          when ASCII.NUL => exit;
 
          when 'o' =>
@@ -150,6 +166,10 @@ begin
 
          when 'c' =>
             Set_Config_Directory (Parameter);
+            First := First + 1;
+
+         when 'C' =>
+            Set_Current_Directory (Parameter);
             First := First + 1;
 
          when 'e' =>

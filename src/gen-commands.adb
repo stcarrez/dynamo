@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands -- Commands for dynamo
---  Copyright (C) 2011, 2012, 2017, 2021 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2017, 2021, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -83,13 +83,16 @@ package body Gen.Commands is
    Help_Cmd           : aliased Drivers.Help_Command_Type;
 begin
    Driver.Set_Description (Gen.Configs.RELEASE);
-   Driver.Set_Usage ("[-v] [-o directory] [-t templates] {command} {arguments}" & ASCII.LF &
+   Driver.Set_Usage ("[-v] [-C dir] [-o directory] [-t templates] {command} {arguments}" &
+                       ASCII.LF &
                        "where:" & ASCII.LF &
                        "   -v           Print the version, configuration and installation paths" &
                        ASCII.LF &
                        "   -o directory Directory where the Ada mapping files are generated" &
                        ASCII.LF &
                        "   -t templates Directory where the Ada templates are defined" &
+                       ASCII.LF &
+                       "   -C dir       Change directory before executing the command" &
                        ASCII.LF &
                        "   -c dir       Directory where the Ada templates " &
                        "and configurations are defined");

@@ -1,3 +1,6 @@
+Version 1.5.0   - Under development
+  - New option `-C <dir>` to change directory before executing a command
+
 Version 1.4.0   - Aug 2023
   - Feature #22: Support to audit creation of new objects in the database
   - Feature #23: Update SQL templates for ADO 2.4

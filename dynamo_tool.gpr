@@ -15,7 +15,7 @@ project Dynamo_Tool is
 
    Mains := ("dynamo.adb");
 
-   Version      := "1.4.0";
+   Version      := "1.5.0";
 
    Root_Dir := external ("ROOT_DIR", "./");
 

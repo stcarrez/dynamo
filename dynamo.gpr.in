@@ -1,5 +1,5 @@
 with "@UTIL_DIR@config";
-with "xmlada";
+with "xmlada_dom";
 with "@UTIL_DIR@utilada_sys";
 with "@EL_DIR@elada";
 with "@ASF_DIR@asf";

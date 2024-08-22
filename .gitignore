@@ -1,6 +1,5 @@
 *~
 *.log
-config.status
 CHANGES
 access.xml
 acc.xml
@@ -10,10 +9,6 @@ acc.xml
 *.log
 ChangeLog
 .settings
-configure.lineno
-Makefile
-dynamo.gpr
-autom4te.cache
 *.txt
 lib/
 obj/

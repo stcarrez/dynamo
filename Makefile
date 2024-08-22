@@ -2,7 +2,7 @@
 # target names defined.
 BUILD=debug
 NAME=dynamo
-VERSION=1.5.1
+VERSION=1.5.0
 
 DIST_DIR=dynamo-$(VERSION)
 DIST_FILE=dynamo-$(VERSION).tar.gz

@@ -14,18 +14,9 @@ XML description, YAML doctrine model or UML models.  It provides various command
 generation of a web application which uses the Ada Web Application framework
 (https://gitlab.com/stcarrez/ada-awa/).
 
-To build Dynamo, you will need:
-
-* Ada Util     (https://github.com/stcarrez/ada-util          2.6.0)
-* Ada EL       (https://github.com/stcarrez/ada-el            1.8.6)
-* Ada Security (https://github.com/stcarrez/ada-security      1.4.1)
-* Ada Servlet  (https://github.com/stcarrez/ada-servlet       1.6.0)
-* Ada Server Faces (https://github.com/stcarrez/ada-asf       1.5.0)
-* Ada ADO      (https://github.com/stcarrez/ada-ado           2.3.0)
-* XML/Ada      (https://libre.adacore.com/libre/tools/xmlada/  23)
-
 ## Version 1.5.0   - Under development
   - New option `-C <dir>` to change directory before executing a command
+  - Cleanup build environment to drop configure
 
 ## Version 1.4.0   - Aug 2023
 - Feature #22: Support to audit creation of new objects in the database
@@ -47,16 +38,9 @@ To build Dynamo, you will need:
 alr with dynamo
 ```
 
-## Build with configure
-
-Build with the following commands:
-```
-   ./configure
-   make
-```
 Install it with:
 ```
-   make install
+make install
 ```
 ## Documentation
 

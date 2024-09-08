@@ -2,6 +2,7 @@
 NAME=dynamo.cov
 lcov --quiet --base-directory . --directory . \
    --no-external \
+   --exclude '*/<unknown>' \
    --exclude '*/b__*.adb' \
    --exclude '*/samples/*' \
    --exclude '*/regtests*' \

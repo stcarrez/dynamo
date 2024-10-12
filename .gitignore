@@ -12,6 +12,7 @@ ChangeLog
 *.txt
 lib/
 obj/
+Makefile.conf
 dynamo-aunit.xml
 dynamo-tests.xml
 regtests/check_build/check_build.gpr

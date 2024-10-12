@@ -43,7 +43,11 @@ CP=cp
 build::	local-build build-tests
 
 local-build:
+ifeq ($(HAVE_ALIRE),yes)
 	$(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS)
+else
+	$(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS) -Pdynamo_tool.gpr
+endif
 
 build-tests:
 	cd regtests && $(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS)

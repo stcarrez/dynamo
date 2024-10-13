@@ -13,26 +13,25 @@ ado.database=mysql://localhost:3306/#{projectName}?user=#{projectName}
 #{'#'}ado.database=sqlite:///#{projectName}.db?synchronous=OFF&amp;encoding=UTF-8
 
 #{''}
-# Configuration for log4j
-log4j.rootCategory=DEBUG,console,result
+# Configuration for #{projectName}
+#{projectName}.rootCategory=DEBUG,console,result
 
-log4j.appender.console=Console
-log4j.appender.console.level=DEBUG
-log4j.appender.console.layout=level-message
+#{projectName}.appender.console=Console
+#{projectName}.appender.console.level=DEBUG
+#{projectName}.appender.console.layout=level-message
 
-log4j.appender.result=File
-log4j.appender.result.File=#{projectName}.log
+#{projectName}.appender.result=File
+#{projectName}.appender.result.File=#{projectName}.log
 #{''}
 
 # Logger configuration
-log4j.logger.log=WARN
+#{projectName}.logger.log=WARN
 
-log4j.logger.Util=WARN
+#{projectName}.logger.Util=WARN
 
-log4j.logger.ADO=INFO,result
-log4j.logger.ADO.Sessions=WARN
-log4j.logger.ADO.Statements=DEBUG
-#{''}
+#{projectName}.logger.ADO=INFO,result
+#{projectName}.logger.ADO.Sessions=WARN
+#{projectName}.logger.ADO.Statements=DEBUG
 #{''}
 
 </f:view>

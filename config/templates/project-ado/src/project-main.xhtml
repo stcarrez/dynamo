@@ -30,7 +30,7 @@ procedure #{fn:capitalize(projectName)}.Main is
    Factory : ADO.Sessions.Factory.Session_Factory;
    DB      : ADO.Sessions.Master_Session;
 begin
-   Util.Log.Loggers.Initialize ("#{projectName}.properties");
+   Util.Log.Loggers.Initialize ("#{projectName}.properties", "#{projectName}.");
 #{''}
    --  Initialize the database drivers.
    ADO.Drivers.Initialize ("#{projectName}.properties");

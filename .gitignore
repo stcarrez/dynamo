@@ -15,7 +15,6 @@ obj/
 Makefile.conf
 dynamo-aunit.xml
 dynamo-tests.xml
-regtests/check_build/check_build.gpr
 src/gen-configs.ads
 test-app/
 test-dist

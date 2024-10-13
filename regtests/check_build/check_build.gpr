@@ -1,8 +1,8 @@
-with "@UTIL_DIR@utilada_sys";
-with "@UTIL_DIR@utilada_unit";
-with "@EL_DIR@elada";
-with "@ASF_DIR@asf";
-with "@ADO_DIR@ado";
+with "utilada_sys";
+with "utilada_unit";
+with "elada";
+with "asf";
+with "ado";
 
 project Check_Build is
 

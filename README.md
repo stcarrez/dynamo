@@ -15,6 +15,7 @@ generation of a web application which uses the Ada Web Application framework
 (https://gitlab.com/stcarrez/ada-awa/).
 
 ## Version 1.5.0   - Under development
+  - Feature #30: Generate support for Alire
   - New option `-C <dir>` to change directory before executing a command
   - Cleanup build environment to drop configure
 

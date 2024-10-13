@@ -3,16 +3,16 @@
         xmlns:fn="http://java.sun.com/jsp/jstl/functions"
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
-        file="#{projectName}.gpr.in">
-with "@UTIL_DIR@config";
-with "@UTIL_DIR@utilada_sys";
+        file="#{projectName}.gpr">
+with "#{projectName}_config";
+with "utilada_sys";
 #{''}
 
-library project #{projectName} is
+library project #{fn:capitalize(projectName)} is
 #{''}
    Version := "@#{fn:toUpperCase(projectName)}_VERSION@";
    Library_Dir := "lib";
-   Library_Type : Config.Library_Type_Type := external ("#{fn:toUpperCase(projectName)}_LIBRARY_TYPE", "static");
+   Library_Type : #{fn:capitalize(projectName)}_Config.Library_Type_Type := external ("#{fn:toUpperCase(projectName)}_LIBRARY_TYPE", "static");
 #{''}
 
    for Library_Name use "#{projectName}";
@@ -25,15 +25,15 @@ library project #{projectName} is
    for Object_Dir use "obj/#{projectName}/" &amp; Project'Library_Kind;
 #{''}
 
-   package Builder renames Config.Builder;
-   package Compiler renames Config.Compiler;
-   package Ide      renames Config.Ide;
+   package Builder  renames #{fn:capitalize(projectName)}_Config.Builder;
+   package Compiler renames #{fn:capitalize(projectName)}_Config.Compiler;
+   package Ide      renames #{fn:capitalize(projectName)}_Config.Ide;
 #{''}
 
    package Binder is
-       for Default_Switches ("Ada") use Config.Binder'Default_Switches ("Ada") &amp; ("-a");
+       for Default_Switches ("Ada") use #{fn:capitalize(projectName)}_Config.Binder'Default_Switches ("Ada") &amp; ("-a");
    end Binder;
 #{''}
 
-end #{projectName};
+end #{fn:capitalize(projectName)};
 </f:view>

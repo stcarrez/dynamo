@@ -5,6 +5,10 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="Makefile"><![CDATA[
 NAME=#{projectName}
+VERSION=0.1.0
+#{''}
+
+MAKE_ARGS += -X#{fn:toUpperCase(projectName)}_BUILD=$(BUILD)
 #{''}
 
 -include Makefile.conf
@@ -21,8 +25,8 @@ include Makefile.defaults
 
 #{''}
 # Build executables for all mains defined by the project.
-build-test::	setup
-	# $(GNATMAKE) $(GPRFLAGS) -p -P$(NAME)_tests $(MAKE_ARGS)
+build-test::	lib-setup
+	$(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS)
 
 #{''}
 # Build and run the unit tests
@@ -30,13 +34,6 @@ test:	build
 	# bin/#{projectName}_harness -xml #{projectName}-aunit.xml
 
 #{''}
-install-samples:
-	$(MKDIR) -p $(samplesdir)/samples
-	cp -rp $(srcdir)/samples/*.ad[sb] $(samplesdir)/samples/
-	cp -p $(srcdir)/samples.gpr $(samplesdir)
-	cp -p $(srcdir)/config.gpr $(samplesdir)
-
-#{''}
-$(eval $(call ada_library,$(NAME)))
+$(eval $(call ada_library,$(NAME),.))
 ]]>
 </f:view>

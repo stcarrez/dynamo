@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-project -- Project creation command for dynamo
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2019 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -176,33 +176,8 @@ package body Gen.Commands.Project is
          end if;
 
          Generator.Save_Project;
-         declare
-            use type GNAT.OS_Lib.String_Access;
-
-            Path   : constant GNAT.OS_Lib.String_Access
-              := GNAT.OS_Lib.Locate_Exec_On_Path ("autoconf");
-            Args   : GNAT.OS_Lib.Argument_List (1 .. 0);
-            Status : Boolean;
-         begin
-            if Path = null then
-               Generator.Error ("The 'autoconf' tool was not found.  It is necessary to "
-                                & "generate the configure script.");
-               Generator.Error ("Install 'autoconf' or launch it manually.");
-            else
-               Ada.Directories.Set_Directory (Generator.Get_Result_Directory);
-               Log.Info ("Executing {0}", Path.all);
-               GNAT.OS_Lib.Spawn (Path.all, Args, Status);
-               if not Status then
-                  Generator.Error ("Execution of {0} failed", Path.all);
-               else
-                  Log.Info ("");
-                  Ada.Text_IO.Put_Line ("Your project is now created.");
-                  Ada.Text_IO.Put_Line ("Run the following commands to build it:");
-                  Ada.Text_IO.Put_Line ("  ./configure");
-                  Ada.Text_IO.Put_Line ("  make generate build");
-               end if;
-            end if;
-         end;
+         Ada.Text_IO.Put_Line ("Your project is now created.");
+         Ada.Text_IO.Put_Line ("  make generate build");
       end;
    end Execute;
 

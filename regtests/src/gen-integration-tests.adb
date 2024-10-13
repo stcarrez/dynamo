@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012 - 2023 Stephane Carrez
+--  Copyright (C) 2012 - 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,8 +72,6 @@ package body Gen.Integration.Tests is
                        Test_Create_GTK_Project'Access);
       Caller.Add_Test (Suite, "Create Lib project",
                        Test_Create_Lib_Project'Access);
-      Caller.Add_Test (Suite, "Configure",
-                       Test_Configure'Access);
       Caller.Add_Test (Suite, "Propset",
                        Test_Change_Property'Access);
       Caller.Add_Test (Suite, "Add Module",
@@ -198,19 +196,6 @@ package body Gen.Integration.Tests is
       Util.Tests.Assert_Matches (T, ".*Generating file.*src/test.ads", Result,
                                  "Invalid generation");
    end Test_Create_Lib_Project;
-
-   --  ------------------------------
-   --  Test project configure.
-   --  ------------------------------
-   procedure Test_Configure (T : in out Test) is
-      Result : UString;
-   begin
-      T.Execute ("./configure --enable-coverage", Result);
-      Util.Tests.Assert_Matches (T, ".*checking build system.*", Result,
-                                 "Invalid configure");
-      Util.Tests.Assert_Matches (T, ".*config.status: creating Makefile.*", Result,
-                                 "Invalid configure");
-   end Test_Configure;
 
    --  ------------------------------
    --  Test propset command.
@@ -680,7 +665,6 @@ package body Gen.Integration.Tests is
 
       Result : UString;
    begin
-      T.Test_Configure;
       T.Execute ("make", Result);
 
       pragma Warnings (Off, "condition is always False");

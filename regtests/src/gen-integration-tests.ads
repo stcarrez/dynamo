@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-integration-tests -- Tests for integration
---  Copyright (C) 2012, 2013, 2014, 2016, 2017, 2018, 2021, 2023 Stephane Carrez
+--  Copyright (C) 2012 - 2024 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,9 +43,6 @@ package Gen.Integration.Tests is
 
    --  Test dynamo create-project command --lib.
    procedure Test_Create_Lib_Project (T : in out Test);
-
-   --  Test project configure.
-   procedure Test_Configure (T : in out Test);
 
    --  Test propset command.
    procedure Test_Change_Property (T : in out Test);

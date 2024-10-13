@@ -19,7 +19,6 @@ with Ada.Directories;
 with Ada.Text_IO;
 with Gen.Artifacts;
 with GNAT.Command_Line;
-with GNAT.OS_Lib;
 
 with Util.Log.Loggers;
 with Util.Strings.Transforms;

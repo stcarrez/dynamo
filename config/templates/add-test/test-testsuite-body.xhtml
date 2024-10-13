@@ -4,27 +4,47 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
 	mode="once"
-        file="regtests/#{projectName}-testsuite.adb">-----------------------------------------------------------------------
+        file="regtests/src/#{projectName}-testsuite.adb">-----------------------------------------------------------------------
 --  #{projectName}-testsuite -- Testsuite for #{projectName}
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
-with ASF.Server.Tests;
+with AWA.Tests;
+with Servlet.Server;
+with Security.Auth.Fake;
 with #{fn:capitalize(projectName)}.Applications;
 package body #{fn:capitalize(projectName)}.Testsuite is
 #{''}
+   function OAuth_Provider_Factory (Name : in String) return Security.Auth.Manager_Access;
+#{''}
    Tests : aliased Util.Tests.Test_Suite;
+#{''}
+   function OAuth_Provider_Factory (Name : in String) return Security.Auth.Manager_Access is
+      pragma Unreferenced (Name);
+   begin
+      return new Security.Auth.Fake.Manager;
+   end OAuth_Provider_Factory;
 #{''}
    function Suite return Util.Tests.Access_Test_Suite is
    begin
+      Security.Auth.Set_Default_Factory (OAuth_Provider_Factory'Access);
       return Tests'Access;
    end Suite;
 #{''}
    procedure Initialize (Props : in Util.Properties.Manager) is
       App  : constant #{fn:capitalize(projectName)}.Applications.Application_Access := new #{fn:capitalize(projectName)}.Applications.Application;
    begin
+      Initialize (App.all'Access, Props, True);
+   end Initialize;
+#{''}
+   procedure Initialize (App         : in AWA.Applications.Application_Access;
+                         Props       : in Util.Properties.Manager;
+                         Add_Modules : in Boolean) is
+   begin
+      ADO.Drivers.Initialize;
+      AWA.Tests.Initialize (App, Props, Add_Modules);
       #{fn:capitalize(projectName)}.Applications.Initialize (App);
-      ASF.Server.Tests.Set_Context (App.all'Access);
+      Servlet.Server.Set_Context (Application.all'Access);
    end Initialize;
 #{''}
 end #{fn:capitalize(projectName)}.Testsuite;

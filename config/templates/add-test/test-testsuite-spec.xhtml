@@ -4,18 +4,24 @@
         xmlns:g="http://code.google.com/p/ada-ado/generator"
         xmlns:f="http://java.sun.com/jsf/core"
 	mode="once"
-        file="regtests/#{projectName}-testsuite.ads">-----------------------------------------------------------------------
+        file="regtests/src/#{projectName}-testsuite.ads">-----------------------------------------------------------------------
 --  #{projectName}-testsuite -- Testsuite for #{projectName}
 <ui:include src="../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
 #{''}
 with Util.Tests;
 with Util.Properties;
+with AWA.Applications;
 package #{fn:capitalize(projectName)}.Testsuite is
 #{''}
    function Suite return Util.Tests.Access_Test_Suite;
 #{''}
    procedure Initialize (Props : in Util.Properties.Manager);
+#{''}
+   --  Initialize the AWA test framework mockup.
+   procedure Initialize (App         : in AWA.Applications.Application_Access;
+                         Props       : in Util.Properties.Manager;
+                         Add_Modules : in Boolean);
 #{''}
 end #{fn:capitalize(projectName)}.Testsuite;
 </f:view>

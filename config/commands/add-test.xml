@@ -9,12 +9,12 @@
   generates the test harness, testsuite framework and a test case for the module.
   The following files are created:
   
-    <project>_tests.gpr.in
-    regtests/<project>_harness.adb
-    regtests/<project>-testsuite.ads
-    regtests/<project>-testsuite.adb
-    regtests/<project>-<module>-tests.ads
-    regtests/<project>-<module>-tests.adb
+    regtests/<project>_tests.gpr.in
+    regtests/src/<project>_harness.adb
+    regtests/src/<project>-testsuite.ads
+    regtests/src/<project>-testsuite.adb
+    regtests/src/<project>-<module>-tests.ads
+    regtests/src/<project>-<module>-tests.adb
 
   When a new test is added, the project testsuite (<project>-testsuite.adb) is updated
   to add the new tests in the testsuite (returned by the Suite function).
@@ -22,12 +22,13 @@
 ]]>      </help>
       <param optional='false' name='moduleName' arg='MODULE'/>
       <basedir></basedir>
+      <template>add-test/alire.toml.xhtml</template>
       <template>add-test/test-spec.xhtml</template>
       <template>add-test/test-body.xhtml</template>
       <template>add-test/test-testsuite-spec.xhtml</template>
       <template>add-test/test-testsuite-body.xhtml</template>
       <template>add-test/test-harness.xhtml</template>
-      <template>add-test/tests.gpr.in.xhtml</template>
+      <template>add-test/tests.gpr.xhtml</template>
       <patch optional='true'>
           <title>adding with clause for new test</title>
           <template>add-test/patch-testsuite-body-1.xhtml</template>

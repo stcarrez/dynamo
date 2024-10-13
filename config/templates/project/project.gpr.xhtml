@@ -1,0 +1,47 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        file="#{projectName}.gpr">
+with "#{projectName}_config";
+with "utilada_sys";
+with "elada";
+with "servletada";
+with "servletada_aws";
+with "ado";
+with "ado_all";
+with "awa";
+with "awa_workspaces";
+with "awa_mail";
+with "awa_comments";
+with "awa_blogs";
+with "awa_storages";
+with "awa_tags";
+with "awa_wikis";
+with "awa_counters";
+with "awa_images";
+with "awa_setup";
+#{''}
+
+project #{fn:capitalize(projectName)} is
+#{''}
+
+   Mains := ("#{projectName}-server.adb");
+
+   for Main use Mains;
+
+   for Source_Dirs use ("src", "src/model");
+
+   for Object_Dir use "./" &amp; #{fn:capitalize(projectName)}_Config'Object_Dir &amp; "/obj";
+   for Exec_Dir use "./" &amp; #{fn:capitalize(projectName)}_Config'Exec_Dir &amp; "/bin";
+#{''}
+
+   package Binder   renames #{fn:capitalize(projectName)}_Config.Binder;
+   package Builder  renames #{fn:capitalize(projectName)}_Config.Builder;
+   package Compiler renames #{fn:capitalize(projectName)}_Config.Compiler;
+   package Linker   renames #{fn:capitalize(projectName)}_Config.Linker;
+#{''}
+
+end #{fn:capitalize(projectName)};
+</f:view>

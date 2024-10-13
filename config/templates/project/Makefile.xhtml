@@ -5,7 +5,10 @@
         xmlns:f="http://java.sun.com/jsf/core"
         file="Makefile">
 NAME=#{projectName}
-GPRPATH=\${NAME}.gpr
+VERSION=0.1.0
+#{''}
+
+MAKE_ARGS += -X#{fn:toUpperCase(projectName)}_BUILD=$(BUILD)
 #{''}
 
 -include Makefile.conf
@@ -17,8 +20,6 @@ include Makefile.defaults
 PLUGINS=
 #{''}
 
-LIBNAME=lib\${NAME}
-
 #{''}
 # Model generation arguments with Dynamo
 # --package XXX.XXX.Models db uml/xxx.zargo
@@ -26,18 +27,17 @@ DYNAMO_ARGS=db
 
 #{''}
 
-ROOTDIR=.
-#{''}
-
 $(foreach PLUGIN,$(PLUGINS),$(eval include plugins/$(PLUGIN)/Makefile))
 #{''}
 
-build::
-	$(GNATMAKE) -m -p -P "$(GPRPATH)" $(MAKE_ARGS)
+build:: lib-setup
+	$(BUILD_COMMAND) $(GPRFLAGS) $(MAKE_ARGS)
 #{''}
 
 generate::
 	mkdir -p db
 	$(DYNAMO) generate $(DYNAMO_ARGS)
+
+lib-setup::
 
 </f:view>

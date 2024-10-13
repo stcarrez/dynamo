@@ -12,13 +12,13 @@ with Util.Commands;
 #{''}
 with Servlet.Server.Web;
 #{''}
-with AWA.Setup.Applications;
 with AWA.Commands.Drivers;
 with AWA.Commands.Start;
 with AWA.Commands.Setup;
 with AWA.Commands.Stop;
 with AWA.Commands.List;
 with AWA.Commands.Info;
+with AWA.Commands.Migrate;
 #{''}
 with ADO.Drivers;
 --  with ADO.Sqlite;
@@ -32,12 +32,26 @@ procedure #{fn:capitalize(projectName)}.Server is
      new AWA.Commands.Drivers (Driver_Name => "#{projectName}",
                                Container_Type => Servlet.Server.Web.AWS_Container);
 #{''}
-   package List_Command is new AWA.Commands.List (Server_Commands);
-   package Start_Command is new AWA.Commands.Start (Server_Commands);
-   package Stop_Command is new AWA.Commands.Stop (Server_Commands);
-   package Info_Command is new AWA.Commands.Info (Server_Commands);
-   package Setup_Command is new AWA.Commands.Setup (Start_Command);
+   package List_Command is
+     new AWA.Commands.List (Server_Commands);
+
+   package Info_Command is
+     new AWA.Commands.Info (Server_Commands);
+
+   package Start_Command is
+     new AWA.Commands.Start (Server_Commands);
+
+   package Stop_Command is
+     new AWA.Commands.Stop (Server_Commands);
+
+   package Setup_Command is
+     new AWA.Commands.Setup (Start_Command);
+
+   package Migrate_Command is
+     new AWA.Commands.Migrate (Server_Commands);
 #{''}
+   pragma Unreferenced (Setup_Command, List_Command, Info_Command, Start_Command,
+                        Stop_Command, Migrate_Command);
    Log       : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.Server");
 
    App       : constant #{fn:capitalize(projectName)}.Applications.Application_Access := new #{fn:capitalize(projectName)}.Applications.Application;
@@ -60,6 +74,6 @@ begin
 
 exception
    when E : others =>
-      Context.Print (E);
+      AWA.Commands.Print (Context, E);
 end #{fn:capitalize(projectName)}.Server;
 </f:view>

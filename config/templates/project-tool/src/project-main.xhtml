@@ -7,8 +7,6 @@
 --  #{fn:capitalize(projectName)}-main -- Main tool program
 <ui:include src="../../licenses/license-ada.xhtml"/>
 -----------------------------------------------------------------------
-with Ada.Exceptions;
-#{''}
 with Util.Log.loggers;
 #{''}
 procedure #{fn:capitalize(projectName)}.Main is
@@ -16,7 +14,11 @@ procedure #{fn:capitalize(projectName)}.Main is
    Log     : constant Util.Log.Loggers.Logger := Util.Log.Loggers.Create ("#{fn:capitalize(projectName)}.Main");
 #{''}
 begin
-   Util.Log.Loggers.Initialize ("#{projectName}.properties");
+   Util.Log.Loggers.Initialize ("#{projectName}.properties", "#{projectName}.");
+#{''}
+exception
+   when E : others =>
+      Log.Error ("Exception", E);
 #{''}
 end #{fn:capitalize(projectName)}.Main;
 </f:view>

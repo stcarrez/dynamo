@@ -1,0 +1,60 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+        xmlns:g="http://code.google.com/p/ada-ado/generator"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:c="http://java.sun.com/jstl/core"
+        file="alire.toml"><![CDATA[
+name = "#{projectName}"
+version = "0.1.0"
+description = "#{projectName}"
+authors = ["#{project.author_email}"]
+project-files = ["#{projectName}.gpr"]
+]]>
+<c:choose>
+        <c:when test="#{project.license eq 'gpl' or project.license eq 'gpl2'}">
+licenses = "GPL-2.0"
+        </c:when>
+
+        <c:when test="#{project.license eq 'gpl3'}">
+licenses = "GPL-3.0"
+        </c:when>
+
+        <c:when test="#{project.license eq 'apache'}">
+licenses = "Apache-2.0"
+        </c:when>
+
+        <c:when test="#{project.license eq 'mit'}">
+licenses = "MIT"
+        </c:when>
+
+        <c:when test="#{project.license eq 'bsd3'}">
+licenses = "BSD-3-Clause"
+        </c:when>
+
+        <c:when test="#{project.license eq 'proprietary'}">
+licenses = "Proprietary"
+        </c:when>
+
+        <c:otherwise>
+licenses = "Apache-2.0"
+        </c:otherwise>
+    </c:choose><![CDATA[
+#{''}
+
+[[depends-on]]
+utilada = "^2.7.0"
+gtkada = "^24.0"
+#{''}
+
+[gpr-externals]
+#{fn:toUpperCase(projectName)}_BUILD = ["distrib", "debug", "optimize", "profile", "coverage"]
+#{fn:toUpperCase(projectName)}_LIBRARY_TYPE = ["relocatable", "static", "static-pic"]
+#{''}
+
+[configuration]
+disabled = true
+#{''}
+
+]]>
+</f:view>

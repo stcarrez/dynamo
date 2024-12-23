@@ -1,7 +1,7 @@
 #!/bin/sh
 NAME=dynamo.cov
-lcov --quiet --base-directory . --directory . \
-   --no-external \
+alr exec -- lcov --quiet --base-directory . --directory . \
+   --no-external  --ignore-errors gcov,unused \
    --exclude '*/<unknown>' \
    --exclude '*/b__*.adb' \
    --exclude '*/samples/*' \

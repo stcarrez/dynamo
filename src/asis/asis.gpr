@@ -1,7 +1,0 @@
-project Asis is
-   for Languages use ("ada");
-   for Source_Dirs use ("../../include/asis");
-   for Library_Name use "asis";
-   for Library_Dir use  "../../lib/asis";
-   for Externally_Built use "true";
-end Asis;

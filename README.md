@@ -1,6 +1,7 @@
 # Dynamo Ada Generator
 
 [![Alire](https://img.shields.io/endpoint?url=https://alire.ada.dev/badges/dynamo.json)](https://alire.ada.dev/crates/dynamo)
+[![Ada 2012](https://img.shields.io/badge/2012-inside-green?logo=ada&logoColor=white&logoSize=auto)](https://adaic.org/ada-resources/standards/ada12)
 [![Build Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/build.json)](https://porion.vacs.fr/porion/projects/view/dynamo/summary)
 [![Test Status](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/tests.json)](https://porion.vacs.fr/porion/projects/view/dynamo/xunits)
 [![Coverage](https://img.shields.io/endpoint?url=https://porion.vacs.fr/porion/api/v1/projects/dynamo/badges/coverage.json)](https://porion.vacs.fr/porion/projects/view/dynamo/summary)

@@ -36,7 +36,7 @@ project Dynamo_Tool is
    package Linker renames Dynamo_Config.Linker;
 
    package Install is
-      for Artifacts (".") use ("config");
+      for Artifacts ("share/dynamo/base") use ("config/*");
    end Install;
 
 end Dynamo_Tool;

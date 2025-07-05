@@ -2,6 +2,7 @@ Version 1.5.0   - Under development
   - Feature #30: Generate support for Alire
   - New option `-C <dir>` to change directory before executing a command
   - Cleanup build environment to drop configure
+  - Fix #32: Generate single quote strings for SQLite schem
 
 Version 1.4.0   - Aug 2023
   - Feature #22: Support to audit creation of new objects in the database

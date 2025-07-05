@@ -1,12 +1,13 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012 - 2022 Stephane Carrez
+--  Copyright (C) 2012 - 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
 with Util.Files;
 with Util.Log.Loggers;
 with Util.Strings;
+with Util.Strings.Tokenizers;
 with Util.Strings.Vectors;
 with Util.Streams.Pipes;
 with Util.Streams.Texts;
@@ -57,24 +58,33 @@ package body Gen.Artifacts.Docs is
                       Context : in out Generator'Class) is
       pragma Unreferenced (Model, Project);
    begin
-      Handler.Generate (Context);
+      Handler.Generate ("src", Context);
    end Prepare;
 
    procedure Generate (Handler : in out Artifact;
+                       Paths   : in String;
                        Context : in out Generator'Class) is
+      procedure Scan (Path : in String;
+                      Done : out Boolean);
+
       Docs    : Doc_Maps.Map;
       Name    : constant String := (if Handler.Format = DOC_WIKI_GOOGLE
                                     then "generator.doc.xslt.command"
                                     else "generator.markdown.xslt.command");
       Command : constant String := Context.Get_Parameter (Name);
+
+      procedure Scan (Path : in String;
+                      Done : out Boolean) is
+      begin
+         Handler.Scan_Files (Path, Docs);
+         Done := False;
+      end Scan;
+
    begin
       Log.Info ("Using command: {0}", Command);
 
       Handler.Xslt_Command := To_UString (Command);
-      Handler.Scan_Files ("src", Docs);
-      Handler.Scan_Files ("config", Docs);
-      Handler.Scan_Files ("db", Docs);
-      Handler.Scan_Files ("plugins", Docs);
+      Util.Strings.Tokenizers.Iterate_Tokens (Paths, ";", Scan'Access);
       Handler.Generate (Docs, Context.Get_Result_Directory);
    end Generate;
 

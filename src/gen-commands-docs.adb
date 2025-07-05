@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-docs -- Extract and generate documentation for the project
---  Copyright (C) 2012, 2015, 2017, 2018, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2021, 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -65,7 +65,8 @@ package body Gen.Commands.Docs is
       end if;
       Doc.Set_Format (Fmt, Footer);
       Doc.Read_Links (Generator.Get_Project_Property ("links", "links.txt"));
-      Doc.Generate (Generator);
+      Doc.Generate (Generator.Get_Project_Property ("docs", "src;config;db;plugins"),
+                    Generator);
    end Execute;
 
    --  ------------------------------

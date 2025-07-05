@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012, 2015, 2017, 2018, 2019, 2020, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2015, 2017, 2018, 2019, 2020, 2021, 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -12,15 +12,7 @@ with Ada.Text_IO;
 with Gen.Model.Packages;
 private with Util.Strings.Maps;
 
---  with Asis;
---  with Asis.Text;
---  with Asis.Elements;
---  with Asis.Exceptions;
---  with Asis.Errors;
---  with Asis.Implementation;
---  with Asis.Elements;
---  with Asis.Declarations;
---  The <b>Gen.Artifacts.Docs</b> package is an artifact for the generation of
+--  The `Gen.Artifacts.Docs` package is an artifact for the generation of
 --  application documentation.  Its purpose is to scan the project source files
 --  and extract some interesting information for a developer's guide.  The artifact
 --  scans the Ada source files, the XML configuration files, the XHTML files.
@@ -81,6 +73,7 @@ package Gen.Artifacts.Docs is
                       Context : in out Generator'Class);
 
    procedure Generate (Handler : in out Artifact;
+                       Paths   : in String;
                        Context : in out Generator'Class);
 
    --  Set the output document format to generate.

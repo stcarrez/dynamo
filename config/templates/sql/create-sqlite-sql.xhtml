@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS #{table.table} (
 </h:list>
 <h:panelGroup rendered="#{not empty model.tables}">
   <h:list value="#{model.tables}" var="table">
-INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("#{table.table}");
+INSERT OR IGNORE INTO ado_entity_type (name) VALUES ('#{table.table}');
 </h:list>
 </h:panelGroup>
 <h:panelGroup rendered="#{not empty model.tables and project.skip_awa_audit_field ne 'yes'}">
@@ -31,10 +31,10 @@ INSERT OR IGNORE INTO ado_entity_type (name) VALUES ("#{table.table}");
     <h:list value="#{table.members}" var="column">
       <h:panelGroup rendered="#{column.isAuditable}">
 INSERT OR IGNORE INTO awa_audit_field (entity_type, name)
-  VALUES ((SELECT id FROM ado_entity_type WHERE name = "#{table.table}"), "#{column.name}");
+  VALUES ((SELECT id FROM ado_entity_type WHERE name = '#{table.table}'), '#{column.name}');
       </h:panelGroup>
     </h:list>
 </h:list>
 </h:panelGroup>
-INSERT OR IGNORE INTO ado_version (name, version) VALUES ("#{projectName}", #{project.modelVersion});
+INSERT OR IGNORE INTO ado_version (name, version) VALUES ('#{projectName}', #{project.modelVersion});
 </f:view>

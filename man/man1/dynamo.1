@@ -1,6 +1,6 @@
 .\"
 .\"
-.TH DYNAMO 1 "Aug 27, 2022" "Ada Web Application"
+.TH DYNAMO 1 "Jul 5, 2025" "Ada Web Application"
 .SH NAME
 dynamo - Ada Application Generator
 .SH SYNOPSIS
@@ -371,7 +371,10 @@ project documentation.  The Ada specification files are scanned and the
 package specification header comment is used as the main structure for
 the project documentation.  The XML files are also scanned and the documentation
 is extracted from these files.  It can be merged together with other
-documentation to build up the final project user documentation.
+documentation to build up the final project user documentation.  The command
+scans a set of pre-defined directories which can be configured by using the
+.I docs
+configuration property.
 .\"
 .PP
 The
@@ -547,6 +550,14 @@ This must be a positive integer that is incremented manually each time
 the database schema is changed.  It is used for the generation of
 SQL schema to insert the database schema version associated with
 the current project.
+.\"
+.SS docs
+The list of directories to scan to extract and generate the documentation.
+Each directory must be relative to the root of the project and should
+be separated by a
+.BR `;` .
+The default value is:
+.BR `src;config;db;plugins` .
 .\"
 .SS no_properties
 This boolean property controls the generation of project properties files

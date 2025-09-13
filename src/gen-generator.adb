@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-generator -- Code Generator
---  Copyright (C) 2009 - 2022 Stephane Carrez
+--  Copyright (C) 2009 - 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -965,6 +965,13 @@ package body Gen.Generator is
          H.Distrib.Prepare (Model => H.Model, Project => H.Project, Context => H);
       end if;
       H.Model.Validate (H);
+      if H.Yaml.Is_Initialized then
+         Log.Debug ("Saving the model in YAML");
+
+         H.Yaml.Save_Model (Path    => "model.yaml",
+                            Model   => H.Model,
+                            Context => H);
+      end if;
    end Prepare;
 
    --  ------------------------------

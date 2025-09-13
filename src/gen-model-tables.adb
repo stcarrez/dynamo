@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-tables -- Database table model representation
---  Copyright (C) 2009 - 2022 Stephane Carrez
+--  Copyright (C) 2009 - 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -497,12 +497,12 @@ package body Gen.Model.Tables is
          C := Column_List.Element (Iter);
          C.Prepare;
          if C.Is_Key then
-            Log.Info ("Found key {0}", C.Get_Name);
+            Log.Info ("Found key {0}.{1}", O.Get_Name, C.Get_Name);
             O.Key_Count := O.Key_Count + 1;
             O.Id_Column := C;
          end if;
          if C.Is_Version then
-            Log.Info ("Found version column {0}", C.Get_Name);
+            Log.Info ("Found version column {0}.{1}", O.Get_Name, C.Get_Name);
             O.Version_Column := C;
 
             --  For the <<Version>> columns, do not allow users to modify them.

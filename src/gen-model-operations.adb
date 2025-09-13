@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012, 2016, 2017, 2018, 2021, 2022 Stephane Carrez
+--  Copyright (C) 2012, 2016, 2017, 2018, 2021, 2022, 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -75,6 +75,12 @@ package body Gen.Model.Operations is
    begin
       return From.Kind;
    end Get_Type;
+
+   procedure Set_Type (Into : in out Operation_Definition;
+                       Kind : in Operation_Type) is
+   begin
+      Into.Kind := Kind;
+   end Set_Type;
 
    --  ------------------------------
    --  Create an operation with the given name.

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009 - 2022 Stephane Carrez
+--  Copyright (C) 2009 - 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -208,6 +208,9 @@ package body Gen.Model.Packages is
       Bean.Package_Def.Beans.Append (Bean.all'Access);
       Bean.Package_Def.Types.Include (Bean.Name, Bean.all'Access);
       O.Queries.Append (Bean.all'Access);
+      if O.Is_Generation_Enabled (To_String (Bean.Pkg_Name)) then
+         O.Beans.Append (Bean.all'Access);
+      end if;
    end Register_Bean;
 
    --  ------------------------------
@@ -290,6 +293,24 @@ package body Gen.Model.Packages is
    begin
       Model.Tables.Iterate (Process_Definition'Access);
    end Iterate_Tables;
+
+   --  ------------------------------
+   --  Iterate over the model beans.
+   --  ------------------------------
+   procedure Iterate_Beans (Model   : in Model_Definition;
+                            Process : not null access
+                              procedure (Item : in out Beans.Bean_Definition)) is
+
+      procedure Process_Definition (Item : in Definition_Access);
+
+      procedure Process_Definition (Item : in Definition_Access) is
+      begin
+         Process (Beans.Bean_Definition (Item.all));
+      end Process_Definition;
+
+   begin
+      Model.Beans.Iterate (Process_Definition'Access);
+   end Iterate_Beans;
 
    --  ------------------------------
    --  Iterate over the model enums.

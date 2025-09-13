@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-operations -- Operation declarations
---  Copyright (C) 2012, 2016, 2017, 2021 Stephane Carrez
+--  Copyright (C) 2012, 2016, 2017, 2021, 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -44,6 +44,9 @@ package Gen.Model.Operations is
 
    --  Get the operation type.
    function Get_Type (From : in Operation_Definition) return Operation_Type;
+
+   procedure Set_Type (Into : in out Operation_Definition;
+                       Kind : in Operation_Type);
 
    --  Create an operation with the given name.
    function Create_Operation (Name : in UString) return Operation_Definition_Access;

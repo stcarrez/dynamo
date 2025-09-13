@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-packages -- Packages holding model, query representation
---  Copyright (C) 2009 - 2022 Stephane Carrez
+--  Copyright (C) 2009 - 2025 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -155,6 +155,11 @@ package Gen.Model.Packages is
    procedure Iterate_Tables (Model   : in Model_Definition;
                              Process : not null access
                                procedure (Item : in out Tables.Table_Definition));
+
+   --  Iterate over the model beans.
+   procedure Iterate_Beans (Model   : in Model_Definition;
+                            Process : not null access
+                              procedure (Item : in out Beans.Bean_Definition));
 
    --  Iterate over the model enums.
    procedure Iterate_Enums (Model   : in Model_Definition;

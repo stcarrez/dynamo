@@ -15,7 +15,6 @@
         <from>Nullable_DateTime</from>
         <from>Nullable_Timestamp</from>
         <from>Time</from>
-        <from>date</from>
         <from>DateTime</from>
         <from>dateTime</from>
         <from>PrimitiveTypes::Time</from>
@@ -26,6 +25,7 @@
     </mapping>
     <mapping type='date'>
         <from>Nullable_Date</from>
+        <from>date</from>
         <from>Date</from>
         <from>PrimitiveTypes::Date</from>
         <from>datatype::Date</from>

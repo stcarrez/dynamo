@@ -1,6 +1,7 @@
 Version 1.5.0   - Under development
   - Feature #30: Generate support for Alire
   - Feature #33: Allow to customize the list of directories to scan and extract the documentation
+  - Feature #34: Add support for beans in the YAML model description
   - New option `-C <dir>` to change directory before executing a command
   - Cleanup build environment to drop configure
   - Fix #32: Generate single quote strings for SQLite schem

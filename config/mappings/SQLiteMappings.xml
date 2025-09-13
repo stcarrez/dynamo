@@ -17,6 +17,7 @@
         <from>Time</from>
         <from>date</from>
         <from>DateTime</from>
+        <from>dateTime</from>
         <from>PrimitiveTypes::Time</from>
         <from>PrimitiveTypes::DateTime</from>
         <from>datatype::Time</from>
@@ -32,6 +33,7 @@
     </mapping>
     <mapping type='date'>
         <from>Timestamp</from>
+        <from>timestamp</from>
         <from>datatype::Timestamp</from>
         <from>datatype::DateTime</from>
         <to>TIMESTAMP</to>

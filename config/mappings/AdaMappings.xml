@@ -10,10 +10,13 @@
 <mappings name="Ada05">
     <mapping type="date">
         <from>Time</from>
+        <from>time</from>
         <from>Date</from>
         <from>date</from>
         <from>DateTime</from>
+        <from>dateTime</from>
         <from>Timestamp</from>
+        <from>timestamp</from>
         <from>PrimitiveTypes::Time</from>
         <from>PrimitiveTypes::Date</from>
         <from>PrimitiveTypes::DateTime</from>
@@ -25,10 +28,14 @@
         <to>Ada.Calendar.Time</to>
     </mapping>
     <mapping type="date" allow-null='true'>
+        <from>Time</from>
+        <from>time</from>
         <from>date</from>
         <from>Date</from>
         <from>DateTime</from>
+        <from>dateTime</from>
         <from>Timestamp</from>
+        <from>timestamp</from>
         <from>Nullable_Time</from>
         <from>Nullable_Date</from>
         <from>Nullable_DateTime</from>

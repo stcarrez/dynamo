@@ -21,7 +21,7 @@ generation of a web application which uses the Ada Web Application framework
   - Feature #34: Add support for beans in the YAML model description
   - New option `-C <dir>` to change directory before executing a command
   - Cleanup build environment to drop configure
-  - Fix #32: Generate single quote strings for SQLite schem
+  - Fix #32: Generate single quote strings for SQLite schema
 
 ## Version 1.4.0   - Aug 2023
 - Feature #22: Support to audit creation of new objects in the database

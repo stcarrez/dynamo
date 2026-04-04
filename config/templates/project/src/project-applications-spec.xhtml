@@ -32,6 +32,7 @@ with AWA.Wikis.Modules;
 with AWA.Wikis.Previews;
 with AWA.Images.Modules;
 with AWA.Jobs.Modules;
+with AWA.SEO.Modules;
 with AWA.Counters.Modules;
 with AWA.Converters.Dates;
 package #{fn:capitalize(projectName)}.Applications is
@@ -85,6 +86,7 @@ private
       --  The application modules.
       User_Module        : aliased AWA.Users.Modules.User_Module;
       Workspace_Module   : aliased AWA.Workspaces.Modules.Workspace_Module;
+      Seo_Module         : aliased AWA.SEO.Modules.SEO_Module;
       Blog_Module        : aliased AWA.Blogs.Modules.Blog_Module;
       Mail_Module        : aliased AWA.Mail.Modules.Mail_Module;
       Comment_Module     : aliased AWA.Comments.Modules.Comment_Module;

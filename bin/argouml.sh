@@ -47,5 +47,18 @@ CONFIG="-Dargouml.profiles.directory=$UML_PATH -Dlog4j.configuration=org/argouml
 
 CONFIG="$CONFIG -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.plaf.metal.windowTitleFont=Sans-17 -Dswing.plaf.metal.systemTextFont=Sans-17 -Dswing.plaf.metal.menuTextFont=Sans-17 -Dswing.plaf.metal.controlFont=Sans-24 -Dswing.plaf.metal.userFont=Sans-24 -Dawt.useSystemAAFontSettings=on -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.plaf.metal.userTextFont=Sans-24 -Dswing.plaf.metal.subTextFont=Sans-24"
 
-exec java -Xms64m -Xmx512m $CONFIG -jar $JAR "$@"
+JVM_VERSION=`java -version 2>&1 | grep version`
+case $JVM_VERSION in
+    *17*)
+        JAVA=java
+        ;;
+    *)
+        JAVA=/usr/lib/jvm/java-17-openjdk-amd64/bin/java
+        echo "Java version $JVM_VERSION is not supported correctly by ArgoUML"
+        echo "Switching to $JAVA"
+        ;;
+esac
+
+exec java -Xms64m -Xmx512m $CONFIG -jar $JAR "$@" 2>/dev/null
+
 

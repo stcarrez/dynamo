@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-model-projects -- Projects meta data
---  Copyright (C) 2011 - 2022 Stephane Carrez
+--  Copyright (C) 2011 - 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -179,6 +179,7 @@ package body Gen.Model.Projects is
                end if;
             end;
          end if;
+         Log.Debug ("Dynamo file {0} not found in {1}", Name, Install_Dir);
 
       else
          declare

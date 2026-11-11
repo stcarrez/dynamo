@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-commands-page -- Page creation command for dynamo
---  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2022 Stephane Carrez
+--  Copyright (C) 2011, 2012, 2013, 2014, 2017, 2018, 2019, 2022, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -82,7 +82,7 @@ package body Gen.Commands.Page is
       use Ada.Directories;
 
       Path    : constant String := Generator.Get_Result_Directory & "web/WEB-INF/layouts";
-      Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
+      Filter  : constant Filter_Type := [Ordinary_File => True, others => False];
       Search  : Search_Type;
       Ent     : Directory_Entry_Type;
    begin

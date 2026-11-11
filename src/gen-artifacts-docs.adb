@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-docs -- Artifact for documentation
---  Copyright (C) 2012 - 2025 Stephane Carrez
+--  Copyright (C) 2012 - 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -163,7 +163,8 @@ package body Gen.Artifacts.Docs is
             Into.Lines (L_INCLUDE).Insert (Before => Position,
                                            New_Item => (Len => 0,
                                                         Kind => L_TEXT,
-                                                        Content => ""));
+                                                        Content => ""),
+                                           Count => 1);
          end if;
       end Do_Include;
 
@@ -344,12 +345,12 @@ package body Gen.Artifacts.Docs is
                          Docs    : in out Doc_Maps.Map) is
       use Ada.Directories;
 
-      File_Filter  : constant Filter_Type := (Ordinary_File => True,
+      File_Filter  : constant Filter_Type := [Ordinary_File => True,
                                               Directory     => False,
-                                              others        => False);
-      Dir_Filter  : constant Filter_Type := (Ordinary_File => False,
+                                              others        => False];
+      Dir_Filter  : constant Filter_Type := [Ordinary_File => False,
                                              Directory     => True,
-                                             others        => False);
+                                             others        => False];
       Ent     : Ada.Directories.Directory_Entry_Type;
       Search  : Search_Type;
 
@@ -520,9 +521,9 @@ package body Gen.Artifacts.Docs is
                                Pattern : in String) is
          use Ada.Directories;
 
-         File_Filter  : constant Filter_Type := (Ordinary_File => True,
+         File_Filter  : constant Filter_Type := [Ordinary_File => True,
                                                  Directory     => False,
-                                                 others        => False);
+                                                 others        => False];
          Ent     : Ada.Directories.Directory_Entry_Type;
          Search  : Search_Type;
          Files   : Gen.Utils.String_Set.Set;

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-distribs -- Artifact for distributions
---  Copyright (C) 2012, 2013, 2015, 2020, 2021, 2022 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2015, 2020, 2021, 2022, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -360,9 +360,9 @@ package body Gen.Artifacts.Distribs is
 
       Full_Path : constant String := Util.Files.Compose (Path, Rel_Path);
 
-      Filter  : constant Filter_Type := (Ordinary_File => True,
+      Filter  : constant Filter_Type := [Ordinary_File => True,
                                          Directory     => True,
-                                         others        => False);
+                                         others        => False];
       Ent     : Ada.Directories.Directory_Entry_Type;
       Search  : Search_Type;
    begin

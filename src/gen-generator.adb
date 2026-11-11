@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-generator -- Code Generator
---  Copyright (C) 2009 - 2025 Stephane Carrez
+--  Copyright (C) 2009 - 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -214,7 +214,7 @@ package body Gen.Generator is
    --  ------------------------------
    function Indent (Value : UBO.Object) return UBO.Object is
       S      : constant String := UBO.To_String (Value);
-      Result : constant String (S'Range) := (others => ' ');
+      Result : constant String (S'Range) := [others => ' '];
    begin
       return UBO.To_Object (Result);
    end Indent;
@@ -861,7 +861,7 @@ package body Gen.Generator is
       use Ada.Directories;
       Path    : constant String := Dirname;
       Name    : constant String := Ada.Directories.Base_Name (Path);
-      Filter  : constant Filter_Type := (Ordinary_File => True, others => False);
+      Filter  : constant Filter_Type := [Ordinary_File => True, others => False];
       Search  : Search_Type;
       Ent     : Directory_Entry_Type;
       Files   : Util.Strings.Vectors.Vector;
@@ -1183,8 +1183,8 @@ package body Gen.Generator is
       use Ada.Directories;
 
       Search     : Search_Type;
-      Filter     : constant Filter_Type := (Ordinary_File => True, others => False);
-      Dir_Filter : constant Filter_Type := (Directory => True, others => False);
+      Filter     : constant Filter_Type := [Ordinary_File => True, others => False];
+      Dir_Filter : constant Filter_Type := [Directory => True, others => False];
       Ent        : Directory_Entry_Type;
       Dir        : constant String := H.Conf.Get (ASF.Applications.VIEW_DIR);
       Path       : constant String := Util.Files.Compose (Dir, Name);

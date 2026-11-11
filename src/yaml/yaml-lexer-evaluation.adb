@@ -180,7 +180,7 @@ package body Yaml.Lexer.Evaluation is
             if Newlines = 1 then
                Target.Append (' ');
             else
-               Target.Append ((1 .. Newlines - 1 => Line_Feed));
+               Target.Append ([1 .. Newlines - 1 => Line_Feed]);
             end if;
          end;
       end loop Multiline_Loop;
@@ -232,7 +232,7 @@ package body Yaml.Lexer.Evaluation is
       elsif Newlines = 1 then
          Target.Append (' ');
       else
-         Target.Append ((1 .. Newlines - 1 => Line_Feed));
+         Target.Append ([1 .. Newlines - 1 => Line_Feed]);
       end if;
    end Process_Quoted_Whitespace;
 
@@ -492,7 +492,7 @@ package body Yaml.Lexer.Evaluation is
             end case;
          end loop;
          if Separation_Lines > 0 then
-            Target.Append ((1 .. Separation_Lines => Line_Feed));
+            Target.Append ([1 .. Separation_Lines => Line_Feed]);
          end if;
       end;
 
@@ -541,11 +541,11 @@ package body Yaml.Lexer.Evaluation is
 
          --  line folding
          if T.Kind = Literal_Scalar then
-            Target.Append ((1 .. Separation_Lines  => Line_Feed));
+            Target.Append ([1 .. Separation_Lines  => Line_Feed]);
          elsif Separation_Lines = 1 then
             Target.Append (' ');
          else
-            Target.Append ((1 .. Separation_Lines - 1 => Line_Feed));
+            Target.Append ([1 .. Separation_Lines - 1 => Line_Feed]);
          end if;
       end loop Block_Content;
 
@@ -591,7 +591,7 @@ package body Yaml.Lexer.Evaluation is
             if Target.Length > 0 then
                Target.Append (Line_Feed);
             end if;
-         when Keep => Target.Append ((1 .. Separation_Lines => Line_Feed));
+         when Keep => Target.Append ([1 .. Separation_Lines => Line_Feed]);
       end case;
 
       L.Value := Target.Lock;

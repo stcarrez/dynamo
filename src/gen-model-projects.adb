@@ -755,7 +755,7 @@ package body Gen.Model.Projects is
    procedure Read_Modules (Project : in out Project_Definition) is
       use Ada.Directories;
 
-      Dir_Filter : constant Filter_Type := (Directory => True, others => False);
+      Dir_Filter : constant Filter_Type := [Directory => True, others => False];
       Module_Dir : constant String := Gen.Utils.Absolute_Path (Project.Get_Module_Dir);
       Ent        : Directory_Entry_Type;
       Search     : Search_Type;

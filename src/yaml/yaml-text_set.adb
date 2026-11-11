@@ -53,7 +53,7 @@ package body Yaml.Text_Set is
    begin
       if Object.Count = Object.Elements'Length / 2 then
          Object.Elements := new Holder_Array (0 .. Object.Count * 4 - 1);
-         Object.Elements.all := (others => (Hash => 0, others => <>));
+         Object.Elements.all := [others => (Hash => 0, others => <>)];
          for E of Old_Elements.all loop
             if E.Hash /= 0 then
                Raw_Set (Object, E.Hash, To_String (E.Key)).all := E;
@@ -130,7 +130,7 @@ package body Yaml.Text_Set is
 
    procedure Clear (Object : in out Reference) is
    begin
-      Object.Elements.all := (others => (Hash => 0, others => <>));
+      Object.Elements.all := [others => (Hash => 0, others => <>)];
       Object.Count := 0;
    end Clear;
 

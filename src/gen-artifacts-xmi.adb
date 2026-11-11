@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  gen-artifacts-xmi -- UML-XMI artifact for Code Generator
---  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2018, 2021, 2022 Stephane Carrez
+--  Copyright (C) 2012, 2013, 2014, 2015, 2016, 2018, 2021, 2022, 2026 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --  SPDX-License-Identifier: Apache-2.0
 -----------------------------------------------------------------------
@@ -1057,8 +1057,8 @@ package body Gen.Artifacts.XMI is
          Count : constant Natural := Natural (Associations.Length);
 
          type Assoc_Array is array (Positive range 1 .. Count) of Model_Element_Access;
-         Ordered_List : Assoc_Array := (others => null);
-         Remain_List  : Assoc_Array := (others => null);
+         Ordered_List : Assoc_Array := [others => null];
+         Remain_List  : Assoc_Array := [others => null];
          Last  : Natural := 0;
          First : Natural := 0;
       begin

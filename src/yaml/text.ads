@@ -116,7 +116,7 @@ private
    type Pool_Data is record
       Refcount : Refcount_Type := 1;
       Chunks : Chunk_Array;
-      Usage  : Usage_Array := (1 => 1, others => 0);
+      Usage  : Usage_Array := [1 => 1, others => 0];
       Cur    : Chunk_Index_Type := 1;
       Pos    : Pool_Offset;
    end record;

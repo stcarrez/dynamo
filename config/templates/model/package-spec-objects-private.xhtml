@@ -26,10 +26,10 @@
    #{fn:toUpperCase(table.type)}_AUDIT_DEF : aliased constant ADO.Audits.Auditable_Mapping :=
      (Count    => #{table.auditables.size},
       Of_Class => #{fn:toUpperCase(table.type)}_DEF'Access,
-      Members  => (
+      Members  => [
       <h:list value="#{table.auditables}" var="column">
          #{column.rowIndex} =&gt; #{column.index}<h:panelGroup rendered="#{column.rowIndex lt table.auditables.size}">,
-</h:panelGroup></h:list>)
+</h:panelGroup></h:list>]
      );
    #{fn:toUpperCase(table.type)}_AUDIT_TABLE : constant ADO.Audits.Auditable_Mapping_Access
       := #{fn:toUpperCase(table.type)}_AUDIT_DEF'Access;
